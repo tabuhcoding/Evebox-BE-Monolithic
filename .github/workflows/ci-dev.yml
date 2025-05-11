@@ -46,6 +46,9 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
+      - name: Debug token
+        run: echo "${{ secrets.GH_PAT }}" | head -c 5
+
       - name: Fetch and reset main-promotion
         run: |
           git config user.name "github-actions[bot]"
@@ -53,6 +56,9 @@ jobs:
           git fetch origin main-promotion:main-promotion || echo "main-promotion does not exist yet"
           git checkout -B main-promotion
           git reset --hard dev
+
+      - name: Debug token
+        run: echo "${{ secrets.GH_PAT }}" | head -c 5
 
       - name: Push to main-promotion
         run: |

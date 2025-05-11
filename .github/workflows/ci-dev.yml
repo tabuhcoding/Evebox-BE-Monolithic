@@ -46,7 +46,7 @@ jobs:
         with:
           token: ${{ secrets.GH_PAT }} # ✅ Dùng PAT nếu bạn muốn push được PR
           base: main
-          branch: auto/promote-dev-to-main
+          branch: dev
           title: '[AUTO-PR] Promote from dev to main'
           body: '✅ Automated PR from dev merge. Please review.'
           commit-message: 'chore: promote dev to main'

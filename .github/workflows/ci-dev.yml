@@ -36,36 +36,23 @@ jobs:
     if: github.event.pull_request.merged == true
 
     steps:
-      - name: Checkout dev
+      - name: Checkout code
         uses: actions/checkout@v4
         with:
           ref: dev
 
-      - name: Configure Git
+      - name: Set up Git
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Fetch and reset main-promotion
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git fetch origin main-promotion:main-promotion || echo "main-promotion does not exist yet"
-          git checkout -B main-promotion
-          git reset --hard dev
-
-      - name: Push to main-promotion
-        run: |
-          git config --global credential.helper ""
-          git remote set-url origin https://${{ secrets.GH_PAT }}@github.com/${{ github.repository }}
-          git push origin main-promotion --force
-
-      - name: Create PR to main
+      - name: Create PR to main from main-promotion
         uses: peter-evans/create-pull-request@v6
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          branch: main-promotion
+          token: ${{ secrets.GH_PAT }}  # dùng đúng PAT bạn tạo
           base: main
-          title: '[AUTO-PR] Promote from dev to main-promotion'
-          body: '✅ Automated PR from dev merge. Please review.'
-          commit-message: 'chore: promote dev to main-promotion'
+          branch: main-promotion
+          commit-message: "chore: promote dev to main-promotion"
+          title: "[AUTO-PR] Promote from dev"
+          body: "✅ Tự động tạo PR từ nhánh dev lên main thông qua main-promotion"
+          push-to-fork: false

@@ -1,12 +1,15 @@
-name: CI on PR to Dev
+name: CI & Promote to Main-Promotion
 
 on:
   pull_request:
     branches: [dev]
+    types: [closed]
 
 jobs:
   build-and-test:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
@@ -26,3 +29,36 @@ jobs:
 
       - name: Build
         run: npm run build
+
+  promote:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+
+    steps:
+      - name: Checkout dev
+        uses: actions/checkout@v4
+        with:
+          ref: dev
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Fetch and reset main-promotion
+        run: |
+          git fetch origin main-promotion:main-promotion || echo "main-promotion does not exist yet"
+          git checkout -B main-promotion
+          git reset --hard dev
+          git push origin main-promotion --force
+
+      - name: Create PR to main
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: main-promotion
+          base: main
+          title: '[AUTO-PR] Promote from dev to main-promotion'
+          body: '✅ Automated PR from dev merge. Please review.'
+          commit-message: 'chore: promote dev to main-promotion'

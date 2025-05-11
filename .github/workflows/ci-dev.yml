@@ -48,10 +48,17 @@ jobs:
 
       - name: Fetch and reset main-promotion
         run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
           git fetch origin main-promotion:main-promotion || echo "main-promotion does not exist yet"
           git checkout -B main-promotion
           git reset --hard dev
-          git push https://x-access-token:${{ secrets.GH_PAT }}@github.com/${{ github.repository }} main-promotion --force
+
+      - name: Push to main-promotion
+        run: |
+          git remote set-url origin https://x-access-token:${{ secrets.GH_PAT }}@github.com/${{ github.repository }}
+          git push origin main-promotion --force
+
 
 
       - name: Create PR to main

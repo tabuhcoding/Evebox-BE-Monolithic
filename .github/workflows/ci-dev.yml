@@ -44,10 +44,10 @@ jobs:
       - name: Create PR to main
         uses: peter-evans/create-pull-request@v6
         with:
-          token: ${{ secrets.GH_PAT }} # ✅ Dùng PAT nếu bạn muốn push được PR
-          base: main
-          branch: dev
+          token: ${{ secrets.GH_PAT }} # PAT phải có quyền 'repo'
+          base: main                     # <-- Mục tiêu là merge vào main
+          branch: auto/promote-dev-to-main # <-- Nhánh tạm thời tạo ra từ dev
           title: '[AUTO-PR] Promote from dev to main'
           body: '✅ Automated PR from dev merge. Please review.'
           commit-message: 'chore: promote dev to main'
-          delete-branch: true
+          delete-branch: true            # Xóa nhánh `auto/promote-dev-to-main` sau khi PR merge

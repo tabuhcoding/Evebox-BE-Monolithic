@@ -40,7 +40,10 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: dev
-          fetch-depth: 0  # Lấy toàn bộ lịch sử để tạo PR chính xác
+          fetch-depth: 0  # Đảm bảo đầy đủ lịch sử
+
+      - name: Fetch main branch
+        run: git fetch origin main:main  # <-- Đây là phần quan trọng!
 
       - name: Show git log (debug)
         run: git log --oneline --graph --decorate --all
@@ -48,7 +51,7 @@ jobs:
       - name: Create PR to main
         uses: peter-evans/create-pull-request@v6
         with:
-          token: ${{ secrets.GH_PAT }} # PAT phải có quyền 'repo'
+          token: ${{ secrets.GH_PAT }}
           base: main
           branch: auto/promote-dev-to-main
           title: '[AUTO-PR] Promote from dev to main'

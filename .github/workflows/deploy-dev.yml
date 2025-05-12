@@ -1,0 +1,32 @@
+name: Docker Push on Promote from Dev
+
+on:
+  pull_request:
+    branches: [dev]
+    types: [closed]
+
+jobs:
+  docker-push:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Log in to Azure Container Registry
+        run: az acr login --name eveboxregistry
+
+      - name: Build Docker image
+        run: docker build --no-cache -t evebox-monolithic-api .
+
+      - name: Tag image
+        run: docker tag evebox-monolithic-api eveboxregistry.azurecr.io/evebox-monolithic-api:latest
+
+      - name: Push image
+        run: docker push eveboxregistry.azurecr.io/evebox-monolithic-api:latest

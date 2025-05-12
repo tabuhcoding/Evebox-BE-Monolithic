@@ -30,19 +30,19 @@ jobs:
       - name: Run build
         run: npm run build
 
-  notify:
-    needs: build-and-test
-    if: always()  # chạy bất kể test thành công hay thất bại
-    runs-on: ubuntu-latest
+  # notify:
+  #   needs: build-and-test
+  #   if: always()  # chạy bất kể test thành công hay thất bại
+  #   runs-on: ubuntu-latest
 
-    steps:
-      - name: Comment build result on PR
-        uses: peter-evans/create-or-update-comment@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          issue-number: ${{ github.event.pull_request.number }}
-          body: |
-            🧪 **CI Result**:
-            - Status: ${{ needs.build-and-test.result }}
+  #   steps:
+  #     - name: Comment build result on PR
+  #       uses: peter-evans/create-or-update-comment@v4
+  #       with:
+  #         token: ${{ secrets.GITHUB_TOKEN }}
+  #         issue-number: ${{ github.event.pull_request.number }}
+  #         body: |
+  #           🧪 **CI Result**:
+  #           - Status: ${{ needs.build-and-test.result }}
 
-            Commit: `${{ github.event.pull_request.head.sha }}`
+  #           Commit: `${{ github.event.pull_request.head.sha }}`

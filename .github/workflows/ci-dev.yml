@@ -36,29 +36,23 @@ jobs:
     if: github.event.pull_request.merged == true
 
     steps:
-      - name: Checkout dev
+      - name: Checkout code
         uses: actions/checkout@v4
         with:
           ref: dev
-          fetch-depth: 0  # Đảm bảo đầy đủ lịch sử
+          fetch-depth: 0
 
-      - name: Fetch main branch
-        run: git fetch origin main:main  # <-- Đây là phần quan trọng!
+      - name: Setup GitHub CLI
+        uses: cli/cli-action@v2
 
-      - name: Check diff between dev and main
-        run: git diff origin/main..HEAD --name-only
+      - name: Create PR from dev to main
+        run: |
+          gh pr create \
+            --base main \
+            --head dev \
+            --title "[AUTO-PR] Promote from dev to main" \
+            --body "✅ Automated PR from dev merge. Please review." \
+            --repo ${{ github.repository }}
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
 
-
-      - name: Show git log (debug)
-        run: git log --oneline --graph --decorate --all
-
-      - name: Create PR to main
-        uses: peter-evans/create-pull-request@v6
-        with:
-          token: ${{ secrets.GH_PAT }}
-          base: main
-          branch: dev
-          title: '[AUTO-PR] Promote from dev to main'
-          body: '✅ Automated PR from dev merge. Please review.'
-          commit-message: 'chore: promote dev to main'
-          delete-branch: false

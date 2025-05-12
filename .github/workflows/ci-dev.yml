@@ -32,27 +32,38 @@ jobs:
 
   promote:
     needs: build-and-test
-    runs-on: ubuntu-latest
     if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout code (default is dev)
         uses: actions/checkout@v4
         with:
+          fetch-depth: 0  # Lấy toàn bộ lịch sử để diff chuẩn
           ref: dev
-          fetch-depth: 0
 
-      - name: Setup GitHub CLI
-        uses: cli/cli-action@v2
+      - name: Pull latest dev
+        run: git pull origin dev
 
-      - name: Create PR from dev to main
+      - name: Fetch main branch
+        run: git fetch origin main
+
+      - name: Check if there is a diff between dev and main
+        id: diff
         run: |
-          gh pr create \
-            --base main \
-            --head dev \
-            --title "[AUTO-PR] Promote from dev to main" \
-            --body "✅ Automated PR from dev merge. Please review." \
-            --repo ${{ github.repository }}
-        env:
-          GH_TOKEN: ${{ secrets.GH_PAT }}
+          git diff --quiet origin/main..HEAD || echo "has_diff=true" >> $GITHUB_OUTPUT
 
+      - name: Show git log (debug)
+        run: git log --oneline --graph --decorate --all
+
+      - name: Create PR to main
+        if: steps.diff.outputs.has_diff == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GH_PAT }}
+          base: main
+          branch: dev
+          title: '[AUTO-PR] Promote from dev to main'
+          body: '✅ Automated PR from dev merge. Please review.'
+          commit-message: 'chore: promote dev to main'
+          delete-branch: false

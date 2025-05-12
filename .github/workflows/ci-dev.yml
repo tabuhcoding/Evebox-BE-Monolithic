@@ -40,14 +40,18 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: dev
+          fetch-depth: 0  # Lấy toàn bộ lịch sử để tạo PR chính xác
+
+      - name: Show git log (debug)
+        run: git log --oneline --graph --decorate --all
 
       - name: Create PR to main
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GH_PAT }} # PAT phải có quyền 'repo'
-          base: main                     # <-- Mục tiêu là merge vào main
-          branch: auto/promote-dev-to-main # <-- Nhánh tạm thời tạo ra từ dev
+          base: main
+          branch: auto/promote-dev-to-main
           title: '[AUTO-PR] Promote from dev to main'
           body: '✅ Automated PR from dev merge. Please review.'
           commit-message: 'chore: promote dev to main'
-          delete-branch: true            # Xóa nhánh `auto/promote-dev-to-main` sau khi PR merge
+          delete-branch: false

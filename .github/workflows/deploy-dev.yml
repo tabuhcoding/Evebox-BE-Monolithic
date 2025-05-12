@@ -22,6 +22,11 @@ jobs:
       - name: Log in to Azure Container Registry
         run: az acr login --name eveboxregistry
 
+      - name: Generate .env file
+        run: |
+          echo "${{ secrets.ENV_CONTENTS }}" > .env
+
+
       - name: Build Docker image
         run: docker build --no-cache -t evebox-monolithic-api .
 

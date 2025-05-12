@@ -52,6 +52,12 @@ jobs:
       - name: Show git log (debug)
         run: git log --oneline --graph --decorate --all
 
+      - name: Create promote branch from dev
+        run: git checkout -b auto/promote-dev-to-main
+
+      - name: Push promote branch
+        run: git push origin auto/promote-dev-to-main --force 
+        
       - name: Create PR to main
         uses: peter-evans/create-pull-request@v6
         with:

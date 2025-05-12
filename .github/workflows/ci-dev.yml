@@ -45,6 +45,10 @@ jobs:
       - name: Fetch main branch
         run: git fetch origin main:main  # <-- Đây là phần quan trọng!
 
+      - name: Check diff between dev and main
+        run: git diff origin/main..HEAD --name-only
+
+
       - name: Show git log (debug)
         run: git log --oneline --graph --decorate --all
 

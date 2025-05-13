@@ -1,0 +1,73 @@
+
+// Event Service - Seat map
+enum SeatStatusEnum {
+  NOTSALE
+  AVAILABLE
+  SOLD
+  INCACHE
+  ESOLD
+}
+
+model Row {
+  id        Int      @id @default(autoincrement())
+  name      String
+  sectionId Int
+  createdAt DateTime @default(now())
+  Section   Section  @relation(fields: [sectionId], references: [id])
+  Seat      Seat[]
+}
+
+model Seat {
+  id         Int          @id @default(autoincrement())
+  name       String
+  rowId      Int
+  positionX  Float
+  positionY  Float
+  createdAt  DateTime     @default(now())
+  position   Int
+  Row        Row          @relation(fields: [rowId], references: [id])
+  SeatStatus SeatStatus[]
+}
+
+model Section {
+  id              Int                 @id @default(autoincrement())
+  name            String
+  seatmapId       Int
+  isStage         Boolean
+  element         Json
+  attribute       Json
+  createdAt       DateTime            @default(now())
+  isReservingSeat Boolean             @default(false)
+  Row             Row[]
+  Seatmap         Seatmap             @relation(fields: [seatmapId], references: [id])
+  ticketTypes     TicketTypeSection[]
+}
+
+model Seatmap {
+  id        Int       @id @default(autoincrement())
+  name      String
+  createdAt DateTime  @default(now())
+  viewBox   String
+  status    Int
+  Section   Section[]
+  Showing   Showing[]
+}
+
+model SeatStatus {
+  id        String  @id @default(uuid())
+  showingId String
+  status    SeatStatusEnum
+  seatId    Int
+  seatMapId Int
+  Seat      Seat    @relation(fields: [seatId], references: [id])
+  Showing   Showing @relation(fields: [showingId], references: [id])
+}
+
+model TicketTypeSection {
+  ticketTypeId String
+  sectionId    Int
+  Section      Section    @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  TicketType   TicketType @relation(fields: [ticketTypeId], references: [id], onDelete: Cascade)
+
+  @@id([ticketTypeId, sectionId])
+}

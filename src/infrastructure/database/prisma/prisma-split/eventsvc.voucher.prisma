@@ -1,0 +1,49 @@
+
+// Event Service - Voucher
+enum DiscountType {
+  PERCENTAGE
+  VALUE
+}
+
+enum CreatorRole {
+  ADMIN
+  ORG
+}
+
+model VoucherCampaign {
+  id             String       @id @default(uuid())
+  name           String       
+  createdBy      String       
+  creatorRole    CreatorRole  // 'ADMIN' hoặc 'ORG'
+  organizerId    String?      
+  discountType   DiscountType
+  discountValue  Int
+  maxDiscountValue Int
+  validFrom      DateTime
+  validTo        DateTime
+  eventId        Int[]         // Nếu null thì áp dụng toàn hệ thống
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  codes          VoucherCode[]
+}
+
+model VoucherCode {
+  id               String          @id @default(uuid())
+  campaignId       String
+  code             String          
+  isPublic         Boolean         @default(true)
+  maxUsage         Int             @default(0)
+  maxUsagePerUser  Int             @default(0)
+
+  campaign         VoucherCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  targets          VoucherTargetUser[]
+}
+
+model VoucherTargetUser {
+  id            String       @id @default(uuid())
+  voucherCodeId String
+  userId        String       @db.VarChar(255)
+
+  voucherCode   VoucherCode  @relation(fields: [voucherCodeId], references: [id], onDelete: Cascade)
+}

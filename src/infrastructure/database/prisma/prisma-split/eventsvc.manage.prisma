@@ -1,0 +1,68 @@
+
+// Event Service - Management
+
+model OrgPaymentInfor {
+  id            String   @id @default(uuid())
+  organizerId   String
+  accountName   String
+  accountNumber String
+  bankName      String
+  branch        String
+  businessType  Int
+  fullName      String?
+  address       String?
+  taxCode       String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  isDeleted     Boolean  @default(false)
+
+  @@map("org_payment_infor")
+}
+
+
+
+model EventUserRelationship {
+  eventId   Int
+  userId    String
+  email     String
+  role      Int?
+  role_desc String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isDeleted Boolean  @default(false)
+
+  event Events @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  eventRole  EventRole?  @relation("EventRoleToEventUserRelationship", fields: [role], references: [id])
+
+  @@id([eventId, userId])
+}
+
+model EventRole {
+  id           Int    @id
+  isEdited     Boolean
+  isSummarized Boolean
+  viewVoucher  Boolean
+  marketing    Boolean
+  viewOrder    Boolean
+  viewSeatmap  Boolean
+  viewMember   Boolean
+  checkin      Boolean
+  checkout     Boolean
+  redeem       Boolean
+
+  userRoles    EventUserRelationship[]  @relation("EventRoleToEventUserRelationship")
+
+  @@map("event_role")
+}
+
+
+model UserClickHistory {
+  id      String   @id @default(uuid())
+  eventId Int
+  userId  String   // can be a real user ID or random UUID
+  date    DateTime @default(now())
+
+  event Events @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@map("user_click_history")
+}

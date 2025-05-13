@@ -1,0 +1,46 @@
+
+// Event Service - Form
+
+model Form {
+  id           Int            @id @default(autoincrement())
+  name         String         @db.VarChar(255)
+  createdAt    DateTime       @default(now())
+  createdBy    String?
+  deleteAt     DateTime?
+  FormInput    FormInput[]
+  FormResponse FormResponse[]
+  Showing      Showing[]
+}
+
+model FormAnswer {
+  id             Int          @id @default(autoincrement())
+  formResponseId Int
+  formInputId    Int
+  value          String?
+  FormInput      FormInput    @relation(fields: [formInputId], references: [id], onDelete: Cascade)
+  FormResponse   FormResponse @relation(fields: [formResponseId], references: [id], onDelete: Cascade)
+}
+
+model FormInput {
+  id         Int          @id @default(autoincrement())
+  formId     Int
+  fieldName  String       @db.VarChar(255)
+  type       String       @db.VarChar(50)
+  required   Boolean      @default(true)
+  regex      String?
+  options    Json?
+  deleteAt   DateTime?
+  FormAnswer FormAnswer[]
+  Form       Form         @relation(fields: [formId], references: [id], onDelete: Cascade)
+}
+
+model FormResponse {
+  id         Int          @id @default(autoincrement())
+  formId     Int
+  createdAt  DateTime     @default(now())
+  userId     String
+  showingId  String?
+  FormAnswer FormAnswer[]
+  Form       Form         @relation(fields: [formId], references: [id], onDelete: Cascade)
+  Showing    Showing?     @relation(fields: [showingId], references: [id], onDelete: Cascade)
+}

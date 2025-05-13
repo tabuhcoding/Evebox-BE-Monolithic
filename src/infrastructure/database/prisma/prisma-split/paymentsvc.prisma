@@ -1,0 +1,34 @@
+// Payment Service
+enum PaymentMethod {
+  PAYOS
+  MOMO
+}
+
+model PayOSInfo {
+  orderCode     Int      @unique
+  bin           String?  @db.VarChar(20)
+  accountNumber String?  @db.VarChar(50)
+  accountName   String?  @db.VarChar(100)
+  amount        Int
+  description   String?  @db.VarChar(100)
+  currency      String?  @db.VarChar(10)
+  paymentLinkId String?  @db.VarChar(50)
+  status        String?  @db.VarChar(20)
+  checkoutUrl   String?
+  qrCode        String?
+  createdAt     DateTime @default(now())
+  expiredAt     String?
+}
+
+model PaymentInfo {
+  id          Int           @id @default(autoincrement())
+  method      PaymentMethod
+  paymentCode Int
+  paidAt      DateTime?
+  orderId String?
+}
+
+model PaymentMethodStatus {
+  paymentMethod PaymentMethod @unique
+  status        Boolean       @default(false)
+}

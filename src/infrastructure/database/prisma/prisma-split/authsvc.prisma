@@ -1,0 +1,79 @@
+// Auth Service
+
+enum OTPType {
+  FORGOT_PASSWORD
+  REGISTER
+}
+
+enum ItemType {
+  EVENT
+  ORG
+}
+
+model Role {
+  id        Int    @id
+  role_name String @db.VarChar(50)
+  users     User[]
+
+  @@map("role")
+}
+
+model User {
+  id                    String                  @id @db.VarChar(255)
+  name                  String                  @db.VarChar(255)
+  email                 String                  @unique @db.VarChar(255)
+  phone                 String                  @db.VarChar(10)
+  password              String                  @db.VarChar(255)
+  role_id               Int?
+  created_at            DateTime                @default(now())
+  refreshTokens         RefreshToken[]
+  role                  Role?                   @relation(fields: [role_id], references: [id])
+  favoriteNotiHistory   FavoriteNotiHistory[]   @relation("UserFavoriteHistory")
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  email     String
+  revoked   Boolean  @default(false)
+  expiresAt DateTime
+  user      User     @relation(fields: [email], references: [email], onDelete: Cascade)
+
+  @@map("refresh_tokens")
+}
+
+model Otp {
+  id           String   @id
+  email        String
+  otp          String
+  type         OTPType
+  expiresAt    DateTime
+  isUsed       Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  attempts     Int
+  requestToken String   @unique
+
+  @@index([email])
+  @@index([otp])
+  @@map("otps")
+}
+
+model Images {
+  id         Int      @id @default(autoincrement())
+  userId     String?  @default("TicketBox")
+  imageUrl   String   @db.VarChar(255)
+}
+
+model FavoriteNotiHistory {
+  id          String   @id @default(uuid())
+  userId      String
+  itemType    ItemType
+  orgId       String?
+  eventId     Int?
+  isFavorite  Boolean
+  isNotified  Boolean
+
+  user        User       @relation("UserFavoriteHistory", fields: [userId], references: [id])
+}

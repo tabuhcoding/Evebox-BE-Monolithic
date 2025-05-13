@@ -1,0 +1,40 @@
+// Booking Service
+enum BookingTicketType{
+  PHYSICAL_TICKET
+  E_TICKET
+}
+
+enum BookingTicketStatus{
+  CANCEL
+  SUCCESS
+  PENDING
+}
+
+model Order {
+  id             String         @id @default(uuid())
+  showingId      String
+  formResponseId Int?
+  type           BookingTicketType
+  price          Int
+  totalPrice     Int
+  userId         String
+  quantity       Int?
+  seatId         Int[]
+  status         BookingTicketStatus
+  mailSent       Boolean        @default(false)
+  paymentId      Int?
+  voucherCodeId  String?
+  Ticket         Ticket[]
+}
+
+model Ticket {
+  id           String  @id @default(uuid())
+  qrCode       String?
+  description  String
+  seatId       Int?
+  orderId      String
+  ticketTypeId String?
+  isCheckedIn  Boolean @default(false)
+  checkedBy    String  @default("")
+  Order        Order   @relation(fields: [orderId], references: [id])
+}

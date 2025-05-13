@@ -1,0 +1,97 @@
+
+// Event Service - Event
+enum TicketTypeStatus {
+  SOLD_OUT
+  REGISTER_NOW
+  BOOK_NOW
+  REGISTER_CLOSED
+  SALE_CLOSED
+  NOT_OPEN
+}
+
+model Categories {
+  id              Int               @id @default(autoincrement())
+  name            String            @db.VarChar(255)
+  createdAt       DateTime          @default(now())
+  EventCategories EventCategories[]
+}
+
+model EventCategories {
+  id         Int        @id @default(autoincrement())
+  eventId    Int
+  categoryId Int
+  isSpecial  Boolean    @default(false)
+  Categories Categories @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  Events     Events     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
+
+model Events {
+  id                                Int                     @id @default(autoincrement())
+  title                             String                  @db.VarChar(255)
+  description                       String?
+  organizerId                       String?
+  locationId                        Int?
+  imgLogoUrl                        String?
+  imgPosterUrl                      String?
+  createdAt                         DateTime                @default(now())
+  isOnlyOnEve                       Boolean                 @default(false)
+  isSpecial                         Boolean                 @default(false)
+  lastScore                         Decimal                 @db.Decimal(10, 2)
+  totalClicks                       Int                     @default(0)
+  weekClicks                        Int                     @default(0)
+  venue                             String?                 @db.VarChar(100)
+  isApproved                        Boolean                 @default(false)
+  orgDescription                    String?
+  orgName                           String?
+  deleteAt                          DateTime?
+  isOnline                          Boolean                 @default(false)
+  EventCategories                   EventCategories[]
+  locations                         locations?              @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  Showing                           Showing[]
+  eventUserRelationships            EventUserRelationship[]
+  UserClickHistory UserClickHistory[]
+}
+
+model Showing {
+  id                    String         @id @default(uuid())
+  eventId               Int
+  isFree                Boolean
+  isSalable             Boolean
+  isPresale             Boolean
+  seatMapId             Int
+  startTime             DateTime
+  endTime               DateTime
+  isEnabledQueueWaiting Boolean
+  showAllSeats          Boolean
+  formId                Int?
+  deleteAt              DateTime?
+  FormResponse          FormResponse[]
+  SeatStatus            SeatStatus[]
+  Events                Events         @relation(fields: [eventId], references: [id])
+  Form                  Form?          @relation(fields: [formId], references: [id])
+  Seatmap               Seatmap        @relation(fields: [seatMapId], references: [id])
+  TicketType            TicketType[]
+}
+
+model TicketType {
+  id             String              @id @default(uuid())
+  showingId      String
+  status         TicketTypeStatus
+  name           String
+  description    String
+  color          String
+  isFree         Boolean
+  price          Int
+  originalPrice  Int
+  startTime      DateTime
+  endTime        DateTime
+  position       Int
+  imageUrl       String
+  maxQtyPerOrder Int
+  minQtyPerOrder Int
+  isHidden       Boolean             @default(false)
+  quantity       Int?                @default(0)
+  deleteAt       DateTime?
+  Showing        Showing             @relation(fields: [showingId], references: [id])
+  sections       TicketTypeSection[]
+}

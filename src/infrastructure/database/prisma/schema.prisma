@@ -333,6 +333,7 @@ model VoucherCampaign {
   organizerId    String?      
   discountType   DiscountType
   discountValue  Int
+  maxDiscountValue Int
   validFrom      DateTime
   validTo        DateTime
   eventId        Int[]         // Nếu null thì áp dụng toàn hệ thống

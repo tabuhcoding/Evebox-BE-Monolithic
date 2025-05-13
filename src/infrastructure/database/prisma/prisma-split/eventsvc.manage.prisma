@@ -32,7 +32,6 @@ model EventUserRelationship {
   isDeleted Boolean  @default(false)
 
   event Events @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   eventRole  EventRole?  @relation("EventRoleToEventUserRelationship", fields: [role], references: [id])
 
   @@id([eventId, userId])

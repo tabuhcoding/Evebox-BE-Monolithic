@@ -43,5 +43,4 @@ model FormResponse {
   FormAnswer FormAnswer[]
   Form       Form         @relation(fields: [formId], references: [id], onDelete: Cascade)
   Showing    Showing?     @relation(fields: [showingId], references: [id], onDelete: Cascade)
-  user       User         @relation(fields: [userId], references: [email], onDelete: Cascade)
 }

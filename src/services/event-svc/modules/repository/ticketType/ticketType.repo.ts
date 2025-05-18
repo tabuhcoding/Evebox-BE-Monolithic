@@ -1,0 +1,1 @@
+export { TicketType } from '@prisma/client';

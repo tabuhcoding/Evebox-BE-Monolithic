@@ -8,7 +8,7 @@ import { ErrorHandler } from 'src/shared/exceptions/error.handler';
 import { USER_MESSAGES } from 'src/shared/constants/constants';
 
 @Controller('/api/user')
-@ApiTags('Authentication')
+@ApiTags('Authentication Service')
 export class RegisterUserController {
   constructor(private readonly registerUserService: RegisterUserService) { }
 

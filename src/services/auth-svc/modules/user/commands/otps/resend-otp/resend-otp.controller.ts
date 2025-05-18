@@ -8,7 +8,7 @@ import { ErrorHandler } from 'src/shared/exceptions/error.handler';
 import { USER_MESSAGES } from 'src/shared/constants/constants';
 
 @Controller('api/user/otps')
-@ApiTags('Authentication')
+@ApiTags('Authentication Service')
 export class ResendOTPController {
   constructor(private readonly resendOTPService: ResendOTPService) {}
 

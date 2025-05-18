@@ -14,7 +14,7 @@ import { ErrorHandler } from 'src/shared/exceptions/error.handler';
 import { USER_MESSAGES } from 'src/shared/constants/constants';
 
 @Controller('api/user')
-@ApiTags('Authentication')
+@ApiTags('Authentication Service')
 export class LoginUserController {
   constructor(private readonly loginUserService: LoginUserService) {}
 

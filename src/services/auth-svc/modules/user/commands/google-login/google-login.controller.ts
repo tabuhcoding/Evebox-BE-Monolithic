@@ -16,7 +16,7 @@ interface GoogleUser {
   }
 
 @Controller('api/user/google')
-@ApiTags('Authentication')
+@ApiTags('Authentication Service')
 export class GoogleLoginController {
   constructor(private readonly googleLoginService: GoogleLoginService) {}
 

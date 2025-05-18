@@ -7,7 +7,7 @@ import { ErrorHandler } from 'src/shared/exceptions/error.handler';
 import { ResetPasswordDto, ResetPasswordResponse } from './reset-password.dto';
 
 @Controller('api/user')
-@ApiTags('Authentication')
+@ApiTags('Authentication Service')
 export class ResetPasswordController {
   constructor(
     private readonly resetPasswordService: ResetPasswordService,

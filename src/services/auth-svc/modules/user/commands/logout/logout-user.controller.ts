@@ -8,7 +8,7 @@ import { LogoutResponse } from './logout-user.dto';
 import { USER_MESSAGES } from 'src/shared/constants/constants';
 
 @Controller('api/user')
-@ApiTags('Authentication')
+@ApiTags('Authentication Service')
 export class LogoutUserController {
   constructor(private readonly logoutService: LogoutUserService) {}
 

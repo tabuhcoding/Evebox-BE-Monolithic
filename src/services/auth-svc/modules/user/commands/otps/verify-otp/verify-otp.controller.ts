@@ -9,7 +9,7 @@ import { ErrorHandler } from 'src/shared/exceptions/error.handler';
 import { OTP_MESSAGES } from 'src/shared/constants/constants';
 
 @Controller('api/user/otps')
-@ApiTags('Authentication')
+@ApiTags('Authentication Service')
 export class VerifyOTPController {
   constructor(
     private readonly verifyOTPService: VerifyOTPService,

@@ -8,7 +8,7 @@ import { RefreshTokenDto, RefreshTokenResponse } from './refresh-token.dto';
 import { REFRESH_TOKEN_MESSAGES } from 'src/shared/constants/constants';
 
 @Controller('api/user')
-@ApiTags('Authentication')
+@ApiTags('Authentication Service')
 export class RefreshTokenController {
   constructor(private readonly refreshTokenService: RefreshTokenService) {}
 

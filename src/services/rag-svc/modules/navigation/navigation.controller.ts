@@ -3,7 +3,7 @@ import { Controller, Post, Body, Query } from '@nestjs/common';
 import { NavigationService } from './navigation.service';
 import { ApiTags } from '@nestjs/swagger';
 
-@ApiTags('RAG')
+@ApiTags('RAG Service')
 @Controller('rag/navigation')
 export class NavigationController {
   constructor(private readonly navigationService: NavigationService) {}

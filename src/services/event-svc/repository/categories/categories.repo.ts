@@ -2,7 +2,7 @@ import { BaseRepository } from "src/shared/repo/base.repository";
 import { Categories } from "@prisma/client";
 import { Prisma } from "@prisma/client";
 
-export { Categories } from "@prisma/client";
+export { Categories }
 
 export interface CategoriesRepository
   extends BaseRepository<Categories, Prisma.CategoriesDelegate> {

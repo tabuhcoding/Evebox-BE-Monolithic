@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { Events, EventsRepository } from '../../../repository/events/events.repo';
+import { Events, EventsRepository } from '../../../../repository/events/events.repo';
 import { GetAllEventDetailForRAGResponseDto } from './getAllEventDetailForRAG-response.dto';
 
 @Injectable()

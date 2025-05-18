@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { CqrsModule } from '@nestjs/cqrs';
 import { PrismaModule } from './infrastructure/database/prisma/prisma.module';
 import { EventSvcModule } from './services/event-svc/event-svc.module';
+import { RagSvcModule } from './services/rag-svc/rag-svc.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { EventSvcModule } from './services/event-svc/event-svc.module';
     PrismaModule,
     CqrsModule,
     EventSvcModule,
+    RagSvcModule,
   ],
 })
 export class AppModule {}

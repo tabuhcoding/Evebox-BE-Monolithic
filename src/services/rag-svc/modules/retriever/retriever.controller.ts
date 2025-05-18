@@ -3,7 +3,7 @@ import { Controller, Get, Query } from '@nestjs/common';
 import { RetrieverService } from './retriever.service';
 import { ApiTags } from '@nestjs/swagger';
 
-@ApiTags('RAG')
+@ApiTags('RAG Service')
 @Controller('rag/retriever')
 export class RetrieverController {
   constructor(private readonly retrieverService: RetrieverService) {}

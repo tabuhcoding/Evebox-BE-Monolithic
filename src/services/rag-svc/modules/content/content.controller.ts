@@ -3,7 +3,7 @@ import { ContentDto } from "./content.dto";
 import { ContentService } from "./content.service";
 import { ApiTags } from "@nestjs/swagger";
 
-@ApiTags('RAG')
+@ApiTags('RAG Service')
 @Controller('rag/content')
 export class ContentController {
   constructor( private readonly contentService: ContentService) {}

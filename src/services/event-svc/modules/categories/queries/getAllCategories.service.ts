@@ -12,9 +12,7 @@ export class GetAllCategoriesService {
   async findAll(): Promise<Result<CategoriesResponseDto[], Error>> {
 
     try {
-      const categories = await this.categoriesRepository.findMany({
-        orderBy: { createdAt: 'desc' },
-      });
+      const categories = await this.categoriesRepository.findMany({});
 
       return Ok(categories);
     } catch (error) {

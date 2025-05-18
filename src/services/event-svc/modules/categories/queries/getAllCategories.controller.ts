@@ -4,7 +4,7 @@ import { Response } from 'express';
 import { ApiOperation, ApiProperty, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CategoriesResponse } from './getAllCategories-response.dto';
 
-@ApiTags('Event Service')
+@ApiTags('Event Service - Categories')
 @Controller('api/categories')
 export class GetAllCategoriesController {
   constructor(private readonly categoriesService: GetAllCategoriesService) {}

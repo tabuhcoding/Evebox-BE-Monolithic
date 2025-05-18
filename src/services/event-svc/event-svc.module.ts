@@ -6,12 +6,16 @@ import { EventCategoriesRepositoryImpl } from './repository/eventCategories/even
 import { GetAllEventDetailForRAGService } from './modules/event/queries/getAllEventDetailForRAG/getAllEventDetailForRAG.service';
 import { GetAllCategoriesController } from './modules/categories/queries/getAllCategories.controller';
 import { GetAllCategoriesService } from './modules/categories/queries/getAllCategories.service';
+import { GetEventFrontDisplayController } from './modules/event/queries/getEventFrontDisplay/getEventFrontDisplay.controller';
+import { GetEventFrontDisplayService } from './modules/event/queries/getEventFrontDisplay/getEventFrontDisplay.service';
 
 @Module({
   controllers: [
     // Categories
     GetAllCategoriesController,
 
+    // Event
+    GetEventFrontDisplayController,
   ],
   providers: [
     // Categories
@@ -19,6 +23,7 @@ import { GetAllCategoriesService } from './modules/categories/queries/getAllCate
 
     // Event
     GetAllEventDetailForRAGService,
+    GetEventFrontDisplayService,
 
     // Repositories
     { provide: 'CategoriesRepository', useClass: CategoriesRepositoryImpl },

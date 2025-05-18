@@ -9,7 +9,6 @@
     "prisma:generate:ai": "prisma generate --schema=src/services/rag-svc/database/prisma-ai/schema.prisma",
     "prisma:generate:all": "npx prisma generate && npm run prisma:generate:ai",
     "prestart": "npm run prisma:generate:all",
-    "prestart:dev": "npm run prisma:generate:all",
     "prebuild": "npm run prisma:generate:all",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",

@@ -42,49 +42,50 @@ export class BaseRepository<
     await this.repo.updateMany({ where: filter, data });
   }
 
-  async findAndUpdateMany(filter: any, data: any): Promise<TModel[]> {
+  async findAndUpdateMany(filter: any, data: any, include?: any): Promise<TModel[]> {
     await this.repo.updateMany({ where: filter, data });
-    return this.repo.findMany({ where: filter }) as Promise<TModel[]>;
+    return this.repo.findMany({ where: filter, ...(include && { include }) }) as Promise<TModel[]>;
   }
 
   async updateOneById(id: string, data: any): Promise<void> {
     await this.repo.update({ where: { id }, data });
   }
 
-  async updateAndFindOneById(id: string, data: any): Promise<TModel> {
-    return this.repo.update({ where: { id }, data }) as Promise<TModel>;
+  async updateAndFindOneById(id: string, data: any, include?: any): Promise<TModel> {
+    return this.repo.update({ where: { id }, data, ...(include && { include }) }) as Promise<TModel>;
   }
 
-  async findOneAndUpsert(filter: any, update: any): Promise<TModel> {
+  async findOneAndUpsert(filter: any, update: any, include?: any): Promise<TModel> {
     return this.repo.upsert({
       where: filter,
       update,
       create: update,
+      ...(include && { include: include }),
     }) as Promise<TModel>;
   }
 
-  async upsertAndFindOne(filter: any, update: any): Promise<TModel> {
-    return this.findOneAndUpsert(filter, update);
+  async upsertAndFindOne(filter: any, update: any, include?: any): Promise<TModel> {
+    return this.findOneAndUpsert(filter, update, include);
   }
 
-  async findOne(filter: any): Promise<TModel | null> {
-    return this.repo.findFirst({ where: filter }) as Promise<TModel | null>;
+  async findOne(filter: any, include?: any): Promise<TModel | null> {
+    return this.repo.findFirst({ where: filter, ...(include && { include }) }) as Promise<TModel | null>;
   }
 
-  async findOneById(id: string): Promise<TModel | null> {
-    return this.repo.findUnique({ where: { id } }) as Promise<TModel | null>;
+  async findOneById(id: string, include?: any): Promise<TModel | null> {
+    return this.repo.findUnique({ where: { id }, ...(include && { include }) }) as Promise<TModel | null>;
   }
 
-  async findByIds(ids: string[]): Promise<TModel[]> {
-    return this.repo.findMany({ where: { id: { in: ids } } }) as Promise<TModel[]>;
+  async findByIds(ids: string[], include?: any): Promise<TModel[]> {
+    return this.repo.findMany({ where: { id: { in: ids } }, ...(include && { include }) }) as Promise<TModel[]>;
   }
 
-  async findAll(filter: any): Promise<TModel[]> {
-    return this.repo.findMany({ where: filter }) as Promise<TModel[]>;
+  async findAll(filter: any, include?: any): Promise<TModel[]> {
+    return this.repo.findMany({ where: filter, ...(include && { include }) }) as Promise<TModel[]>;
   }
 
-  async findMany(filter: any): Promise<TModel[]> {
-    return this.repo.findMany({ where: filter }) as Promise<TModel[]>;
+  async findMany(filter: any, include?: any): Promise<TModel[]> {
+    return this.repo.findMany({ where: filter, ...(include && { include }) }) as Promise<TModel[]>;
   }
 
   async count(filter: any): Promise<number> {

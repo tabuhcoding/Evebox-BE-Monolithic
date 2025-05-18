@@ -24,8 +24,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('api-docs', app, document);
 
-  const allowedOrigins = process.env.CORS_ALLOWED_ORIGINS?.split(',') || [];
-  console.log('Allowed origins:', allowedOrigins); 
+  // const allowedOrigins = process.env.CORS_ALLOWED_ORIGINS?.split(',') || [];
 
   app.enableCors({
     // origin: allowedOrigins,

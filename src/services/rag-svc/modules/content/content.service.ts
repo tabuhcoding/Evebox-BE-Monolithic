@@ -1,11 +1,11 @@
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { ContentDto } from "./content.dto";
 import { ContentRepository } from "../../repository/content.repo";
 
 @Injectable()
 export class ContentService {
   constructor(
-    private readonly contentRepository: ContentRepository,
+    @Inject('ContentRepository') private readonly contentRepository: ContentRepository,
   ) {}
 
   async createContent(dto: ContentDto) {

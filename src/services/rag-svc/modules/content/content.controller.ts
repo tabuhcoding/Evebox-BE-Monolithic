@@ -1,8 +1,10 @@
 import { Controller, Get, Post, Body } from "@nestjs/common";
 import { ContentDto } from "./content.dto";
 import { ContentService } from "./content.service";
+import { ApiTags } from "@nestjs/swagger";
 
-@Controller('content')
+@ApiTags('RAG')
+@Controller('rag/content')
 export class ContentController {
   constructor( private readonly contentService: ContentService) {}
 

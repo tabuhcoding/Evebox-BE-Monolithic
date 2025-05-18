@@ -4,11 +4,23 @@ import { CategoriesRepositoryImpl } from './repository/categories/categories.imp
 import { EventsRepositoryImpl } from './repository/events/events.impl';
 import { EventCategoriesRepositoryImpl } from './repository/eventCategories/eventCategories.impl';
 import { GetAllEventDetailForRAGService } from './modules/event/queries/getAllEventDetailForRAG/getAllEventDetailForRAG.service';
+import { GetAllCategoriesController } from './modules/categories/queries/getAllCategories.controller';
+import { GetAllCategoriesService } from './modules/categories/queries/getAllCategories.service';
 
 @Module({
-  controllers: [],
+  controllers: [
+    // Categories
+    GetAllCategoriesController,
+
+  ],
   providers: [
+    // Categories
+    GetAllCategoriesService,
+
+    // Event
     GetAllEventDetailForRAGService,
+
+    // Repositories
     { provide: 'CategoriesRepository', useClass: CategoriesRepositoryImpl },
     { provide: 'EventsRepository', useClass: EventsRepositoryImpl },
     { provide: 'EventCategoriesRepository', useClass: EventCategoriesRepositoryImpl },

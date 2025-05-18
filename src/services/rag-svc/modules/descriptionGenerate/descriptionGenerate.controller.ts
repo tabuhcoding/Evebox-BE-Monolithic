@@ -4,7 +4,7 @@ import { CreateEventDto } from "./descriptionGenerate.dto";
 import { ApiTags } from "@nestjs/swagger";
 
 
-@ApiTags('RAG')
+@ApiTags('RAG Service')
 @Controller('rag/description-generate')
 export class DescriptionGenerateController {
   constructor( private readonly descriptionGenerateService: DescriptionGenerateService) {}

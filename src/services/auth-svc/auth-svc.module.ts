@@ -31,6 +31,10 @@ import { GoogleLoginController } from "./modules/user/commands/google-login/goog
 import { GoogleLoginService } from "./modules/user/commands/google-login/google-login.service";
 import { GetUserController } from "./modules/user/queries/get-user/get-user.controller";
 import { GetUserService } from "./modules/user/queries/get-user/get-user.service";
+import { AddToFavoriteController } from "./modules/user/commands/add-to-favorite/create-favorite.controller";
+import { FavoriteRepositoryImpl } from "./repository/favorite/favorite.impl";
+import { AddToFavoriteService } from "./modules/user/commands/add-to-favorite/create-favorite.service";
+
 
 @Module({
   imports: [
@@ -59,6 +63,7 @@ import { GetUserService } from "./modules/user/queries/get-user/get-user.service
     ForgotPasswordController,
     GoogleLoginController,
     GetUserController,
+    AddToFavoriteController
   ],
   providers: [
     RegisterUserService,
@@ -77,7 +82,17 @@ import { GetUserService } from "./modules/user/queries/get-user/get-user.service
     ResendOTPService,
     GoogleLoginService,
     GetUserService,
+    AddToFavoriteService,
+    {
+      provide: 'FavoriteRepository',
+      useClass: FavoriteRepositoryImpl,
+    },  ],
+  exports: [
+    UserRepositoryImpl,
+    {
+      provide: 'FavoriteRepository',
+      useClass: FavoriteRepositoryImpl,
+    },
   ],
-  exports: [UserRepositoryImpl],
 })
 export class UserModule {}

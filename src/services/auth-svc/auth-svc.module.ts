@@ -34,6 +34,10 @@ import { GetUserService } from "./modules/user/queries/get-user/get-user.service
 import { AddToFavoriteController } from "./modules/user/commands/add-to-favorite/create-favorite.controller";
 import { FavoriteRepositoryImpl } from "./repository/favorite/favorite.impl";
 import { AddToFavoriteService } from "./modules/user/commands/add-to-favorite/create-favorite.service";
+import { UnfavoriteEventService } from "./modules/user/commands/unfavorite-event/unfavorite-event.service";
+import { UnfavoriteOrgService } from "./modules/user/commands/unfavorite-org/unfavorite-org.service";
+import { UnfavoriteEventController } from "./modules/user/commands/unfavorite-event/unfavorite-event.controller";
+import { UnfavoriteOrgController } from "./modules/user/commands/unfavorite-org/unfavorite-org.controller";
 
 
 @Module({
@@ -63,7 +67,9 @@ import { AddToFavoriteService } from "./modules/user/commands/add-to-favorite/cr
     ForgotPasswordController,
     GoogleLoginController,
     GetUserController,
-    AddToFavoriteController
+    AddToFavoriteController,
+    UnfavoriteEventController,
+    UnfavoriteOrgController
   ],
   providers: [
     RegisterUserService,
@@ -83,6 +89,8 @@ import { AddToFavoriteService } from "./modules/user/commands/add-to-favorite/cr
     GoogleLoginService,
     GetUserService,
     AddToFavoriteService,
+    UnfavoriteEventService,
+    UnfavoriteOrgService,
     {
       provide: 'FavoriteRepository',
       useClass: FavoriteRepositoryImpl,

@@ -53,7 +53,10 @@ import { UpdateUserRoleController } from "./modules/admin/commands/updateUserRol
 import { UpdateUserRoleService } from "./modules/admin/commands/updateUserRole/updateUserRole.service";
 import { AdminRepositoryImpl } from "./repository/admin/admin.repository.impl";
 import { CheckUserExistService } from "./modules/user/commands/checkuserExist/checkuserExist.service";
-import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
+import { SlackService } from "src/infrastructure/adapters/slack/slack.service";import { EventSvcModule } from "../event-svc/event-svc.module";
+import { GetFavoriteEventService } from "./modules/user/queries/get-favorite-event/get-favorite-event.service";
+import { GetFavoriteEventController } from "./modules/user/queries/get-favorite-event/get-favorite-event.controller";
+
 
 @Module({
   imports: [
@@ -71,6 +74,7 @@ import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
     LocalStorageModule,
     OtpUtilsModule,
     CloudinaryModule,
+    EventSvcModule
   ],
   controllers: [
     ResendOTPController,
@@ -86,6 +90,7 @@ import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
     AddToFavoriteController,
     UnfavoriteEventController,
     UnfavoriteOrgController,
+    GetFavoriteEventController,
     ImagesController,
     UpdateUserController,
     ChangePasswordController,
@@ -116,6 +121,7 @@ import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
     SlackService,
 
     // Repositories
+    GetFavoriteEventService,
     {
       provide: 'FavoriteRepository',
       useClass: FavoriteRepositoryImpl,
@@ -144,10 +150,6 @@ import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
   ],
   exports: [
     UserRepositoryImpl,
-    {
-      provide: 'FavoriteRepository',
-      useClass: FavoriteRepositoryImpl,
-    },
     CheckUserExistService,
   ],
 })

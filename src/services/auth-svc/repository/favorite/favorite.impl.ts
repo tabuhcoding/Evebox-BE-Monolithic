@@ -68,4 +68,17 @@ implements FavoriteRepository {
   return records.map(r => r.eventId!).filter(id => id !== null);
 }
 
+async getFavoriteOrgs(userId: string): Promise<{ orgId: string }[]> {
+  return this.prisma.favoriteNotiHistory.findMany({
+    where: {
+      userId,
+      isFavorite: true,
+      itemType: 'ORG', // assuming string enum or constant
+    },
+    select: {
+      orgId: true,
+    },
+  });
+}
+
 }

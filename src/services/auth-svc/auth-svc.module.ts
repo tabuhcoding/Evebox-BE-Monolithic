@@ -41,6 +41,8 @@ import { UnfavoriteOrgController } from "./modules/user/commands/unfavorite-org/
 import { EventSvcModule } from "../event-svc/event-svc.module";
 import { GetFavoriteEventService } from "./modules/user/queries/get-favorite-event/get-favorite-event.service";
 import { GetFavoriteEventController } from "./modules/user/queries/get-favorite-event/get-favorite-event.controller";
+import { GetFavoriteOrgService } from "./modules/user/queries/get-favorite-org/get-favorite-org.service";
+import { GetFavoriteOrgController } from "./modules/user/queries/get-favorite-org/get-favorite-org.controller";
 
 
 @Module({
@@ -74,7 +76,8 @@ import { GetFavoriteEventController } from "./modules/user/queries/get-favorite-
     AddToFavoriteController,
     UnfavoriteEventController,
     UnfavoriteOrgController,
-    GetFavoriteEventController
+    GetFavoriteEventController,
+    GetFavoriteOrgController
   ],
   providers: [
     RegisterUserService,
@@ -97,6 +100,7 @@ import { GetFavoriteEventController } from "./modules/user/queries/get-favorite-
     UnfavoriteEventService,
     UnfavoriteOrgService,
     GetFavoriteEventService,
+    GetFavoriteOrgService,
     {
       provide: 'FavoriteRepository',
       useClass: FavoriteRepositoryImpl,

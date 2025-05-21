@@ -72,11 +72,11 @@ export class BaseRepository<
     return this.repo.findFirst({ where: filter, ...(include && { include }) }) as Promise<TModel | null>;
   }
 
-  async findOneById(id: string, include?: any): Promise<TModel | null> {
+  async findOneById(id: string | number, include?: any): Promise<TModel | null> {
     return this.repo.findUnique({ where: { id }, ...(include && { include }) }) as Promise<TModel | null>;
   }
 
-  async findByIds(ids: string[], include?: any): Promise<TModel[]> {
+  async findByIds(ids: string[] | number[], include?: any): Promise<TModel[]> {
     return this.repo.findMany({ where: { id: { in: ids } }, ...(include && { include }) }) as Promise<TModel[]>;
   }
 

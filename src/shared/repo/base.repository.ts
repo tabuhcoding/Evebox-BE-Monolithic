@@ -84,8 +84,8 @@ export class BaseRepository<
     return this.repo.findMany({ where: filter, ...(include && { include }) }) as Promise<TModel[]>;
   }
 
-  async findMany(filter: any, include?: any): Promise<TModel[]> {
-    return this.repo.findMany({ where: filter, ...(include && { include }) }) as Promise<TModel[]>;
+  async findMany(filter: any, include?: any, orderBy?: any, skip?: number, take?: number): Promise<TModel[]> {
+    return this.repo.findMany({ where: filter, ...(include && { include }), ...(orderBy && {orderBy}), ...(skip && {skip}), ...(take&&{take})}) as Promise<TModel[]>;
   }
 
   async count(filter: any): Promise<number> {

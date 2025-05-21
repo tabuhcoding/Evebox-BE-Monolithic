@@ -10,6 +10,8 @@ import { GetEventFrontDisplayController } from './modules/event/queries/getEvent
 import { GetEventFrontDisplayService } from './modules/event/queries/getEventFrontDisplay/getEventFrontDisplay.service';
 import { GetEventFDByIdsService } from './modules/event/queries/getEventFDByIds/getEventFDByIds.service';
 import { GetEventFDByIdsController } from './modules/event/queries/getEventFDByIds/getEventFDByIds.controller';
+import { GetRecommendedEventController } from './modules/event/queries/getRecommendEvent/getRecommendEvent.controller';
+import { GetRecommendEventService } from './modules/event/queries/getRecommendEvent/getRecommendEvent.service';
 
 @Module({
   controllers: [
@@ -19,6 +21,7 @@ import { GetEventFDByIdsController } from './modules/event/queries/getEventFDByI
     // Event
     GetEventFrontDisplayController,
     GetEventFDByIdsController,
+    GetRecommendedEventController
   ],
   providers: [
     // Categories
@@ -28,6 +31,7 @@ import { GetEventFDByIdsController } from './modules/event/queries/getEventFDByI
     GetAllEventDetailForRAGService,
     GetEventFrontDisplayService,
     GetEventFDByIdsService,
+    GetRecommendEventService,
 
     // Repositories
     { provide: 'CategoriesRepository', useClass: CategoriesRepositoryImpl },

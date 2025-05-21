@@ -23,4 +23,6 @@ export interface FavoriteRepository
   ): Promise<void>;
 
   getFavoriteEventIds(userId: string): Promise<number[]>;
+
+  getFavoriteOrgs(userId: string): Promise<{ orgId: string }[]>;
 }

@@ -56,6 +56,8 @@ import { CheckUserExistService } from "./modules/user/commands/checkuserExist/ch
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";import { EventSvcModule } from "../event-svc/event-svc.module";
 import { GetFavoriteEventService } from "./modules/user/queries/get-favorite-event/get-favorite-event.service";
 import { GetFavoriteEventController } from "./modules/user/queries/get-favorite-event/get-favorite-event.controller";
+import { GetFavoriteOrgService } from "./modules/user/queries/get-favorite-org/get-favorite-org.service";
+import { GetFavoriteOrgController } from "./modules/user/queries/get-favorite-org/get-favorite-org.controller";
 
 
 @Module({
@@ -91,6 +93,7 @@ import { GetFavoriteEventController } from "./modules/user/queries/get-favorite-
     UnfavoriteEventController,
     UnfavoriteOrgController,
     GetFavoriteEventController,
+    GetFavoriteOrgController,
     ImagesController,
     UpdateUserController,
     ChangePasswordController,
@@ -122,6 +125,7 @@ import { GetFavoriteEventController } from "./modules/user/queries/get-favorite-
 
     // Repositories
     GetFavoriteEventService,
+    GetFavoriteOrgService,
     {
       provide: 'FavoriteRepository',
       useClass: FavoriteRepositoryImpl,

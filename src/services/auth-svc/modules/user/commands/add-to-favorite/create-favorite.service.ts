@@ -37,16 +37,25 @@ export class AddToFavoriteService {
 
       if (existing) {
         if (existing.isFavorite) {
-          // Already favorited
-          return Ok(true);
+          return Ok(true); // Already favorited
         } else {
           await this.favoriteRepository.updateFavoriteStatus(existing.id, true);
           return Ok(true);
         }
       }
 
-      // No existing favorite, create new
-      await this.favoriteRepository.addFavorite(userId.value, dto.itemType, dto.itemId);
+      // Determine how to assign itemId
+      const isEvent = dto.itemType === 'EVENT';
+      const eventId = isEvent ? parseInt(dto.itemId) : null;
+      const orgId = isEvent ? null : dto.itemId;
+
+      await this.favoriteRepository.addFavorite(
+        userId.value,
+        dto.itemType,
+        orgId,
+        eventId,
+      );
+
       return Ok(true);
     } catch (error) {
       return Err(new Error(`Failed to add favorite: ${error.message}`));

@@ -12,4 +12,35 @@ export class EventsRepositoryImpl
   constructor(protected readonly prisma: PrismaService) {
     super(prisma.events, prisma);
   }
+
+   async findManyByIdsWithDetails(ids: number[]): Promise<Events[]> {
+    return this.prisma.events.findMany({
+      where: {
+        id: { in: ids },
+        deleteAt: null,
+        isApproved: true,
+      },
+      include: {
+        locations: {
+          include: {
+            districts: {
+              include: {
+                province: true,
+              },
+            },
+          },
+        },
+        EventCategories: {
+          include: {
+            Categories: true,
+          },
+        },
+        Showing: {
+          include: {
+            TicketType: true,
+          },
+        },
+      },
+    });
+  }
 }

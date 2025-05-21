@@ -38,6 +38,9 @@ import { UnfavoriteEventService } from "./modules/user/commands/unfavorite-event
 import { UnfavoriteOrgService } from "./modules/user/commands/unfavorite-org/unfavorite-org.service";
 import { UnfavoriteEventController } from "./modules/user/commands/unfavorite-event/unfavorite-event.controller";
 import { UnfavoriteOrgController } from "./modules/user/commands/unfavorite-org/unfavorite-org.controller";
+import { EventSvcModule } from "../event-svc/event-svc.module";
+import { GetFavoriteEventService } from "./modules/user/queries/get-favorite-event/get-favorite-event.service";
+import { GetFavoriteEventController } from "./modules/user/queries/get-favorite-event/get-favorite-event.controller";
 
 
 @Module({
@@ -55,6 +58,7 @@ import { UnfavoriteOrgController } from "./modules/user/commands/unfavorite-org/
     EmailModule,
     LocalStorageModule,
     OtpUtilsModule,
+    EventSvcModule
   ],
   controllers: [
     ResendOTPController,
@@ -69,7 +73,8 @@ import { UnfavoriteOrgController } from "./modules/user/commands/unfavorite-org/
     GetUserController,
     AddToFavoriteController,
     UnfavoriteEventController,
-    UnfavoriteOrgController
+    UnfavoriteOrgController,
+    GetFavoriteEventController
   ],
   providers: [
     RegisterUserService,
@@ -91,16 +96,13 @@ import { UnfavoriteOrgController } from "./modules/user/commands/unfavorite-org/
     AddToFavoriteService,
     UnfavoriteEventService,
     UnfavoriteOrgService,
+    GetFavoriteEventService,
     {
       provide: 'FavoriteRepository',
       useClass: FavoriteRepositoryImpl,
     },  ],
   exports: [
     UserRepositoryImpl,
-    {
-      provide: 'FavoriteRepository',
-      useClass: FavoriteRepositoryImpl,
-    },
   ],
 })
 export class UserModule {}

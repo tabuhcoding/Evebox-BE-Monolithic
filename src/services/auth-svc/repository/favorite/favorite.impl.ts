@@ -52,4 +52,20 @@ implements FavoriteRepository {
       },
     });
   }
+
+  async getFavoriteEventIds(userId: string): Promise<number[]> {
+  const records = await this.prisma.favoriteNotiHistory.findMany({
+    where: {
+      userId,
+      isFavorite: true,
+      itemType: 'EVENT',
+    },
+    select: {
+      eventId: true,
+    },
+  });
+
+  return records.map(r => r.eventId!).filter(id => id !== null);
+}
+
 }

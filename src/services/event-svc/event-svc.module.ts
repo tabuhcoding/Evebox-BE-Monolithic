@@ -8,6 +8,7 @@ import { GetAllCategoriesController } from './modules/categories/queries/getAllC
 import { GetAllCategoriesService } from './modules/categories/queries/getAllCategories.service';
 import { GetEventFrontDisplayController } from './modules/event/queries/getEventFrontDisplay/getEventFrontDisplay.controller';
 import { GetEventFrontDisplayService } from './modules/event/queries/getEventFrontDisplay/getEventFrontDisplay.service';
+import { GetEventsByIdsService } from './modules/event/queries/getEventsById/GetEventsByIds.service';
 
 @Module({
   controllers: [
@@ -25,11 +26,13 @@ import { GetEventFrontDisplayService } from './modules/event/queries/getEventFro
     GetAllEventDetailForRAGService,
     GetEventFrontDisplayService,
 
+    GetEventsByIdsService,
+
     // Repositories
     { provide: 'CategoriesRepository', useClass: CategoriesRepositoryImpl },
     { provide: 'EventsRepository', useClass: EventsRepositoryImpl },
     { provide: 'EventCategoriesRepository', useClass: EventCategoriesRepositoryImpl },
   ],
-  exports: [GetAllEventDetailForRAGService],
+  exports: [GetAllEventDetailForRAGService,GetEventsByIdsService],
 })
 export class EventSvcModule {}

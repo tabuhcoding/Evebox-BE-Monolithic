@@ -27,4 +27,6 @@ export type Events = Prisma.EventsGetPayload<{
 
 export interface EventsRepository extends BaseRepository<Events, Prisma.EventsDelegate> {
   // Thêm các method riêng cho Events nếu cần, ví dụ:
+    findManyByIdsWithDetails(ids: number[]): Promise<Events[]>;
+
 }

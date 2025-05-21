@@ -66,7 +66,7 @@ export async function calculateEventStatusAndMinPriceAndStartDate(event: Events)
   let nowDate = new Date();
 
   if ( !event.Showing || event.Showing?.length === 0) {
-    console.log("Event has no showings");
+
     return Promise.resolve([EventStatus.EVENT_OVER, 0, new Date("9999-12-31T23:59:59.999Z")]);
   }
 

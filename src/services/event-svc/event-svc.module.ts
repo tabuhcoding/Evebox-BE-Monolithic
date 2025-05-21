@@ -8,6 +8,10 @@ import { GetAllCategoriesController } from './modules/categories/queries/getAllC
 import { GetAllCategoriesService } from './modules/categories/queries/getAllCategories.service';
 import { GetEventFrontDisplayController } from './modules/event/queries/getEventFrontDisplay/getEventFrontDisplay.controller';
 import { GetEventFrontDisplayService } from './modules/event/queries/getEventFrontDisplay/getEventFrontDisplay.service';
+import { GetEventFDByIdsService } from './modules/event/queries/getEventFDByIds/getEventFDByIds.service';
+import { GetEventFDByIdsController } from './modules/event/queries/getEventFDByIds/getEventFDByIds.controller';
+import { GetRecommendedEventController } from './modules/event/queries/getRecommendEvent/getRecommendEvent.controller';
+import { GetRecommendEventService } from './modules/event/queries/getRecommendEvent/getRecommendEvent.service';
 import { GetEventsByIdsService } from './modules/event/queries/getEventsById/GetEventsByIds.service';
 
 @Module({
@@ -17,6 +21,8 @@ import { GetEventsByIdsService } from './modules/event/queries/getEventsById/Get
 
     // Event
     GetEventFrontDisplayController,
+    GetEventFDByIdsController,
+    GetRecommendedEventController
   ],
   providers: [
     // Categories
@@ -25,6 +31,8 @@ import { GetEventsByIdsService } from './modules/event/queries/getEventsById/Get
     // Event
     GetAllEventDetailForRAGService,
     GetEventFrontDisplayService,
+    GetEventFDByIdsService,
+    GetRecommendEventService,
 
     GetEventsByIdsService,
 
@@ -33,6 +41,6 @@ import { GetEventsByIdsService } from './modules/event/queries/getEventsById/Get
     { provide: 'EventsRepository', useClass: EventsRepositoryImpl },
     { provide: 'EventCategoriesRepository', useClass: EventCategoriesRepositoryImpl },
   ],
-  exports: [GetAllEventDetailForRAGService,GetEventsByIdsService],
+  exports: [GetAllEventDetailForRAGService, GetEventFrontDisplayService,GetEventsByIdsService],
 })
 export class EventSvcModule {}

@@ -6,7 +6,7 @@ import { ImagesService } from "./image.service";
 import { ErrorHandler } from "src/shared/exceptions/error.handler";
 import { ImagesResponseDto } from "./image-response.dto";
 
-@ApiTags('Images')
+@ApiTags('Auth Service - Image')
 @Controller('api/image')
 export class ImagesController {
   constructor(private readonly imagesService: ImagesService) { }

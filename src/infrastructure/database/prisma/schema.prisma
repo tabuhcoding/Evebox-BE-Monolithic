@@ -25,6 +25,7 @@ model User {
   created_at          DateTime              @default(now())
   receiveNoti         Boolean                 @default(false)
   avatar_id           Int?   
+  status        UserStatus     @default(ACTIVE)
   
   images              Images[]                 @relation("UserUploadedImages") 
   avatar              Images?                  @relation("UserAvatar", fields: [avatar_id], references: [id])
@@ -510,4 +511,9 @@ enum TicketTypeStatus {
   REGISTER_CLOSED
   SALE_CLOSED
   NOT_OPEN
+}
+
+enum UserStatus {
+ACTIVE
+BLOCKED
 }

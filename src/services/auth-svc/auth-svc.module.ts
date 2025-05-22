@@ -38,7 +38,10 @@ import { UnfavoriteEventService } from "./modules/user/commands/unfavorite-event
 import { UnfavoriteOrgService } from "./modules/user/commands/unfavorite-org/unfavorite-org.service";
 import { UnfavoriteEventController } from "./modules/user/commands/unfavorite-event/unfavorite-event.controller";
 import { UnfavoriteOrgController } from "./modules/user/commands/unfavorite-org/unfavorite-org.controller";
-
+import { CloudinaryModule } from "src/infrastructure/adapters/cloudinary/cloudinary.module";
+import { ImagesController } from "./modules/images/commands/image.controller";
+import { ImagesRepositoryImpl } from "./repository/images/images.impl";
+import { ImagesService } from "./modules/images/commands/image.service";
 
 @Module({
   imports: [
@@ -55,6 +58,7 @@ import { UnfavoriteOrgController } from "./modules/user/commands/unfavorite-org/
     EmailModule,
     LocalStorageModule,
     OtpUtilsModule,
+    CloudinaryModule
   ],
   controllers: [
     ResendOTPController,
@@ -69,7 +73,8 @@ import { UnfavoriteOrgController } from "./modules/user/commands/unfavorite-org/
     GetUserController,
     AddToFavoriteController,
     UnfavoriteEventController,
-    UnfavoriteOrgController
+    UnfavoriteOrgController,
+    ImagesController,
   ],
   providers: [
     RegisterUserService,
@@ -94,7 +99,13 @@ import { UnfavoriteOrgController } from "./modules/user/commands/unfavorite-org/
     {
       provide: 'FavoriteRepository',
       useClass: FavoriteRepositoryImpl,
-    },  ],
+    },
+    ImagesService,
+    {
+      provide: 'ImagesRepository',
+      useClass: ImagesRepositoryImpl,
+    },
+  ],
   exports: [
     UserRepositoryImpl,
     {
@@ -103,4 +114,4 @@ import { UnfavoriteOrgController } from "./modules/user/commands/unfavorite-org/
     },
   ],
 })
-export class UserModule {}
+export class UserModule { }

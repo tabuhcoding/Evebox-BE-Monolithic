@@ -5,8 +5,10 @@ import { PrismaModule } from './infrastructure/database/prisma/prisma.module';
 import { EventSvcModule } from './services/event-svc/event-svc.module';
 import { RagSvcModule } from './services/rag-svc/rag-svc.module';
 import { UserModule } from './services/auth-svc/auth-svc.module';
+import { SlackService } from './infrastructure/adapters/slack/slack.service';
 
 @Module({
+  providers: [SlackService],
   imports: [
     ConfigModule.forRoot({
       isGlobal: true, // Makes ConfigService globally available
@@ -18,5 +20,6 @@ import { UserModule } from './services/auth-svc/auth-svc.module';
     RagSvcModule,
     UserModule
   ],
+  exports: [SlackService]
 })
 export class AppModule {}

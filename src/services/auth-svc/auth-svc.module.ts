@@ -34,6 +34,10 @@ import { GetUserService } from "./modules/user/queries/get-user/get-user.service
 import { AddToFavoriteController } from "./modules/user/commands/add-to-favorite/create-favorite.controller";
 import { FavoriteRepositoryImpl } from "./repository/favorite/favorite.impl";
 import { AddToFavoriteService } from "./modules/user/commands/add-to-favorite/create-favorite.service";
+import { CloudinaryModule } from "src/infrastructure/adapters/cloudinary/cloudinary.module";
+import { ImagesController } from "./modules/images/commands/image.controller";
+import { ImagesRepositoryImpl } from "./repository/images/images.impl";
+import { ImagesService } from "./modules/images/commands/image.service";
 
 
 @Module({
@@ -51,6 +55,7 @@ import { AddToFavoriteService } from "./modules/user/commands/add-to-favorite/cr
     EmailModule,
     LocalStorageModule,
     OtpUtilsModule,
+    CloudinaryModule
   ],
   controllers: [
     ResendOTPController,
@@ -63,7 +68,8 @@ import { AddToFavoriteService } from "./modules/user/commands/add-to-favorite/cr
     ForgotPasswordController,
     GoogleLoginController,
     GetUserController,
-    AddToFavoriteController
+    AddToFavoriteController,
+    ImagesController,
   ],
   providers: [
     RegisterUserService,
@@ -86,7 +92,13 @@ import { AddToFavoriteService } from "./modules/user/commands/add-to-favorite/cr
     {
       provide: 'FavoriteRepository',
       useClass: FavoriteRepositoryImpl,
-    },  ],
+    },
+    ImagesService,
+    {
+      provide: 'ImagesRepository',
+      useClass: ImagesRepositoryImpl,
+    },
+  ],
   exports: [
     UserRepositoryImpl,
     {
@@ -95,4 +107,4 @@ import { AddToFavoriteService } from "./modules/user/commands/add-to-favorite/cr
     },
   ],
 })
-export class UserModule {}
+export class UserModule { }

@@ -34,11 +34,14 @@ import { GetUserService } from "./modules/user/queries/get-user/get-user.service
 import { AddToFavoriteController } from "./modules/user/commands/add-to-favorite/create-favorite.controller";
 import { FavoriteRepositoryImpl } from "./repository/favorite/favorite.impl";
 import { AddToFavoriteService } from "./modules/user/commands/add-to-favorite/create-favorite.service";
+import { UnfavoriteEventService } from "./modules/user/commands/unfavorite-event/unfavorite-event.service";
+import { UnfavoriteOrgService } from "./modules/user/commands/unfavorite-org/unfavorite-org.service";
+import { UnfavoriteEventController } from "./modules/user/commands/unfavorite-event/unfavorite-event.controller";
+import { UnfavoriteOrgController } from "./modules/user/commands/unfavorite-org/unfavorite-org.controller";
 import { CloudinaryModule } from "src/infrastructure/adapters/cloudinary/cloudinary.module";
 import { ImagesController } from "./modules/images/commands/image.controller";
 import { ImagesRepositoryImpl } from "./repository/images/images.impl";
 import { ImagesService } from "./modules/images/commands/image.service";
-
 
 @Module({
   imports: [
@@ -69,6 +72,8 @@ import { ImagesService } from "./modules/images/commands/image.service";
     GoogleLoginController,
     GetUserController,
     AddToFavoriteController,
+    UnfavoriteEventController,
+    UnfavoriteOrgController,
     ImagesController,
   ],
   providers: [
@@ -89,6 +94,8 @@ import { ImagesService } from "./modules/images/commands/image.service";
     GoogleLoginService,
     GetUserService,
     AddToFavoriteService,
+    UnfavoriteEventService,
+    UnfavoriteOrgService,
     {
       provide: 'FavoriteRepository',
       useClass: FavoriteRepositoryImpl,

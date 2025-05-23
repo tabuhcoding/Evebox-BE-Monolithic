@@ -4,12 +4,14 @@ import { EventCategoriesSpectial, EventFrontDisplayDto, GetEventFrontDisplayDTO 
 import { Events, EventsRepository } from 'src/services/event-svc/repository/events/events.repo';
 import { calculateEventStatusAndMinPriceAndStartDate, EventStatus } from 'src/shared/utils/status/status';
 import { CategoriesRepository } from 'src/services/event-svc/repository/categories/categories.repo';
+import { SlackService } from 'src/infrastructure/adapters/slack/slack.service';
 
 @Injectable()
 export class GetEventFrontDisplayService {
   constructor(
     @Inject('EventsRepository') private readonly eventsRepository: EventsRepository,
     @Inject('CategoriesRepository') private readonly categoriesRepository: CategoriesRepository,
+    private readonly slackService: SlackService,
   ) {}
 
   async execute(): Promise<Result<GetEventFrontDisplayDTO, Error>> {
@@ -49,7 +51,9 @@ export class GetEventFrontDisplayService {
 
       return Ok(result);
     } catch (error) {
-      console.error(error);
+      // send error to slack
+      this.slackService.sendError(`EventSvc - Event >>> GetEventFrontDisplayService: ${error.message}`);
+
       return Err(new Error('Failed to fetch front display data.'));
     }
   }

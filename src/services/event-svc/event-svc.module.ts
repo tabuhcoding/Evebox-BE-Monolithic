@@ -12,6 +12,9 @@ import { GetEventFDByIdsService } from './modules/event/queries/getEventFDByIds/
 import { GetEventFDByIdsController } from './modules/event/queries/getEventFDByIds/getEventFDByIds.controller';
 import { GetRecommendedEventController } from './modules/event/queries/getRecommendEvent/getRecommendEvent.controller';
 import { GetRecommendEventService } from './modules/event/queries/getRecommendEvent/getRecommendEvent.service';
+import { SlackService } from 'src/infrastructure/adapters/slack/slack.service';
+import { GetEventDetailRecommendController } from './modules/event/queries/getEventDetailRecommend/getEventDetailRecommend.controller';
+import { GetEventDetailRecommendService } from './modules/event/queries/getEventDetailRecommend/getEventDetailRecommend.service';
 
 @Module({
   controllers: [
@@ -21,9 +24,14 @@ import { GetRecommendEventService } from './modules/event/queries/getRecommendEv
     // Event
     GetEventFrontDisplayController,
     GetEventFDByIdsController,
-    GetRecommendedEventController
+    GetRecommendedEventController,
+    GetEventDetailRecommendController,
   ],
   providers: [
+    // Adapters
+
+    SlackService,
+    
     // Categories
     GetAllCategoriesService,
 
@@ -32,6 +40,7 @@ import { GetRecommendEventService } from './modules/event/queries/getRecommendEv
     GetEventFrontDisplayService,
     GetEventFDByIdsService,
     GetRecommendEventService,
+    GetEventDetailRecommendService,
 
     // Repositories
     { provide: 'CategoriesRepository', useClass: CategoriesRepositoryImpl },

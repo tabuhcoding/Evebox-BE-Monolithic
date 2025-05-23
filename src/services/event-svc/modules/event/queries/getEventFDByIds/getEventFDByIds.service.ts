@@ -5,13 +5,15 @@ import { EventsRepository } from "src/services/event-svc/repository/events/event
 import { GetEventFrontDisplayService } from "../getEventFrontDisplay/getEventFrontDisplay.service";
 import { EventFrontDisplayDto } from "../getEventFrontDisplay/getEventFrontDisplay-response.dto";
 import { EventStatus } from "src/shared/utils/status/status";
+import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 
 @Injectable()
 export class GetEventFDByIdsService {
   constructor(
     @Inject('EventsRepository') private readonly eventsRepository: EventsRepository,
     private readonly getEventFrontDisplayService: GetEventFrontDisplayService,
-   ) {}
+    private readonly slackService: SlackService,
+  ) {}
 
   async execute(ids: number[]): Promise<Result<GetEventFDByIdsResponseDto, Error>> {
     try {
@@ -59,7 +61,8 @@ export class GetEventFDByIdsService {
       return Ok({ event: filteredEventDtos });
 
     } catch (error) {
-      console.error(error);
+      this.slackService.sendError(`Event Service - Event >>> getEventFDByIds: ${error.message}`);
+      
       return Err(new Error("Failed to fetch events by IDs."));
     }
   }

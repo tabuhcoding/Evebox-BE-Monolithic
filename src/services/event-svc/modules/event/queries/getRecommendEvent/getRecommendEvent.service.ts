@@ -4,12 +4,14 @@ import { EventsRepository } from 'src/services/event-svc/repository/events/event
 import { GetEventFrontDisplayService } from '../getEventFrontDisplay/getEventFrontDisplay.service';
 import { EventStatus } from 'src/shared/utils/status/status';
 import { EventFrontDisplayDto } from '../getEventFrontDisplay/getEventFrontDisplay-response.dto';
+import { SlackService } from 'src/infrastructure/adapters/slack/slack.service';
 
 @Injectable()
 export class GetRecommendEventService {
   constructor(
-      private readonly getEventFrontDisplayService: GetEventFrontDisplayService,
+    private readonly getEventFrontDisplayService: GetEventFrontDisplayService,
     @Inject('EventsRepository') private readonly eventsRepository: EventsRepository,
+    private readonly slackService: SlackService,
   ) {}
 
   async getRecommendedEvents(timeWindow: "week" | "month"): Promise<Result<EventFrontDisplayDto[], Error>> {
@@ -85,7 +87,8 @@ export class GetRecommendEventService {
       // Return the result
       return Ok(filteredEventDtos);
     } catch (error) {
-      console.error(error);
+      this.slackService.sendError(`Event Service - Event >>> getRecommendedEvents: ${error.message}`);
+      
       return Err(new Error('Failed to fetch recommended events.'));
     }
   }

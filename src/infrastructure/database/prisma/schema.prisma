@@ -7,18 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Auth Service
-
-enum OTPType {
-  FORGOT_PASSWORD
-  REGISTER
-}
-
-enum ItemType {
-  EVENT
-  ORG
-}
-
 model Role {
   id        Int    @id
   role_name String @db.VarChar(50)
@@ -28,16 +16,22 @@ model Role {
 }
 
 model User {
-  id                    String                  @id @db.VarChar(255)
-  name                  String                  @db.VarChar(255)
-  email                 String                  @unique @db.VarChar(255)
-  phone                 String                  @db.VarChar(10)
-  password              String                  @db.VarChar(255)
-  role_id               Int?
-  created_at            DateTime                @default(now())
-  refreshTokens         RefreshToken[]
-  role                  Role?                   @relation(fields: [role_id], references: [id])
-  favoriteNotiHistory   FavoriteNotiHistory[]   @relation("UserFavoriteHistory")
+  id                  String                @id @db.VarChar(255)
+  name                String                @db.VarChar(255)
+  email               String                @unique @db.VarChar(255)
+  phone               String                @db.VarChar(10)
+  password            String                @db.VarChar(255)
+  role_id             Int?
+  created_at          DateTime              @default(now())
+  receiveNoti         Boolean                 @default(false)
+  avatar_id           Int?   
+  status        UserStatus     @default(ACTIVE)
+  
+  images              Images[]                 @relation("UserUploadedImages") 
+  avatar              Images?                  @relation("UserAvatar", fields: [avatar_id], references: [id])
+  favoriteNotiHistory FavoriteNotiHistory[] @relation("UserFavoriteHistory")
+  refreshTokens       RefreshToken[]
+  role                Role?                 @relation(fields: [role_id], references: [id])
 
   @@map("users")
 }
@@ -70,27 +64,24 @@ model Otp {
 }
 
 model Images {
-  id         Int      @id @default(autoincrement())
-  userId     String?  @default("TicketBox")
-  imageUrl   String   @db.VarChar(255)
+  id       Int     @id @default(autoincrement())
+  userId   String? @default("TicketBox")
+  imageUrl String  @db.VarChar(255)
+  createdAt  DateTime @default(now())
+
+  user       User?     @relation("UserUploadedImages",fields: [userId], references: [email], onDelete: Cascade)
+  avatarUser User[]   @relation("UserAvatar")
 }
 
 model FavoriteNotiHistory {
-  id          String   @id @default(uuid())
-  userId      String
-  itemType    ItemType
-  orgId       String?
-  eventId     Int?
-  isFavorite  Boolean
-  isNotified  Boolean
-
-  user        User       @relation("UserFavoriteHistory", fields: [userId], references: [id])
-}
-
-// Payment Service
-enum PaymentMethod {
-  PAYOS
-  MOMO
+  id         String   @id @default(uuid())
+  userId     String
+  itemType   ItemType
+  orgId      String?
+  eventId    Int?
+  isFavorite Boolean
+  isNotified Boolean
+  user       User     @relation("UserFavoriteHistory", fields: [userId], references: [id])
 }
 
 model PayOSInfo {
@@ -114,7 +105,7 @@ model PaymentInfo {
   method      PaymentMethod
   paymentCode Int
   paidAt      DateTime?
-  orderId String?
+  orderId     String?
 }
 
 model PaymentMethodStatus {
@@ -122,20 +113,8 @@ model PaymentMethodStatus {
   status        Boolean       @default(false)
 }
 
-// Booking Service
-enum BookingTicketType{
-  PHYSICAL_TICKET
-  E_TICKET
-}
-
-enum BookingTicketStatus{
-  CANCEL
-  SUCCESS
-  PENDING
-}
-
 model Order {
-  id             String         @id @default(uuid())
+  id             String              @id @default(uuid())
   showingId      String
   formResponseId Int?
   type           BookingTicketType
@@ -145,7 +124,7 @@ model Order {
   quantity       Int?
   seatId         Int[]
   status         BookingTicketStatus
-  mailSent       Boolean        @default(false)
+  mailSent       Boolean             @default(false)
   paymentId      Int?
   voucherCodeId  String?
   Ticket         Ticket[]
@@ -163,15 +142,11 @@ model Ticket {
   Order        Order   @relation(fields: [orderId], references: [id])
 }
 
-// Event Service
-
-// Event Service - location
-
 model Province {
-  id           Int            @id @default(autoincrement())
-  name         String         @db.VarChar(100)
-  created_at   DateTime       @default(now())
-  districts    districts[]
+  id         Int         @id @default(autoincrement())
+  name       String      @db.VarChar(100)
+  created_at DateTime    @default(now())
+  districts  districts[]
 
   @@map("province")
 }
@@ -194,8 +169,6 @@ model locations {
   Events     Events[]
   districts  districts @relation(fields: [districtId], references: [id], onDelete: Cascade)
 }
-
-// Event Service - Form
 
 model Form {
   id           Int            @id @default(autoincrement())
@@ -239,15 +212,6 @@ model FormResponse {
   FormAnswer FormAnswer[]
   Form       Form         @relation(fields: [formId], references: [id], onDelete: Cascade)
   Showing    Showing?     @relation(fields: [showingId], references: [id], onDelete: Cascade)
-}
-
-// Event Service - Seat map
-enum SeatStatusEnum {
-  NOTSALE
-  AVAILABLE
-  SOLD
-  INCACHE
-  ESOLD
 }
 
 model Row {
@@ -296,13 +260,13 @@ model Seatmap {
 }
 
 model SeatStatus {
-  id        String  @id @default(uuid())
+  id        String         @id @default(uuid())
   showingId String
   status    SeatStatusEnum
   seatId    Int
   seatMapId Int
-  Seat      Seat    @relation(fields: [seatId], references: [id])
-  Showing   Showing @relation(fields: [showingId], references: [id])
+  Seat      Seat           @relation(fields: [seatId], references: [id])
+  Showing   Showing        @relation(fields: [showingId], references: [id])
 }
 
 model TicketTypeSection {
@@ -314,63 +278,39 @@ model TicketTypeSection {
   @@id([ticketTypeId, sectionId])
 }
 
-// Event Service - Voucher
-enum DiscountType {
-  PERCENTAGE
-  VALUE
-}
-
-enum CreatorRole {
-  ADMIN
-  ORG
-}
-
 model VoucherCampaign {
-  id             String       @id @default(uuid())
-  name           String       
-  createdBy      String       
-  creatorRole    CreatorRole  // 'ADMIN' hoặc 'ORG'
-  organizerId    String?      
-  discountType   DiscountType
-  discountValue  Int
+  id               String        @id @default(uuid())
+  name             String
+  createdBy        String
+  creatorRole      CreatorRole
+  organizerId      String?
+  discountType     DiscountType
+  discountValue    Int
   maxDiscountValue Int
-  validFrom      DateTime
-  validTo        DateTime
-  eventId        Int[]         // Nếu null thì áp dụng toàn hệ thống
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-
-  codes          VoucherCode[]
+  validFrom        DateTime
+  validTo          DateTime
+  eventId          Int[]
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  codes            VoucherCode[]
 }
 
 model VoucherCode {
-  id               String          @id @default(uuid())
-  campaignId       String
-  code             String          
-  isPublic         Boolean         @default(true)
-  maxUsage         Int             @default(0)
-  maxUsagePerUser  Int             @default(0)
-
-  campaign         VoucherCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
-  targets          VoucherTargetUser[]
+  id              String              @id @default(uuid())
+  campaignId      String
+  code            String
+  isPublic        Boolean             @default(true)
+  maxUsage        Int                 @default(0)
+  maxUsagePerUser Int                 @default(0)
+  campaign        VoucherCampaign     @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  targets         VoucherTargetUser[]
 }
 
 model VoucherTargetUser {
-  id            String       @id @default(uuid())
+  id            String      @id @default(uuid())
   voucherCodeId String
-  userId        String       @db.VarChar(255)
-
-  voucherCode   VoucherCode  @relation(fields: [voucherCodeId], references: [id], onDelete: Cascade)
-}
-
-// Event Service - Event
-enum TicketTypeStatus {
-  SOLD_OUT
-  REGISTER_NOW
-  BOOK_NOW
-  REGISTER_CLOSED
-  SALE_CLOSED
-  NOT_OPEN
+  userId        String      @db.VarChar(255)
+  voucherCode   VoucherCode @relation(fields: [voucherCodeId], references: [id], onDelete: Cascade)
 }
 
 model Categories {
@@ -390,30 +330,30 @@ model EventCategories {
 }
 
 model Events {
-  id                                Int                     @id @default(autoincrement())
-  title                             String                  @db.VarChar(255)
-  description                       String?
-  organizerId                       String?
-  locationId                        Int?
-  imgLogoUrl                        String?
-  imgPosterUrl                      String?
-  createdAt                         DateTime                @default(now())
-  isOnlyOnEve                       Boolean                 @default(false)
-  isSpecial                         Boolean                 @default(false)
-  lastScore                         Decimal                 @db.Decimal(10, 2)
-  totalClicks                       Int                     @default(0)
-  weekClicks                        Int                     @default(0)
-  venue                             String?                 @db.VarChar(100)
-  isApproved                        Boolean                 @default(false)
-  orgDescription                    String?
-  orgName                           String?
-  deleteAt                          DateTime?
-  isOnline                          Boolean                 @default(false)
-  EventCategories                   EventCategories[]
-  locations                         locations?              @relation(fields: [locationId], references: [id], onDelete: Cascade)
-  Showing                           Showing[]
-  eventUserRelationships            EventUserRelationship[]
-  UserClickHistory UserClickHistory[]
+  id                     Int                     @id @default(autoincrement())
+  title                  String                  @db.VarChar(255)
+  description            String?
+  organizerId            String?
+  locationId             Int?
+  imgLogoUrl             String?
+  imgPosterUrl           String?
+  createdAt              DateTime                @default(now())
+  isOnlyOnEve            Boolean                 @default(false)
+  isSpecial              Boolean                 @default(false)
+  lastScore              Decimal                 @db.Decimal(10, 2)
+  totalClicks            Int                     @default(0)
+  weekClicks             Int                     @default(0)
+  venue                  String?                 @db.VarChar(100)
+  isApproved             Boolean                 @default(false)
+  orgDescription         String?
+  orgName                String?
+  deleteAt               DateTime?
+  isOnline               Boolean                 @default(false)
+  EventCategories        EventCategories[]
+  eventUserRelationships EventUserRelationship[]
+  locations              locations?              @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  Showing                Showing[]
+  UserClickHistory       UserClickHistory[]
 }
 
 model Showing {
@@ -460,8 +400,6 @@ model TicketType {
   sections       TicketTypeSection[]
 }
 
-// Event Service - Management
-
 model OrgPaymentInfor {
   id            String   @id @default(uuid())
   organizerId   String
@@ -480,26 +418,23 @@ model OrgPaymentInfor {
   @@map("org_payment_infor")
 }
 
-
-
 model EventUserRelationship {
   eventId   Int
   userId    String
   email     String
   role      Int?
   role_desc String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  isDeleted Boolean  @default(false)
-
-  event Events @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  eventRole  EventRole?  @relation("EventRoleToEventUserRelationship", fields: [role], references: [id])
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  isDeleted Boolean    @default(false)
+  event     Events     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  eventRole EventRole? @relation("EventRoleToEventUserRelationship", fields: [role], references: [id])
 
   @@id([eventId, userId])
 }
 
 model EventRole {
-  id           Int    @id
+  id           Int                     @id
   isEdited     Boolean
   isSummarized Boolean
   viewVoucher  Boolean
@@ -510,20 +445,75 @@ model EventRole {
   checkin      Boolean
   checkout     Boolean
   redeem       Boolean
-
-  userRoles    EventUserRelationship[]  @relation("EventRoleToEventUserRelationship")
+  userRoles    EventUserRelationship[] @relation("EventRoleToEventUserRelationship")
 
   @@map("event_role")
 }
 
-
 model UserClickHistory {
   id      String   @id @default(uuid())
   eventId Int
-  userId  String   // can be a real user ID or random UUID
+  userId  String
   date    DateTime @default(now())
-
-  event Events @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  event   Events   @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
   @@map("user_click_history")
+}
+
+enum OTPType {
+  FORGOT_PASSWORD
+  REGISTER
+}
+
+enum ItemType {
+  EVENT
+  ORG
+}
+
+enum PaymentMethod {
+  PAYOS
+  MOMO
+}
+
+enum BookingTicketType {
+  PHYSICAL_TICKET
+  E_TICKET
+}
+
+enum BookingTicketStatus {
+  CANCEL
+  SUCCESS
+  PENDING
+}
+
+enum SeatStatusEnum {
+  NOTSALE
+  AVAILABLE
+  SOLD
+  INCACHE
+  ESOLD
+}
+
+enum DiscountType {
+  PERCENTAGE
+  VALUE
+}
+
+enum CreatorRole {
+  ADMIN
+  ORG
+}
+
+enum TicketTypeStatus {
+  SOLD_OUT
+  REGISTER_NOW
+  BOOK_NOW
+  REGISTER_CLOSED
+  SALE_CLOSED
+  NOT_OPEN
+}
+
+enum UserStatus {
+ACTIVE
+BLOCKED
 }

@@ -26,6 +26,10 @@ model User {
   password              String                  @db.VarChar(255)
   role_id               Int?
   created_at            DateTime                @default(now())
+  receiveNoti           Boolean                 @default(false)
+  avatar_id             Int?   
+  images                Image[]                 @relation("UserUploadedImages") 
+  avatar                Image?                  @relation("UserAvatar", fields: [avatar_id], references: [id])
   refreshTokens         RefreshToken[]
   role                  Role?                   @relation(fields: [role_id], references: [id])
   favoriteNotiHistory   FavoriteNotiHistory[]   @relation("UserFavoriteHistory")
@@ -64,6 +68,9 @@ model Images {
   id         Int      @id @default(autoincrement())
   userId     String?  @default("TicketBox")
   imageUrl   String   @db.VarChar(255)
+  createdAt  DateTime @default(now())
+  user       User?     @relation("UserUploadedImages",fields: [userId], references: [email], onDelete: Cascade)
+  avatarUser User[]   @relation("UserAvatar")
 }
 
 model FavoriteNotiHistory {

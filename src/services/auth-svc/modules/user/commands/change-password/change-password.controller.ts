@@ -28,7 +28,6 @@ export class ChangePasswordController {
   ) {
     try {
       if (!email) {
-        this.slackService.sendError(`AuthSvc - User >>> ChangePasswordController: User email is required`);
         return res
           .status(HttpStatus.UNAUTHORIZED)
           .json(ErrorHandler.unauthorized('User email is required'));
@@ -40,34 +39,27 @@ export class ChangePasswordController {
         const error = result.unwrapErr();
 
         if (error.message === 'User not found') {
-          this.slackService.sendError(`AuthSvc - User >>> ChangePasswordController: User not found`);
           return res
             .status(HttpStatus.NOT_FOUND)
             .json(ErrorHandler.notFound('User not found'));
         }
 
         if (error.message === 'Passwords do not match') {
-          this.slackService.sendError(`AuthSvc - User >>> ChangePasswordController: Passwords do not match`);
           return res
             .status(HttpStatus.BAD_REQUEST)
             .json(ErrorHandler.badRequest('Passwords do not match'));
         }
 
         if (error.message === 'Invalid old password') {
-          this.slackService.sendError(`AuthSvc - User >>> ChangePasswordController: Old password is incorrect`);
-
           return res
             .status(HttpStatus.BAD_REQUEST)
             .json(ErrorHandler.badRequest('Old password is incorrect'));
         }
 
-        this.slackService.sendError(`AuthSvc - User >>> ChangePasswordController: Bad request`);
         return res
           .status(HttpStatus.BAD_REQUEST)
           .json(ErrorHandler.badRequest(error.message));
       }
-
-      this.slackService.sendNotice('AuthSvc - User >>> ChangePasswordController: Password has been changed successfully')
 
       return res.status(HttpStatus.OK).json({
         statusCode: HttpStatus.OK,

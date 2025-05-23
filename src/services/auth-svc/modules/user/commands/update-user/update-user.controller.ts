@@ -40,7 +40,6 @@ export class UpdateUserController {
   ) {
     try {
       if (!email) {
-        this.slackService.sendError(`AuthSvc - User >>> UpdateUserService: User not found`);
         return res
           .status(HttpStatus.NOT_FOUND)
           .json(ErrorHandler.notFound('User not found'));
@@ -52,26 +51,22 @@ export class UpdateUserController {
         const error = result.unwrapErr();
 
         if (error.message === 'User not found') {
-          this.slackService.sendError(`AuthSvc - User >>> UpdateUserController: User not found`);
           return res
             .status(HttpStatus.NOT_FOUND)
             .json(ErrorHandler.notFound('User not found'));
         }
 
         if (error.message === 'Invalid input data') {
-          this.slackService.sendError(`AuthSvc - User >>> UpdateUserService: Invalid input data`);
           return res
             .status(HttpStatus.BAD_REQUEST)
             .json(ErrorHandler.badRequest('Invalid input data'));
         }
 
-        this.slackService.sendError(`AuthSvc - User >>> UpdateUserController: Bad request`);
         return res
           .status(HttpStatus.BAD_REQUEST)
           .json(ErrorHandler.badRequest(error.message));
       }
 
-      this.slackService.sendNotice('AuthSvc - User >>> UpdateUserController: Update user successfully')
       return res.status(HttpStatus.OK).json({
         statusCode: HttpStatus.OK,
         message: 'Update user successfully',

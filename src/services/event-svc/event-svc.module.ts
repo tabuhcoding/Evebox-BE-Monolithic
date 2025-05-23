@@ -12,6 +12,9 @@ import { GetEventFDByIdsService } from './modules/event/queries/getEventFDByIds/
 import { GetEventFDByIdsController } from './modules/event/queries/getEventFDByIds/getEventFDByIds.controller';
 import { GetRecommendedEventController } from './modules/event/queries/getRecommendEvent/getRecommendEvent.controller';
 import { GetRecommendEventService } from './modules/event/queries/getRecommendEvent/getRecommendEvent.service';
+import { SlackService } from 'src/infrastructure/adapters/slack/slack.service';
+import { GetEventDetailRecommendController } from './modules/event/queries/getEventDetailRecommend/getEventDetailRecommend.controller';
+import { GetEventDetailRecommendService } from './modules/event/queries/getEventDetailRecommend/getEventDetailRecommend.service';
 import { GetEventsByIdsService } from './modules/event/queries/getEventsById/GetEventsByIds.service';
 
 @Module({
@@ -22,9 +25,14 @@ import { GetEventsByIdsService } from './modules/event/queries/getEventsById/Get
     // Event
     GetEventFrontDisplayController,
     GetEventFDByIdsController,
-    GetRecommendedEventController
+    GetRecommendedEventController,
+    GetEventDetailRecommendController,
   ],
   providers: [
+    // Adapters
+
+    SlackService,
+    
     // Categories
     GetAllCategoriesService,
 
@@ -33,6 +41,7 @@ import { GetEventsByIdsService } from './modules/event/queries/getEventsById/Get
     GetEventFrontDisplayService,
     GetEventFDByIdsService,
     GetRecommendEventService,
+    GetEventDetailRecommendService,
 
     GetEventsByIdsService,
 

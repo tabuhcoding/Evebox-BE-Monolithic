@@ -8,26 +8,44 @@ import { Password } from '../../modules/user/domain/value-objects/user/password.
 import { Role } from '../../modules/user/domain/value-objects/user/role.vo';
 import { Name } from '../../modules/user/domain/value-objects/user/name.vo';
 import { Phone } from '../../modules/user/domain/value-objects/user/phone.vo';
-import { ProvinceId } from '../../modules/user/domain/value-objects/user/province-id.vo';
 import { EventBus } from '@nestjs/cqrs';
-import { Prisma, RefreshToken } from '@prisma/client';
+import { Prisma, RefreshToken, UserStatus } from '@prisma/client';
 import { IOTPData } from './user.repository.interface';
 import { OTPType } from '../../modules/user/domain/enums/otp-type.enum';
 import { DomainEvent } from 'src/libs/ddd/domain-event.base';
 import { OTP } from '../../modules/user/domain/entities/otp.entity';
+import { Avatar } from '../../modules/user/domain/value-objects/user/avatar.vo';
+import { Status } from '../../modules/user/domain/value-objects/user/status.vo';
 
 @Injectable()
 export class UserRepositoryImpl implements UserRepository {
   constructor(
     private readonly prisma: PrismaService,
     private readonly eventBus: EventBus,
-  ) {}
+  ) { }
 
   async findByEmail(email: Email): Promise<User | null> {
     const userRecord = await this.prisma.user.findUnique({
       where: { email: email.value },
       include: {
         role: true,
+        avatar: true,
+      },
+    });
+
+    if (!userRecord) {
+      return null;
+    }
+
+    return this.mapToDomain(userRecord);
+  }
+
+  async findById(id: UserId): Promise<User | null> {
+    const userRecord = await this.prisma.user.findUnique({
+      where: { id: id.value },
+      include: {
+        role: true,
+        avatar: true,
       },
     });
 
@@ -69,6 +87,7 @@ export class UserRepositoryImpl implements UserRepository {
           password: userOrmData.password,
           phone: userOrmData.phone,
           role_id: userOrmData.role,
+          status: userOrmData.status,
         },
       });
     });
@@ -163,6 +182,20 @@ export class UserRepositoryImpl implements UserRepository {
     }
     const role = roleOrError.unwrap();
 
+     const avatarIdOrError = Avatar.create(userRecord.avatar_id);
+    if (avatarIdOrError.isErr()) {
+      throw new Error(avatarIdOrError.unwrapErr().message);
+    }
+    const avatarId = avatarIdOrError.unwrap();
+
+    const statusOrError = Status.create(userRecord.status);
+    if (statusOrError.isErr()) {
+      throw new Error(statusOrError.unwrapErr().message);
+    }
+    const status = statusOrError.unwrap();
+
+    const createAt = userRecord.created_at;
+
     const userOrError = User.createExisting(
       userId,
       name,
@@ -170,6 +203,9 @@ export class UserRepositoryImpl implements UserRepository {
       password,
       phone,
       role,
+      avatarId,
+      status,
+      createAt
     );
     if (userOrError.isErr()) {
       throw new Error(userOrError.unwrapErr().message);
@@ -186,6 +222,7 @@ export class UserRepositoryImpl implements UserRepository {
       password: user.password.getHashedValue(),
       phone: user.phone.value,
       role: user.role.getValue(),
+      status: user.status.getValue(),
     };
   }
 
@@ -294,8 +331,6 @@ export class UserRepositoryImpl implements UserRepository {
     });
   }
 
-  async findById() {}
-
   async removeAllRefreshTokens(email: string): Promise<void> {
     try {
       // Delete all refresh tokens for the user
@@ -308,5 +343,16 @@ export class UserRepositoryImpl implements UserRepository {
       console.error('Error removing refresh tokens:', error);
       throw new Error('Failed to remove refresh tokens');
     }
+  }
+
+  async updateUserInfo(user: User): Promise<void> {
+    await this.prisma.user.update({
+      where: { id: user.id.value },
+      data: {
+        name: user.name.value,
+        phone: user.phone.value,
+        avatar_id: user.avatarId,
+      },
+    });
   }
 }

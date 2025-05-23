@@ -2,6 +2,7 @@ import { Module } from "@nestjs/common";
 import { JwtModule } from "@nestjs/jwt";
 import { ConfigService, ConfigModule } from "@nestjs/config";
 import { CqrsModule } from "@nestjs/cqrs";
+import { SlackModule } from "src/infrastructure/adapters/slack/slack.module";
 import { JwtStrategy } from "src/shared/strategies/jwt.strategy";
 import { SendWelcomeEmailHandler } from "./modules/user/domain/events/handler/send-welcome-email.service";
 import { RegisterUserController } from "./modules/user/commands/register/register-user.controller";
@@ -42,6 +43,10 @@ import { CloudinaryModule } from "src/infrastructure/adapters/cloudinary/cloudin
 import { ImagesController } from "./modules/images/commands/image.controller";
 import { ImagesRepositoryImpl } from "./repository/images/images.impl";
 import { ImagesService } from "./modules/images/commands/image.service";
+import { UpdateUserController } from "./modules/user/commands/update-user/update-user.controller";
+import { UpdateUserService } from "./modules/user/commands/update-user/update-user.service";
+import { ChangePasswordController } from "./modules/user/commands/change-password/change-password.controller";
+import { ChangePasswordService } from "./modules/user/commands/change-password/change-password.service";
 
 @Module({
   imports: [
@@ -58,7 +63,8 @@ import { ImagesService } from "./modules/images/commands/image.service";
     EmailModule,
     LocalStorageModule,
     OtpUtilsModule,
-    CloudinaryModule
+    CloudinaryModule,
+    SlackModule
   ],
   controllers: [
     ResendOTPController,
@@ -75,6 +81,8 @@ import { ImagesService } from "./modules/images/commands/image.service";
     UnfavoriteEventController,
     UnfavoriteOrgController,
     ImagesController,
+    UpdateUserController,
+    ChangePasswordController,
   ],
   providers: [
     RegisterUserService,
@@ -105,6 +113,12 @@ import { ImagesService } from "./modules/images/commands/image.service";
       provide: 'ImagesRepository',
       useClass: ImagesRepositoryImpl,
     },
+    UpdateUserService, 
+    {
+      provide: 'UserRepository',
+      useClass: UserRepositoryImpl
+    },
+    ChangePasswordService,
   ],
   exports: [
     UserRepositoryImpl,

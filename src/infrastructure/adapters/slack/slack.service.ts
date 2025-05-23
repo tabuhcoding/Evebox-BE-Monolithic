@@ -4,10 +4,11 @@ import axios from 'axios';
 @Injectable()
 export class SlackService {
   private readonly webhookUrl = process.env.SLACK_WEBHOOK_URL!;
-  private readonly isDevelopment = process.env.NODE_ENV === 'development';
+  private readonly isDevelopment = process.env.ENV === 'development';
 
   async sendError(message: string) {
     if (this.isDevelopment) {
+      console.log('Console error:', message);
       
       return;
     }

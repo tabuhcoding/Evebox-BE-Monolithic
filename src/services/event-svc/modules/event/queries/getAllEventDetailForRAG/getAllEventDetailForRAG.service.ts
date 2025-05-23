@@ -1,11 +1,13 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Events, EventsRepository } from '../../../../repository/events/events.repo';
 import { GetAllEventDetailForRAGResponseDto } from './getAllEventDetailForRAG-response.dto';
+import { SlackService } from 'src/infrastructure/adapters/slack/slack.service';
 
 @Injectable()
 export class GetAllEventDetailForRAGService {
   constructor(
     @Inject('EventsRepository') private readonly eventsRepository: EventsRepository,
+    private readonly slackService: SlackService,
   ) {}
   
   async getAllEvents(): Promise<GetAllEventDetailForRAGResponseDto[]> {
@@ -66,7 +68,10 @@ export class GetAllEventDetailForRAGService {
         } as GetAllEventDetailForRAGResponseDto;
       });
     } catch (error) {
-      console.error('Error fetching events in service:', error);
+      this.slackService.sendError(
+        `Event Service - Event >>> GetAllEventDetailForRAGService - getAllEvents: ${error.message}`
+      );
+
       return [];
     }
   }

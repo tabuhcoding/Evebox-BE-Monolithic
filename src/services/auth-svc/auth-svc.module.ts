@@ -45,6 +45,8 @@ import { ImagesRepositoryImpl } from "./repository/images/images.impl";
 import { ImagesService } from "./modules/images/commands/image.service";
 import { UpdateUserController } from "./modules/user/commands/update-user/update-user.controller";
 import { UpdateUserService } from "./modules/user/commands/update-user/update-user.service";
+import { ChangePasswordController } from "./modules/user/commands/change-password/change-password.controller";
+import { ChangePasswordService } from "./modules/user/commands/change-password/change-password.service";
 
 @Module({
   imports: [
@@ -80,6 +82,7 @@ import { UpdateUserService } from "./modules/user/commands/update-user/update-us
     UnfavoriteOrgController,
     ImagesController,
     UpdateUserController,
+    ChangePasswordController,
   ],
   providers: [
     RegisterUserService,
@@ -114,7 +117,8 @@ import { UpdateUserService } from "./modules/user/commands/update-user/update-us
     {
       provide: 'UserRepository',
       useClass: UserRepositoryImpl
-    }
+    },
+    ChangePasswordService,
   ],
   exports: [
     UserRepositoryImpl,

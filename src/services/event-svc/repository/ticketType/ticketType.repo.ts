@@ -10,5 +10,11 @@ export type TicketType = Prisma.TicketTypeGetPayload<{
   }
 }>;
 
+export type TicketTypeWithoutShowingAndSections = Prisma.TicketTypeGetPayload<{
+  include: {
+    Showing: false;
+    sections: false;
+  }
+}>;
 export interface TicketTypeRepository extends BaseRepository<TicketType, Prisma.TicketTypeDelegate> {
 }

@@ -3,24 +3,24 @@ import { BaseRepository } from "src/shared/repo/base.repository";
 
 export type Showing = Prisma.ShowingGetPayload<{
   include: {
-    Event: {
-      include: {
-        locations: {
-          include: {
-            districts: {
-              include: {
-                province: true;
-              };
-            };
-          };
-        };
-        EventCategories: {
-          include: {
-            Categories: true;
-          };
-        };
-      };
-    };
+    // Event: {
+    //   include: {
+    //     locations: {
+    //       include: {
+    //         districts: {
+    //           include: {
+    //             province: true;
+    //           };
+    //         };
+    //       };
+    //     };
+    //     EventCategories: {
+    //       include: {
+    //         Categories: true;
+    //       };
+    //     };
+    //   };
+    // };
     TicketType: true;
   };
 }>;

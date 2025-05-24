@@ -18,8 +18,6 @@ model Order {
   price          Int
   totalPrice     Int
   userId         String
-  quantity       Int?
-  seatId         Int[]
   status         BookingTicketStatus
   mailSent       Boolean        @default(false)
   paymentId      Int?

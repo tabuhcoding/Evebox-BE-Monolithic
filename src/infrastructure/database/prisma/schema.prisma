@@ -517,3 +517,10 @@ enum UserStatus {
 ACTIVE
 BLOCKED
 }
+
+enum UserRole {
+  SYSTEM_ADMIN
+  ADMIN
+  ORGANIZER
+  CUSTOMER
+}

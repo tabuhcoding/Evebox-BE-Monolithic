@@ -47,6 +47,11 @@ import { UpdateUserController } from "./modules/user/commands/update-user/update
 import { UpdateUserService } from "./modules/user/commands/update-user/update-user.service";
 import { ChangePasswordController } from "./modules/user/commands/change-password/change-password.controller";
 import { ChangePasswordService } from "./modules/user/commands/change-password/change-password.service";
+import { UpdateUserStatusController } from "./modules/admin/commands/updateUserStatus/updateUserStatus.controller";
+import { UpdateUserStatusService } from "./modules/admin/commands/updateUserStatus/updateUserStatus.service";
+import { UpdateUserRoleController } from "./modules/admin/commands/updateUserRole/updateUserRole.controller";
+import { UpdateUserRoleService } from "./modules/admin/commands/updateUserRole/updateUserRole.service";
+import { AdminRepositoryImpl } from "./repository/admin/admin.repository.impl";
 import { CheckUserExistService } from "./modules/user/commands/checkuserExist/checkuserExist.service";
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 
@@ -84,6 +89,8 @@ import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
     ImagesController,
     UpdateUserController,
     ChangePasswordController,
+    UpdateUserStatusController,
+    UpdateUserRoleController,
   ],
   providers: [
     RegisterUserService,
@@ -124,6 +131,16 @@ import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
       useClass: UserRepositoryImpl
     },
     ChangePasswordService,
+    UpdateUserStatusService,
+    {
+      provide: 'AdminRepository',
+      useClass: AdminRepositoryImpl
+    },
+    UpdateUserRoleService,
+    {
+      provide: 'AdminRepository',
+      useClass: AdminRepositoryImpl
+    },
   ],
   exports: [
     UserRepositoryImpl,

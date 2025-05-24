@@ -33,6 +33,12 @@ export const USER_MESSAGES = {
   }
 };
 
+export const ADMIN_MESSAGES = {
+  ERRORS: {
+    NO_PERMISSION: 'You do not have permission to do this action'
+  }
+}
+
 export const OTP_MESSAGES = {
   SUCCESS: {
     VERIFIED: 'OTP verified successfully',

@@ -5,7 +5,7 @@ import { Response } from 'express';
 import { GetUsersNotifiedByEventService } from './get-notified-users-event.service';
 import { GetNotifiedUsersResponse } from './get-notified-users-event.dto';
 
-@ApiTags('User')
+@ApiTags('Auth Service - User')
 @Controller('api/user')
 export class GetUsersNotifiedByEventController {
   constructor(private readonly getUsersNotifiedService: GetUsersNotifiedByEventService) {}

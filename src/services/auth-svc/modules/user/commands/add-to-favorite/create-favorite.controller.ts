@@ -5,7 +5,7 @@ import { CreateFavoriteDto, CreateFavoriteResponse } from './create-favorite.dto
 import { AddToFavoriteService } from './create-favorite.service';
 import { Response } from 'express';
 
-@ApiTags('User')
+@ApiTags('Auth Service - User')
 @Controller('api/user')
 export class AddToFavoriteController {
   constructor(private readonly favoriteService: AddToFavoriteService) {}

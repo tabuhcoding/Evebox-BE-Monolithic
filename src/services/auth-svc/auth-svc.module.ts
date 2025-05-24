@@ -114,4 +114,4 @@ import { ImagesService } from "./modules/images/commands/image.service";
     },
   ],
 })
-export class UserModule { }
+export class AuthSvcModule { }

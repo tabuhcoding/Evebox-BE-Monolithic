@@ -24,4 +24,5 @@ export interface UserRepository {
   markOTPAsUsed(requestToken: string): Promise<void>
   removeAllRefreshTokens(email: string): Promise<void>
   setReceiveNoti(userId: string, receive: boolean): Promise<void>;
+  getReceiveNotiByUserId(userId: string): Promise<boolean>;
 }

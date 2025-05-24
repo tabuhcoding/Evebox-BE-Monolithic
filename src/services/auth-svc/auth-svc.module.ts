@@ -53,6 +53,8 @@ import { GetFavoriteOrgService } from "./modules/user/queries/get-favorite-org/g
 import { GetFavoriteOrgController } from "./modules/user/queries/get-favorite-org/get-favorite-org.controller";
 import { SetReceiveNotiController } from "./modules/user/commands/set-receive-noti/set-receive-noti.controller";
 import { SetReceiveNotiService } from "./modules/user/commands/set-receive-noti/set-receive-noti.service";
+import { TurnOnNotificationController } from "./modules/user/commands/turn-on-notification/turn-on-notification.controller";
+import { TurnOnNotificationService } from "./modules/user/commands/turn-on-notification/turn-on-notification.service";
 
 
 @Module({
@@ -90,10 +92,11 @@ import { SetReceiveNotiService } from "./modules/user/commands/set-receive-noti/
     UnfavoriteOrgController,
     ImagesController,
     UpdateUserController,
-    ChangePasswordController,,
+    ChangePasswordController,
     GetFavoriteEventController,
     GetFavoriteOrgController,
-    SetReceiveNotiController
+    SetReceiveNotiController,
+    TurnOnNotificationController
   ],
   providers: [
     RegisterUserService,
@@ -132,7 +135,8 @@ import { SetReceiveNotiService } from "./modules/user/commands/set-receive-noti/
       useClass: UserRepositoryImpl
     },
     ChangePasswordService,
-    SetReceiveNotiService
+    SetReceiveNotiService,
+    TurnOnNotificationService
   ],
   exports: [
     UserRepositoryImpl,

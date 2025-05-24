@@ -23,4 +23,5 @@ export interface UserRepository {
   getOTPAttempts(request_token: string): Promise<number | null>
   markOTPAsUsed(requestToken: string): Promise<void>
   removeAllRefreshTokens(email: string): Promise<void>
+  setReceiveNoti(userId: string, receive: boolean): Promise<void>;
 }

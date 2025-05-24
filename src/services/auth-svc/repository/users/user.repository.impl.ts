@@ -355,4 +355,11 @@ export class UserRepositoryImpl implements UserRepository {
       },
     });
   }
+
+  async setReceiveNoti(userId: string, receive: boolean): Promise<void> {
+  await this.prisma.user.update({
+    where: { id: userId },
+    data: { receiveNoti: receive },
+  });
+}
 }

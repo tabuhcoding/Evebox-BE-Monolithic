@@ -51,6 +51,8 @@ import { GetFavoriteEventService } from "./modules/user/queries/get-favorite-eve
 import { GetFavoriteEventController } from "./modules/user/queries/get-favorite-event/get-favorite-event.controller";
 import { GetFavoriteOrgService } from "./modules/user/queries/get-favorite-org/get-favorite-org.service";
 import { GetFavoriteOrgController } from "./modules/user/queries/get-favorite-org/get-favorite-org.controller";
+import { SetReceiveNotiController } from "./modules/user/commands/set-receive-noti/set-receive-noti.controller";
+import { SetReceiveNotiService } from "./modules/user/commands/set-receive-noti/set-receive-noti.service";
 
 
 @Module({
@@ -69,8 +71,8 @@ import { GetFavoriteOrgController } from "./modules/user/queries/get-favorite-or
     LocalStorageModule,
     OtpUtilsModule,
     CloudinaryModule,
-    SlackModule
-    EventSvcModule
+    SlackModule,
+    EventSvcModule,
   ],
   controllers: [
     ResendOTPController,
@@ -90,7 +92,8 @@ import { GetFavoriteOrgController } from "./modules/user/queries/get-favorite-or
     UpdateUserController,
     ChangePasswordController,,
     GetFavoriteEventController,
-    GetFavoriteOrgController
+    GetFavoriteOrgController,
+    SetReceiveNotiController
   ],
   providers: [
     RegisterUserService,
@@ -129,6 +132,7 @@ import { GetFavoriteOrgController } from "./modules/user/queries/get-favorite-or
       useClass: UserRepositoryImpl
     },
     ChangePasswordService,
+    SetReceiveNotiService
   ],
   exports: [
     UserRepositoryImpl,

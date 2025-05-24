@@ -1,19 +1,40 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { Result, Ok, Err } from "oxide.ts";
 import { AdminRepository } from "src/services/auth-svc/repository/admin/admin.repository";
+import { UserRepository } from "src/services/auth-svc/repository/users/user.repository";
 import { UpdateUserStatusDto } from "./updateUserStatus.dto";
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 import { USER_MESSAGES } from "src/shared/constants/constants";
+import { Status } from "../../../user/domain/value-objects/user/status.vo";
+import { Email } from "../../../user/domain/value-objects/user/email.vo";
 
 @Injectable()
 export class UpdateUserStatusService {
   constructor(
     @Inject('AdminRepository') private readonly adminRepository: AdminRepository,
+    @Inject('UserRepository') private readonly userRepository: UserRepository,
     private readonly slackService: SlackService
-  ) {}
+  ) { }
 
   async execute(dto: UpdateUserStatusDto, email: string): Promise<Result<void, Error>> {
     try {
+      const emailOrError = Email.create(email);
+      if (emailOrError.isErr()) {
+        return Err(emailOrError.unwrapErr());
+      }
+
+      const emailUnwrapped = emailOrError.unwrap();
+
+      const user = await this.userRepository.findByEmail(emailUnwrapped);
+      if (!user) {
+        return Err(new Error(USER_MESSAGES.ERRORS.USER_NOT_FOUND));
+      }
+
+      const statusOrError = Status.create(dto.status);
+      if (statusOrError.isErr()) {
+        return Err(statusOrError.unwrapErr());
+      }
+
       await this.adminRepository.updateUserStatus(email, dto.status);
 
       return Ok(void 0);

@@ -158,4 +158,4 @@ import { TurnOffNotificationServiceForOrg } from "./modules/user/commands/turn-o
     UserRepositoryImpl,
   ],
 })
-export class UserModule { }
+export class AuthSvcModule { }

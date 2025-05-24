@@ -66,6 +66,7 @@ model SeatStatus {
 model TicketTypeSection {
   ticketTypeId String
   sectionId    Int
+  quantity     Int        @default(20)
   Section      Section    @relation(fields: [sectionId], references: [id], onDelete: Cascade)
   TicketType   TicketType @relation(fields: [ticketTypeId], references: [id], onDelete: Cascade)
 

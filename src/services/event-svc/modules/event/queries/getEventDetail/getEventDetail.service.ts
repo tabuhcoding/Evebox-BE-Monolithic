@@ -3,20 +3,21 @@ import { Result, Ok, Err } from "oxide.ts";
 import { EventsRepository } from "src/services/event-svc/repository/events/events.repo";
 import { EventDetailResponseDto, ShowingDto } from "./getEventDetail-response.dto";
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
-import { Showing } from "src/services/event-svc/repository/showing/showing.repo";
-import { getSeatmapType, SeatmapType } from "src/shared/utils/status/seatmap";
 import { SeatmapRepository } from "src/services/event-svc/repository/seatmap/seatmap.repo";
-import { TicketType } from "src/services/event-svc/repository/ticketType/ticketType.repo";
 import { calculateShowingStatusAndMinPrice, EventStatus, ShowingStatus } from "src/shared/utils/status/status";
 import { CalculateShowingStatusService } from "../../commands/calculateShowingStatus/calculateShowingStatus.service";
+import { UserClickHistoryRepository } from "src/services/event-svc/repository/userClickHistory/userClickHistory.repo";
+import { CheckUserExistService } from "src/services/auth-svc/modules/user/commands/checkuserExist/checkuserExist.service";
 
 @Injectable()
 export class GetEventDetailService {
   constructor(
     @Inject('EventsRepository') private readonly eventsRepository: EventsRepository,
     @Inject('SeatmapRepository') private readonly seatmapRepository: SeatmapRepository,
+    @Inject('UserClickHistoryRepository') private readonly userClickHistoryRepository: UserClickHistoryRepository,
     private readonly slackService: SlackService,
     private readonly calculateShowingStatusService: CalculateShowingStatusService,
+    private readonly checkUserExistService: CheckUserExistService,
   ) {}
 
   async execute(eventId: number): Promise<Result<EventDetailResponseDto, Error>> {
@@ -47,6 +48,15 @@ export class GetEventDetailService {
               Categories: true,
             },
           },
+          locations: {
+            include: {
+              districts: {
+                include: {
+                  province: true,
+                },
+              },
+            },
+          }
         }
       );
 
@@ -150,5 +160,53 @@ export class GetEventDetailService {
       return Err(new Error("Failed to fetch event detail data."));
     }
     
+  }
+
+  async increasePostClickCount(eventId: number, userId?: string){
+    if (!eventId) {
+      return;
+    }
+
+    try{
+      // If userId is provided, update user click history
+      if (userId) {
+        // Check if user exists
+        const userExists = await this.checkUserExistService.execute(userId);
+        if (!userExists) {
+          // this.slackService.sendError(`Event Svc - Event >>> GetEventDetail Increase Post Click Count: User with ID ${userId} does not exist.`);
+          
+          return;
+        }
+
+        // Check if create new click history in last 30 minutes
+        const userClickHistory = await this.userClickHistoryRepository.findOne({
+          userId: userId,
+          eventId: eventId,
+          date: {
+            gte: new Date(Date.now() - 30 * 60 * 1000), // last 30 minutes
+          },
+        });
+
+        if (userClickHistory) {
+          // If user has clicked this event in last 30 minutes, do not create new click history
+          return;
+        }
+
+        // Increase post click count
+        this.eventsRepository.updateOneById(eventId, {
+          weekClicks: { increment: 1 },
+          totalClicks: { increment: 1 },
+        });
+
+        this.userClickHistoryRepository.insertOne({
+          userId: userId,
+          eventId: eventId,
+          date: new Date(),
+        })
+      }
+
+    } catch (error) {
+      this.slackService.sendError(` Event Svc - Event >>> GetEventDetail Increase Post Click Count: ${error}`);
+    }
   }
 }

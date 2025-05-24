@@ -1,4 +1,5 @@
 // src/modules/auth/repositories/auth.repository.ts
+import { isEmail } from 'class-validator';
 import { User } from '../../modules/user/domain/entities/user.entity';
 import { Email } from '../../modules/user/domain/value-objects/user/email.vo';
 import { UserId } from '../../modules/user/domain/value-objects/user/user-id.vo';
@@ -23,4 +24,5 @@ export interface UserRepository {
   getOTPAttempts(request_token: string): Promise<number | null>
   markOTPAsUsed(requestToken: string): Promise<void>
   removeAllRefreshTokens(email: string): Promise<void>
+  isEmailExists(email: string): Promise<boolean>;
 }

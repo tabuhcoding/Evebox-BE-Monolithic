@@ -369,5 +369,13 @@ export class UserRepositoryImpl implements UserRepository {
     select: { receiveNoti: true },
   });
   return user?.receiveNoti ?? false;
+  }
+
+  async getEmailsByIds(userIds: string[]): Promise<string[]> {
+  const users = await this.prisma.user.findMany({
+    where: { id: { in: userIds } },
+    select: { email: true },
+  });
+  return users.map((u) => u.email);
 }
 }

@@ -25,4 +25,5 @@ export interface UserRepository {
   removeAllRefreshTokens(email: string): Promise<void>
   setReceiveNoti(userId: string, receive: boolean): Promise<void>;
   getReceiveNotiByUserId(userId: string): Promise<boolean>;
+  getEmailsByIds(userIds: string[]): Promise<string[]>;
 }

@@ -34,6 +34,7 @@ model Ticket {
   seatId       Int?
   orderId      String
   ticketTypeId String?
+  sectionId    Int?
   isCheckedIn  Boolean @default(false)
   checkedBy    String  @default("")
   Order        Order   @relation(fields: [orderId], references: [id])

@@ -47,6 +47,9 @@ import { UpdateUserController } from "./modules/user/commands/update-user/update
 import { UpdateUserService } from "./modules/user/commands/update-user/update-user.service";
 import { ChangePasswordController } from "./modules/user/commands/change-password/change-password.controller";
 import { ChangePasswordService } from "./modules/user/commands/change-password/change-password.service";
+import { UpdateUserStatusController } from "./modules/admin/commands/updateUserStatus/updateUserStatus.controller";
+import { UpdateUserStatusService } from "./modules/admin/commands/updateUserStatus/updateUserStatus.service";
+import { AdminRepositoryImpl } from "./repository/admin/admin.repository.impl";
 
 @Module({
   imports: [
@@ -83,6 +86,7 @@ import { ChangePasswordService } from "./modules/user/commands/change-password/c
     ImagesController,
     UpdateUserController,
     ChangePasswordController,
+    UpdateUserStatusController,
   ],
   providers: [
     RegisterUserService,
@@ -119,6 +123,11 @@ import { ChangePasswordService } from "./modules/user/commands/change-password/c
       useClass: UserRepositoryImpl
     },
     ChangePasswordService,
+    UpdateUserStatusService,
+    {
+      provide: 'AdminRepository',
+      useClass: AdminRepositoryImpl
+    }
   ],
   exports: [
     UserRepositoryImpl,

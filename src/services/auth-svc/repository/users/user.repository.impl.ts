@@ -56,6 +56,13 @@ export class UserRepositoryImpl implements UserRepository {
     return this.mapToDomain(userRecord);
   }
 
+  async isEmailExists(email: string): Promise<boolean> {
+    const userRecord = await this.prisma.user.findUnique({
+      where: { email },
+    });
+    return !!userRecord;
+  }
+
   // async publishEvent(user: User): Promise<void> {
   //   const domainEvents = user.getDomainEvents();
   //   for (const event of domainEvents) {

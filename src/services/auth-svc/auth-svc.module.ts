@@ -47,6 +47,8 @@ import { UpdateUserController } from "./modules/user/commands/update-user/update
 import { UpdateUserService } from "./modules/user/commands/update-user/update-user.service";
 import { ChangePasswordController } from "./modules/user/commands/change-password/change-password.controller";
 import { ChangePasswordService } from "./modules/user/commands/change-password/change-password.service";
+import { CheckUserExistService } from "./modules/user/commands/checkuserExist/checkuserExist.service";
+import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 
 @Module({
   imports: [
@@ -64,7 +66,6 @@ import { ChangePasswordService } from "./modules/user/commands/change-password/c
     LocalStorageModule,
     OtpUtilsModule,
     CloudinaryModule,
-    SlackModule
   ],
   controllers: [
     ResendOTPController,
@@ -104,6 +105,10 @@ import { ChangePasswordService } from "./modules/user/commands/change-password/c
     AddToFavoriteService,
     UnfavoriteEventService,
     UnfavoriteOrgService,
+    CheckUserExistService,
+    SlackService,
+
+    // Repositories
     {
       provide: 'FavoriteRepository',
       useClass: FavoriteRepositoryImpl,
@@ -126,6 +131,7 @@ import { ChangePasswordService } from "./modules/user/commands/change-password/c
       provide: 'FavoriteRepository',
       useClass: FavoriteRepositoryImpl,
     },
+    CheckUserExistService,
   ],
 })
 export class AuthSvcModule { }

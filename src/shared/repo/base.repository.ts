@@ -47,11 +47,11 @@ export class BaseRepository<
     return this.repo.findMany({ where: filter, ...(include && { include }) }) as Promise<TModel[]>;
   }
 
-  async updateOneById(id: string, data: any): Promise<void> {
+  async updateOneById(id: string | number, data: any): Promise<void> {
     await this.repo.update({ where: { id }, data });
   }
 
-  async updateAndFindOneById(id: string, data: any, include?: any): Promise<TModel> {
+  async updateAndFindOneById(id: string | number, data: any, include?: any): Promise<TModel> {
     return this.repo.update({ where: { id }, data, ...(include && { include }) }) as Promise<TModel>;
   }
 

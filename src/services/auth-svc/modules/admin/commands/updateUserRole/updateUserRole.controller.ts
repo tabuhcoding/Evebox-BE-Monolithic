@@ -1,43 +1,43 @@
-import { Controller, HttpStatus, Res, Put, Param, Body, Request, UseGuards } from "@nestjs/common";
+import { Controller, HttpStatus, Res, Put, Param, Body, UseGuards, Request } from "@nestjs/common";
 import { Response } from "express";
 import { ApiTags, ApiOperation, ApiOkResponse, ApiNotFoundResponse, ApiInternalServerErrorResponse, ApiBody, ApiBearerAuth } from "@nestjs/swagger";
 import { JwtAuthGuard } from "src/shared/guard/jwt-auth.guard";
 import { ErrorHandler } from "src/shared/exceptions/error.handler";
-import { UpdateUserStatusDto } from "./updateUserStatus.dto";
-import { UpdateUserStatusService } from "./updateUserStatus.service";
+import { UpdateUserRoleDto } from "./updateUserRole.dto";
+import { UpdateUserRoleService } from "./updateUserRole.service";
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 
 @Controller('api/admin')
 @ApiTags('Authentication Service - Admin')
-export class UpdateUserStatusController {
+export class UpdateUserRoleController {
   constructor(
-    private readonly updateUserStatusService: UpdateUserStatusService,
+    private readonly updateUserRoleService: UpdateUserRoleService,
     private readonly slackService: SlackService
-  ) { }
+  ) {}
 
   @UseGuards(JwtAuthGuard)
-  @Put('/:userId/status')
+  @Put('/:userId/role')
   @ApiBearerAuth('access-token')
   @ApiOperation({
-    summary: 'Update status user',
-    description: 'Update status user by userId',
+    summary: 'Update user role',
+    description: 'Update role of user by userId',
   })
   @ApiBody({
-    description: 'Update status user',
-    type: UpdateUserStatusDto
+    description: 'Update role user',
+    type: UpdateUserRoleDto,
   })
   @ApiOkResponse({
-    description: 'Update status user successfully',
+    description: 'Update role user successfully',
   })
   @ApiNotFoundResponse({
     description: 'User not found',
   })
   @ApiInternalServerErrorResponse({
-    description: 'Failed to Update status user information',
+    description: 'Failed to update role user information',
   })
-  async updateUserStatus(
+  async updateUserRole(
     @Res() res: Response,
-    @Body() dto: UpdateUserStatusDto,
+    @Body() dto: UpdateUserRoleDto,
     @Param('userId') userId: string,
     @Request() req,
   ) {
@@ -48,15 +48,15 @@ export class UpdateUserStatusController {
           .json(ErrorHandler.badRequest('User ID is required'));
       }
 
-      if (!dto.status) {
+      if (dto.role === undefined || dto.role === null) {
         return res
-          .status(HttpStatus.BAD_REQUEST)
-          .json(ErrorHandler.badRequest('Status is required'));
+        .status(HttpStatus.BAD_REQUEST)
+        .json(ErrorHandler.badRequest('Role is required'));
       }
-
+      
       const email = req.user?.email;
 
-      const result = await this.updateUserStatusService.execute(dto, userId, email);
+      const result = await this.updateUserRoleService.execute(dto, userId, email);
 
       if (result.isErr()) {
         const error = result.unwrapErr();
@@ -74,15 +74,15 @@ export class UpdateUserStatusController {
 
       return res.status(HttpStatus.OK).json({
         statusCode: HttpStatus.OK,
-        message: 'Update status user successfully',
+        message: 'Update role user successfully',
       });
     } catch (error) {
-      this.slackService.sendError(`AuthSvc - User >>> UpdateUserStatusController: ${error.message}`);
+      this.slackService.sendError(`AuthSvc - User >>> UpdateUserRoleController: ${error.message}`);
       return res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .json(
           ErrorHandler.internalServerError(
-            'Failed to Update status user information',
+            'Failed to update role user information',
           ),
         );
     }

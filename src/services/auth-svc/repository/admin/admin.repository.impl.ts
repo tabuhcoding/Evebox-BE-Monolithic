@@ -12,6 +12,7 @@ import { Password } from "../../modules/user/domain/value-objects/user/password.
 import { Status } from "../../modules/user/domain/value-objects/user/status.vo";
 import { Avatar } from "../../modules/user/domain/value-objects/user/avatar.vo";
 import { Role } from "../../modules/user/domain/value-objects/user/role.vo";
+import { UserRole } from "../../modules/user/domain/enums/user-role.enum";
 
 @Injectable()
 export class AdminRepositoryImpl implements AdminRepository {
@@ -34,14 +35,42 @@ export class AdminRepositoryImpl implements AdminRepository {
 
     user.updateStatus(Status.create(status).unwrap());
 
-    console.log(user.status.getValue());
-
     await this.prisma.user.update({
       where: {
         email: userId
       },
       data: {
         status: status
+      }
+    });
+
+    const domainEvents = user.getDomainEvents();
+    for (const event of domainEvents) {
+      await this.eventBus.publish(event);
+    }
+    user.clearDomainEvents();
+  }
+
+  async updateUserRole(userId: string, role: UserRole): Promise<void> {
+    const userData = await this.prisma.user.findUnique({
+      where: {
+        email: userId
+      },
+      include: {
+        role: true,
+      }
+    });
+
+    const user = this.mapToDomain(userData);
+
+    user.updateRole(Role.create(role).unwrap());
+
+    await this.prisma.user.update({
+      where: {
+        email: userId,
+      },
+      data: {
+        role_id: role,
       }
     });
 

@@ -30,10 +30,6 @@ export class AdminRepositoryImpl implements AdminRepository {
       },
     });
 
-    if (!userData) {
-      throw new Error('User not found');
-    }
-
     const user = this.mapToDomain(userData);
 
     user.updateStatus(Status.create(status).unwrap());

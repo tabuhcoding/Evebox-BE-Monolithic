@@ -80,5 +80,12 @@ async getFavoriteOrgs(userId: string): Promise<{ orgId: string }[]> {
     },
   });
 }
+  
+   async updateIsNotified(id: string, isNotified: boolean): Promise<void> {
+    await this.prisma.favoriteNotiHistory.update({
+      where: { id },
+      data: { isNotified },
+    });
+  }
 
 }

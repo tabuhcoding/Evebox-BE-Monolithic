@@ -368,5 +368,13 @@ export class UserRepositoryImpl implements UserRepository {
     where: { id: userId },
     data: { receiveNoti: receive },
   });
+  }
+
+  async getReceiveNotiByUserId(userId: string): Promise<boolean> {
+  const user = await this.prisma.user.findUnique({
+    where: { id: userId },
+    select: { receiveNoti: true },
+  });
+  return user?.receiveNoti ?? false;
 }
 }

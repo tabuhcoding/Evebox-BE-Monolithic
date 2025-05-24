@@ -25,4 +25,5 @@ export interface FavoriteRepository
   getFavoriteEventIds(userId: string): Promise<number[]>;
 
   getFavoriteOrgs(userId: string): Promise<{ orgId: string }[]>;
+  updateIsNotified(id: string, isNotified: boolean): Promise<void>;
 }

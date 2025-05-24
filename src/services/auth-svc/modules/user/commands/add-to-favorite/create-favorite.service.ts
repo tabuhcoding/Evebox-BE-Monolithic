@@ -29,11 +29,24 @@ export class AddToFavoriteService {
     const userId: UserId = user.id;
 
     try {
-      const existing = await this.favoriteRepository.findFavorite(
+     let existing;
+
+    if (dto.itemType == 'EVENT'){
+      existing = await this.favoriteRepository.findFavorite(
+        userId.value,
+        dto.itemType,
+        undefined,
+        parseInt(dto.itemId),
+      );    
+    }
+    else{
+       existing = await this.favoriteRepository.findFavorite(
         userId.value,
         dto.itemType,
         dto.itemId,
-      );
+        undefined,
+      ); 
+    }
 
       if (existing) {
         if (existing.isFavorite) {

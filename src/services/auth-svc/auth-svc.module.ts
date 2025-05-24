@@ -52,6 +52,8 @@ import { UpdateUserStatusService } from "./modules/admin/commands/updateUserStat
 import { UpdateUserRoleController } from "./modules/admin/commands/updateUserRole/updateUserRole.controller";
 import { UpdateUserRoleService } from "./modules/admin/commands/updateUserRole/updateUserRole.service";
 import { AdminRepositoryImpl } from "./repository/admin/admin.repository.impl";
+import { CheckUserExistService } from "./modules/user/commands/checkuserExist/checkuserExist.service";
+import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 
 @Module({
   imports: [
@@ -69,7 +71,6 @@ import { AdminRepositoryImpl } from "./repository/admin/admin.repository.impl";
     LocalStorageModule,
     OtpUtilsModule,
     CloudinaryModule,
-    SlackModule
   ],
   controllers: [
     ResendOTPController,
@@ -111,6 +112,10 @@ import { AdminRepositoryImpl } from "./repository/admin/admin.repository.impl";
     AddToFavoriteService,
     UnfavoriteEventService,
     UnfavoriteOrgService,
+    CheckUserExistService,
+    SlackService,
+
+    // Repositories
     {
       provide: 'FavoriteRepository',
       useClass: FavoriteRepositoryImpl,
@@ -143,6 +148,7 @@ import { AdminRepositoryImpl } from "./repository/admin/admin.repository.impl";
       provide: 'FavoriteRepository',
       useClass: FavoriteRepositoryImpl,
     },
+    CheckUserExistService,
   ],
 })
 export class AuthSvcModule { }

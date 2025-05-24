@@ -24,9 +24,11 @@ import { SeatStatusRepositoryImpl } from './repository/seatStatus/seatStatus.imp
 import { TicketRepositoryImpl } from '../booking-svc/repository/ticket/ticket.impl';
 import { TicketTypeRepositoryImpl } from './repository/ticketType/ticketType.impl';
 import { CalculateShowingStatusService } from './modules/event/commands/calculateShowingStatus/calculateShowingStatus.service';
+import { UserClickHistoryRepositoryImpl } from './repository/userClickHistory/userClickHistory.impl';
+import { AuthSvcModule } from '../auth-svc/auth-svc.module';
 
 @Module({
-  imports: [ BookingSvcModule],
+  imports: [ BookingSvcModule, AuthSvcModule],
   controllers: [
     // Categories
     GetAllCategoriesController,
@@ -65,6 +67,7 @@ import { CalculateShowingStatusService } from './modules/event/commands/calculat
     { provide: 'SeatStatusRepository', useClass: SeatStatusRepositoryImpl},
     { provide: 'TicketTypeRepository', useClass: TicketRepositoryImpl},
     { provide: 'TicketTypeSectionRepository', useClass: TicketTypeRepositoryImpl},
+    { provide: 'UserClickHistoryRepository', useClass: UserClickHistoryRepositoryImpl },
 
   ],
   exports: [GetAllEventDetailForRAGService, GetEventFrontDisplayService],

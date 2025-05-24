@@ -5,7 +5,7 @@ import { GetFavoriteEventService } from './get-favorite-event.service';
 import { GetFavoriteEventResponse } from './get-favorite-event.dto';
 import { Response } from 'express';
 
-@ApiTags('User')
+@ApiTags('Auth Service - User')
 @Controller('api/user')
 export class GetFavoriteEventController {
   constructor(

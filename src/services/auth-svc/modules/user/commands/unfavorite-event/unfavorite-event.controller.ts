@@ -4,7 +4,7 @@ import { JwtAuthGuard } from 'src/shared/guard/jwt-auth.guard';
 import { UnfavoriteEventService } from './unfavorite-event.service';
 import { Response } from 'express';
 
-@ApiTags('User')
+@ApiTags('Auth Service - User')
 @Controller('api/user/favorite/event')
 export class UnfavoriteEventController {
   constructor(private readonly removeFavoriteService: UnfavoriteEventService) {}

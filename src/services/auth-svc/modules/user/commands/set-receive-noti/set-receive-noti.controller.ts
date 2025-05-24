@@ -13,7 +13,7 @@ import {
   import { SetReceiveNotiService } from './set-receive-noti.service';
 import { SetReceiveNotiQueryDto, SetReceiveNotiResponse } from './set-receive-noti.dto';
   
-  @ApiTags('User')
+  @ApiTags('Auth Service - User')
   @Controller('api/user/notification')
   export class SetReceiveNotiController {
     constructor(private readonly service: SetReceiveNotiService) {}

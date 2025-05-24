@@ -10,7 +10,7 @@ import {
   import { TurnOnNotificationService } from './turn-on-notification.service';
   import { Response } from 'express';
   
-  @ApiTags('User')
+  @ApiTags('Auth Service - User')
   @Controller('api/user')
   export class TurnOnNotificationController {
     constructor(private readonly turnOnNotificationService: TurnOnNotificationService) {}

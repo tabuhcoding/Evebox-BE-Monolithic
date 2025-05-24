@@ -2,9 +2,10 @@ import { GetFavoriteOrgService } from './get-favorite-org.service';
 import { GetFavoriteOrgResponse } from './get-favorite-org.response';
 import { Controller, Get, HttpStatus, Req, Res, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/shared/guard/jwt-auth.guard';
-import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 
+@ApiTags('Auth Service - User')
 @Controller('api/user')
 export class GetFavoriteOrgController {
   constructor(

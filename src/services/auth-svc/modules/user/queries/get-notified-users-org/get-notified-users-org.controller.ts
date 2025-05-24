@@ -5,7 +5,7 @@ import { Response } from 'express';
 import { GetUsersNotifiedByOrgService } from './get-notified-users-org.service';
 import { GetNotifiedUsersResponse } from './get-notified-users-org.dto';
 
-@ApiTags('User')
+@ApiTags('Auth Service - User')
 @Controller('api/user')
 export class GetUsersNotifiedByOrgController {
   constructor(private readonly getUsersNotifiedByOrgService: GetUsersNotifiedByOrgService) {}

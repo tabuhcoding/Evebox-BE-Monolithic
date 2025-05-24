@@ -27,4 +27,5 @@ export interface UserRepository {
   isEmailExists(email: string): Promise<boolean>;
   setReceiveNoti(userId: string, receive: boolean): Promise<void>;
   getReceiveNotiByUserId(userId: string): Promise<boolean>;
+  getEmailsByIds(userIds: string[]): Promise<string[]>;
 }

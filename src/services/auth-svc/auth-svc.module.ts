@@ -62,6 +62,10 @@ import { SetReceiveNotiController } from "./modules/user/commands/set-receive-no
 import { SetReceiveNotiService } from "./modules/user/commands/set-receive-noti/set-receive-noti.service";
 import { TurnOnNotificationController } from "./modules/user/commands/turn-on-notification/turn-on-notification.controller";
 import { TurnOnNotificationService } from "./modules/user/commands/turn-on-notification/turn-on-notification.service";
+import { GetUsersNotifiedByEventController } from './modules/user/queries/get-notified-users-event/get-notified-users-event.controller';
+import { GetUsersNotifiedByEventService } from "./modules/user/queries/get-notified-users-event/get-notified-users-event.service";
+import { GetUsersNotifiedByOrgService } from "./modules/user/queries/get-notified-users-org/get-notified-users-org.service";
+import { GetUsersNotifiedByOrgController } from "./modules/user/queries/get-notified-users-org/get-notified-users-org.controller";
 
 
 @Module({
@@ -106,7 +110,9 @@ import { TurnOnNotificationService } from "./modules/user/commands/turn-on-notif
     GetFavoriteEventController,
     GetFavoriteOrgController,
     SetReceiveNotiController,
-    TurnOnNotificationController
+    TurnOnNotificationController, 
+    GetUsersNotifiedByEventController,
+    GetUsersNotifiedByOrgController
   ],
   providers: [
     RegisterUserService,
@@ -160,7 +166,9 @@ import { TurnOnNotificationService } from "./modules/user/commands/turn-on-notif
       useClass: AdminRepositoryImpl
     },
     SetReceiveNotiService,
-    TurnOnNotificationService
+    TurnOnNotificationService,
+    GetUsersNotifiedByEventService,
+    GetUsersNotifiedByOrgService
   ],
   exports: [
     UserRepositoryImpl,

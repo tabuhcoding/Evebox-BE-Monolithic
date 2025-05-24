@@ -88,4 +88,32 @@ async getFavoriteOrgs(userId: string): Promise<{ orgId: string }[]> {
     });
   }
 
+  async getUserIdsNotifiedByEvent(eventId: number): Promise<{ userId: string }[]> {
+  return this.prisma.favoriteNotiHistory.findMany({
+    where: {
+      itemType: 'EVENT',
+      eventId,
+      isNotified: true,
+      isFavorite: true,
+    },
+    select: {
+      userId: true,
+    },
+  });
+  }
+
+  async getUserIdsNotifiedByOrganizer(orgId: string): Promise<{ userId: string }[]> {
+  return this.prisma.favoriteNotiHistory.findMany({
+    where: {
+      itemType: 'ORG',
+      orgId,
+      isNotified: true,
+      isFavorite: true,
+    },
+    select: {
+      userId: true,
+    },
+  });
+}
+
 }

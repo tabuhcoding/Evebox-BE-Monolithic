@@ -58,6 +58,8 @@ import { GetFavoriteEventService } from "./modules/user/queries/get-favorite-eve
 import { GetFavoriteEventController } from "./modules/user/queries/get-favorite-event/get-favorite-event.controller";
 import { GetFavoriteOrgService } from "./modules/user/queries/get-favorite-org/get-favorite-org.service";
 import { GetFavoriteOrgController } from "./modules/user/queries/get-favorite-org/get-favorite-org.controller";
+import { SetReceiveNotiController } from "./modules/user/commands/set-receive-noti/set-receive-noti.controller";
+import { SetReceiveNotiService } from "./modules/user/commands/set-receive-noti/set-receive-noti.service";
 
 
 @Module({
@@ -96,9 +98,12 @@ import { GetFavoriteOrgController } from "./modules/user/queries/get-favorite-or
     GetFavoriteOrgController,
     ImagesController,
     UpdateUserController,
-    ChangePasswordController,
     UpdateUserStatusController,
     UpdateUserRoleController,
+    ChangePasswordController,,
+    GetFavoriteEventController,
+    GetFavoriteOrgController,
+    SetReceiveNotiController
   ],
   providers: [
     RegisterUserService,
@@ -151,6 +156,7 @@ import { GetFavoriteOrgController } from "./modules/user/queries/get-favorite-or
       provide: 'AdminRepository',
       useClass: AdminRepositoryImpl
     },
+    SetReceiveNotiService
   ],
   exports: [
     UserRepositoryImpl,

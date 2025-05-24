@@ -15,8 +15,18 @@ import { GetRecommendEventService } from './modules/event/queries/getRecommendEv
 import { SlackService } from 'src/infrastructure/adapters/slack/slack.service';
 import { GetEventDetailRecommendController } from './modules/event/queries/getEventDetailRecommend/getEventDetailRecommend.controller';
 import { GetEventDetailRecommendService } from './modules/event/queries/getEventDetailRecommend/getEventDetailRecommend.service';
+import { BookingSvcModule } from '../booking-svc/booking.module';
+import { GetEventDetailController } from './modules/event/queries/getEventDetail/getEventDetail.controller';
+import { GetEventDetailService } from './modules/event/queries/getEventDetail/getEventDetail.service';
+import { ShowingRepositoryImpl } from './repository/showing/showing.impl';
+import { SeatmapRepositoryImpl } from './repository/seatmap/seatmap.impl';
+import { SeatStatusRepositoryImpl } from './repository/seatStatus/seatStatus.impl';
+import { TicketRepositoryImpl } from '../booking-svc/repository/ticket/ticket.impl';
+import { TicketTypeRepositoryImpl } from './repository/ticketType/ticketType.impl';
+import { CalculateShowingStatusService } from './modules/event/commands/calculateShowingStatus/calculateShowingStatus.service';
 
 @Module({
+  imports: [ BookingSvcModule],
   controllers: [
     // Categories
     GetAllCategoriesController,
@@ -26,11 +36,14 @@ import { GetEventDetailRecommendService } from './modules/event/queries/getEvent
     GetEventFDByIdsController,
     GetRecommendedEventController,
     GetEventDetailRecommendController,
+    GetEventDetailController,
   ],
   providers: [
     // Adapters
-
     SlackService,
+
+    // Utils Command
+    CalculateShowingStatusService,
     
     // Categories
     GetAllCategoriesService,
@@ -41,11 +54,18 @@ import { GetEventDetailRecommendService } from './modules/event/queries/getEvent
     GetEventFDByIdsService,
     GetRecommendEventService,
     GetEventDetailRecommendService,
+    GetEventDetailService,
 
     // Repositories
     { provide: 'CategoriesRepository', useClass: CategoriesRepositoryImpl },
     { provide: 'EventsRepository', useClass: EventsRepositoryImpl },
     { provide: 'EventCategoriesRepository', useClass: EventCategoriesRepositoryImpl },
+    { provide: 'ShowingRepository', useClass: ShowingRepositoryImpl },
+    { provide: 'SeatmapRepository', useClass: SeatmapRepositoryImpl },
+    { provide: 'SeatStatusRepository', useClass: SeatStatusRepositoryImpl},
+    { provide: 'TicketTypeRepository', useClass: TicketRepositoryImpl},
+    { provide: 'TicketTypeSectionRepository', useClass: TicketTypeRepositoryImpl},
+
   ],
   exports: [GetAllEventDetailForRAGService, GetEventFrontDisplayService],
 })

@@ -128,4 +128,4 @@ import { ChangePasswordService } from "./modules/user/commands/change-password/c
     },
   ],
 })
-export class UserModule { }
+export class AuthSvcModule { }

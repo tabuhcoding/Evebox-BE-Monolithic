@@ -1,7 +1,7 @@
 import { TicketTypeStatus } from "src/services/event-svc/repository/ticketType/ticketType.repo";
 import { Events } from "src/services/event-svc/repository/events/events.repo";
 import { Showing } from "src/services/event-svc/repository/showing/showing.repo";
-import { TicketType } from "src/services/event-svc/repository/ticketType/ticketType.repo";
+import { TicketTypeWithoutShowingAndSections } from "src/services/event-svc/repository/ticketType/ticketType.repo";
 
 export enum ShowingStatus {
  SOLD_OUT = 'SOLD_OUT',
@@ -21,12 +21,12 @@ export enum EventStatus {
   EVENT_OVER = 'EVENT_OVER',
 }
 
-export function calculateShowingStatusAndMinPrice(ticketTypes: TicketType[]): Promise<[ShowingStatus, number]> {
+export function calculateShowingStatusAndMinPrice(ticketTypes: TicketTypeWithoutShowingAndSections[]): Promise<[ShowingStatus, number]> {
   let showingStatus = ShowingStatus.SOLD_OUT;
   let minPrice = Number.MAX_VALUE;
 
   if (ticketTypes?.length === 0) {
-    console.log("No ticket types available");
+
     return Promise.resolve([ShowingStatus.SOLD_OUT, 0]);
   }
 
@@ -55,7 +55,7 @@ export function calculateShowingStatusAndMinPrice(ticketTypes: TicketType[]): Pr
     }
   }
   
-  return Promise.resolve([ShowingStatus.REGISTER_NOW, minPrice]);
+  return Promise.resolve([showingStatus, minPrice]);
 }
 
 export async function calculateEventStatusAndMinPriceAndStartDate(event: Events): Promise<[EventStatus, number, Date]> {

@@ -69,6 +69,7 @@ export class GetEventFrontDisplayService {
               startTime: {
                 gte: new Date(),
               },
+              deleteAt: null,
             },
           }
       },
@@ -88,6 +89,7 @@ export class GetEventFrontDisplayService {
             startTime: {
               gte: new Date(),
             },
+            deleteAt: null,
           },
         }
       }
@@ -128,6 +130,7 @@ export class GetEventFrontDisplayService {
             startTime: {
               gte: new Date(),
             },
+            deleteAt: null,
           },
         }
       },
@@ -147,6 +150,7 @@ export class GetEventFrontDisplayService {
             startTime: {
               gte: new Date(),
             },
+            deleteAt: null,
           },
         }
       }
@@ -191,6 +195,7 @@ export class GetEventFrontDisplayService {
             startTime: {
               gte: new Date(),
             },
+            deleteAt: null,
           },
         }
       },
@@ -210,6 +215,7 @@ export class GetEventFrontDisplayService {
             startTime: {
               gte: new Date(),
             },
+            deleteAt: null,
           },
         }
       });
@@ -279,6 +285,7 @@ export class GetEventFrontDisplayService {
               startTime: {
                 gte: new Date(),
               },
+              deleteAt: null,
             },
           }
         },
@@ -298,6 +305,7 @@ export class GetEventFrontDisplayService {
             startTime: {
               gte: new Date(),
             },
+            deleteAt: null,
           },
         },
         EventCategories: true,

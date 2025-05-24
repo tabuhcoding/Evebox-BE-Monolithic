@@ -52,4 +52,68 @@ implements FavoriteRepository {
       },
     });
   }
+
+  async getFavoriteEventIds(userId: string): Promise<number[]> {
+  const records = await this.prisma.favoriteNotiHistory.findMany({
+    where: {
+      userId,
+      isFavorite: true,
+      itemType: 'EVENT',
+    },
+    select: {
+      eventId: true,
+    },
+  });
+
+  return records.map(r => r.eventId!).filter(id => id !== null);
+}
+
+async getFavoriteOrgs(userId: string): Promise<{ orgId: string }[]> {
+  return this.prisma.favoriteNotiHistory.findMany({
+    where: {
+      userId,
+      isFavorite: true,
+      itemType: 'ORG', // assuming string enum or constant
+    },
+    select: {
+      orgId: true,
+    },
+  });
+}
+  
+   async updateIsNotified(id: string, isNotified: boolean): Promise<void> {
+    await this.prisma.favoriteNotiHistory.update({
+      where: { id },
+      data: { isNotified },
+    });
+  }
+
+  async getUserIdsNotifiedByEvent(eventId: number): Promise<{ userId: string }[]> {
+  return this.prisma.favoriteNotiHistory.findMany({
+    where: {
+      itemType: 'EVENT',
+      eventId,
+      isNotified: true,
+      isFavorite: true,
+    },
+    select: {
+      userId: true,
+    },
+  });
+  }
+
+  async getUserIdsNotifiedByOrganizer(orgId: string): Promise<{ userId: string }[]> {
+  return this.prisma.favoriteNotiHistory.findMany({
+    where: {
+      itemType: 'ORG',
+      orgId,
+      isNotified: true,
+      isFavorite: true,
+    },
+    select: {
+      userId: true,
+    },
+  });
+}
+
 }

@@ -355,4 +355,27 @@ export class UserRepositoryImpl implements UserRepository {
       },
     });
   }
+
+  async setReceiveNoti(userId: string, receive: boolean): Promise<void> {
+  await this.prisma.user.update({
+    where: { id: userId },
+    data: { receiveNoti: receive },
+  });
+  }
+
+  async getReceiveNotiByUserId(userId: string): Promise<boolean> {
+  const user = await this.prisma.user.findUnique({
+    where: { id: userId },
+    select: { receiveNoti: true },
+  });
+  return user?.receiveNoti ?? false;
+  }
+
+  async getEmailsByIds(userIds: string[]): Promise<string[]> {
+  const users = await this.prisma.user.findMany({
+    where: { id: { in: userIds } },
+    select: { email: true },
+  });
+  return users.map((u) => u.email);
+}
 }

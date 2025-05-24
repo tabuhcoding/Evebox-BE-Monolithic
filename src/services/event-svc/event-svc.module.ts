@@ -15,6 +15,7 @@ import { GetRecommendEventService } from './modules/event/queries/getRecommendEv
 import { SlackService } from 'src/infrastructure/adapters/slack/slack.service';
 import { GetEventDetailRecommendController } from './modules/event/queries/getEventDetailRecommend/getEventDetailRecommend.controller';
 import { GetEventDetailRecommendService } from './modules/event/queries/getEventDetailRecommend/getEventDetailRecommend.service';
+import { GetEventsByIdsService } from './modules/event/queries/getEventsById/GetEventsByIds.service';
 import { BookingSvcModule } from '../booking-svc/booking.module';
 import { GetEventDetailController } from './modules/event/queries/getEventDetail/getEventDetail.controller';
 import { GetEventDetailService } from './modules/event/queries/getEventDetail/getEventDetail.service';
@@ -56,6 +57,8 @@ import { CalculateShowingStatusService } from './modules/event/commands/calculat
     GetEventDetailRecommendService,
     GetEventDetailService,
 
+    GetEventsByIdsService,
+
     // Repositories
     { provide: 'CategoriesRepository', useClass: CategoriesRepositoryImpl },
     { provide: 'EventsRepository', useClass: EventsRepositoryImpl },
@@ -67,6 +70,6 @@ import { CalculateShowingStatusService } from './modules/event/commands/calculat
     { provide: 'TicketTypeSectionRepository', useClass: TicketTypeRepositoryImpl},
 
   ],
-  exports: [GetAllEventDetailForRAGService, GetEventFrontDisplayService],
+  exports: [GetAllEventDetailForRAGService, GetEventFrontDisplayService,GetEventsByIdsService],
 })
 export class EventSvcModule {}

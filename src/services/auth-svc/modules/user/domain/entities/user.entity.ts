@@ -118,6 +118,12 @@ export class User extends AggregateRoot<UserId, UserProps> {
     this.props.avatar_id = avatarId;
   }
 
+  public updateStatus(status: Status): void {
+    this.props.status = status;
+
+    // this.addDomainEvent(new UserChangeStatusDomainEvent(this));
+  }
+
   // Các getter
   public get name(): Name {
     return this.props.name;

@@ -4,7 +4,7 @@ import { IsString, IsOptional, IsDateString, IsBoolean, IsNumber, IsIn } from 'c
 import { isDeepStrictEqual } from 'util';
 
 
-export class CreateEventDto {
+export class EventDescriptionGenDto {
   @ApiProperty({ example: 'Tech Conference 2025', description: 'Title of the event' })
   @IsString({message: 'Title must be a string'})
   name: string;

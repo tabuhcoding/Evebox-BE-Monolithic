@@ -5,7 +5,7 @@ import { PromptTemplate } from '@langchain/core/prompts';
 import { Document } from 'langchain/document';
 import { GEMINI_API_KEY, COHERE_API_KEY } from 'src/shared/utils/rag/key.containts';
 import { ChatCohere } from 'src/shared/utils/rag/cohere.chat';
-import { CreateEventDto } from './descriptionGenerate.dto';
+import { EventDescriptionGenDto } from './descriptionGenerate.dto';
 import { transformEventsDtoToQuery } from 'src/shared/utils/rag/transform_documents';
 import { console } from 'inspector';
 
@@ -125,7 +125,7 @@ export class DescriptionGenerateService {
     throw new Error('❌ All API keys exhausted during RAG flow.');
   }
 
-  async askQuestion(dto: CreateEventDto): Promise<{
+  async askQuestion(dto: EventDescriptionGenDto): Promise<{
     answer: string;
   }> {
     const question = transformEventsDtoToQuery(dto);

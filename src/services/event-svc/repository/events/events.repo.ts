@@ -1,4 +1,6 @@
 import { BaseRepository } from 'src/shared/repo/base.repository';
+import { Result } from 'oxide.ts';
+import { CreateEventDto } from '../../modules/event/commands/createEvent/createEvent.dto';
 import { Prisma } from '@prisma/client';
 
 export type Events = Prisma.EventsGetPayload<{
@@ -46,4 +48,7 @@ export type EventsWithoutShowing = Prisma.EventsGetPayload<{
 
 export interface EventsRepository extends BaseRepository<Events, Prisma.EventsDelegate> {
   // Thêm các method riêng cho Events nếu cần, ví dụ:
+  createEvent(data: CreateEventDto, email: string, locationId?: number): Promise<number>;
+  createEventCategory(eventId: number, categoryIds: number[]): Promise<Result<any, Error>>
+  createLocation(streetString: string, wardString: string, districtId: number): Promise<number>
 }

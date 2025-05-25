@@ -25,6 +25,8 @@ import { TicketRepositoryImpl } from '../booking-svc/repository/ticket/ticket.im
 import { TicketTypeRepositoryImpl } from './repository/ticketType/ticketType.impl';
 import { CalculateShowingStatusService } from './modules/event/commands/calculateShowingStatus/calculateShowingStatus.service';
 import { UserClickHistoryRepositoryImpl } from './repository/userClickHistory/userClickHistory.impl';
+import { CreateEventController } from './modules/event/commands/createEvent/createEvent.controller';
+import { CreateEventService } from './modules/event/commands/createEvent/createEvent.service';
 import { AuthSvcModule } from '../auth-svc/auth-svc.module';
 
 @Module({
@@ -39,6 +41,7 @@ import { AuthSvcModule } from '../auth-svc/auth-svc.module';
     GetRecommendedEventController,
     GetEventDetailRecommendController,
     GetEventDetailController,
+    CreateEventController,
   ],
   providers: [
     // Adapters
@@ -57,6 +60,7 @@ import { AuthSvcModule } from '../auth-svc/auth-svc.module';
     GetRecommendEventService,
     GetEventDetailRecommendService,
     GetEventDetailService,
+    CreateEventService,
 
     // Repositories
     { provide: 'CategoriesRepository', useClass: CategoriesRepositoryImpl },

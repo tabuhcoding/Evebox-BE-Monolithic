@@ -53,7 +53,24 @@ import { UpdateUserRoleController } from "./modules/admin/commands/updateUserRol
 import { UpdateUserRoleService } from "./modules/admin/commands/updateUserRole/updateUserRole.service";
 import { AdminRepositoryImpl } from "./repository/admin/admin.repository.impl";
 import { CheckUserExistService } from "./modules/user/commands/checkuserExist/checkuserExist.service";
-import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
+import { SlackService } from "src/infrastructure/adapters/slack/slack.service";import { EventSvcModule } from "../event-svc/event-svc.module";
+import { GetFavoriteEventService } from "./modules/user/queries/get-favorite-event/get-favorite-event.service";
+import { GetFavoriteEventController } from "./modules/user/queries/get-favorite-event/get-favorite-event.controller";
+import { GetFavoriteOrgService } from "./modules/user/queries/get-favorite-org/get-favorite-org.service";
+import { GetFavoriteOrgController } from "./modules/user/queries/get-favorite-org/get-favorite-org.controller";
+import { SetReceiveNotiController } from "./modules/user/commands/set-receive-noti/set-receive-noti.controller";
+import { SetReceiveNotiService } from "./modules/user/commands/set-receive-noti/set-receive-noti.service";
+import { TurnOnNotificationController } from "./modules/user/commands/turn-on-notification/turn-on-notification.controller";
+import { TurnOnNotificationService } from "./modules/user/commands/turn-on-notification/turn-on-notification.service";
+import { GetUsersNotifiedByEventController } from './modules/user/queries/get-notified-users-event/get-notified-users-event.controller';
+import { GetUsersNotifiedByEventService } from "./modules/user/queries/get-notified-users-event/get-notified-users-event.service";
+import { GetUsersNotifiedByOrgService } from "./modules/user/queries/get-notified-users-org/get-notified-users-org.service";
+import { GetUsersNotifiedByOrgController } from "./modules/user/queries/get-notified-users-org/get-notified-users-org.controller";
+import { TurnOffNotificationForEventController } from "./modules/user/commands/turn-off-notification-event/turn-off-notification.controller";
+import { TurnOffNotificationForOrgController } from "./modules/user/commands/turn-off-notification-org/turn-off-notification.controller";
+import { TurnOffNotificationServiceForEvent } from "./modules/user/commands/turn-off-notification-event/turn-off-notification.service";
+import { TurnOffNotificationServiceForOrg } from "./modules/user/commands/turn-off-notification-org/turn-off-notification.service";
+
 
 @Module({
   imports: [
@@ -71,6 +88,7 @@ import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
     LocalStorageModule,
     OtpUtilsModule,
     CloudinaryModule,
+    EventSvcModule
   ],
   controllers: [
     ResendOTPController,
@@ -88,9 +106,17 @@ import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
     UnfavoriteOrgController,
     ImagesController,
     UpdateUserController,
-    ChangePasswordController,
     UpdateUserStatusController,
     UpdateUserRoleController,
+    ChangePasswordController,
+    GetFavoriteEventController,
+    GetFavoriteOrgController,
+    SetReceiveNotiController,
+    TurnOnNotificationController, 
+    GetUsersNotifiedByEventController,
+    GetUsersNotifiedByOrgController,
+    TurnOffNotificationForEventController,
+    TurnOffNotificationForOrgController
   ],
   providers: [
     RegisterUserService,
@@ -116,6 +142,8 @@ import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
     SlackService,
 
     // Repositories
+    GetFavoriteEventService,
+    GetFavoriteOrgService,
     {
       provide: 'FavoriteRepository',
       useClass: FavoriteRepositoryImpl,
@@ -141,13 +169,15 @@ import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
       provide: 'AdminRepository',
       useClass: AdminRepositoryImpl
     },
+    SetReceiveNotiService,
+    TurnOnNotificationService,
+    GetUsersNotifiedByEventService,
+    GetUsersNotifiedByOrgService, 
+    TurnOffNotificationServiceForEvent,
+    TurnOffNotificationServiceForOrg
   ],
   exports: [
     UserRepositoryImpl,
-    {
-      provide: 'FavoriteRepository',
-      useClass: FavoriteRepositoryImpl,
-    },
     CheckUserExistService,
   ],
 })

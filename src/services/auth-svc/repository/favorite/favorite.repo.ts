@@ -21,4 +21,11 @@ export interface FavoriteRepository
     orgId?: string,
     eventId?: number,
   ): Promise<void>;
+
+  getFavoriteEventIds(userId: string): Promise<number[]>;
+
+  getFavoriteOrgs(userId: string): Promise<{ orgId: string }[]>;
+  updateIsNotified(id: string, isNotified: boolean): Promise<void>;
+  getUserIdsNotifiedByEvent(eventId: number): Promise<{ userId: string }[]>;
+  getUserIdsNotifiedByOrganizer(orgId: string): Promise<{ userId: string }[]>;
 }

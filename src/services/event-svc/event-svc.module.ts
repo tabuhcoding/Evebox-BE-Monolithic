@@ -26,14 +26,17 @@ import { CalculateShowingStatusService } from './modules/event/commands/calculat
 import { UserClickHistoryRepositoryImpl } from './repository/userClickHistory/userClickHistory.impl';
 import { AuthSvcModule } from '../auth-svc/auth-svc.module';
 import { GetEventsByIdsService } from './modules/event/queries/getEventsById/GetEventsByIds.service';
-import { getAllShowingController } from './modules/showing/queries/getAllShowing/getAllShowing.controller';
-import { getAllShowingService } from './modules/showing/queries/getAllShowing/getAllShowing.service';
-import { getFormOfShowingController } from './modules/showing/queries/getFormOfShowing/getFormOfShowing.controller';
-import { getFormOfShowingService } from './modules/showing/queries/getFormOfShowing/getFormOfShowing.service';
-import { getShowingDetailController } from './modules/showing/queries/getShowingDetail/getShowingDetail.controller';
-import { getShowingDetailService } from './modules/showing/queries/getShowingDetail/getShowingDetail.service';
+import { getAllShowingController as GetAllShowingController } from './modules/showing/queries/getAllShowing/getAllShowing.controller';
+import { getAllShowingService as GetAllShowingService } from './modules/showing/queries/getAllShowing/getAllShowing.service';
+import { getFormOfShowingController as GetFormOfShowingController } from './modules/showing/queries/getFormOfShowing/getFormOfShowing.controller';
+import { getFormOfShowingService as GetFormOfShowingService } from './modules/showing/queries/getFormOfShowing/getFormOfShowing.service';
+import { getShowingDetailController as GetShowingDetailController } from './modules/showing/queries/getShowingDetail/getShowingDetail.controller';
+import { getShowingDetailService as GetShowingDetailService } from './modules/showing/queries/getShowingDetail/getShowingDetail.service';
 import { FormRepositoryImpl } from './repository/form/form.impl';
 import { TicketTypeSectionRepositoryImpl } from './repository/ticketTypeSection/ticketTypeSection.impl';
+import { getShowingSeatmapController as GetShowingSeatmapController } from './modules/showing/queries/getShowingSeatmap/getShowingSeatmap.controller';
+import { getShowingSeatmapService as GetShowingSeatmapService } from './modules/showing/queries/getShowingSeatmap/getShowingSeatmap.service';
+import { CalculateSectionStatusService } from './modules/showing/command/calculateSectionStatus/calculateSectionStatus.service';
 
 @Module({
   imports: [ BookingSvcModule, forwardRef(() => AuthSvcModule) ],
@@ -49,9 +52,10 @@ import { TicketTypeSectionRepositoryImpl } from './repository/ticketTypeSection/
     GetEventDetailController,
 
     // Showing
-    getAllShowingController,
-    getFormOfShowingController,
-    getShowingDetailController,
+    GetAllShowingController,
+    GetFormOfShowingController,
+    GetShowingDetailController,
+    GetShowingSeatmapController,
   ],
   providers: [
     // Adapters
@@ -72,10 +76,15 @@ import { TicketTypeSectionRepositoryImpl } from './repository/ticketTypeSection/
     GetEventDetailService,
 
     GetEventsByIdsService,
-    // Showing
-    getAllShowingService,
-    getFormOfShowingService,
-    getShowingDetailService,
+    ///// Showing
+    
+    // Commands
+    CalculateSectionStatusService,
+    // Queries,
+    GetAllShowingService,
+    GetFormOfShowingService,
+    GetShowingDetailService,
+    GetShowingSeatmapService,
 
     // Repositories
     { provide: 'CategoriesRepository', useClass: CategoriesRepositoryImpl },

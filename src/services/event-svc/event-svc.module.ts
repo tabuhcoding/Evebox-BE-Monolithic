@@ -1,5 +1,5 @@
 // event-svc.module.ts
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { CategoriesRepositoryImpl } from './repository/categories/categories.impl';
 import { EventsRepositoryImpl } from './repository/events/events.impl';
 import { EventCategoriesRepositoryImpl } from './repository/eventCategories/eventCategories.impl';
@@ -27,9 +27,11 @@ import { CalculateShowingStatusService } from './modules/event/commands/calculat
 import { UserClickHistoryRepositoryImpl } from './repository/userClickHistory/userClickHistory.impl';
 import { AuthSvcModule } from '../auth-svc/auth-svc.module';
 import { GetEventsByIdsService } from './modules/event/queries/getEventsById/GetEventsByIds.service';
+import { UpdateEventAdminController } from './modules/event/commands/calculateShowingStatus/UpdateEventAdmin/updateEventAdmin.controller';
+import { UpdateEventAdminService } from './modules/event/commands/calculateShowingStatus/UpdateEventAdmin/updateEventAdmin.service';
 
 @Module({
-  imports: [ BookingSvcModule, AuthSvcModule],
+  imports: [ BookingSvcModule, forwardRef(() => AuthSvcModule)],
   controllers: [
     // Categories
     GetAllCategoriesController,
@@ -40,6 +42,7 @@ import { GetEventsByIdsService } from './modules/event/queries/getEventsById/Get
     GetRecommendedEventController,
     GetEventDetailRecommendController,
     GetEventDetailController,
+    UpdateEventAdminController
   ],
   providers: [
     // Adapters
@@ -60,6 +63,8 @@ import { GetEventsByIdsService } from './modules/event/queries/getEventsById/Get
     GetEventDetailService,
 
     GetEventsByIdsService,
+
+    UpdateEventAdminService,
 
     // Repositories
     { provide: 'CategoriesRepository', useClass: CategoriesRepositoryImpl },

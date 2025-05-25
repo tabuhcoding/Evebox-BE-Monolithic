@@ -1,5 +1,6 @@
 import { BaseRepository } from 'src/shared/repo/base.repository';
 import { Prisma } from '@prisma/client';
+import { UpdateEventAdminDto } from '../../modules/event/commands/calculateShowingStatus/UpdateEventAdmin/updateEventAdmin.dto';
 
 export type Events = Prisma.EventsGetPayload<{
   include: {
@@ -47,5 +48,5 @@ export type EventsWithoutShowing = Prisma.EventsGetPayload<{
 export interface EventsRepository extends BaseRepository<Events, Prisma.EventsDelegate> {
   // Thêm các method riêng cho Events nếu cần, ví dụ:
     findManyByIdsWithDetails(ids: number[]): Promise<Events[]>;
-
+    updateEventFields(dto: UpdateEventAdminDto, eventId: number): Promise<any | null>;
 }

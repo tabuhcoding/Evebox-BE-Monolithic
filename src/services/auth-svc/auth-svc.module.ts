@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { forwardRef, Module } from "@nestjs/common";
 import { JwtModule } from "@nestjs/jwt";
 import { ConfigService, ConfigModule } from "@nestjs/config";
 import { CqrsModule } from "@nestjs/cqrs";
@@ -88,7 +88,7 @@ import { TurnOffNotificationServiceForOrg } from "./modules/user/commands/turn-o
     LocalStorageModule,
     OtpUtilsModule,
     CloudinaryModule,
-    EventSvcModule
+    forwardRef(() => EventSvcModule)
   ],
   controllers: [
     ResendOTPController,

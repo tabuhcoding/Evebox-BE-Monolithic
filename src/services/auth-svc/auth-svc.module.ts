@@ -104,8 +104,6 @@ import { TurnOffNotificationServiceForOrg } from "./modules/user/commands/turn-o
     AddToFavoriteController,
     UnfavoriteEventController,
     UnfavoriteOrgController,
-    GetFavoriteEventController,
-    GetFavoriteOrgController,
     ImagesController,
     UpdateUserController,
     UpdateUserStatusController,

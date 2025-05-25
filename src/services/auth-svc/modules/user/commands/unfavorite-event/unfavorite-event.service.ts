@@ -3,12 +3,14 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Result, Ok, Err } from 'oxide.ts';
 import { FavoriteRepository } from 'src/services/auth-svc/repository/favorite/favorite.repo';
 import { Email } from '../../domain/value-objects/user/email.vo';
+import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 
 @Injectable()
 export class UnfavoriteEventService {
   constructor(
     @Inject('FavoriteRepository') private readonly favoriteRepository: FavoriteRepository,
-    private readonly userRepository: UserRepositoryImpl
+    private readonly userRepository: UserRepositoryImpl,
+    private readonly slackService: SlackService,
   ) {}
 
   async execute(userEmail: string, eventId: number): Promise<Result<boolean, Error>> {
@@ -37,7 +39,9 @@ export class UnfavoriteEventService {
       await this.favoriteRepository.updateFavoriteStatus(favorite.id, false);
       return Ok(true);
     } catch (error) {
-      return Err(new Error(error.message || 'Failed to unfavorite event'));
+      this.slackService.sendError(` Auth Svc - User >>> UnfavoriteEvent: ${error}`);
+      
+      return Err(new Error("Failed to unfavorite event"));
     }
   }
 }

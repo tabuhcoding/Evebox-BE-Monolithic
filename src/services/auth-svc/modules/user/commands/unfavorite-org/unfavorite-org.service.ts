@@ -3,12 +3,14 @@ import { Result, Ok, Err } from 'oxide.ts';
 import { Email } from 'src/services/auth-svc/modules/user/domain/value-objects/user/email.vo';
 import { FavoriteRepository } from 'src/services/auth-svc/repository/favorite/favorite.repo';
 import { UserRepositoryImpl } from 'src/services/auth-svc/repository/users/user.repository.impl';
+import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 
 @Injectable()
 export class UnfavoriteOrgService {
  constructor(
      @Inject('FavoriteRepository') private readonly favoriteRepository: FavoriteRepository,
-     private readonly userRepository: UserRepositoryImpl
+     private readonly userRepository: UserRepositoryImpl,
+     private readonly slackService: SlackService,
   ) {}
 
   async execute(userEmail: string, orgId: string): Promise<Result<boolean, Error>> {
@@ -37,7 +39,9 @@ export class UnfavoriteOrgService {
       await this.favoriteRepository.updateFavoriteStatus(favorite.id, false);
       return Ok(true);
     } catch (error) {
-      return Err(new Error(error.message || 'Failed to unfavorite organization'));
+      this.slackService.sendError(` Auth Svc - User >>> UnfavoriteOrg: ${error}`);
+      
+      return Err(new Error("Failed to unfavorite organization"));
     }
   }
 }

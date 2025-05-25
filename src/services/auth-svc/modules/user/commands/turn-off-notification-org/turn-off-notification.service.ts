@@ -3,12 +3,14 @@ import { Result, Ok, Err } from 'oxide.ts';
 import { FavoriteRepository } from 'src/services/auth-svc/repository/favorite/favorite.repo';
 import { UserRepositoryImpl } from 'src/services/auth-svc/repository/users/user.repository.impl';
 import { Email } from '../../domain/value-objects/user/email.vo';
+import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 
 @Injectable()
 export class TurnOffNotificationServiceForOrg {
  constructor(
          @Inject('FavoriteRepository') private readonly favoriteRepository: FavoriteRepository,
-         private readonly userRepository: UserRepositoryImpl
+         private readonly userRepository: UserRepositoryImpl,
+         private readonly slackService: SlackService,
      ) {}
  
    async execute(ordId: string, emailStr: string): Promise<Result<boolean, Error>> {
@@ -34,7 +36,9 @@ export class TurnOffNotificationServiceForOrg {
        await this.favoriteRepository.updateIsNotified(existing.id, false);
        return Ok(true);
      } catch (error) {
-       return Err(error instanceof Error ? error : new Error('Unknown error'));
+       this.slackService.sendError(` Auth Svc - User >>> TurnOffNotification: ${error}`);
+      
+       return Err(new Error("Failed to turn off notification."));
      }
    }
 }

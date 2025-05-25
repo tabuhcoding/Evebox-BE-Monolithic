@@ -4,6 +4,7 @@ import { FavoriteRepository } from 'src/services/auth-svc/repository/favorite/fa
 import { UserRepositoryImpl } from 'src/services/auth-svc/repository/users/user.repository.impl';
 import { Email } from '../../domain/value-objects/user/email.vo';
 import { GetEventsByIdsService } from 'src/services/event-svc/modules/event/queries/getEventsById/GetEventsByIds.service';
+import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 
 @Injectable()
 export class GetFavoriteEventService {
@@ -11,6 +12,7 @@ constructor(
     @Inject('FavoriteRepository') private readonly favoriteRepository: FavoriteRepository,
     private readonly userRepository: UserRepositoryImpl,
     private readonly getEventsByIdsService: GetEventsByIdsService,
+    private readonly slackService: SlackService,
   ) {}
   
  async execute(email: string): Promise<Result<any[], Error>> {
@@ -24,14 +26,14 @@ constructor(
 
     const eventIds = await this.favoriteRepository.getFavoriteEventIds(user.id.value);
     if (!eventIds.length) return Ok([]);
-    console.log(eventIds)
 
     try {
       const events = await this.getEventsByIdsService.getEventsByIds(eventIds);
       return Ok(events);
     } catch (error) {
-      console.error('Failed to fetch favorite event details:', error);
-      return Err(new Error('Failed to retrieve events'));
+      this.slackService.sendError(` Auth Svc - User >>> GetFavoriteEvent: ${error}`);
+      
+      return Err(new Error("Failed to retrieve events"));
     }
   }
 }

@@ -5,12 +5,14 @@ import { Email } from 'src/services/auth-svc/modules/user/domain/value-objects/u
 import { UserRepositoryImpl } from 'src/services/auth-svc/repository/users/user.repository.impl';
 import { FavoriteRepository } from 'src/services/auth-svc/repository/favorite/favorite.repo';
 import { UserId } from '../../domain/value-objects/user/user-id.vo';
+import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 
 @Injectable()
 export class TurnOnNotificationService {
   constructor(
       @Inject('FavoriteRepository') private readonly favoriteRepository: FavoriteRepository,
-      private readonly userRepository: UserRepositoryImpl
+      private readonly userRepository: UserRepositoryImpl,
+      private readonly slackService: SlackService,
   ) {}
 
   async execute(dto: TurnOnNotificationDto, emailStr: string): Promise<Result<boolean, Error>> {
@@ -54,7 +56,9 @@ export class TurnOnNotificationService {
       await this.favoriteRepository.updateIsNotified(existing.id, true);
       return Ok(true);
     } catch (error) {
-      return Err(error instanceof Error ? error : new Error('Unknown error'));
+       this.slackService.sendError(` Auth Svc - User >>> TurnOnNotification: ${error}`);
+      
+      return Err(new Error("Failed to turn on notification."));
     }
   }
 }

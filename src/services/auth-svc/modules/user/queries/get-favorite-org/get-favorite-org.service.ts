@@ -4,12 +4,14 @@ import { UserRepository } from 'src/services/auth-svc/repository/users/user.repo
 import { Email } from 'src/services/auth-svc/modules/user/domain/value-objects/user/email.vo';
 import { FavoriteRepository } from 'src/services/auth-svc/repository/favorite/favorite.repo';
 import { UserRepositoryImpl } from 'src/services/auth-svc/repository/users/user.repository.impl';
+import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 
 @Injectable()
 export class GetFavoriteOrgService {
   constructor(
     @Inject('FavoriteRepository') private readonly favoriteRepository: FavoriteRepository,
-    private readonly userRepository: UserRepositoryImpl
+    private readonly userRepository: UserRepositoryImpl,
+    private readonly slackService: SlackService
   ) {}
 
   async execute(emailStr: string): Promise<Result<{ orgId: string }[], Error>> {
@@ -27,7 +29,9 @@ export class GetFavoriteOrgService {
     try {
       const orgs = await this.favoriteRepository.getFavoriteOrgs(user.id.value);
       return Ok(orgs);
-    } catch (err) {
+    } catch (error) {
+      this.slackService.sendError(` Auth Svc - User >>> GetFavoriteOrg: ${error}`);
+      
       return Err(new Error('Failed to get favorite organizers'));
     }
   }

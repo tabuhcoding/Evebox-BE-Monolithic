@@ -6,11 +6,13 @@ import { UserRepository } from 'src/services/auth-svc/repository/users/user.repo
 import { Email } from '../../domain/value-objects/user/email.vo';
 import { UserId } from '../../domain/value-objects/user/user-id.vo';
 import { UserRepositoryImpl } from 'src/services/auth-svc/repository/users/user.repository.impl';
+import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 
 @Injectable()
 export class AddToFavoriteService {
   constructor(
     @Inject('FavoriteRepository') private readonly favoriteRepository: FavoriteRepository,
+    private readonly slackService: SlackService,
     private readonly userRepository: UserRepositoryImpl
   ) {}
 
@@ -71,7 +73,8 @@ export class AddToFavoriteService {
 
       return Ok(true);
     } catch (error) {
-      return Err(new Error(`Failed to add favorite: ${error.message}`));
+      this.slackService.sendError(` Auth Svc - User >>> CreatFavorite: ${error}`);  
+      return Err(new Error("Failed to add event/org to favorite"));
     }
   }
 }

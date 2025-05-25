@@ -6,20 +6,27 @@ import { FormRepository } from "src/services/event-svc/repository/form/form.repo
 @Injectable()
 export class getFormOfShowingService {
   constructor (
-    @Inject('FormRespository') private readonly formRepository: FormRepository,
+    @Inject('FormRepository') private readonly formRepository: FormRepository,
   ) {}
 
   async execute(showingId: string): Promise<Result<GetFormOfShowingDataDto, Error>> {
     try {
       const form = await this.formRepository.findOne({
-        where: {
-          showingId: showingId,
-        },
+        Showing: {
+          every: {
+            id: showingId,
+            deleteAt: null,
+            startTime: {
+              lte: new Date(),
+            },
+            endTime: {
+              gte: new Date(),
+            },
+          }
+        }
       },
       {
-        include: {
-          FormInput: true,
-        }
+        FormInput: true,
       });
       if (!form) {
         return Err(new Error('Form not found.'));

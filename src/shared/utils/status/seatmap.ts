@@ -15,7 +15,7 @@ export function getSeatmapType(seatmap: Seatmap): SeatmapType {
     return SeatmapType.NOT_A_SEATMAP
   }
 
-  if (seatmap.Section.filter((section) => section.Row?.length > 0).length === 0) {
+  if (seatmap.Section.some(section => section.Row && section.Row.length > 0)) {
     return SeatmapType.SELECT_SEAT
   }
 

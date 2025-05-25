@@ -1,8 +1,9 @@
 import { Inject, Injectable } from "@nestjs/common";
+import { Ticket } from "@prisma/client";
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 import { GetTotalTicketOfTicketTypeService } from "src/services/booking-svc/modules/queries/getTotalTicketOfTicketType/getTotalTicketOfTicketType.service";
 import { SeatmapRepository } from "src/services/event-svc/repository/seatmap/seatmap.repo";
-import { SeatStatusRepository } from "src/services/event-svc/repository/seatStatus/seatStatus.repo";
+import { SeatStatusEnum, SeatStatusRepository } from "src/services/event-svc/repository/seatStatus/seatStatus.repo";
 import { Showing } from "src/services/event-svc/repository/showing/showing.repo";
 import { TicketTypeRepository, TicketTypeStatus } from "src/services/event-svc/repository/ticketType/ticketType.repo";
 import { TicketTypeSectionRepository } from "src/services/event-svc/repository/ticketTypeSection/ticketTypeSection.repo";
@@ -43,7 +44,10 @@ export class CalculateShowingStatusService {
       
       // update ticket type status
       for (const ticketType of showing.TicketType) {
-        await this.reCalculateTicketTypeStatus(ticketType.id, seatmapType);
+        const newStatus = await this.reCalculateTicketTypeStatus(ticketType.id as string, seatmapType);
+        if (newStatus !== undefined) {
+          ticketType.status = newStatus;
+        }
       }
       
       return;
@@ -54,7 +58,7 @@ export class CalculateShowingStatusService {
     }
   }
 
-  async reCalculateTicketTypeStatus(ticketTypeId: string, seatmapType: SeatmapType) {
+  async reCalculateTicketTypeStatus(ticketTypeId: string, seatmapType: SeatmapType): Promise<TicketTypeStatus | undefined> {
     try{
       // Find ticket type by id
       const ticketType = await this.ticketTypeRepository.findOneById(ticketTypeId, {
@@ -62,19 +66,21 @@ export class CalculateShowingStatusService {
 
       if (!ticketType) {
 
-        return;
+        return undefined;
       }
       
       // Normal check
       const now = new Date();
       if (ticketType.startTime > now) {
         ticketType.status = TicketTypeStatus.NOT_OPEN;
-        return;
+
+        return ticketType.status;
       }
 
       if (ticketType.endTime < now) {
         ticketType.status = ticketType.isFree ? TicketTypeStatus.REGISTER_CLOSED : TicketTypeStatus.SALE_CLOSED;
-        return;
+
+        return ticketType.status;
       }
       
       // Seatmap is not a seatmap
@@ -85,7 +91,7 @@ export class CalculateShowingStatusService {
           this.slackService.sendError(`Booking Svc >>> reCalculateTicketTypeStatus: Failed to get total tickets for ticket type ${ticketType.id}`);
           ticketType.status = TicketTypeStatus.NOT_OPEN
 
-          return;
+          return ticketType.status;
         }
 
         if (totalTickets < ticketType.quantity && ticketType.quantity > 0)
@@ -93,22 +99,20 @@ export class CalculateShowingStatusService {
         else 
           ticketType.status = TicketTypeStatus.SOLD_OUT;
 
-        return;
+        return ticketType.status;
       }
 
       // Seatmap is a Select section seatmap
       if (seatmapType === SeatmapType.SELECT_SECTION) {
         // Get all ticket type sections
         const ticketTypeSections = await this.ticketTypeSectionRepository.findMany({
-          where: {
-            ticketTypeId: ticketType.id,
-          },
+          ticketTypeId: ticketType.id,
         });
 
         if (!ticketTypeSections || ticketTypeSections.length === 0) {
           this.slackService.sendError(`Event Svc - Event >>> reCalculateTicketTypeStatus: No ticket type sections found for ticket type ${ticketType.id}`);
           ticketType.status = TicketTypeStatus.NOT_OPEN;
-          return;
+          return ticketType.status;
         }
 
         for (const ticketTypeSection of ticketTypeSections) {
@@ -117,55 +121,53 @@ export class CalculateShowingStatusService {
           if (totalTickets === null) {
             this.slackService.sendError(`Booking Svc >>> reCalculateTicketTypeStatus: Failed to get total tickets for ticket type ${ticketType.id} and section ${ticketTypeSection.sectionId}`);
             ticketType.status = TicketTypeStatus.NOT_OPEN;
-            return;
+            return ticketType.status;
           }
 
           if (totalTickets < ticketTypeSection.quantity && ticketTypeSection.quantity > 0) {
             ticketType.status = ticketType.isFree ? TicketTypeStatus.REGISTER_NOW : TicketTypeStatus.BOOK_NOW;
 
-            return;
+            return ticketType.status;
           } else {
             ticketType.status = TicketTypeStatus.SOLD_OUT;
           }
         }
 
-        return;
+        return ticketType.status;
       }
 
       // Seatmap is a Select seat seatmap
       if (seatmapType === SeatmapType.SELECT_SEAT) {
         // Get all ticket type sections
         const ticketTypeSections = await this.ticketTypeSectionRepository.findMany({
-          where: {
-            ticketTypeId: ticketType.id,
-          },
+          ticketTypeId: ticketType.id,
         });
 
         if (!ticketTypeSections || ticketTypeSections.length === 0) {
           this.slackService.sendError(`Event Svc - Event >>> reCalculateTicketTypeStatus: No ticket type sections found for ticket type ${ticketType.id}`);
           ticketType.status = TicketTypeStatus.NOT_OPEN;
-          return;
+          return ticketType.status;
         }
 
         // Get all seatStatus of sections
         const allSeatOfSections = await this.seatStatusRepository.findMany({
-          where: {
-            Seat: {
-              Row: {
-                Section: {
-                  id: {
-                    in: ticketTypeSections.map(section => section.sectionId),
-                  }
+          Seat: {
+            Row: {
+              Section: {
+                id: {
+                  in: ticketTypeSections.map(section => section.sectionId),
                 }
               }
             }
-          }
+          },
+          showingId: ticketType.showingId,
         });
+
 
         if (!allSeatOfSections || allSeatOfSections.length === 0) {
           this.slackService.sendError(`Event Svc - Event >>> reCalculateTicketTypeStatus: No seat status found for ticket type ${ticketType.id}`);
           ticketType.status = TicketTypeStatus.NOT_OPEN;
-          return;
+          return ticketType.status;
         }
 
         // Get all seat has sale of ticket type
@@ -174,10 +176,19 @@ export class CalculateShowingStatusService {
         if (allSeatHasSale === null) {
           this.slackService.sendError(`Booking Svc >>> reCalculateTicketTypeStatus: Failed to get all seat has sale for ticket type ${ticketType.id}`);
           ticketType.status = TicketTypeStatus.NOT_OPEN;
-          return;
+          return ticketType.status;
         }
 
         // compare all seat status is available with all seat has sale
+
+        // Check if there are any available seats that are not sold
+        const seatStatusAvailable = allSeatOfSections.some(seatStatus => seatStatus.status === SeatStatusEnum.AVAILABLE )
+        
+        if (!seatStatusAvailable)
+        {
+          ticketType.status = TicketTypeStatus.SOLD_OUT;
+          return ticketType.status;
+        }
 
         const allSeatStatusAvailable = allSeatOfSections.filter(seatStatus => 
           seatStatus.status === 'AVAILABLE' && 
@@ -189,12 +200,14 @@ export class CalculateShowingStatusService {
         } else {
           ticketType.status = TicketTypeStatus.SOLD_OUT;
         }
-        return;
+
+        return ticketType.status;
       }
 
       // If seatmap type is not recognized, set status to NOT_OPEN
       this.slackService.sendError(`Event Svc - Event >>> reCalculateTicketTypeStatus: Unrecognized seatmap type for ticket type ${ticketType.id}`);
       ticketType.status = TicketTypeStatus.NOT_OPEN;
+      return ticketType.status;
     }
     catch (error) {
       this.slackService.sendError(`Event Svc - Event >>> reCalculateTicketTypeStatus: ${error.message}`);

@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Delete, Param, UploadedFile, UseInterceptors, Res, HttpStatus, Put, Headers } from "@nestjs/common";
+import { Controller, Get, Post, Delete, Param, UploadedFile, Request, UseGuards, UseInterceptors, Res, HttpStatus, Put, Headers } from "@nestjs/common";
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { JwtAuthGuard } from "src/shared/guard/jwt-auth.guard";
 import { ImagesService } from "./image.service";
 import { ErrorHandler } from "src/shared/exceptions/error.handler";
 import { ImagesResponseDto } from "./image-response.dto";
@@ -11,6 +12,8 @@ import { ImagesResponseDto } from "./image-response.dto";
 export class ImagesController {
   constructor(private readonly imagesService: ImagesService) { }
 
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
   @Post('/upload')
   @ApiOperation({ summary: 'Upload an image' })
   @ApiResponse({
@@ -27,9 +30,15 @@ export class ImagesController {
   async uploadImage(
     @UploadedFile() file: Express.Multer.File,
     @Res() res: Response,
-    @Headers('X-User-Email') email: string
+    @Request() req: any,
   ) {
     try {
+      const email = req.user?.email;
+      if (!email) {
+        return res
+          .status(HttpStatus.UNAUTHORIZED)
+          .json(ErrorHandler.unauthorized('User not authenticated'));
+      }
       if (!file) {
         return res
           .status(HttpStatus.BAD_REQUEST)
@@ -62,6 +71,8 @@ export class ImagesController {
     }
   }
 
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
   @Get('/')
   @ApiOperation({ summary: 'Get all images' })
   @ApiResponse({
@@ -74,9 +85,16 @@ export class ImagesController {
   })
   async getAllImages(
     @Res() res: Response,
-    @Headers('X-User-Email') email: string,
+    @Request() req: any,
+
   ) {
     try {
+      const email = req.user?.email;
+      if (!email) {
+        return res
+          .status(HttpStatus.UNAUTHORIZED)
+          .json(ErrorHandler.unauthorized('User not authenticated'));
+      }
       const result = await this.imagesService.findAll(email);
 
       if (result.isErr()) {
@@ -100,6 +118,8 @@ export class ImagesController {
     }
   }
 
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
   @Get('/:id')
   @ApiOperation({ summary: 'Get an image by ID' })
   @ApiResponse({
@@ -108,7 +128,13 @@ export class ImagesController {
     type: ImagesResponseDto,
   })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Image not found' })
-  async getImage(@Param('id') id: string, @Res() res: Response) {
+  async getImage(@Param('id') id: string, @Res() res: Response, @Request() req: any) {
+    const email = req.user?.email;
+    if (!email) {
+      return res
+        .status(HttpStatus.UNAUTHORIZED)
+        .json(ErrorHandler.unauthorized('User not authenticated'));
+    }
     try {
       const result = await this.imagesService.findOne(Number(id));
 
@@ -133,6 +159,8 @@ export class ImagesController {
     }
   }
 
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
   @Put('/:id')
   @ApiOperation({ summary: 'Update an image by ID' })
   @ApiResponse({
@@ -150,8 +178,16 @@ export class ImagesController {
     @Param('id') id: string,
     @UploadedFile() file: Express.Multer.File,
     @Res() res: Response,
+    @Request() req: any,
   ) {
     try {
+      const email = req.user?.email;
+      if (!email) {
+        return res
+          .status(HttpStatus.UNAUTHORIZED)
+          .json(ErrorHandler.unauthorized('User not authenticated'));
+      }
+
       const result = await this.imagesService.update(
         Number(id),
         file.buffer,
@@ -177,6 +213,8 @@ export class ImagesController {
     }
   }
 
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
   @Delete('/:id')
   @ApiOperation({ summary: 'Delete an image by ID' })
   @ApiResponse({
@@ -184,7 +222,13 @@ export class ImagesController {
     description: 'Image deleted successfully',
   })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Image not found' })
-  async removeImage(@Param('id') id: string, @Res() res: Response) {
+  async removeImage(@Param('id') id: string, @Res() res: Response, @Request() req: any) {
+    const email = req.user?.email;
+    if (!email) {
+      return res
+        .status(HttpStatus.UNAUTHORIZED)
+        .json(ErrorHandler.unauthorized('User not authenticated'));
+    }
     try {
       const result = await this.imagesService.remove(Number(id));
 

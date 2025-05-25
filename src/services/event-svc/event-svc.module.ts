@@ -36,6 +36,8 @@ import { getShowingDetailController } from './modules/showing/queries/getShowing
 import { getShowingDetailService } from './modules/showing/queries/getShowingDetail/getShowingDetail.service';
 import { FormRepositoryImpl } from './repository/form/form.impl';
 import { TicketTypeSectionRepositoryImpl } from './repository/ticketTypeSection/ticketTypeSection.impl';
+import { UpdateEventController } from './modules/event/commands/updateEvent/updateEvent.controller';
+import { UpdateEventService } from './modules/event/commands/updateEvent/updateEvent.service';
 
 @Module({
   imports: [ BookingSvcModule, forwardRef(() => AuthSvcModule) ],
@@ -50,6 +52,7 @@ import { TicketTypeSectionRepositoryImpl } from './repository/ticketTypeSection/
     GetEventDetailRecommendController,
     GetEventDetailController,
     CreateEventController,
+    UpdateEventController,
 
     // Showing
     getAllShowingController,
@@ -74,6 +77,7 @@ import { TicketTypeSectionRepositoryImpl } from './repository/ticketTypeSection/
     GetEventDetailRecommendService,
     GetEventDetailService,
     CreateEventService,
+    UpdateEventService,
 
     GetEventsByIdsService,
     // Showing

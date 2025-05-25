@@ -27,6 +27,10 @@ import { CalculateShowingStatusService } from './modules/event/commands/calculat
 import { UserClickHistoryRepositoryImpl } from './repository/userClickHistory/userClickHistory.impl';
 import { AuthSvcModule } from '../auth-svc/auth-svc.module';
 import { GetEventsByIdsService } from './modules/event/queries/getEventsById/GetEventsByIds.service';
+import { getAllShowingController } from './modules/showing/queries/getAllShowing/getAllShowing.controller';
+import { getAllShowingService } from './modules/showing/queries/getAllShowing/getAllShowing.service';
+import { getFormOfShowingController } from './modules/showing/queries/getFormOfShowing/getFormOfShowing.controller';
+import { getFormOfShowingService } from './modules/showing/queries/getFormOfShowing/getFormOfShowing.service';
 
 @Module({
   imports: [ BookingSvcModule, AuthSvcModule],
@@ -40,6 +44,10 @@ import { GetEventsByIdsService } from './modules/event/queries/getEventsById/Get
     GetRecommendedEventController,
     GetEventDetailRecommendController,
     GetEventDetailController,
+
+    // Showing
+    getAllShowingController,
+    getFormOfShowingController,
   ],
   providers: [
     // Adapters
@@ -60,6 +68,9 @@ import { GetEventsByIdsService } from './modules/event/queries/getEventsById/Get
     GetEventDetailService,
 
     GetEventsByIdsService,
+    // Showing
+    getAllShowingService,
+    getFormOfShowingService,
 
     // Repositories
     { provide: 'CategoriesRepository', useClass: CategoriesRepositoryImpl },

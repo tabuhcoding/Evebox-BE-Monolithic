@@ -28,6 +28,8 @@ import { UserClickHistoryRepositoryImpl } from './repository/userClickHistory/us
 import { CreateEventController } from './modules/event/commands/createEvent/createEvent.controller';
 import { CreateEventService } from './modules/event/commands/createEvent/createEvent.service';
 import { AuthSvcModule } from '../auth-svc/auth-svc.module';
+import { UpdateEventController } from './modules/event/commands/updateEvent/updateEvent.controller';
+import { UpdateEventService } from './modules/event/commands/updateEvent/updateEvent.service';
 
 @Module({
   imports: [ BookingSvcModule, AuthSvcModule],
@@ -42,6 +44,7 @@ import { AuthSvcModule } from '../auth-svc/auth-svc.module';
     GetEventDetailRecommendController,
     GetEventDetailController,
     CreateEventController,
+    UpdateEventController,
   ],
   providers: [
     // Adapters
@@ -61,6 +64,7 @@ import { AuthSvcModule } from '../auth-svc/auth-svc.module';
     GetEventDetailRecommendService,
     GetEventDetailService,
     CreateEventService,
+    UpdateEventService,
 
     // Repositories
     { provide: 'CategoriesRepository', useClass: CategoriesRepositoryImpl },

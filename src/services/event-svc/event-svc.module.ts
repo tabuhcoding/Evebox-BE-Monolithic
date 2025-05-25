@@ -24,6 +24,8 @@ import { SeatStatusRepositoryImpl } from './repository/seatStatus/seatStatus.imp
 import { TicketTypeRepositoryImpl } from './repository/ticketType/ticketType.impl';
 import { CalculateShowingStatusService } from './modules/event/commands/calculateShowingStatus/calculateShowingStatus.service';
 import { UserClickHistoryRepositoryImpl } from './repository/userClickHistory/userClickHistory.impl';
+import { CreateEventController } from './modules/event/commands/createEvent/createEvent.controller';
+import { CreateEventService } from './modules/event/commands/createEvent/createEvent.service';
 import { AuthSvcModule } from '../auth-svc/auth-svc.module';
 import { GetEventsByIdsService } from './modules/event/queries/getEventsById/GetEventsByIds.service';
 import { getAllShowingController } from './modules/showing/queries/getAllShowing/getAllShowing.controller';
@@ -47,6 +49,7 @@ import { TicketTypeSectionRepositoryImpl } from './repository/ticketTypeSection/
     GetRecommendedEventController,
     GetEventDetailRecommendController,
     GetEventDetailController,
+    CreateEventController,
 
     // Showing
     getAllShowingController,
@@ -70,6 +73,7 @@ import { TicketTypeSectionRepositoryImpl } from './repository/ticketTypeSection/
     GetRecommendEventService,
     GetEventDetailRecommendService,
     GetEventDetailService,
+    CreateEventService,
 
     GetEventsByIdsService,
     // Showing

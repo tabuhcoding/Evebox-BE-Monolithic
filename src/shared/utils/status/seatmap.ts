@@ -6,6 +6,12 @@ export enum SeatmapType {
  SELECT_SEAT = 'SELECT_SEAT',
 }
 
+export enum SectionStatus {
+  AVAILABLE = 'AVAILABLE',
+  SOLD_OUT = 'SOLD_OUT',
+  NOT_SALE = 'NOT_SALE',
+}
+
 export function getSeatmapType(seatmap: Seatmap): SeatmapType {
   if (!seatmap || seatmap.id === 0) {
     return SeatmapType.NOT_A_SEATMAP

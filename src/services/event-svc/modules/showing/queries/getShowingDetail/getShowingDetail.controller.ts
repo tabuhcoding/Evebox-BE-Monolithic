@@ -5,7 +5,7 @@ import { ErrorHandler } from 'src/shared/exceptions/error.handler';
 import { ShowingResponseDto } from './getShowingDetail-response.dto';
 import { getShowingDetailService } from './getShowingDetail.service';
 
-@ApiTags('Showing')
+@ApiTags('Event Service - Showing')
 @Controller('api/showing')
 export class getShowingDetailController {
   constructor(private readonly getShowingDetailService: getShowingDetailService) {}

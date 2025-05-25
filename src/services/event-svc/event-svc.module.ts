@@ -1,5 +1,5 @@
 // event-svc.module.ts
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { CategoriesRepositoryImpl } from './repository/categories/categories.impl';
 import { EventsRepositoryImpl } from './repository/events/events.impl';
 import { EventCategoriesRepositoryImpl } from './repository/eventCategories/eventCategories.impl';
@@ -36,7 +36,7 @@ import { FormRepositoryImpl } from './repository/form/form.impl';
 import { TicketTypeSectionRepositoryImpl } from './repository/ticketTypeSection/ticketTypeSection.impl';
 
 @Module({
-  imports: [ BookingSvcModule, AuthSvcModule],
+  imports: [ BookingSvcModule, forwardRef(() => AuthSvcModule) ],
   controllers: [
     // Categories
     GetAllCategoriesController,

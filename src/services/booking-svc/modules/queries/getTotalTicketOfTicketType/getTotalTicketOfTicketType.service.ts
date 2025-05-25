@@ -15,9 +15,7 @@ export class GetTotalTicketOfTicketTypeService {
     try{
       // Use the ticketRepository to count tickets by ticketTypeId
       const totalTickets = await this.ticketRepository.count({
-        where: {
-          ticketTypeId: ticketTypeId,
-        },
+        ticketTypeId: ticketTypeId,
       });
 
       return totalTickets;
@@ -33,10 +31,8 @@ export class GetTotalTicketOfTicketTypeService {
     try{
       // Use the ticketRepository to count tickets by ticketTypeId
       const totalTickets = await this.ticketRepository.count({
-        where: {
-          ticketTypeId: ticketTypeId,
-          sectionId: sectionId,
-        },
+        ticketTypeId: ticketTypeId,
+        sectionId: sectionId,
       });
 
       return totalTickets;
@@ -52,13 +48,8 @@ export class GetTotalTicketOfTicketTypeService {
     try {
       // Get all orderID of showing
       const orders = await this.orderRepository.findMany({
-        where: {
           showingId: showingId,
-        },
-        select: {
-          id: true,
-        },
-      });
+        });
 
       if (!orders || orders.length === 0) {
         return [];
@@ -66,13 +57,8 @@ export class GetTotalTicketOfTicketTypeService {
 
       // Get all seat IDs from the orders
       const tickets = await this.ticketRepository.findMany({
-        where: {
-          orderId: {
-            in: orders.map(order => order.id),
-          },
-        },
-        select: {
-          seatId: true,
+        orderId: {
+          in: orders.map(order => order.id),
         },
       });
 
@@ -97,12 +83,7 @@ export class GetTotalTicketOfTicketTypeService {
     try {
       // Get all tickets of the ticket type
       const tickets = await this.ticketRepository.findMany({
-        where: {
-          ticketTypeId: ticketTypeId,
-        },
-        select: {
-          seatId: true,
-        },
+        ticketTypeId: ticketTypeId,
       });
 
       if (!tickets || tickets.length === 0) {

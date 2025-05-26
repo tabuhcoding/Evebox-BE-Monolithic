@@ -53,7 +53,7 @@ import { UpdateUserRoleController } from "./modules/admin/commands/updateUserRol
 import { UpdateUserRoleService } from "./modules/admin/commands/updateUserRole/updateUserRole.service";
 import { AdminRepositoryImpl } from "./repository/admin/admin.repository.impl";
 import { CheckUserExistService } from "./modules/user/commands/checkuserExist/checkuserExist.service";
-import { SlackService } from "src/infrastructure/adapters/slack/slack.service";import { EventSvcModule } from "../event-svc/event-svc.module";
+import { SlackService } from "src/infrastructure/adapters/slack/slack.service"; import { EventSvcModule } from "../event-svc/event-svc.module";
 import { GetFavoriteEventService } from "./modules/user/queries/get-favorite-event/get-favorite-event.service";
 import { GetFavoriteEventController } from "./modules/user/queries/get-favorite-event/get-favorite-event.controller";
 import { GetFavoriteOrgService } from "./modules/user/queries/get-favorite-org/get-favorite-org.service";
@@ -112,7 +112,7 @@ import { TurnOffNotificationServiceForOrg } from "./modules/user/commands/turn-o
     GetFavoriteEventController,
     GetFavoriteOrgController,
     SetReceiveNotiController,
-    TurnOnNotificationController, 
+    TurnOnNotificationController,
     GetUsersNotifiedByEventController,
     GetUsersNotifiedByOrgController,
     TurnOffNotificationForEventController,
@@ -153,7 +153,7 @@ import { TurnOffNotificationServiceForOrg } from "./modules/user/commands/turn-o
       provide: 'ImagesRepository',
       useClass: ImagesRepositoryImpl,
     },
-    UpdateUserService, 
+    UpdateUserService,
     {
       provide: 'UserRepository',
       useClass: UserRepositoryImpl
@@ -172,12 +172,16 @@ import { TurnOffNotificationServiceForOrg } from "./modules/user/commands/turn-o
     SetReceiveNotiService,
     TurnOnNotificationService,
     GetUsersNotifiedByEventService,
-    GetUsersNotifiedByOrgService, 
+    GetUsersNotifiedByOrgService,
     TurnOffNotificationServiceForEvent,
     TurnOffNotificationServiceForOrg
   ],
   exports: [
     UserRepositoryImpl,
+    {
+      provide: 'UserRepository',
+      useClass: UserRepositoryImpl,
+    },
     CheckUserExistService,
   ],
 })

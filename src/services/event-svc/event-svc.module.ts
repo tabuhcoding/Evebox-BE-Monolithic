@@ -3,6 +3,7 @@ import { forwardRef, Module } from '@nestjs/common';
 import { CategoriesRepositoryImpl } from './repository/categories/categories.impl';
 import { EventsRepositoryImpl } from './repository/events/events.impl';
 import { EventCategoriesRepositoryImpl } from './repository/eventCategories/eventCategories.impl';
+import { LocationsRepositoryImpl } from './repository/locations/location.impl';
 import { GetAllEventDetailForRAGService } from './modules/event/queries/getAllEventDetailForRAG/getAllEventDetailForRAG.service';
 import { GetAllCategoriesController } from './modules/categories/queries/getAllCategories.controller';
 import { GetAllCategoriesService } from './modules/categories/queries/getAllCategories.service';
@@ -24,6 +25,8 @@ import { SeatStatusRepositoryImpl } from './repository/seatStatus/seatStatus.imp
 import { TicketTypeRepositoryImpl } from './repository/ticketType/ticketType.impl';
 import { CalculateShowingStatusService } from './modules/event/commands/calculateShowingStatus/calculateShowingStatus.service';
 import { UserClickHistoryRepositoryImpl } from './repository/userClickHistory/userClickHistory.impl';
+import { CreateEventController } from './modules/event/commands/createEvent/createEvent.controller';
+import { CreateEventService } from './modules/event/commands/createEvent/createEvent.service';
 import { AuthSvcModule } from '../auth-svc/auth-svc.module';
 import { GetEventsByIdsService } from './modules/event/queries/getEventsById/GetEventsByIds.service';
 import { getAllShowingController as GetAllShowingController } from './modules/showing/queries/getAllShowing/getAllShowing.controller';
@@ -34,6 +37,10 @@ import { getShowingDetailController as GetShowingDetailController } from './modu
 import { getShowingDetailService as GetShowingDetailService } from './modules/showing/queries/getShowingDetail/getShowingDetail.service';
 import { FormRepositoryImpl } from './repository/form/form.impl';
 import { TicketTypeSectionRepositoryImpl } from './repository/ticketTypeSection/ticketTypeSection.impl';
+import { UpdateEventController } from './modules/event/commands/updateEvent/updateEvent.controller';
+import { UpdateEventService } from './modules/event/commands/updateEvent/updateEvent.service';
+import { DeleteEventController } from './modules/event/commands/deleteEvent/deleteEvent.controller';
+import { DeleteEventService } from './modules/event/commands/deleteEvent/deleteEvent.service';
 import { getShowingSeatmapController as GetShowingSeatmapController } from './modules/showing/queries/getShowingSeatmap/getShowingSeatmap.controller';
 import { getShowingSeatmapService as GetShowingSeatmapService } from './modules/showing/queries/getShowingSeatmap/getShowingSeatmap.service';
 import { CalculateSectionStatusService } from './modules/showing/command/calculateSectionStatus/calculateSectionStatus.service';
@@ -50,6 +57,9 @@ import { CalculateSectionStatusService } from './modules/showing/command/calcula
     GetRecommendedEventController,
     GetEventDetailRecommendController,
     GetEventDetailController,
+    CreateEventController,
+    UpdateEventController,
+    DeleteEventController,
 
     // Showing
     GetAllShowingController,
@@ -74,6 +84,9 @@ import { CalculateSectionStatusService } from './modules/showing/command/calcula
     GetRecommendEventService,
     GetEventDetailRecommendService,
     GetEventDetailService,
+    CreateEventService,
+    UpdateEventService,
+    DeleteEventService,
 
     GetEventsByIdsService,
     ///// Showing
@@ -97,6 +110,7 @@ import { CalculateSectionStatusService } from './modules/showing/command/calcula
     { provide: 'TicketTypeSectionRepository', useClass: TicketTypeSectionRepositoryImpl},
     { provide: 'UserClickHistoryRepository', useClass: UserClickHistoryRepositoryImpl },
     { provide: 'FormRepository', useClass: FormRepositoryImpl },
+    { provide: 'LocationsRepository', useClass: LocationsRepositoryImpl },
   ],
   exports: [GetAllEventDetailForRAGService, GetEventFrontDisplayService,GetEventsByIdsService],
 })

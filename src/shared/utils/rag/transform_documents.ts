@@ -1,6 +1,6 @@
 import { Document } from 'langchain/document';
 import { GetAllEventDetailForRAGResponseDto } from 'src/services/event-svc/modules/event/queries/getAllEventDetailForRAG/getAllEventDetailForRAG-response.dto';
-import { CreateEventDto } from 'src/services/rag-svc/modules/descriptionGenerate/descriptionGenerate.dto';
+import { EventDescriptionGenDto } from 'src/services/rag-svc/modules/descriptionGenerate/descriptionGenerate.dto';
 
 export function transformEventsToDocuments(events: GetAllEventDetailForRAGResponseDto[]): Document[] {
   return events.map((event) => {
@@ -56,7 +56,7 @@ export function transformEventsDescriptionToDocuments(events: GetAllEventDetailF
   });
 }
 
-export function transformEventsDtoToQuery(events: CreateEventDto): string {
+export function transformEventsDtoToQuery(events: EventDescriptionGenDto): string {
   const categories = events.categoryIds.map((categoryId) => {
       switch (categoryId) {
         case 1:

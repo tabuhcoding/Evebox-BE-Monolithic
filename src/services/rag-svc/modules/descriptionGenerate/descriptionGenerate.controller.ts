@@ -1,6 +1,6 @@
 import { Controller, Post, Body } from "@nestjs/common";
 import { DescriptionGenerateService } from "./descriptionGenerate.service";
-import { CreateEventDto } from "./descriptionGenerate.dto";
+import { EventDescriptionGenDto } from "./descriptionGenerate.dto";
 import { ApiTags } from "@nestjs/swagger";
 
 
@@ -11,7 +11,7 @@ export class DescriptionGenerateController {
 
   @Post('/')
   async createDescriptionGenerate(
-    @Body() dto: CreateEventDto, 
+    @Body() dto: EventDescriptionGenDto, 
   ) {
     try {
       const content = await this.descriptionGenerateService.askQuestion(dto);

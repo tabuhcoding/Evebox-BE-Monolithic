@@ -39,6 +39,8 @@ import { FormRepositoryImpl } from './repository/form/form.impl';
 import { TicketTypeSectionRepositoryImpl } from './repository/ticketTypeSection/ticketTypeSection.impl';
 import { UpdateEventController } from './modules/event/commands/updateEvent/updateEvent.controller';
 import { UpdateEventService } from './modules/event/commands/updateEvent/updateEvent.service';
+import { DeleteEventController } from './modules/event/commands/deleteEvent/deleteEvent.controller';
+import { DeleteEventService } from './modules/event/commands/deleteEvent/deleteEvent.service';
 import { getShowingSeatmapController as GetShowingSeatmapController } from './modules/showing/queries/getShowingSeatmap/getShowingSeatmap.controller';
 import { getShowingSeatmapService as GetShowingSeatmapService } from './modules/showing/queries/getShowingSeatmap/getShowingSeatmap.service';
 import { CalculateSectionStatusService } from './modules/showing/command/calculateSectionStatus/calculateSectionStatus.service';
@@ -57,6 +59,7 @@ import { CalculateSectionStatusService } from './modules/showing/command/calcula
     GetEventDetailController,
     CreateEventController,
     UpdateEventController,
+    DeleteEventController,
 
     // Showing
     GetAllShowingController,
@@ -83,6 +86,7 @@ import { CalculateSectionStatusService } from './modules/showing/command/calcula
     GetEventDetailService,
     CreateEventService,
     UpdateEventService,
+    DeleteEventService,
 
     GetEventsByIdsService,
     ///// Showing

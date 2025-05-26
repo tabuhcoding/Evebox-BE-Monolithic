@@ -5,11 +5,16 @@ import { CreateEventService } from "./createEvent.service";
 import { CreateEventDto } from "./createEvent.dto";
 import { JwtAuthGuard } from "src/shared/guard/jwt-auth.guard";
 import { CreateEventResponseDto } from "./createEvent-response.dto";
+import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
+
 
 @ApiTags('Event Service - Event')
 @Controller('api/org/event')
 export class CreateEventController {
-  constructor(private readonly createEventService: CreateEventService) {}
+  constructor(
+    private readonly createEventService: CreateEventService,
+    private readonly slackService: SlackService
+  ) {}
 
   @UseGuards(JwtAuthGuard)
   @Post('/')
@@ -48,6 +53,7 @@ export class CreateEventController {
         data: result.unwrap(),
       });
     } catch (error) {
+      this.slackService.sendError(`EventSvc - Event >>> CreateEventController: ${error.message}`);
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
         message: 'Internal server error',

@@ -95,7 +95,7 @@ export class EventsRepositoryImpl
           eventId: result.id,
           userId: user.id.value,
           email: email || '',
-          role: 3, // Assuming 3 is the role for organizer
+          role: 2, // Assuming 2 is the role for organizer
           role_desc: 'organizer',
         },
       });
@@ -190,7 +190,7 @@ export class EventsRepositoryImpl
     }
   }
 
-  async hasPermissionToUpdateEvent(eventId: number, userEmail: string): Promise<Result<boolean, Error>> {
+  async hasPermissionToManageEvent(eventId: number, userEmail: string): Promise<Result<boolean, Error>> {
     try {
       const emailOrError = Email.create(userEmail);
       if (emailOrError.isErr()) {
@@ -198,11 +198,13 @@ export class EventsRepositoryImpl
       }
 
       const user = await this.userRepository.findByEmail(emailOrError.unwrap());
+      console.log("🚀 ~ hasPermissionToManageEvent ~ user:", user)
       if (!user) {
         throw new Error(`User with email ${userEmail} not found`);
       }
 
       const event = await this.findOneById(eventId);
+      console.log("🚀 ~ hasPermissionToManageEvent ~ event:", event)
       if (!event) {
         throw new Error(`Event with ID ${eventId} not found`);
       }
@@ -224,6 +226,24 @@ export class EventsRepositoryImpl
       }
 
       return Ok(role.isEdited === true);
+    } catch (error) {
+      throw new Error(`Failed to check permission: ${error.message}`);
+    }
+  }
+
+  async deleteEvent(id: number): Promise<number> {
+    try {
+      const event = await this.findOneById(id);
+
+      if (event && event.deleteAt === null) {
+        await this.updateOneById(id, {
+          deleteAt: new Date(),
+        });
+
+        return event.id;
+      }
+
+      throw new Error('Event not found or could not be deleted');
     } catch (error) {
       throw new Error(`Failed to check permission: ${error.message}`);
     }

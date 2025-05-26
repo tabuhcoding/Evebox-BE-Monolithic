@@ -19,7 +19,7 @@ export class UpdateEventService {
 
   async execute(dto: UpdateEventDto, email: string, id: number): Promise<Result<UpdateEventResponseData, Error>> {
     try {
-      const hasPermisison = await this.eventsRepository.hasPermissionToUpdateEvent(id, email);
+      const hasPermisison = await this.eventsRepository.hasPermissionToManageEvent(id, email);
       if (hasPermisison.isErr()) {
         return Err(new Error('Failed to check permission'));
       }

@@ -1,44 +1,35 @@
-import { Controller, Request, Res, HttpStatus, Body, UseGuards, Put, Param } from "@nestjs/common";
+import { Controller, Request, Res, HttpStatus, UseGuards, Param, Delete } from "@nestjs/common";
 import { Response } from "express";
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags, ApiParam } from '@nestjs/swagger';
-import { UpdateEventService } from "./updateEvent.service";
-import { UpdateEventDto } from "./updateEvent.dto";
+import { DeleteEventService } from "./deleteEvent.service";
 import { JwtAuthGuard } from "src/shared/guard/jwt-auth.guard";
-import { UpdateEventResponseDto } from "./updateEvent-response.dto";
+import { DeleteEventResponseDto } from "./deleteEvent-response.dto";
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 
 @ApiTags('Event Service - Event')
 @Controller('api/org/event')
-export class UpdateEventController {
+export class DeleteEventController {
   constructor(
-    private readonly updateEventService: UpdateEventService,
+    private readonly deleteEventService: DeleteEventService,
     private readonly slackService: SlackService
   ) {}
 
   @UseGuards(JwtAuthGuard)
-  @Put('/:id')
+  @Delete('/:id')
   @ApiBearerAuth('access-token')
   @ApiParam({ name: 'id', example: 123123, description: "The ID of the event" })
-  @ApiOperation({ summary: 'Update an existing event' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Event updated successfully', type: UpdateEventResponseDto })
+  @ApiOperation({ summary: 'Delete an event' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Event deleted successfully', type: DeleteEventResponseDto })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid input' })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Internal server error' })
-  async updateEvent(
-    @Body() updateEventDto: UpdateEventDto,
-    @Request() req,
-    @Res() res: Response,
+  async deleteEvent(
     @Param('id') id: number,
+    @Res() res: Response,
+    @Request() req: any,
   ) {
     try {
       const email = req.user?.email;
-      if (!email) {
-        return res.status(HttpStatus.UNAUTHORIZED).json({
-          statusCode: HttpStatus.UNAUTHORIZED,
-          message: 'Unauthorized',
-        });
-      }
-
-      const result = await this.updateEventService.execute(updateEventDto, email, Number(id));
+      const result = await this.deleteEventService.execute(id, email);
 
       if (result.isErr()) {
         return res.status(HttpStatus.BAD_REQUEST).json({
@@ -49,11 +40,11 @@ export class UpdateEventController {
 
       return res.status(HttpStatus.OK).json({
         statusCode: HttpStatus.OK,
-        message: 'Event updated successfully',
+        message: 'Event deleted successfully',
         data: result.unwrap(),
       });
     } catch (error) {
-      this.slackService.sendError(`EventSvc - Event >>> UpdateEventController: ${error.message}`);
+      this.slackService.sendError(`EventSvc - Event >>> DeleteEventController: ${error.message}`);
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
         message: 'Internal server error',

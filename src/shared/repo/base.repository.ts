@@ -25,6 +25,10 @@ export class BaseRepository<
     await this.repo.delete({ where: { id } });
   }
 
+  async deleteHardMany(filter: any): Promise<void> {
+    await this.repo.deleteMany({ where: filter });
+  }
+
   async insertOne(data: any): Promise<string> {
     const result = await this.repo.create({ data }) as unknown as { id: string };
     return result.id;

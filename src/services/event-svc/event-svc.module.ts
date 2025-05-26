@@ -3,6 +3,7 @@ import { forwardRef, Module } from '@nestjs/common';
 import { CategoriesRepositoryImpl } from './repository/categories/categories.impl';
 import { EventsRepositoryImpl } from './repository/events/events.impl';
 import { EventCategoriesRepositoryImpl } from './repository/eventCategories/eventCategories.impl';
+import { LocationsRepositoryImpl } from './repository/locations/location.impl';
 import { GetAllEventDetailForRAGService } from './modules/event/queries/getAllEventDetailForRAG/getAllEventDetailForRAG.service';
 import { GetAllCategoriesController } from './modules/categories/queries/getAllCategories.controller';
 import { GetAllCategoriesService } from './modules/categories/queries/getAllCategories.service';
@@ -96,6 +97,7 @@ import { UpdateEventService } from './modules/event/commands/updateEvent/updateE
     { provide: 'TicketTypeSectionRepository', useClass: TicketTypeSectionRepositoryImpl},
     { provide: 'UserClickHistoryRepository', useClass: UserClickHistoryRepositoryImpl },
     { provide: 'FormRepository', useClass: FormRepositoryImpl },
+    { provide: 'LocationsRepository', useClass: LocationsRepositoryImpl },
   ],
   exports: [GetAllEventDetailForRAGService, GetEventFrontDisplayService,GetEventsByIdsService],
 })

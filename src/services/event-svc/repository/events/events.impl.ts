@@ -1,21 +1,27 @@
-import { Injectable } from '@nestjs/common';
-import { Events, EventsRepository } from './events.repo';
+import { Inject, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
 import { BaseRepository } from 'src/shared/repo/base.repository';
 import { Prisma } from '@prisma/client';
+import { Result, Ok, Err } from 'oxide.ts';
+
+import { Events, EventsRepository } from './events.repo';
+import { Email } from 'src/services/auth-svc/modules/user/domain/value-objects/user/email.vo';
 import { CreateEventDto } from '../../modules/event/commands/createEvent/createEvent.dto';
 import { UpdateEventDto } from '../../modules/event/commands/updateEvent/updateEvent.dto';
-import { Result, Ok, Err } from 'oxide.ts';
+import { UserRepository } from 'src/services/auth-svc/repository/users/user.repository';
 
 @Injectable()
 export class EventsRepositoryImpl
   extends BaseRepository<Events, Prisma.EventsDelegate>
   implements EventsRepository {
-  constructor(protected readonly prisma: PrismaService) {
+  constructor(
+    @Inject('UserRepository') private readonly userRepository: UserRepository,
+    protected readonly prisma: PrismaService
+  ) {
     super(prisma.events, prisma);
   }
 
-   async findManyByIdsWithDetails(ids: number[]): Promise<Events[]> {
+  async findManyByIdsWithDetails(ids: number[]): Promise<Events[]> {
     return this.prisma.events.findMany({
       where: {
         id: { in: ids },
@@ -49,9 +55,11 @@ export class EventsRepositoryImpl
   /* Create Event */
   async createEvent(dto: CreateEventDto, email: string, locationId?: number): Promise<number> {
     try {
-      const user = await this.prisma.user.findUnique({
-        where: { email },
-      });
+      const emailOrError = Email.create(email);
+      if (emailOrError.isErr()) {
+        throw new Error(emailOrError.unwrapErr().message);
+      }
+      const user = await this.userRepository.findByEmail(emailOrError.unwrap());
 
       if (!user) {
         throw new Error('User not found');
@@ -85,7 +93,7 @@ export class EventsRepositoryImpl
       const eventUserRelationship = await this.prisma.eventUserRelationship.create({
         data: {
           eventId: result.id,
-          userId: user.id,
+          userId: user.id.value,
           email: email || '',
           role: 3, // Assuming 3 is the role for organizer
           role_desc: 'organizer',
@@ -102,81 +110,6 @@ export class EventsRepositoryImpl
     }
   }
 
-  async createEventCategory(eventId: number, categoryIds: number[]): Promise<Result<any, Error>> {
-    let parsedCategoryIds: number[];
-
-    if (typeof categoryIds === 'string') {
-      try {
-        parsedCategoryIds = JSON.parse(categoryIds);
-      } catch (error) {
-        throw new Error('Failed to parsed category ids');
-      }
-    } else {
-      parsedCategoryIds = categoryIds;
-    }
-
-    try {
-      const categories = await this.prisma.categories.findMany({
-        where: {
-          id: {
-            in: parsedCategoryIds
-          }
-        }
-      })
-      if (categories.length === 0) {
-        return Err(new Error('Categories not found'));
-      }
-      
-      const eventCategory = categories.map(category => {
-        return {
-          eventId: eventId,
-          categoryId: category.id
-        }
-      })
-
-      const result = await this.prisma.eventCategories.createMany({
-        data: eventCategory
-      });
-      if (!result) {
-        throw new Error('Failed to create event category');
-      }
-      return Ok(undefined);
-    }
-    catch (error) {
-      return Err(new Error('Failed to create event category'));
-    }
-  }
-
-  async createLocation(streetString: string, wardString: string, districtId: number): Promise<number> {
-    try {
-      const location = await this.prisma.locations.findFirst({
-        where: {
-          street: streetString,
-          ward: wardString,
-          districtId: districtId >> 0,
-        },
-      });
-      if (location) {
-        return location.id;
-      }
-      const result = await this.prisma.locations.create({
-        data: {
-          street: streetString,
-          ward: wardString,
-          districtId: districtId >> 0,
-        },
-      });
-
-      if (!result) {
-        throw new Error('Failed to create location');
-      }
-
-      return result.id;
-    } catch (error) {
-      throw new Error(`Failed to create location: ${error.message}`);
-    }
-  }
-  
   /* Update Event */
   async updateEvent(dto: UpdateEventDto, eventId: number, email: string, locationId?: number): Promise<number> {
     try {
@@ -232,9 +165,11 @@ export class EventsRepositoryImpl
 
   async getMember(eventId: number, userEmail: string): Promise<any | null> {
     try {
-      const user = await this.prisma.user.findUnique({
-        where: { email: userEmail },
-      });
+      const emailOrError = Email.create(userEmail);
+      if (emailOrError.isErr()) {
+        throw new Error(emailOrError.unwrapErr().message);
+      }
+      const user = await this.userRepository.findByEmail(emailOrError.unwrap());
 
       if (!user) {
         throw new Error(`User with email ${userEmail} not found`);
@@ -244,7 +179,7 @@ export class EventsRepositoryImpl
         where: {
           eventId_userId: {
             eventId,
-            userId: user.id,
+            userId: user.id.value,
           },
         },
       });
@@ -257,9 +192,12 @@ export class EventsRepositoryImpl
 
   async hasPermissionToUpdateEvent(eventId: number, userEmail: string): Promise<Result<boolean, Error>> {
     try {
-      const user = await this.prisma.user.findUnique({
-        where: { email: userEmail },
-      });
+      const emailOrError = Email.create(userEmail);
+      if (emailOrError.isErr()) {
+        throw new Error(emailOrError.unwrapErr().message);
+      }
+
+      const user = await this.userRepository.findByEmail(emailOrError.unwrap());
       if (!user) {
         throw new Error(`User with email ${userEmail} not found`);
       }
@@ -288,49 +226,6 @@ export class EventsRepositoryImpl
       return Ok(role.isEdited === true);
     } catch (error) {
       throw new Error(`Failed to check permission: ${error.message}`);
-    }
-  }
-
-  async updateEventCategory(eventId: number, categoryIds: number[]): Promise<Result<any, Error>> {
-    let parsedCategoryIds: number[];
-
-    if (typeof categoryIds === 'string') {
-      try {
-        parsedCategoryIds = JSON.parse(categoryIds);
-      } catch (error) {
-        return Err(new Error('Invalid categoryIds format'));
-      }
-    } else {
-      parsedCategoryIds = categoryIds;
-    }
-
-    try {
-      // Remove all existing event categories
-      await this.prisma.eventCategories.deleteMany({
-        where: { eventId: eventId >> 0 },
-      });
-      // If new categories are provided, add them
-      if (parsedCategoryIds.length > 0) {
-        const categories = await this.prisma.categories.findMany({
-          where: {
-            id: { in: parsedCategoryIds }
-          }
-        });
-        if (categories.length === 0) {
-          return Err(new Error('Categories not found'));
-        }
-        const eventCategory = categories.map(category => ({
-          eventId: eventId >> 0,
-          categoryId: category.id
-        }));
-        await this.prisma.eventCategories.createMany({
-          data: eventCategory
-        });
-        return Ok(eventCategory);
-      }
-      return Ok([]);
-    } catch (error) {
-      return Err(new Error('Failed to update event category'));
     }
   }
 }

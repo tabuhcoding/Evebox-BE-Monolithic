@@ -1,6 +1,9 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { Result, Ok, Err } from "oxide.ts";
+
 import { EventsRepository } from "src/services/event-svc/repository/events/events.repo";
+import { EventCategoriesRepository } from "src/services/event-svc/repository/eventCategories/eventCategories.repo";
+import { LocationsRepository } from "src/services/event-svc/repository/locations/location.repo";
 import { UpdateEventDto } from "./updateEvent.dto";
 import { UpdateEventResponseData } from "./updateEvent-response.dto";
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
@@ -9,6 +12,8 @@ import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 export class UpdateEventService {
   constructor(
     @Inject('EventsRepository') private readonly eventsRepository: EventsRepository,
+    @Inject('EventCategoriesRepository') private readonly eventCategoriesRepository: EventCategoriesRepository,
+    @Inject('LocationsRepository') private readonly locationsRepository: LocationsRepository,
     private readonly slackService: SlackService
   ) {}
 
@@ -25,7 +30,7 @@ export class UpdateEventService {
 
       let locationId: number | undefined;
       if (dto.streetString && dto.wardString && dto.districtId) {
-        const locationIdRes = await this.eventsRepository.createLocation(dto.streetString, dto.wardString, dto.districtId);
+        const locationIdRes = await this.locationsRepository.createLocation(dto.streetString, dto.wardString, dto.districtId);
         if (!locationIdRes) {
           return Err(new Error('Failed to create location'));
         }
@@ -38,7 +43,7 @@ export class UpdateEventService {
       }
 
       if (dto.categoryIds && dto.categoryIds.length > 0) {
-        const categoryResult = await this.eventsRepository.updateEventCategory(id, dto.categoryIds);
+        const categoryResult = await this.eventCategoriesRepository.updateEventCategory(id, dto.categoryIds);
         if (categoryResult.isErr()) {
           return Err(new Error('Failed to update event categories'));
         }

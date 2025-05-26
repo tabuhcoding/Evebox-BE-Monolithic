@@ -56,8 +56,4 @@ export class CreateEventDto {
   @ApiProperty({ example: "https://domain.com/image2.png", description: "Event poster URL" })
   @IsString()
   imgPosterUrl: string;
-
-  @ApiProperty({ example: true })
-  @IsBoolean()
-  isApproved: boolean;
 }

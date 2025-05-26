@@ -175,7 +175,6 @@ export class EventsRepositoryImpl
   async hasPermissionToManageEvent(eventId: number, userEmail: string): Promise<Result<boolean, Error>> {
     try {
       const event = await this.findOneById(eventId);
-      console.log("🚀 ~ hasPermissionToManageEvent ~ event:", event)
       if (!event) {
         throw new Error(`Event with ID ${eventId} not found`);
       }

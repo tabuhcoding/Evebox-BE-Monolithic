@@ -59,6 +59,8 @@ export class CreateEventService {
 
       const categoryResult = await this.eventCategoriesRepository.createEventCategory(eventId, categories);
       if (categoryResult.isErr()) {
+        // Reverse when error occurs in creating event category
+        await this.eventsRepository.deleteHardOne(eventId);
         return Err(categoryResult.unwrapErr());
       }
 

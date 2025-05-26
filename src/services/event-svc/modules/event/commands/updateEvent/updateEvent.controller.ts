@@ -7,7 +7,7 @@ import { JwtAuthGuard } from "src/shared/guard/jwt-auth.guard";
 import { UpdateEventResponseDto } from "./updateEvent-response.dto";
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 
-@ApiTags('Event Service - Event')
+@ApiTags('Event Service - Organizer')
 @Controller('api/org/event')
 export class UpdateEventController {
   constructor(

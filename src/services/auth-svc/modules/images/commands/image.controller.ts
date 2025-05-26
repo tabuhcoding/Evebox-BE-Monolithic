@@ -63,7 +63,6 @@ export class ImagesController {
         data,
       });
     } catch (error) {
-      console.log("🚀 ~ ImagesController ~ error:", error)
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
         message: 'Internal server error',
@@ -110,7 +109,6 @@ export class ImagesController {
         data,
       });
     } catch (error) {
-      console.log("🚀 ~ ImagesController ~ error:", error)
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
         message: 'Internal server error',
@@ -151,7 +149,6 @@ export class ImagesController {
         data,
       });
     } catch (error) {
-      console.log("🚀 ~ ImagesController ~ error:", error)
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
         message: 'Internal server error',
@@ -205,7 +202,6 @@ export class ImagesController {
         message: 'Image updated successfully',
       });
     } catch (error) {
-      console.log("🚀 ~ ImagesController ~ error:", error)
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
         message: 'Internal server error',
@@ -243,7 +239,6 @@ export class ImagesController {
         message: 'Image deleted successfully',
       });
     } catch (error) {
-      console.log("🚀 ~ ImagesController ~ error:", error)
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
         message: 'Internal server error',

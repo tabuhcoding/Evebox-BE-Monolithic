@@ -21,7 +21,7 @@ export class BaseRepository<
     protected readonly prisma: PrismaClient,
   ) {}
 
-  async deleteHardOne(id: string): Promise<void> {
+  async deleteHardOne(id: string | number): Promise<void> {
     await this.repo.delete({ where: { id } });
   }
 

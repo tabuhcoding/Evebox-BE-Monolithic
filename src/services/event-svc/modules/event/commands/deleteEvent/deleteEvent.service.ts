@@ -4,16 +4,24 @@ import { Result, Ok, Err } from "oxide.ts";
 import { EventsRepository } from "src/services/event-svc/repository/events/events.repo";
 import { DeleteEventResponseData } from "./deleteEvent-response.dto";
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
+import { CheckUserExistService } from "src/services/auth-svc/modules/user/commands/checkuserExist/checkuserExist.service";
 
 @Injectable()
 export class DeleteEventService {
   constructor(
     @Inject('EventsRepository') private readonly eventsRepository: EventsRepository,
-    private readonly slackService: SlackService
+    private readonly slackService: SlackService,
+    private readonly checkUserExistService: CheckUserExistService, 
   ) {}
 
   async execute(id: number, email: string): Promise<Result<DeleteEventResponseData, Error>> {
     try {
+      // Check if the user exists
+      const userExists = await this.checkUserExistService.execute(email);
+      if (!userExists) {
+        return Err(new Error('User does not exist'));
+      }
+      
       const hasPermisison = await this.eventsRepository.hasPermissionToManageEvent(Number(id), email);
       if (hasPermisison.isErr()) {
         console.error('Failed to check permission');

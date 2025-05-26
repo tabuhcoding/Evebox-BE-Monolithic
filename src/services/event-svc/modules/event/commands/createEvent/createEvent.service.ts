@@ -7,6 +7,7 @@ import { LocationsRepository } from "src/services/event-svc/repository/locations
 import { CreateEventDto } from "./createEvent.dto";
 import { CreateEventResponseData } from "./createEvent-response.dto";
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
+import { CheckUserExistService } from "src/services/auth-svc/modules/user/commands/checkuserExist/checkuserExist.service";
 
 @Injectable()
 export class CreateEventService {
@@ -14,11 +15,18 @@ export class CreateEventService {
     @Inject('EventsRepository') private readonly eventsRepository: EventsRepository,
     @Inject('EventCategoriesRepository') private readonly eventCategoriesRepository: EventCategoriesRepository,
     @Inject('LocationsRepository') private readonly locationsRepository: LocationsRepository,
-    private readonly slackService: SlackService
+    private readonly slackService: SlackService,
+    private readonly checkUserExistService: CheckUserExistService, 
   ) {}
 
   async execute(dto: CreateEventDto, email: string): Promise<Result<CreateEventResponseData, Error>> {
     try {
+      // Check if the user exists
+      const userExists = await this.checkUserExistService.execute(email);
+      if (!userExists) {
+        return Err(new Error('User does not exist'));
+      }
+
       const categories = dto.categoryIds;
       if (categories.length === 0) {
         return Err(new Error('Categories not found'));
@@ -30,6 +38,7 @@ export class CreateEventService {
         return Err(new Error('isOnline field is required'));
       }
 
+      // Create location if the event is not online
       let locationId: number | undefined;
       if (!dto.isOnline) {
         if (!dto.streetString || !dto.wardString || !dto.districtId) {
@@ -41,6 +50,8 @@ export class CreateEventService {
         }
         locationId = locationIdRes;
       }
+
+      // Create the event
       const eventId = await this.eventsRepository.createEvent(dto, email, locationId);
       if (!eventId) {
         return Err(new Error('Failed to create event'));
@@ -54,6 +65,7 @@ export class CreateEventService {
       return Ok({ id: eventId });
     } catch (error) {
       this.slackService.sendError(`EventSvc - Event >>> CreateEventService: ${error.message}`);
+
       return Err(new Error(`Error creating event: ${error.message}`));
     }
   }

@@ -8,14 +8,12 @@ import { Events, EventsRepository } from './events.repo';
 import { Email } from 'src/services/auth-svc/modules/user/domain/value-objects/user/email.vo';
 import { CreateEventDto } from '../../modules/event/commands/createEvent/createEvent.dto';
 import { UpdateEventDto } from '../../modules/event/commands/updateEvent/updateEvent.dto';
-import { UserRepository } from 'src/services/auth-svc/repository/users/user.repository';
 
 @Injectable()
 export class EventsRepositoryImpl
   extends BaseRepository<Events, Prisma.EventsDelegate>
   implements EventsRepository {
   constructor(
-    @Inject('UserRepository') private readonly userRepository: UserRepository,
     protected readonly prisma: PrismaService
   ) {
     super(prisma.events, prisma);
@@ -55,15 +53,6 @@ export class EventsRepositoryImpl
   /* Create Event */
   async createEvent(dto: CreateEventDto, email: string, locationId?: number): Promise<number> {
     try {
-      const emailOrError = Email.create(email);
-      if (emailOrError.isErr()) {
-        throw new Error(emailOrError.unwrapErr().message);
-      }
-      const user = await this.userRepository.findByEmail(emailOrError.unwrap());
-
-      if (!user) {
-        throw new Error('User not found');
-      }
       const result = await this.prisma.events.create({
         data: {
           title: dto.title,
@@ -93,8 +82,8 @@ export class EventsRepositoryImpl
       const eventUserRelationship = await this.prisma.eventUserRelationship.create({
         data: {
           eventId: result.id,
-          userId: user.id.value,
-          email: email || '',
+          userId: email,
+          email: email,
           role: 2, // Assuming 2 is the role for organizer
           role_desc: 'organizer',
         },

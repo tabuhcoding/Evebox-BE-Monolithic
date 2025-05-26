@@ -100,7 +100,7 @@ export class EventsRepositoryImpl
   }
 
   /* Update Event */
-  async updateEvent(dto: UpdateEventDto, eventId: number, email: string, locationId?: number): Promise<number> {
+  async updateEvent(dto: UpdateEventDto, eventId: number, locationId?: number): Promise<[number, boolean]> {
     try {
       const event = await this.findOneById(eventId);
       if (!event) {
@@ -127,9 +127,12 @@ export class EventsRepositoryImpl
       // updateData.isApproved = false
       // TODO: handle after update
 
-      await this.updateOne({ id: eventId }, updateData);
+      const updatedEvent = await this.updateAndFindOneById(eventId, updateData);
+      if( !updatedEvent) {
+        throw new Error('Failed to update event');
+      }
 
-      return eventId;
+      return [updatedEvent.id, updatedEvent.isApproved];
     } catch (error) {
       throw new Error(`Failed to find user: ${error.message}`);
     }
@@ -154,21 +157,11 @@ export class EventsRepositoryImpl
 
   async getMember(eventId: number, userEmail: string): Promise<any | null> {
     try {
-      const emailOrError = Email.create(userEmail);
-      if (emailOrError.isErr()) {
-        throw new Error(emailOrError.unwrapErr().message);
-      }
-      const user = await this.userRepository.findByEmail(emailOrError.unwrap());
-
-      if (!user) {
-        throw new Error(`User with email ${userEmail} not found`);
-      }
-
       const member = await this.prisma.eventUserRelationship.findUnique({
         where: {
           eventId_userId: {
             eventId,
-            userId: user.id.value,
+            userId: userEmail,
           },
         },
       });
@@ -181,17 +174,6 @@ export class EventsRepositoryImpl
 
   async hasPermissionToManageEvent(eventId: number, userEmail: string): Promise<Result<boolean, Error>> {
     try {
-      const emailOrError = Email.create(userEmail);
-      if (emailOrError.isErr()) {
-        throw new Error(emailOrError.unwrapErr().message);
-      }
-
-      const user = await this.userRepository.findByEmail(emailOrError.unwrap());
-      console.log("🚀 ~ hasPermissionToManageEvent ~ user:", user)
-      if (!user) {
-        throw new Error(`User with email ${userEmail} not found`);
-      }
-
       const event = await this.findOneById(eventId);
       console.log("🚀 ~ hasPermissionToManageEvent ~ event:", event)
       if (!event) {

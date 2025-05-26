@@ -7,6 +7,7 @@ import { LocationsRepository } from "src/services/event-svc/repository/locations
 import { UpdateEventDto } from "./updateEvent.dto";
 import { UpdateEventResponseData } from "./updateEvent-response.dto";
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
+import { CheckUserExistService } from "src/services/auth-svc/modules/user/commands/checkuserExist/checkuserExist.service";
 
 @Injectable()
 export class UpdateEventService {
@@ -14,11 +15,18 @@ export class UpdateEventService {
     @Inject('EventsRepository') private readonly eventsRepository: EventsRepository,
     @Inject('EventCategoriesRepository') private readonly eventCategoriesRepository: EventCategoriesRepository,
     @Inject('LocationsRepository') private readonly locationsRepository: LocationsRepository,
-    private readonly slackService: SlackService
+    private readonly slackService: SlackService,
+    private readonly checkUserExistService: CheckUserExistService, 
   ) {}
 
   async execute(dto: UpdateEventDto, email: string, id: number): Promise<Result<UpdateEventResponseData, Error>> {
     try {
+      // Check if the user exists
+      const userExists = await this.checkUserExistService.execute(email);
+      if (!userExists) {
+        return Err(new Error('User does not exist'));
+      }
+
       const hasPermisison = await this.eventsRepository.hasPermissionToManageEvent(id, email);
       if (hasPermisison.isErr()) {
         return Err(new Error('Failed to check permission'));
@@ -37,9 +45,13 @@ export class UpdateEventService {
         locationId = locationIdRes;
       }
 
-      const eventId = await this.eventsRepository.updateEvent(dto, id, email, locationId);
+      const [eventId, isApproved] = await this.eventsRepository.updateEvent(dto, id, locationId);
       if (!eventId) {
         return Err(new Error('Failed to update event'));
+      }
+
+      if (isApproved) {
+        this.slackService.sendNotice(`Event Service - Event >>> Event with ID ${eventId} has been updated.`);
       }
 
       if (dto.categoryIds && dto.categoryIds.length > 0) {

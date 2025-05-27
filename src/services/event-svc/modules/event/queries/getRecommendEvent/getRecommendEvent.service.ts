@@ -5,6 +5,7 @@ import { GetEventFrontDisplayService } from '../getEventFrontDisplay/getEventFro
 import { EventStatus } from 'src/shared/utils/status/status';
 import { EventFrontDisplayDto } from '../getEventFrontDisplay/getEventFrontDisplay-response.dto';
 import { SlackService } from 'src/infrastructure/adapters/slack/slack.service';
+import { FileCacheService } from 'src/infrastructure/cache/fileCache/fileCache.service';
 
 @Injectable()
 export class GetRecommendEventService {
@@ -12,10 +13,17 @@ export class GetRecommendEventService {
     private readonly getEventFrontDisplayService: GetEventFrontDisplayService,
     @Inject('EventsRepository') private readonly eventsRepository: EventsRepository,
     private readonly slackService: SlackService,
+    private readonly fileCacheService: FileCacheService,
   ) {}
 
   async getRecommendedEvents(timeWindow: "week" | "month"): Promise<Result<EventFrontDisplayDto[], Error>> {
     try {
+      // Check cache first
+      const cacheData = await this.fileCacheService.getCache('getRecommendedEvents', { timeWindow });
+      if (cacheData) {
+        return Ok(cacheData as EventFrontDisplayDto[]);
+      }
+
       const now = new Date();
 
       let endDate: Date;
@@ -53,6 +61,7 @@ export class GetRecommendEventService {
                 select: {
                   id: true,
                   price: true,
+                  status: true,
                 },
               },
             },
@@ -84,6 +93,10 @@ export class GetRecommendEventService {
       && event.status !== EventStatus.REGISTER_CLOSE
       && event.status !== EventStatus.SALE_CLOSE
       ) as EventFrontDisplayDto[];
+
+      // Cache the result
+      this.fileCacheService.cacheEndpoint('getRecommendedEvents', 300, { timeWindow }, filteredEventDtos);
+
       // Return the result
       return Ok(filteredEventDtos);
     } catch (error) {

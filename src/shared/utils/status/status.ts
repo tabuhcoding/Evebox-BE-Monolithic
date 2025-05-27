@@ -38,14 +38,13 @@ export function calculateShowingStatusAndMinPrice(ticketTypes: TicketTypeWithout
     else if (ticketType.status === TicketTypeStatus.BOOK_NOW && showingStatus !== ShowingStatus.REGISTER_NOW) {
       showingStatus = ShowingStatus.BOOK_NOW;
     }
-    else if (ticketType.status === TicketTypeStatus.NOT_OPEN && [ShowingStatus.SOLD_OUT, ShowingStatus.REGISTER_NOW, ShowingStatus.BOOK_NOW].includes(showingStatus)) {
+    else if (ticketType.status === TicketTypeStatus.NOT_OPEN && ![ShowingStatus.REGISTER_NOW, ShowingStatus.BOOK_NOW].includes(showingStatus)) {
       showingStatus = ShowingStatus.NOT_OPEN;
     }
-    else if (ticketType.status === TicketTypeStatus.REGISTER_CLOSED && [ShowingStatus.SOLD_OUT, ShowingStatus.REGISTER_NOW, ShowingStatus.BOOK_NOW, ShowingStatus.NOT_OPEN, ShowingStatus.SALE_CLOSE].includes(showingStatus)) {
+    else if (ticketType.status === TicketTypeStatus.REGISTER_CLOSED && ![ShowingStatus.REGISTER_NOW, ShowingStatus.BOOK_NOW, ShowingStatus.NOT_OPEN, ShowingStatus.SALE_CLOSE].includes(showingStatus)) {
       showingStatus = ShowingStatus.REGISTER_CLOSE;
     }
-    
-    else if (ticketType.status === TicketTypeStatus.SALE_CLOSED && [ShowingStatus.SOLD_OUT, ShowingStatus.REGISTER_NOW, ShowingStatus.BOOK_NOW, ShowingStatus.NOT_OPEN].includes(showingStatus)) {
+    else if (ticketType.status === TicketTypeStatus.SALE_CLOSED && ![ShowingStatus.REGISTER_NOW, ShowingStatus.BOOK_NOW, ShowingStatus.NOT_OPEN, ShowingStatus.REGISTER_CLOSE].includes(showingStatus)) {
       showingStatus = ShowingStatus.SALE_CLOSE;
     }
 

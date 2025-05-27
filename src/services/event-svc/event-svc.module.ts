@@ -43,6 +43,12 @@ import { DeleteEventController } from './modules/event/commands/deleteEvent/dele
 import { DeleteEventService } from './modules/event/commands/deleteEvent/deleteEvent.service';
 import { getShowingSeatmapController as GetShowingSeatmapController } from './modules/showing/queries/getShowingSeatmap/getShowingSeatmap.controller';
 import { getShowingSeatmapService as GetShowingSeatmapService } from './modules/showing/queries/getShowingSeatmap/getShowingSeatmap.service';
+import { CreateShowingController } from './modules/showing/command/createShowing/createShowing.controller';
+import { CreateShowingService } from './modules/showing/command/createShowing/createShowing.service';
+import { UpdateShowingController } from './modules/showing/command/updateShowing/updateShowing.controller';
+import { UpdateShowingService } from './modules/showing/command/updateShowing/updateShowing.service';
+import { DeleteShowingController } from './modules/showing/command/deleteShowing/deleteShowing.controller';
+import { DeleteShowingService } from './modules/showing/command/deleteShowing/deleteShowing.service';
 import { CalculateSectionStatusService } from './modules/showing/command/calculateSectionStatus/calculateSectionStatus.service';
 import { FileCacheService } from 'src/infrastructure/cache/fileCache/fileCache.service';
 
@@ -67,6 +73,9 @@ import { FileCacheService } from 'src/infrastructure/cache/fileCache/fileCache.s
     GetFormOfShowingController,
     GetShowingDetailController,
     GetShowingSeatmapController,
+    CreateShowingController,
+    UpdateShowingController,
+    DeleteShowingController,
   ],
   providers: [
     // Adapters
@@ -92,6 +101,9 @@ import { FileCacheService } from 'src/infrastructure/cache/fileCache/fileCache.s
 
     GetEventsByIdsService,
     ///// Showing
+    CreateShowingService,
+    UpdateShowingService,
+    DeleteShowingService,
     
     // Commands
     CalculateSectionStatusService,

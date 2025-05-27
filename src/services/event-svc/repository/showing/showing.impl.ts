@@ -21,7 +21,7 @@ export class ShowingRepositoryImpl
     super(prisma.showing, prisma);
   }
 
-  async createShowing(dto: CreateShowingDto, eventId: number): Promise<Result<string, Error>> {
+  async createShowing(dto: CreateShowingDto, eventId: number): Promise<Result<[string, boolean], Error>> {
     try {
       const showingId = await this.insertOne({
         startTime: dto.startTime,
@@ -39,7 +39,9 @@ export class ShowingRepositoryImpl
         return Err(new Error('Failed to create showing'));
       }
 
-      return Ok(showingId);
+      const event = await this.eventsRepository.findOneById(eventId);
+
+      return Ok([showingId, event.isApproved]);
     } catch (error) {
       console.error(`Failed to create showing: ${error.message}`);
       return Err(new Error(`Failed to create showing: ${error.message}`));

@@ -31,7 +31,7 @@ export type Showing = Prisma.ShowingGetPayload<{
 export interface ShowingRepository extends BaseRepository<Showing, Prisma.ShowingDelegate> {
   checkAuthor(id: string, userId: string): Promise<Result<boolean, Error>>;
   /* Create Showing */
-  createShowing(dto: CreateShowingDto, eventId: number): Promise<Result<string, Error>>;
+  createShowing(dto: CreateShowingDto, eventId: number): Promise<Result<[string, boolean], Error>>;
 
   /* Update Showing */
   updateShowing(dto: UpdateShowingDto, id: string): Promise<Result<[string, boolean], Error>>;

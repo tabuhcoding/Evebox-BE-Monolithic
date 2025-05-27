@@ -42,7 +42,7 @@ export class UpdateShowingService {
 
       const [showingId, isApproved] = result.unwrap();
       if (isApproved) {
-        this.slackService.sendNotice(`Event Service - Showing >>> UpdateShowingService: Event with ID ${showing.eventId} has been updated.`);
+        this.slackService.sendNotice(`Event Service - Showing >>> UpdateShowingService: Event with ID ${showing.eventId} has been updated showing.`);
       }
 
       return Ok(showingId);

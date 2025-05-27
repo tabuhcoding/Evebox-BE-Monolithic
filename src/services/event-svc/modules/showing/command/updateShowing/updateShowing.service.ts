@@ -28,7 +28,7 @@ export class UpdateShowingService {
 
       const isAuthor = await this.showingRepository.checkAuthor(id, userEmail);
       if (isAuthor.isErr()) {
-        return Err(new Error('Failed to check author'));
+        return Err(new Error(isAuthor.unwrapErr().message));
       }
 
       if (!isAuthor.unwrap()) {

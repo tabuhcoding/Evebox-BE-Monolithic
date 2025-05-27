@@ -4,11 +4,15 @@ import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags, ApiParam } from '@ne
 import { DeleteShowingService } from "./deleteShowing.service";
 import { JwtAuthGuard } from "src/shared/guard/jwt-auth.guard";
 import { DeleteShowingResponseDto } from "./deleteShowing-response.dto";
+import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 
 @ApiTags('Event Service - Showing')
 @Controller('api/org/showing')
 export class DeleteShowingController {
-  constructor(private readonly deleteShowingService: DeleteShowingService) {}
+  constructor(
+    private readonly deleteShowingService: DeleteShowingService,
+    private readonly slackService: SlackService
+  ) {}
 
   @UseGuards(JwtAuthGuard)
   @Delete('/:id')
@@ -52,7 +56,7 @@ export class DeleteShowingController {
         data: result.unwrap(),
       });
     } catch (error) {
-      console.error(error);
+      this.slackService.sendError(`EventSvc - Showing >>> DeleteShowingController: ${error.message}`);
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
         message: 'Internal server error',

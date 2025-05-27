@@ -1,0 +1,49 @@
+import { Inject, Injectable } from "@nestjs/common";
+import { Result, Ok, Err } from "oxide.ts";
+
+import { ShowingRepository } from "src/services/event-svc/repository/showing/showing.repo";
+import { EventsRepository } from "src/services/event-svc/repository/events/events.repo";
+import { CreateShowingDto } from "./createShowing.dto";
+import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
+import { CheckUserExistService } from "src/services/auth-svc/modules/user/commands/checkuserExist/checkuserExist.service";
+
+@Injectable()
+export class CreateShowingService {
+  constructor(
+    @Inject('EventsRepository') private readonly eventsRepository: EventsRepository,
+    @Inject('ShowingRepository') private readonly showingRepository: ShowingRepository,
+    private readonly slackService: SlackService,
+    private readonly checkUserExistService: CheckUserExistService
+  ) {}
+
+  async execute(dto: CreateShowingDto, eventId: number, userEmail: string): Promise<Result<string, Error>> {
+    try {
+      const userExists = await this.checkUserExistService.execute(userEmail);
+      if (!userExists) {
+        return Err(new Error('User does not exist'));
+      }
+      
+      const event = await this.eventsRepository.findOneById(eventId);
+
+      if (!event) {
+        return Err(new Error('Event not found'));
+      }
+
+      if(!dto.startTime || !dto.endTime || dto.startTime >= dto.endTime) {
+        return Err(new Error('Invalid start time or end time'));
+      }
+
+      const result = await this.showingRepository.createShowing(dto, eventId);
+
+      if (!result) {
+        return Err(new Error('Failed to create showing'));
+      }
+
+      return result;
+    } catch (error) {
+      this.slackService.sendError(`EventSvc - Showing >>> CreateShowingService: ${error.message}`);
+
+      return Err(new Error(`Failed to create showing: ${error.message}`));
+    }
+  }
+}

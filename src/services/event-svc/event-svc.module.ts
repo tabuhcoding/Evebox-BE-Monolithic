@@ -44,6 +44,7 @@ import { DeleteEventService } from './modules/event/commands/deleteEvent/deleteE
 import { getShowingSeatmapController as GetShowingSeatmapController } from './modules/showing/queries/getShowingSeatmap/getShowingSeatmap.controller';
 import { getShowingSeatmapService as GetShowingSeatmapService } from './modules/showing/queries/getShowingSeatmap/getShowingSeatmap.service';
 import { CalculateSectionStatusService } from './modules/showing/command/calculateSectionStatus/calculateSectionStatus.service';
+import { FileCacheService } from 'src/infrastructure/cache/fileCache/fileCache.service';
 
 @Module({
   imports: [ BookingSvcModule, forwardRef(() => AuthSvcModule) ],
@@ -70,6 +71,7 @@ import { CalculateSectionStatusService } from './modules/showing/command/calcula
   providers: [
     // Adapters
     SlackService,
+    FileCacheService,
 
     // Utils Command
     CalculateShowingStatusService,

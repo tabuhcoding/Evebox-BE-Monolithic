@@ -1,50 +1,50 @@
 import { Controller, Delete, Request, Res, HttpStatus, UseGuards, Param } from "@nestjs/common";
 import { Response } from "express";
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags, ApiParam } from '@nestjs/swagger';
-import { DeleteShowingService } from "./deleteShowing.service";
+import { ApiBearerAuth, ApiParam, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { DeleteTicketTypeService } from "./deleteTicketType.service";
+import { DeleteTicketTypeResponseDto } from "./deleteTicketType-response.dto";
 import { JwtAuthGuard } from "src/shared/guard/jwt-auth.guard";
-import { DeleteShowingResponseDto } from "./deleteShowing-response.dto";
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 
-@ApiTags('Event Service - Showing')
-@Controller('api/org/showing')
-export class DeleteShowingController {
+@ApiTags('Event Service - Ticket type')
+@Controller('api/org/ticketType')
+export class DeleteTicketTypeController {
   constructor(
-    private readonly deleteShowingService: DeleteShowingService,
+    private readonly deleteTicketTypeService: DeleteTicketTypeService,
     private readonly slackService: SlackService
-  ) {}
+  ) { }
 
   @UseGuards(JwtAuthGuard)
   @Delete('/:id')
   @ApiBearerAuth('access-token')
-  @ApiParam({ name: 'id', example: "10157860047763", description: "The ID of the event" })
-  @ApiOperation({ summary: 'Delete a showing' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Showing deleted successfully', type: DeleteShowingResponseDto })
+  @ApiOperation({ summary: 'Delete a ticket type' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Ticket type deleted successfully', type: DeleteTicketTypeResponseDto })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad request' })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Internal server error' })
-  async deleteShowing(
+  async deleteTicketType(
     @Param('id') id: string,
     @Res() res: Response,
     @Request() req: any,
   ) {
     try {
-      if(!id) {
+      if (!id) {
         return res.status(HttpStatus.BAD_REQUEST).json({
           statusCode: HttpStatus.BAD_REQUEST,
           message: 'Showing id is required',
         });
       }
 
-      const userId = req.user.email;
-      
-      const result = await this.deleteShowingService.execute(id, userId);
+      const email = req.user?.email;
+
+      if (!email) {
+        return res.status(HttpStatus.UNAUTHORIZED).json({
+          statusCode: HttpStatus.UNAUTHORIZED,
+          message: 'Unauthorized',
+        });
+      }
+
+      const result = await this.deleteTicketTypeService.execute(id, email);
       if (result.isErr()) {
-        if(result.unwrapErr().message === 'Showing not found') {
-          return res.status(HttpStatus.BAD_REQUEST).json({
-            statusCode: HttpStatus.BAD_REQUEST,
-            message: 'Showing not found',
-          });
-        }
         return res.status(HttpStatus.BAD_REQUEST).json({
           statusCode: HttpStatus.BAD_REQUEST,
           message: result.unwrapErr().message,
@@ -52,11 +52,11 @@ export class DeleteShowingController {
       }
       return res.status(HttpStatus.OK).json({
         statusCode: HttpStatus.OK,
-        message: 'Showing deleted successfully',
+        message: 'Ticket type deleted successfully',
         data: result.unwrap(),
       });
     } catch (error) {
-      this.slackService.sendError(`EventSvc - Showing >>> DeleteShowingController: ${error.message}`);
+      this.slackService.sendError(`EventSvc - Showing >>> DeleteTicketTypeController: ${error.message}`);
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
         message: 'Internal server error',

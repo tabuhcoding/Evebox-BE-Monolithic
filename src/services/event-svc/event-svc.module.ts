@@ -49,6 +49,12 @@ import { UpdateShowingController } from './modules/showing/command/updateShowing
 import { UpdateShowingService } from './modules/showing/command/updateShowing/updateShowing.service';
 import { DeleteShowingController } from './modules/showing/command/deleteShowing/deleteShowing.controller';
 import { DeleteShowingService } from './modules/showing/command/deleteShowing/deleteShowing.service';
+import { CreateTicketTypeController } from './modules/ticketType/commands/createTicketType/createTicketType.controller';
+import { CreateTicketTypeService } from './modules/ticketType/commands/createTicketType/createTicketType.service';
+import { UpdateTicketTypeController } from './modules/ticketType/commands/updateTicketType/updateTicketType.controller';
+import { UpdateTicketTypeService } from './modules/ticketType/commands/updateTicketType/updateTicketType.service';
+import { DeleteTicketTypeController } from './modules/ticketType/commands/deleteTicketType/deleteTicketType.controller';
+import { DeleteTicketTypeService } from './modules/ticketType/commands/deleteTicketType/deleteTicketType.service';
 import { CalculateSectionStatusService } from './modules/showing/command/calculateSectionStatus/calculateSectionStatus.service';
 import { FileCacheService } from 'src/infrastructure/cache/fileCache/fileCache.service';
 
@@ -76,6 +82,11 @@ import { FileCacheService } from 'src/infrastructure/cache/fileCache/fileCache.s
     CreateShowingController,
     UpdateShowingController,
     DeleteShowingController,
+
+    // Ticket type
+    CreateTicketTypeController,
+    UpdateTicketTypeController,
+    DeleteTicketTypeController,
   ],
   providers: [
     // Adapters
@@ -104,6 +115,11 @@ import { FileCacheService } from 'src/infrastructure/cache/fileCache/fileCache.s
     CreateShowingService,
     UpdateShowingService,
     DeleteShowingService,
+
+    // Ticket type
+    CreateTicketTypeService,
+    UpdateTicketTypeService,
+    DeleteTicketTypeService,
     
     // Commands
     CalculateSectionStatusService,

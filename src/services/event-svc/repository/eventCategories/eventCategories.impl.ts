@@ -139,4 +139,17 @@ export class EventCategoriesRepositoryImpl
       return Err(new Error('Failed to update event category'));
     }
   }
+
+  async getCategoriesByEventId(eventId: number): Promise<{ id: number; name: string }[]> {
+    const categories = await this.prisma.eventCategories.findMany({
+      where: { eventId },
+      select: {
+        Categories: {
+          select: { id: true, name: true },
+        },
+      },
+    });
+
+    return categories.map(c => c.Categories);
+  }
 }

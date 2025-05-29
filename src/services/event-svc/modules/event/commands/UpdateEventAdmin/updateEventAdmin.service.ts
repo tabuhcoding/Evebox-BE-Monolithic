@@ -14,7 +14,6 @@ export class UpdateEventAdminService {
   constructor(
     @Inject('EventCategoriesRepository') private readonly updateEventRepository: EventCategoriesRepository,
     @Inject('EventsRepository') private readonly eventRepository: EventsRepository,
-    private readonly userRepository: UserRepositoryImpl,
     private readonly slackService: SlackService,
     private readonly checkUserExistService: CheckUserExistService,  
   ) {}

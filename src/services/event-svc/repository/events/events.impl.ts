@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
 import { BaseRepository } from 'src/shared/repo/base.repository';
-import { Prisma } from '@prisma/client';
+import { Prisma, Categories } from '@prisma/client';
 import { Result, Ok, Err } from 'oxide.ts';
 
 import { Events, EventsRepository } from './events.repo';
@@ -10,6 +10,7 @@ import { CreateEventDto } from '../../modules/event/commands/createEvent/createE
 import { UpdateEventDto } from '../../modules/event/commands/updateEvent/updateEvent.dto';
 import { UpdateEventAdminDto } from '../../modules/event/commands/UpdateEventAdmin/updateEventAdmin.dto';
 import { error } from 'console';
+import { EventDataDto } from '../../modules/event/queries/getEventsByAdmin/getEvents-response.dto';
 
 @Injectable()
 export class EventsRepositoryImpl
@@ -241,4 +242,72 @@ export class EventsRepositoryImpl
       return null;
     }
   }
+
+  async findWithFilters(filters: any): Promise<Result<any[], Error>> {
+  try {
+    const where = this.buildWhereClause(filters);
+    const page = Number(filters.page ?? 1);
+    const limit = Number(filters.limit ?? 10);
+
+    const data = await this.prisma.events.findMany({
+      where: {
+        ...where,
+        ...(filters.categoryId && {
+          EventCategories: {
+            some: { categoryId: Number(filters.categoryId) }
+          }
+        })
+      },
+      skip: (page - 1) * limit,
+      take: limit,
+      select: {
+        id: true,
+        title: true,
+        venue: true,
+        imgLogoUrl: true,
+        imgPosterUrl: true,
+        deleteAt: true,
+        locations: {
+          select: {
+            street: true,
+            ward: true,
+            districts: {
+              select: {
+                name: true,
+                province: { select: { name: true } }
+              }
+            }
+          }
+        },
+        isApproved: true,
+        createdAt: true,
+        isSpecial: true,
+        isOnlyOnEve: true,
+        isOnline: true,
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    return Ok(data); // ✅ wrap in Ok
+  } catch (error) {
+    return Err(new Error('Failed to fetch events')); // ✅ return error clearly
+  }
+}
+
+  async getShowingsByEventId(eventId: number): Promise<{ startTime: Date }[]> {
+    return this.prisma.showing.findMany({
+      where: { eventId },
+      select: { startTime: true },
+    });
+  }
+
+  private buildWhereClause(filters: any): any {
+    const where: any = {};
+    if ('isApproved' in filters) where.isApproved = filters.isApproved === 'true';
+    if ('isDeleted' in filters) where.deleteAt = filters.isDeleted === 'true' ? { not: null } : null;
+    if ('createdFrom' in filters) where.createdAt = { ...where.createdAt, gte: new Date(filters.createdFrom) };
+    if ('createdTo' in filters) where.createdAt = { ...where.createdAt, lte: new Date(filters.createdTo) };
+    return where;
+  }
+
 }

@@ -13,4 +13,5 @@ export interface EventCategoriesRepository
   // Thêm các method riêng cho EventCategories nếu cần, ví dụ:
   createEventCategory(eventId: number, categoryIds: number[]): Promise<Result<any, Error>>;
   updateEventCategory(eventId: number, categoryIds: number[]): Promise<Result<any, Error>>;
+  getCategoriesByEventId(eventId: number): Promise<{ id: number; name: string }[]>
 }

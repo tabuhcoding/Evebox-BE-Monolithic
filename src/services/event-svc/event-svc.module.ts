@@ -1,3 +1,4 @@
+import { GetEventsByAdminController } from './modules/event/queries/getEventsByAdmin/getEvents.controller';
 // event-svc.module.ts
 import { forwardRef, Module } from '@nestjs/common';
 import { CategoriesRepositoryImpl } from './repository/categories/categories.impl';
@@ -59,6 +60,7 @@ import { CalculateSectionStatusService } from './modules/showing/command/calcula
 import { FileCacheService } from 'src/infrastructure/cache/fileCache/fileCache.service';
 import { UpdateEventAdminController } from './modules/event/commands/UpdateEventAdmin/updateEventAdmin.controller';
 import { UpdateEventAdminService } from './modules/event/commands/UpdateEventAdmin/updateEventAdmin.service';
+import { GetEventsByAdminService } from './modules/event/queries/getEventsByAdmin/getEvents.service';
 
 @Module({
   imports: [ BookingSvcModule, AuthSvcModule],
@@ -89,7 +91,8 @@ import { UpdateEventAdminService } from './modules/event/commands/UpdateEventAdm
     CreateTicketTypeController,
     UpdateTicketTypeController,
     DeleteTicketTypeController,
-    UpdateEventAdminController
+    UpdateEventAdminController, 
+    GetEventsByAdminController
   ],
   providers: [
     // Adapters
@@ -133,6 +136,7 @@ import { UpdateEventAdminService } from './modules/event/commands/UpdateEventAdm
     GetShowingSeatmapService,
 
     UpdateEventAdminService,
+    GetEventsByAdminService,
 
     // Repositories
     { provide: 'CategoriesRepository', useClass: CategoriesRepositoryImpl },

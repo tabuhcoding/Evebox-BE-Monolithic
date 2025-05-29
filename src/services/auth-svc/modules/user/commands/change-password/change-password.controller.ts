@@ -1,4 +1,4 @@
-import { Controller, Post, Body, HttpStatus, Res, Headers } from "@nestjs/common";
+import { Controller, Post, Body, HttpStatus, Res, Headers, Request } from "@nestjs/common";
 import { ApiTags, ApiOperation, ApiOkResponse, ApiBadRequestResponse, ApiNotFoundResponse, ApiInternalServerErrorResponse, ApiBody } from "@nestjs/swagger";
 import { Response } from "express";
 import { ChangePasswordDto } from "./change-password.dto";
@@ -24,9 +24,10 @@ export class ChangePasswordController {
   async changePassword(
     @Body() dto: ChangePasswordDto,
     @Res() res: Response,
-    @Headers('X-User-Email') email: string,
+    @Request() req
   ) {
     try {
+      const email = req.user?.email;
       if (!email) {
         return res
           .status(HttpStatus.UNAUTHORIZED)

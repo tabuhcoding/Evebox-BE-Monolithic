@@ -5,6 +5,7 @@ import { Events, EventsRepository } from 'src/services/event-svc/repository/even
 import { calculateEventStatusAndMinPriceAndStartDate, EventStatus } from 'src/shared/utils/status/status';
 import { CategoriesRepository } from 'src/services/event-svc/repository/categories/categories.repo';
 import { SlackService } from 'src/infrastructure/adapters/slack/slack.service';
+import { FileCacheService } from 'src/infrastructure/cache/fileCache/fileCache.service';
 
 @Injectable()
 export class GetEventFrontDisplayService {
@@ -12,10 +13,17 @@ export class GetEventFrontDisplayService {
     @Inject('EventsRepository') private readonly eventsRepository: EventsRepository,
     @Inject('CategoriesRepository') private readonly categoriesRepository: CategoriesRepository,
     private readonly slackService: SlackService,
+    private readonly fileCacheService: FileCacheService,
   ) {}
 
   async execute(): Promise<Result<GetEventFrontDisplayDTO, Error>> {
     try {
+      // Check if data is cached
+      const cachedData = await this.fileCacheService.getCache('getEventFrontDisplay', {});
+      if (cachedData) {
+        return Ok(cachedData as GetEventFrontDisplayDTO);
+      }
+
       // Fetch special events, trending events, only on eve events, and special events by category
       const specialEvents = await this.getSpecialEvents();
       if (specialEvents.isErr()) {
@@ -49,6 +57,9 @@ export class GetEventFrontDisplayService {
 
       };
 
+      // Cache the result without await
+      this.fileCacheService.cacheEndpoint('getEventFrontDisplay', 720, {}, result); // Cache for 12 hour
+
       return Ok(result);
     } catch (error) {
       // send error to slack
@@ -72,28 +83,29 @@ export class GetEventFrontDisplayService {
               deleteAt: null,
             },
           }
-      },
-      {
-        Showing: {
-          select: {
-            id: true,
-            startTime: true,
-            TicketType: {
-              select: {
-                id: true,
-                price: true,
+        },
+        {
+          Showing: {
+            select: {
+              id: true,
+              startTime: true,
+              TicketType: {
+                select: {
+                  id: true,
+                  price: true,
+                  status: true,
+                },
               },
             },
-          },
-          where: {
-            startTime: {
-              gte: new Date(),
+            where: {
+              startTime: {
+                gte: new Date(),
+              },
+              deleteAt: null,
             },
-            deleteAt: null,
-          },
+          }
         }
-      }
-    );
+      );
 
       // Map to EventFrontDisplayDto
       const specialEventsDto = await Promise.all(specialEvents.map(async (event) => {
@@ -143,6 +155,7 @@ export class GetEventFrontDisplayService {
               select: {
                 id: true,
                 price: true,
+                status: true,
               },
             },
           },
@@ -208,6 +221,7 @@ export class GetEventFrontDisplayService {
               select: {
                 id: true,
                 price: true,
+                status: true,
               },
             },
           },
@@ -298,6 +312,7 @@ export class GetEventFrontDisplayService {
               select: {
                 id: true,
                 price: true,
+                status: true,
               },
             },
           },

@@ -28,6 +28,7 @@ export class GetEventFDByIdsService {
                 select: {
                   id: true,
                   price: true,
+                  status: true,
                 },
               },
             },

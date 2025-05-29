@@ -7,9 +7,10 @@ import { RagSvcModule } from './services/rag-svc/rag-svc.module';
 import { AuthSvcModule } from './services/auth-svc/auth-svc.module';
 import { SlackService } from './infrastructure/adapters/slack/slack.service';
 import { BookingSvcModule } from './services/booking-svc/booking.module';
+import { FileCacheService } from './infrastructure/cache/fileCache/fileCache.service';
 
 @Module({
-  providers: [SlackService],
+  providers: [SlackService, FileCacheService],
   imports: [
     ConfigModule.forRoot({
       isGlobal: true, // Makes ConfigService globally available
@@ -22,6 +23,6 @@ import { BookingSvcModule } from './services/booking-svc/booking.module';
     AuthSvcModule,
     BookingSvcModule,
   ],
-  exports: [SlackService]
+  exports: [SlackService, FileCacheService]
 })
 export class AppModule {}

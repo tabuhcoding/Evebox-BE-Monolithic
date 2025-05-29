@@ -3,6 +3,7 @@ import { forwardRef, Module } from '@nestjs/common';
 import { CategoriesRepositoryImpl } from './repository/categories/categories.impl';
 import { EventsRepositoryImpl } from './repository/events/events.impl';
 import { EventCategoriesRepositoryImpl } from './repository/eventCategories/eventCategories.impl';
+import { LocationsRepositoryImpl } from './repository/locations/location.impl';
 import { GetAllEventDetailForRAGService } from './modules/event/queries/getAllEventDetailForRAG/getAllEventDetailForRAG.service';
 import { GetAllCategoriesController } from './modules/categories/queries/getAllCategories.controller';
 import { GetAllCategoriesService } from './modules/categories/queries/getAllCategories.service';
@@ -24,21 +25,43 @@ import { SeatStatusRepositoryImpl } from './repository/seatStatus/seatStatus.imp
 import { TicketTypeRepositoryImpl } from './repository/ticketType/ticketType.impl';
 import { CalculateShowingStatusService } from './modules/event/commands/calculateShowingStatus/calculateShowingStatus.service';
 import { UserClickHistoryRepositoryImpl } from './repository/userClickHistory/userClickHistory.impl';
+import { CreateEventController } from './modules/event/commands/createEvent/createEvent.controller';
+import { CreateEventService } from './modules/event/commands/createEvent/createEvent.service';
 import { AuthSvcModule } from '../auth-svc/auth-svc.module';
 import { GetEventsByIdsService } from './modules/event/queries/getEventsById/GetEventsByIds.service';
-import { getAllShowingController } from './modules/showing/queries/getAllShowing/getAllShowing.controller';
-import { getAllShowingService } from './modules/showing/queries/getAllShowing/getAllShowing.service';
-import { getFormOfShowingController } from './modules/showing/queries/getFormOfShowing/getFormOfShowing.controller';
-import { getFormOfShowingService } from './modules/showing/queries/getFormOfShowing/getFormOfShowing.service';
-import { getShowingDetailController } from './modules/showing/queries/getShowingDetail/getShowingDetail.controller';
-import { getShowingDetailService } from './modules/showing/queries/getShowingDetail/getShowingDetail.service';
+import { getAllShowingController as GetAllShowingController } from './modules/showing/queries/getAllShowing/getAllShowing.controller';
+import { getAllShowingService as GetAllShowingService } from './modules/showing/queries/getAllShowing/getAllShowing.service';
+import { getFormOfShowingController as GetFormOfShowingController } from './modules/showing/queries/getFormOfShowing/getFormOfShowing.controller';
+import { getFormOfShowingService as GetFormOfShowingService } from './modules/showing/queries/getFormOfShowing/getFormOfShowing.service';
+import { getShowingDetailController as GetShowingDetailController } from './modules/showing/queries/getShowingDetail/getShowingDetail.controller';
+import { getShowingDetailService as GetShowingDetailService } from './modules/showing/queries/getShowingDetail/getShowingDetail.service';
 import { FormRepositoryImpl } from './repository/form/form.impl';
 import { TicketTypeSectionRepositoryImpl } from './repository/ticketTypeSection/ticketTypeSection.impl';
+import { UpdateEventController } from './modules/event/commands/updateEvent/updateEvent.controller';
+import { UpdateEventService } from './modules/event/commands/updateEvent/updateEvent.service';
+import { DeleteEventController } from './modules/event/commands/deleteEvent/deleteEvent.controller';
+import { DeleteEventService } from './modules/event/commands/deleteEvent/deleteEvent.service';
+import { getShowingSeatmapController as GetShowingSeatmapController } from './modules/showing/queries/getShowingSeatmap/getShowingSeatmap.controller';
+import { getShowingSeatmapService as GetShowingSeatmapService } from './modules/showing/queries/getShowingSeatmap/getShowingSeatmap.service';
+import { CreateShowingController } from './modules/showing/command/createShowing/createShowing.controller';
+import { CreateShowingService } from './modules/showing/command/createShowing/createShowing.service';
+import { UpdateShowingController } from './modules/showing/command/updateShowing/updateShowing.controller';
+import { UpdateShowingService } from './modules/showing/command/updateShowing/updateShowing.service';
+import { DeleteShowingController } from './modules/showing/command/deleteShowing/deleteShowing.controller';
+import { DeleteShowingService } from './modules/showing/command/deleteShowing/deleteShowing.service';
+import { CreateTicketTypeController } from './modules/ticketType/commands/createTicketType/createTicketType.controller';
+import { CreateTicketTypeService } from './modules/ticketType/commands/createTicketType/createTicketType.service';
+import { UpdateTicketTypeController } from './modules/ticketType/commands/updateTicketType/updateTicketType.controller';
+import { UpdateTicketTypeService } from './modules/ticketType/commands/updateTicketType/updateTicketType.service';
+import { DeleteTicketTypeController } from './modules/ticketType/commands/deleteTicketType/deleteTicketType.controller';
+import { DeleteTicketTypeService } from './modules/ticketType/commands/deleteTicketType/deleteTicketType.service';
+import { CalculateSectionStatusService } from './modules/showing/command/calculateSectionStatus/calculateSectionStatus.service';
+import { FileCacheService } from 'src/infrastructure/cache/fileCache/fileCache.service';
 import { UpdateEventAdminController } from './modules/event/commands/calculateShowingStatus/UpdateEventAdmin/updateEventAdmin.controller';
 import { UpdateEventAdminService } from './modules/event/commands/calculateShowingStatus/UpdateEventAdmin/updateEventAdmin.service';
 
 @Module({
-  imports: [ BookingSvcModule, forwardRef(() => AuthSvcModule)],
+  imports: [ BookingSvcModule, AuthSvcModule],
   controllers: [
     // Categories
     GetAllCategoriesController,
@@ -49,16 +72,29 @@ import { UpdateEventAdminService } from './modules/event/commands/calculateShowi
     GetRecommendedEventController,
     GetEventDetailRecommendController,
     GetEventDetailController,
+    CreateEventController,
+    UpdateEventController,
+    DeleteEventController,
 
     // Showing
-    getAllShowingController,
-    getFormOfShowingController,
-    getShowingDetailController,
+    GetAllShowingController,
+    GetFormOfShowingController,
+    GetShowingDetailController,
+    GetShowingSeatmapController,
+    CreateShowingController,
+    UpdateShowingController,
+    DeleteShowingController,
+
+    // Ticket type
+    CreateTicketTypeController,
+    UpdateTicketTypeController,
+    DeleteTicketTypeController,
     UpdateEventAdminController
   ],
   providers: [
     // Adapters
     SlackService,
+    FileCacheService,
 
     // Utils Command
     CalculateShowingStatusService,
@@ -73,12 +109,28 @@ import { UpdateEventAdminService } from './modules/event/commands/calculateShowi
     GetRecommendEventService,
     GetEventDetailRecommendService,
     GetEventDetailService,
+    CreateEventService,
+    UpdateEventService,
+    DeleteEventService,
 
     GetEventsByIdsService,
-    // Showing
-    getAllShowingService,
-    getFormOfShowingService,
-    getShowingDetailService,
+    ///// Showing
+    CreateShowingService,
+    UpdateShowingService,
+    DeleteShowingService,
+
+    // Ticket type
+    CreateTicketTypeService,
+    UpdateTicketTypeService,
+    DeleteTicketTypeService,
+    
+    // Commands
+    CalculateSectionStatusService,
+    // Queries,
+    GetAllShowingService,
+    GetFormOfShowingService,
+    GetShowingDetailService,
+    GetShowingSeatmapService,
 
     UpdateEventAdminService,
 
@@ -93,6 +145,7 @@ import { UpdateEventAdminService } from './modules/event/commands/calculateShowi
     { provide: 'TicketTypeSectionRepository', useClass: TicketTypeSectionRepositoryImpl},
     { provide: 'UserClickHistoryRepository', useClass: UserClickHistoryRepositoryImpl },
     { provide: 'FormRepository', useClass: FormRepositoryImpl },
+    { provide: 'LocationsRepository', useClass: LocationsRepositoryImpl },
   ],
   exports: [GetAllEventDetailForRAGService, GetEventFrontDisplayService,GetEventsByIdsService],
 })

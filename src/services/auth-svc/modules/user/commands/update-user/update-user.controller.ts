@@ -1,6 +1,7 @@
-import { Controller, Body, HttpStatus, Res, Put, Headers } from "@nestjs/common";
-import { ApiTags, ApiOperation, ApiOkResponse, ApiBadRequestResponse, ApiNotFoundResponse, ApiInternalServerErrorResponse, ApiBody } from "@nestjs/swagger";
+import { Controller, Body, HttpStatus, Res, UseGuards, Request, Put, Headers } from "@nestjs/common";
+import { ApiTags, ApiOperation, ApiOkResponse, ApiBearerAuth, ApiBadRequestResponse, ApiNotFoundResponse, ApiInternalServerErrorResponse, ApiBody } from "@nestjs/swagger";
 import { Response } from "express";
+import { JwtAuthGuard } from "src/shared/guard/jwt-auth.guard";
 import { ErrorHandler } from "src/shared/exceptions/error.handler";
 import { UpdateUserDto } from "./update-user.dto";
 import { UpdateUserService } from "./update-user.service";
@@ -15,6 +16,8 @@ export class UpdateUserController {
     private readonly slackService: SlackService
   ) {}
 
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth("access_token")
   @Put('me')
   @ApiOperation({
     summary: 'Update information user',
@@ -36,9 +39,10 @@ export class UpdateUserController {
   async updateUser(
     @Body() dto: UpdateUserDto,
     @Res() res: Response,
-    @Headers('X-User-Email') email: string,
+    @Request() req: any
   ) {
     try {
+      const email = req.user?.email;
       if (!email) {
         return res
           .status(HttpStatus.NOT_FOUND)

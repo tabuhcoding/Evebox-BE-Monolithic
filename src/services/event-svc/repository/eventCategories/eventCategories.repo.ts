@@ -1,6 +1,7 @@
 import { BaseRepository } from "src/shared/repo/base.repository";
 import { EventCategories } from "@prisma/client";
 import { Prisma } from "@prisma/client";
+import { Result } from "oxide.ts";
 import { CategoriesResponseDto } from "../../modules/categories/queries/getAllCategories-response.dto";
 
 export { EventCategories } from "@prisma/client";
@@ -10,4 +11,6 @@ export interface EventCategoriesRepository
     updateEventCategories(eventId: number, categoryIds: number[], isSpecial: boolean): Promise<void>;
     getEventCategories(eventId: number): Promise<CategoriesResponseDto[]>;
   // Thêm các method riêng cho EventCategories nếu cần, ví dụ:
+  createEventCategory(eventId: number, categoryIds: number[]): Promise<Result<any, Error>>;
+  updateEventCategory(eventId: number, categoryIds: number[]): Promise<Result<any, Error>>;
 }

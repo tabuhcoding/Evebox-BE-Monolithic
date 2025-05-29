@@ -6,7 +6,7 @@ import { UpdateEventAdminDto } from './updateEventAdmin.dto';
 import { JwtAuthGuard } from 'src/shared/guard/jwt-auth.guard';
 import { EventResponse } from './updateEventAdmin-response.dto';
 
-@ApiTags('Admin')
+@ApiTags('Event Service - Organizer - Event Management')
 @Controller('api/admin/event')
 export class UpdateEventAdminController {
   constructor(private readonly updateEventService: UpdateEventAdminService) {}

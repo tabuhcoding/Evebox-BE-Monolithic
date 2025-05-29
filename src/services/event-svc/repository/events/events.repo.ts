@@ -3,7 +3,7 @@ import { Result } from 'oxide.ts';
 import { CreateEventDto } from '../../modules/event/commands/createEvent/createEvent.dto';
 import { UpdateEventDto } from '../../modules/event/commands/updateEvent/updateEvent.dto';
 import { Prisma } from '@prisma/client';
-import { UpdateEventAdminDto } from '../../modules/event/commands/calculateShowingStatus/UpdateEventAdmin/updateEventAdmin.dto';
+import { UpdateEventAdminDto } from '../../modules/event/commands/UpdateEventAdmin/updateEventAdmin.dto';
 
 export type Events = Prisma.EventsGetPayload<{
   include: {

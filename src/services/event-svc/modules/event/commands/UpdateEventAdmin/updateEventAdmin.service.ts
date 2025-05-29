@@ -7,6 +7,7 @@ import { UserRepositoryImpl } from 'src/services/auth-svc/repository/users/user.
 import { EventsRepository } from 'src/services/event-svc/repository/events/events.repo';
 import { EventCategoriesRepository } from 'src/services/event-svc/repository/eventCategories/eventCategories.repo';
 import { SlackService } from 'src/infrastructure/adapters/slack/slack.service';
+import { CheckUserExistService } from 'src/services/auth-svc/modules/user/commands/checkuserExist/checkuserExist.service';
 
 @Injectable()
 export class UpdateEventAdminService {
@@ -15,20 +16,24 @@ export class UpdateEventAdminService {
     @Inject('EventsRepository') private readonly eventRepository: EventsRepository,
     private readonly userRepository: UserRepositoryImpl,
     private readonly slackService: SlackService,
-    
+    private readonly checkUserExistService: CheckUserExistService,  
   ) {}
 
   async execute(dto: UpdateEventAdminDto, eventId: number, emailStr: string): Promise<Result<EventDto, Error>> {
-    const emailOrError = Email.create(emailStr);
-    if (emailOrError.isErr()) {
-      return Err(new Error('Invalid email'));
-    }
+    const userExists = await this.checkUserExistService.execute(emailStr);
+      if (!userExists) {
+        return Err(new Error('User does not exist'));
+      }
 
-    const email = emailOrError.unwrap();
-    const user = await this.userRepository.findByEmail(email);
-    if (!user || user.role.getValue() !== 1) {
-      return Err(new Error('You do not have permission to update event'));
-    }
+      const hasPermisison = await this.eventRepository.hasPermissionToManageEvent(eventId, emailStr);
+      if (hasPermisison.isErr()) {
+        return Err(new Error('Failed to check permission'));
+      }
+
+      if (!hasPermisison.unwrap()) {
+        return Err(new Error('Unauthorized'));
+      }
+
 
     try {
       console.log(eventId);

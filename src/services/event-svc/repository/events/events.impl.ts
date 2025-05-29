@@ -8,7 +8,7 @@ import { Events, EventsRepository } from './events.repo';
 import { Email } from 'src/services/auth-svc/modules/user/domain/value-objects/user/email.vo';
 import { CreateEventDto } from '../../modules/event/commands/createEvent/createEvent.dto';
 import { UpdateEventDto } from '../../modules/event/commands/updateEvent/updateEvent.dto';
-import { UpdateEventAdminDto } from '../../modules/event/commands/calculateShowingStatus/UpdateEventAdmin/updateEventAdmin.dto';
+import { UpdateEventAdminDto } from '../../modules/event/commands/UpdateEventAdmin/updateEventAdmin.dto';
 import { error } from 'console';
 
 @Injectable()

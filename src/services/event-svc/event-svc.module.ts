@@ -57,8 +57,8 @@ import { DeleteTicketTypeController } from './modules/ticketType/commands/delete
 import { DeleteTicketTypeService } from './modules/ticketType/commands/deleteTicketType/deleteTicketType.service';
 import { CalculateSectionStatusService } from './modules/showing/command/calculateSectionStatus/calculateSectionStatus.service';
 import { FileCacheService } from 'src/infrastructure/cache/fileCache/fileCache.service';
-import { UpdateEventAdminController } from './modules/event/commands/calculateShowingStatus/UpdateEventAdmin/updateEventAdmin.controller';
-import { UpdateEventAdminService } from './modules/event/commands/calculateShowingStatus/UpdateEventAdmin/updateEventAdmin.service';
+import { UpdateEventAdminController } from './modules/event/commands/UpdateEventAdmin/updateEventAdmin.controller';
+import { UpdateEventAdminService } from './modules/event/commands/UpdateEventAdmin/updateEventAdmin.service';
 
 @Module({
   imports: [ BookingSvcModule, AuthSvcModule],

@@ -6,7 +6,7 @@ import { JwtAuthGuard } from "src/shared/guard/jwt-auth.guard";
 import { DeleteShowingResponseDto } from "./deleteShowing-response.dto";
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 
-@ApiTags('Event Service - Showing')
+@ApiTags('Event Service - Organizer - Showing')
 @Controller('api/org/showing')
 export class DeleteShowingController {
   constructor(

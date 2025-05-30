@@ -7,7 +7,7 @@ import { CreateShowingService } from "./createShowing.service";
 import { CreateShowingResponseDto } from "./createShowing-response.dto";
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 
-@ApiTags('Event Service - Showing')
+@ApiTags('Event Service - Organizer - Showing')
 @Controller('api/org/showing')
 export class CreateShowingController {
   constructor(

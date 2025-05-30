@@ -1,5 +1,6 @@
-import { Controller, Post, Body, HttpStatus, Res, Headers, Request } from "@nestjs/common";
-import { ApiTags, ApiOperation, ApiOkResponse, ApiBadRequestResponse, ApiNotFoundResponse, ApiInternalServerErrorResponse, ApiBody } from "@nestjs/swagger";
+import { Controller, Post, Body, HttpStatus, Res, Headers, Request, UseGuards } from "@nestjs/common";
+import { JwtAuthGuard } from "src/shared/guard/jwt-auth.guard";
+import { ApiTags, ApiOperation, ApiOkResponse, ApiBadRequestResponse, ApiNotFoundResponse, ApiInternalServerErrorResponse, ApiBody, ApiBearerAuth } from "@nestjs/swagger";
 import { Response } from "express";
 import { ChangePasswordDto } from "./change-password.dto";
 import { ChangePasswordService } from "./change-password.service";
@@ -14,7 +15,9 @@ export class ChangePasswordController {
     private readonly slackService: SlackService
   ) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post('/change-password')
+  @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Change user password' })
   @ApiBody({ type: ChangePasswordDto })
   @ApiOkResponse({ description: 'Password has been changed successfully' })

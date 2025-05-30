@@ -8,7 +8,7 @@ import { CreateEventResponseDto } from "./createEvent-response.dto";
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 
 
-@ApiTags('Event Service - Organizer')
+@ApiTags('Event Service - Organizer - Event')
 @Controller('api/org/event')
 export class CreateEventController {
   constructor(

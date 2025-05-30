@@ -6,7 +6,7 @@ import { DeleteTicketTypeResponseDto } from "./deleteTicketType-response.dto";
 import { JwtAuthGuard } from "src/shared/guard/jwt-auth.guard";
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 
-@ApiTags('Event Service - Ticket type')
+@ApiTags('Event Service - Organizer - Ticket type')
 @Controller('api/org/ticketType')
 export class DeleteTicketTypeController {
   constructor(

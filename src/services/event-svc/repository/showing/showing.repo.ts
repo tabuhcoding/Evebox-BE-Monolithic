@@ -3,6 +3,7 @@ import { Result } from "oxide.ts";
 import { BaseRepository } from "src/shared/repo/base.repository";
 import { CreateShowingDto } from "../../modules/showing/command/createShowing/createShowing.dto";
 import { UpdateShowingDto } from "../../modules/showing/command/updateShowing/updateShowing.dto";
+import { ShowingDataDto } from "../../modules/showing/queries/getShowingsByAdmin/getShowings-response.dto";
 
 export type Showing = Prisma.ShowingGetPayload<{
   include: {
@@ -40,4 +41,6 @@ export interface ShowingRepository extends BaseRepository<Showing, Prisma.Showin
   deleteShowing(id: string): Promise<Result<string, Error>>;
   findAdminShowingById(showingId: string): Promise<any>;
   getShowingStatusData(showingId: string): Promise<any>;
+  findWithFilters(filters: any): Promise<ShowingDataDto[]>;
+  count(filters: any): Promise<number>;
 }

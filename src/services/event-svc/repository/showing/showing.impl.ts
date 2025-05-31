@@ -8,6 +8,7 @@ import { Showing, ShowingRepository } from "./showing.repo";
 import { CreateShowingDto } from "../../modules/showing/command/createShowing/createShowing.dto";
 import { UpdateShowingDto } from "../../modules/showing/command/updateShowing/updateShowing.dto";
 import { Ok, Result, Err } from "oxide.ts";
+import { ShowingDataDto } from "../../modules/showing/queries/getShowingsByAdmin/getShowings-response.dto";
 
 @Injectable()
 export class ShowingRepositoryImpl
@@ -157,5 +158,80 @@ export class ShowingRepositoryImpl
         seatMapId: true,
       },
     });
+  }
+
+   async findWithFilters(filters: any): Promise<ShowingDataDto[]> {
+    const where = this.buildWhereClause(filters);
+    const page = Number(filters.page ?? 1);
+    const limit = Number(filters.limit ?? 10);
+
+    const showings = await this.prisma.showing.findMany({
+      where,
+      skip: (page - 1) * limit,
+      take: limit,
+      select: {
+        id: true,
+        startTime: true,
+        endTime: true,
+        seatMapId: true,
+        Events: {
+          select: { id: true, title: true },
+        },
+        TicketType: {
+          select: { id: true },
+        },
+      },
+      orderBy: {
+        startTime: 'asc',
+      },
+    });
+
+    return showings.map((showing) => ({
+      id: showing.id,
+      startTime: showing.startTime,
+      endTime: showing.endTime,
+      seatmapId: showing.seatMapId,
+      eventId: showing.Events.id,
+      eventTitle: showing.Events.title,
+      event: {
+        id: showing.Events.id,
+        title: showing.Events.title,
+      },
+      ticketTypes: showing.TicketType,
+    }));
+  }
+
+  async count(filters: any): Promise<number> {
+    const where = this.buildWhereClause(filters);
+    return this.prisma.showing.count({ where });
+  }
+
+  private buildWhereClause(filters: any) {
+    const where: any = {};
+
+    if (filters.startTime || filters.endTime) {
+      where.startTime = {};
+      where.endTime = {};
+
+      if (filters.startTime) {
+        where.startTime.gte = new Date(filters.startTime);
+      }
+
+      if (filters.endTime) {
+        where.endTime.lte = new Date(filters.endTime);
+      }
+    }
+
+    if (filters.search) {
+      const keyword = filters.search.trim();
+      const isId = !isNaN(Number(keyword));
+      where.Events = {
+        ...(isId
+          ? { id: Number(keyword) }
+          : { title: { contains: keyword, mode: 'insensitive' } }),
+      };
+    }
+
+    return where;
   }
 }

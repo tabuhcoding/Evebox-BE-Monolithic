@@ -55,6 +55,12 @@ import { UpdateTicketTypeController } from './modules/ticketType/commands/update
 import { UpdateTicketTypeService } from './modules/ticketType/commands/updateTicketType/updateTicketType.service';
 import { DeleteTicketTypeController } from './modules/ticketType/commands/deleteTicketType/deleteTicketType.controller';
 import { DeleteTicketTypeService } from './modules/ticketType/commands/deleteTicketType/deleteTicketType.service';
+import { CreateFormController } from './modules/form/commands/createForm/createForm.controller';
+import { CreateFormService } from './modules/form/commands/createForm/createForm.service';
+import { UpdateFormController } from './modules/form/commands/updateForm/updateForm.controller';
+import { UpdateFormService } from './modules/form/commands/updateForm/updateForm.service';
+import { DeleteFormController } from './modules/form/commands/deleteForm/deleteForm.controller';
+import { DeleteFormService } from './modules/form/commands/deleteForm/deleteForm.service';
 import { CalculateSectionStatusService } from './modules/showing/command/calculateSectionStatus/calculateSectionStatus.service';
 import { FileCacheService } from 'src/infrastructure/cache/fileCache/fileCache.service';
 
@@ -73,6 +79,11 @@ import { FileCacheService } from 'src/infrastructure/cache/fileCache/fileCache.s
     CreateEventController,
     UpdateEventController,
     DeleteEventController,
+
+    // Form
+    CreateFormController,
+    UpdateFormController,
+    DeleteFormController,
 
     // Showing
     GetAllShowingController,
@@ -111,6 +122,12 @@ import { FileCacheService } from 'src/infrastructure/cache/fileCache/fileCache.s
     DeleteEventService,
 
     GetEventsByIdsService,
+
+    // Form
+    CreateFormService,
+    UpdateFormService,
+    DeleteFormService,
+
     ///// Showing
     CreateShowingService,
     UpdateShowingService,

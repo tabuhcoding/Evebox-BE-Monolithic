@@ -8,7 +8,7 @@ async function bootstrap() {
   const options = new DocumentBuilder()
     .setTitle('Evebox API')
     .setDescription('The Evebox API description')
-    .setVersion('1.3')
+    .setVersion('1.4')
     .addBearerAuth(
       {
          type: 'http',

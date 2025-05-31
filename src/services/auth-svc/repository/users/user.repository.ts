@@ -28,4 +28,5 @@ export interface UserRepository {
   setReceiveNoti(userId: string, receive: boolean): Promise<void>;
   getReceiveNotiByUserId(userId: string): Promise<boolean>;
   getEmailsByIds(userIds: string[]): Promise<string[]>;
+  isAdmin(email: string): Promise<boolean>;
 }

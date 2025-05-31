@@ -309,5 +309,70 @@ export class EventsRepositoryImpl
     if ('createdTo' in filters) where.createdAt = { ...where.createdAt, lte: new Date(filters.createdTo) };
     return where;
   }
+ async getSpecialEventsWithFilters(filters: any): Promise<any[]> {
+  const where = this.buildWhereClause2(filters);
+  const page = Number(filters.page ?? 1);
+  const limit = Number(filters.limit ?? 10);
 
+  return this.prisma.events.findMany({
+    where: {
+      ...where,
+      ...(filters.categoryId && {
+        EventCategories: {
+          some: {
+            categoryId: Number(filters.categoryId),
+            isSpecial: true,
+          },
+        },
+      }),
+    },
+    skip: (page - 1) * limit,
+    take: limit,
+    select: {
+      id: true,
+      title: true,
+      imgPosterUrl: true,
+      isSpecial: true,
+      isOnlyOnEve: true,
+      EventCategories: {
+        select: {
+          isSpecial: true,
+          Categories: {
+            select: { id: true, name: true },
+          },
+        },
+      },
+    },
+    orderBy: { createdAt: 'desc' },
+  });
+}
+
+async countSpecialEvents(filters: any): Promise<number> {
+  const where = this.buildWhereClause2(filters);
+  return this.prisma.events.count({ where });
+}
+
+private buildWhereClause2(filters: any) {
+  const where: any = {};
+
+  if (filters.isSpecial !== undefined) {
+    where.isSpecial = filters.isSpecial === 'true';
+  }
+  if (filters.isOnlyOnEve !== undefined) {
+    where.isOnlyOnEve = filters.isOnlyOnEve === 'true';
+  }
+  if (filters.search) {
+    const keyword = filters.search.trim();
+    if (!isNaN(Number(keyword))) {
+      where.OR = [
+        { id: Number(keyword) },
+        { title: { contains: keyword, mode: 'insensitive' } },
+      ];
+    } else {
+      where.title = { contains: keyword, mode: 'insensitive' };
+    }
+  }
+
+  return where;
+  }
 }

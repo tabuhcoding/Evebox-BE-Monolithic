@@ -61,6 +61,8 @@ import { FileCacheService } from 'src/infrastructure/cache/fileCache/fileCache.s
 import { UpdateEventAdminController } from './modules/event/commands/UpdateEventAdmin/updateEventAdmin.controller';
 import { UpdateEventAdminService } from './modules/event/commands/UpdateEventAdmin/updateEventAdmin.service';
 import { GetEventsByAdminService } from './modules/event/queries/getEventsByAdmin/getEvents.service';
+import { GetEventSpecialManagementController } from './modules/event/queries/getEventSpecialManagement/getEventSpecialManagement.controller';
+import { GetEventSpecialManagementService } from './modules/event/queries/getEventSpecialManagement/getEventSpecialManagement.service';
 
 @Module({
   imports: [ BookingSvcModule, AuthSvcModule],
@@ -92,7 +94,8 @@ import { GetEventsByAdminService } from './modules/event/queries/getEventsByAdmi
     UpdateTicketTypeController,
     DeleteTicketTypeController,
     UpdateEventAdminController, 
-    GetEventsByAdminController
+    GetEventsByAdminController,
+    GetEventSpecialManagementController
   ],
   providers: [
     // Adapters
@@ -137,6 +140,7 @@ import { GetEventsByAdminService } from './modules/event/queries/getEventsByAdmi
 
     UpdateEventAdminService,
     GetEventsByAdminService,
+    GetEventSpecialManagementService,
 
     // Repositories
     { provide: 'CategoriesRepository', useClass: CategoriesRepositoryImpl },

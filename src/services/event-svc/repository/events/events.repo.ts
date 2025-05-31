@@ -68,4 +68,6 @@ export interface EventsRepository extends BaseRepository<Events, Prisma.EventsDe
   /* Get admin events */
   findWithFilters(filters: any): Promise<Result<any[], Error>>
   getShowingsByEventId(eventId: number): Promise<{ startTime: Date }[]>
+  getSpecialEventsWithFilters(filters: any): Promise<any[]>;
+  countSpecialEvents(filters: any): Promise<number>;
 }

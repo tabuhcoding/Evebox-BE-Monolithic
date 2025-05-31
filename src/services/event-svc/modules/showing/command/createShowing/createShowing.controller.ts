@@ -30,7 +30,7 @@ export class CreateShowingController {
     @Request() req
   ) {
     try {
-      const email = req.user;
+      const email = req.user?.email;
       if (!email) {
         return res.status(HttpStatus.UNAUTHORIZED).json({
           statusCode: HttpStatus.UNAUTHORIZED,

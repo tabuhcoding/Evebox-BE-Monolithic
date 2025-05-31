@@ -1,3 +1,4 @@
+import { GetEventsByAdminController } from './modules/event/queries/getEventsByAdmin/getEvents.controller';
 // event-svc.module.ts
 import { forwardRef, Module } from '@nestjs/common';
 import { CategoriesRepositoryImpl } from './repository/categories/categories.impl';
@@ -63,9 +64,14 @@ import { DeleteFormController } from './modules/form/commands/deleteForm/deleteF
 import { DeleteFormService } from './modules/form/commands/deleteForm/deleteForm.service';
 import { CalculateSectionStatusService } from './modules/showing/command/calculateSectionStatus/calculateSectionStatus.service';
 import { FileCacheService } from 'src/infrastructure/cache/fileCache/fileCache.service';
+import { UpdateEventAdminController } from './modules/event/commands/UpdateEventAdmin/updateEventAdmin.controller';
+import { UpdateEventAdminService } from './modules/event/commands/UpdateEventAdmin/updateEventAdmin.service';
+import { GetEventsByAdminService } from './modules/event/queries/getEventsByAdmin/getEvents.service';
+import { GetEventSpecialManagementController } from './modules/event/queries/getEventSpecialManagement/getEventSpecialManagement.controller';
+import { GetEventSpecialManagementService } from './modules/event/queries/getEventSpecialManagement/getEventSpecialManagement.service';
 
 @Module({
-  imports: [ BookingSvcModule, forwardRef(() => AuthSvcModule) ],
+  imports: [ BookingSvcModule, AuthSvcModule],
   controllers: [
     // Categories
     GetAllCategoriesController,
@@ -98,6 +104,9 @@ import { FileCacheService } from 'src/infrastructure/cache/fileCache/fileCache.s
     CreateTicketTypeController,
     UpdateTicketTypeController,
     DeleteTicketTypeController,
+    UpdateEventAdminController, 
+    GetEventsByAdminController,
+    GetEventSpecialManagementController
   ],
   providers: [
     // Adapters
@@ -145,6 +154,10 @@ import { FileCacheService } from 'src/infrastructure/cache/fileCache/fileCache.s
     GetFormOfShowingService,
     GetShowingDetailService,
     GetShowingSeatmapService,
+
+    UpdateEventAdminService,
+    GetEventsByAdminService,
+    GetEventSpecialManagementService,
 
     // Repositories
     { provide: 'CategoriesRepository', useClass: CategoriesRepositoryImpl },

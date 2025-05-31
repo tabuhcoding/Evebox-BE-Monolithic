@@ -3,6 +3,8 @@ import { Result } from 'oxide.ts';
 import { CreateEventDto } from '../../modules/event/commands/createEvent/createEvent.dto';
 import { UpdateEventDto } from '../../modules/event/commands/updateEvent/updateEvent.dto';
 import { Prisma } from '@prisma/client';
+import { UpdateEventAdminDto } from '../../modules/event/commands/UpdateEventAdmin/updateEventAdmin.dto';
+import { EventDataDto } from '../../modules/event/queries/getEventsByAdmin/getEvents-response.dto';
 
 export type Events = Prisma.EventsGetPayload<{
   include: {
@@ -50,7 +52,7 @@ export type EventsWithoutShowing = Prisma.EventsGetPayload<{
 export interface EventsRepository extends BaseRepository<Events, Prisma.EventsDelegate> {
   // Thêm các method riêng cho Events nếu cần, ví dụ:
   findManyByIdsWithDetails(ids: number[]): Promise<Events[]>;
-
+    updateEventFields(dto: UpdateEventAdminDto, eventId: number): Promise<any | null>;
   /* Create Event */
   createEvent(data: CreateEventDto, email: string, locationId?: number): Promise<number>;
 
@@ -62,4 +64,10 @@ export interface EventsRepository extends BaseRepository<Events, Prisma.EventsDe
 
   /* Delete Event */
   deleteEvent(id: number): Promise<number>;
+
+  /* Get admin events */
+  findWithFilters(filters: any): Promise<Result<any[], Error>>
+  getShowingsByEventId(eventId: number): Promise<{ startTime: Date }[]>
+  getSpecialEventsWithFilters(filters: any): Promise<any[]>;
+  countSpecialEvents(filters: any): Promise<number>;
 }

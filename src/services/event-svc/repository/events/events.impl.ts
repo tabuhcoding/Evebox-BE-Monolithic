@@ -1,13 +1,16 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
 import { BaseRepository } from 'src/shared/repo/base.repository';
-import { Prisma } from '@prisma/client';
+import { Prisma, Categories } from '@prisma/client';
 import { Result, Ok, Err } from 'oxide.ts';
 
 import { Events, EventsRepository } from './events.repo';
 import { Email } from 'src/services/auth-svc/modules/user/domain/value-objects/user/email.vo';
 import { CreateEventDto } from '../../modules/event/commands/createEvent/createEvent.dto';
 import { UpdateEventDto } from '../../modules/event/commands/updateEvent/updateEvent.dto';
+import { UpdateEventAdminDto } from '../../modules/event/commands/UpdateEventAdmin/updateEventAdmin.dto';
+import { error } from 'console';
+import { EventDataDto } from '../../modules/event/queries/getEventsByAdmin/getEvents-response.dto';
 
 @Injectable()
 export class EventsRepositoryImpl
@@ -217,5 +220,159 @@ export class EventsRepositoryImpl
     } catch (error) {
       throw new Error(`Failed to check permission: ${error.message}`);
     }
+  }
+
+  async updateEventFields(dto: UpdateEventAdminDto, eventId: number): Promise<any | null> {
+    const updateData: any = {};
+      if (dto.isSpecial) updateData.isSpecial = dto.isSpecial;
+      if (dto.isOnlyOnEve) updateData.isOnlyOnEve = dto.isOnlyOnEve;
+      if (dto.isApproved) {
+        updateData.isApproved = Boolean(dto.isApproved);
+      }
+      else updateData.isApproved = false;
+      
+    try {
+      return await this.prisma.events.update({
+        where: { id: eventId },
+        data: updateData,
+      });
+    } catch (error) {
+  console.error("Prisma update error:", error);
+
+      return null;
+    }
+  }
+
+  async findWithFilters(filters: any): Promise<Result<any[], Error>> {
+  try {
+    const where = this.buildWhereClause(filters);
+    const page = Number(filters.page ?? 1);
+    const limit = Number(filters.limit ?? 10);
+
+    const data = await this.prisma.events.findMany({
+      where: {
+        ...where,
+        ...(filters.categoryId && {
+          EventCategories: {
+            some: { categoryId: Number(filters.categoryId) }
+          }
+        })
+      },
+      skip: (page - 1) * limit,
+      take: limit,
+      select: {
+        id: true,
+        title: true,
+        venue: true,
+        imgLogoUrl: true,
+        imgPosterUrl: true,
+        deleteAt: true,
+        locations: {
+          select: {
+            street: true,
+            ward: true,
+            districts: {
+              select: {
+                name: true,
+                province: { select: { name: true } }
+              }
+            }
+          }
+        },
+        isApproved: true,
+        createdAt: true,
+        isSpecial: true,
+        isOnlyOnEve: true,
+        isOnline: true,
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    return Ok(data); // ✅ wrap in Ok
+  } catch (error) {
+    return Err(new Error('Failed to fetch events')); // ✅ return error clearly
+  }
+}
+
+  async getShowingsByEventId(eventId: number): Promise<{ startTime: Date }[]> {
+    return this.prisma.showing.findMany({
+      where: { eventId },
+      select: { startTime: true },
+    });
+  }
+
+  private buildWhereClause(filters: any): any {
+    const where: any = {};
+    if ('isApproved' in filters) where.isApproved = filters.isApproved === 'true';
+    if ('isDeleted' in filters) where.deleteAt = filters.isDeleted === 'true' ? { not: null } : null;
+    if ('createdFrom' in filters) where.createdAt = { ...where.createdAt, gte: new Date(filters.createdFrom) };
+    if ('createdTo' in filters) where.createdAt = { ...where.createdAt, lte: new Date(filters.createdTo) };
+    return where;
+  }
+ async getSpecialEventsWithFilters(filters: any): Promise<any[]> {
+  const where = this.buildWhereClause2(filters);
+  const page = Number(filters.page ?? 1);
+  const limit = Number(filters.limit ?? 10);
+
+  return this.prisma.events.findMany({
+    where: {
+      ...where,
+      ...(filters.categoryId && {
+        EventCategories: {
+          some: {
+            categoryId: Number(filters.categoryId),
+            isSpecial: true,
+          },
+        },
+      }),
+    },
+    skip: (page - 1) * limit,
+    take: limit,
+    select: {
+      id: true,
+      title: true,
+      imgPosterUrl: true,
+      isSpecial: true,
+      isOnlyOnEve: true,
+      EventCategories: {
+        select: {
+          isSpecial: true,
+          Categories: {
+            select: { id: true, name: true },
+          },
+        },
+      },
+    },
+    orderBy: { createdAt: 'desc' },
+  });
+}
+
+async countSpecialEvents(filters: any): Promise<number> {
+  const where = this.buildWhereClause2(filters);
+  return this.prisma.events.count({ where });
+}
+
+private buildWhereClause2(filters: any) {
+  const where: any = {};
+
+  if (filters.isSpecial !== undefined) {
+    where.isSpecial = filters.isSpecial === 'true';
+  }
+  if (filters.isOnlyOnEve !== undefined) {
+    where.isOnlyOnEve = filters.isOnlyOnEve === 'true';
+  }
+  if (filters.search) {
+    const keyword = filters.search.trim();
+    if (!isNaN(Number(keyword))) {
+      where.OR = [
+        { id: Number(keyword) },
+        { title: { contains: keyword, mode: 'insensitive' } },
+      ];
+    } else {
+      where.title = { contains: keyword, mode: 'insensitive' };
+    }
+  }
+
+  return where;
   }
 }

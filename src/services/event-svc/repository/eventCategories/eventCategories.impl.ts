@@ -6,6 +6,7 @@ import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service
 import { BaseRepository } from 'src/shared/repo/base.repository';
 import { EventCategoriesRepository } from './eventCategories.repo';
 import { CategoriesRepository } from '../categories/categories.repo';
+import { CategoriesResponseDto } from '../../modules/categories/queries/getAllCategories-response.dto';
 
 @Injectable()
 export class EventCategoriesRepositoryImpl
@@ -17,6 +18,43 @@ export class EventCategoriesRepositoryImpl
   ) {
     super(prisma.eventCategories, prisma);
   }
+
+  async updateEventCategories(
+  eventId: number,
+  categoryIds: number[],
+  isSpecial: boolean,
+): Promise<void> {
+  // Remove old relations
+  await this.prisma.eventCategories.deleteMany({
+    where: { eventId },
+  });
+
+  // Insert new relations
+  const data = categoryIds.map((categoryId) => ({
+    eventId,
+    categoryId,
+    isSpecial,
+  }));
+
+  await this.prisma.eventCategories.createMany({ data });
+}
+
+ async getEventCategories(eventId: number): Promise<CategoriesResponseDto[]> {
+  const categories = await this.prisma.eventCategories.findMany({
+    where: { eventId },
+    include: {
+      Categories: {
+        select: {
+          id: true,
+          name: true,
+          createdAt: true,
+        },
+      },
+    },
+  });
+
+  return categories.map((entry) => entry.Categories); 
+}
 
   async createEventCategory(eventId: number, categoryIds: number[]): Promise<Result<any, Error>> {
     let parsedCategoryIds: number[];
@@ -100,5 +138,18 @@ export class EventCategoriesRepositoryImpl
     } catch (error) {
       return Err(new Error('Failed to update event category'));
     }
+  }
+
+  async getCategoriesByEventId(eventId: number): Promise<{ id: number; name: string }[]> {
+    const categories = await this.prisma.eventCategories.findMany({
+      where: { eventId },
+      select: {
+        Categories: {
+          select: { id: true, name: true },
+        },
+      },
+    });
+
+    return categories.map(c => c.Categories);
   }
 }

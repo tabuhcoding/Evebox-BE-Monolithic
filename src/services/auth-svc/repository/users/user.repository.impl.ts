@@ -384,5 +384,14 @@ export class UserRepositoryImpl implements UserRepository {
     select: { email: true },
   });
   return users.map((u) => u.email);
+ }
+
+ async isAdmin(email: string): Promise<boolean> {
+  const user = await this.prisma.user.findUnique({
+    where: { email },
+    select: { role_id: true },
+  });
+
+  return user?.role_id === 1;
 }
 }

@@ -1,3 +1,4 @@
+import { GetShowingAdminDetailService } from './modules/showing/queries/getShowingAdminDetail/getShowingAdminDetail.service';
 import { GetEventsByAdminController } from './modules/event/queries/getEventsByAdmin/getEvents.controller';
 // event-svc.module.ts
 import { forwardRef, Module } from '@nestjs/common';
@@ -63,6 +64,7 @@ import { UpdateEventAdminService } from './modules/event/commands/UpdateEventAdm
 import { GetEventsByAdminService } from './modules/event/queries/getEventsByAdmin/getEvents.service';
 import { GetEventSpecialManagementController } from './modules/event/queries/getEventSpecialManagement/getEventSpecialManagement.controller';
 import { GetEventSpecialManagementService } from './modules/event/queries/getEventSpecialManagement/getEventSpecialManagement.service';
+import { GetShowingAdminDetailController } from './modules/showing/queries/getShowingAdminDetail/getShowingAdminDetail.controller';
 
 @Module({
   imports: [ BookingSvcModule, AuthSvcModule],
@@ -95,7 +97,8 @@ import { GetEventSpecialManagementService } from './modules/event/queries/getEve
     DeleteTicketTypeController,
     UpdateEventAdminController, 
     GetEventsByAdminController,
-    GetEventSpecialManagementController
+    GetEventSpecialManagementController,
+    GetShowingAdminDetailController
   ],
   providers: [
     // Adapters
@@ -141,6 +144,7 @@ import { GetEventSpecialManagementService } from './modules/event/queries/getEve
     UpdateEventAdminService,
     GetEventsByAdminService,
     GetEventSpecialManagementService,
+    GetShowingAdminDetailService,
 
     // Repositories
     { provide: 'CategoriesRepository', useClass: CategoriesRepositoryImpl },

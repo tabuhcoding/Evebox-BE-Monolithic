@@ -19,6 +19,8 @@ import { GetTotalTicketOfTicketTypeService } from "./modules/queries/getTotalTic
     { provide: 'OrderRepository', useClass: OrderRepositoryImpl },
     { provide: 'TicketRepository', useClass: TicketRepositoryImpl },
   ],
-  exports: [GetTotalTicketOfTicketTypeService],
+  exports: [GetTotalTicketOfTicketTypeService, 
+     {provide: 'TicketRepository', useClass: TicketRepositoryImpl }
+  ],
 })
 export class BookingSvcModule {}

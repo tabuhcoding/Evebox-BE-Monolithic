@@ -110,4 +110,52 @@ export class ShowingRepositoryImpl
       return Err(new Error(`Failed to delete showing: ${error.message}`));
     }
   }
+
+   async findAdminShowingById(showingId: string) {
+    return this.prisma.showing.findUnique({
+      where: { id: showingId, deleteAt: null },
+      select: {
+        id: true,
+        eventId: true,
+        isFree: true,
+        isSalable: true,
+        isPresale: true,
+        seatMapId: true,
+        startTime: true,
+        endTime: true,
+        isEnabledQueueWaiting: true,
+        showAllSeats: true,
+        Events: { select: { id: true, title: true } },
+        TicketType: {
+          select: {
+            id: true,
+            name: true,
+            description: true,
+            color: true,
+            isFree: true,
+            price: true,
+            originalPrice: true,
+            maxQtyPerOrder: true,
+            minQtyPerOrder: true,
+            startTime: true,
+            endTime: true,
+            position: true,
+            imageUrl: true,
+            isHidden: true,
+            quantity: true,
+          },
+        },
+      },
+    });
+  }
+
+  async getShowingStatusData(showingId: string) {
+    return this.prisma.showing.findUnique({
+      where: { id: showingId },
+      select: {
+        TicketType: { select: { id: true } },
+        seatMapId: true,
+      },
+    });
+  }
 }

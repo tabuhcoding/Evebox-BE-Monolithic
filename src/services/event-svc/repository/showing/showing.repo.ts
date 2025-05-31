@@ -38,4 +38,6 @@ export interface ShowingRepository extends BaseRepository<Showing, Prisma.Showin
 
   /* Delete Showing */
   deleteShowing(id: string): Promise<Result<string, Error>>;
+  findAdminShowingById(showingId: string): Promise<any>;
+  getShowingStatusData(showingId: string): Promise<any>;
 }

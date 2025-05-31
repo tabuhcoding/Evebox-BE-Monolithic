@@ -40,13 +40,13 @@ export class ResendOTPController {
     }
 
     const data = result.unwrap();
-    return {
+    return res.status(HttpStatus.OK).json({
       statusCode: HttpStatus.OK,
       message: USER_MESSAGES.SUCCESS.OTP_RESENT,
       data: {
         remaining_attempts: data.remaining_attempts,
         resend_allowed_in: data.resend_allowed_in
       },
-    };
+    });
   }
 }

@@ -7,7 +7,7 @@ import { CreateTicketTypeDto } from "./createTicketType.dto";
 import { CreateTicketTypeResponseDto } from "./createTicketType-response.dto";
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 
-@ApiTags('Event Service - Ticket type')
+@ApiTags('Event Service - Organizer - Ticket type')
 @Controller('api/org/ticketType')
 export class CreateTicketTypeController {
   constructor(

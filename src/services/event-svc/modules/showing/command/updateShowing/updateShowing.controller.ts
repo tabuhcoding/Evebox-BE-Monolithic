@@ -7,7 +7,7 @@ import { JwtAuthGuard } from "src/shared/guard/jwt-auth.guard";
 import { UpdateShowingResponseDto } from "./updateShowing-response.dto";
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 
-@ApiTags('Event Service - Showing')
+@ApiTags('Event Service - Organizer - Showing')
 @Controller('api/org/showing')
 export class UpdateShowingController {
   constructor(

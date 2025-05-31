@@ -6,7 +6,7 @@ import { JwtAuthGuard } from "src/shared/guard/jwt-auth.guard";
 import { DeleteEventResponseDto } from "./deleteEvent-response.dto";
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 
-@ApiTags('Event Service - Organizer')
+@ApiTags('Event Service - Organizer - Event')
 @Controller('api/org/event')
 export class DeleteEventController {
   constructor(

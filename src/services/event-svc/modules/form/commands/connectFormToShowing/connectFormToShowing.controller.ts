@@ -54,6 +54,10 @@ export class ConnectFormController {
       });
     } catch (error) {
       this.slackService.sendError(`Event Service - Form >>> ConnectFormController: ${error.message}`);
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: 'Internal server error',
+      });
     }
   }
 }

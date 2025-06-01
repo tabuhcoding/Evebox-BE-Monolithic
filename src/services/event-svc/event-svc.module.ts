@@ -62,6 +62,8 @@ import { UpdateFormController } from './modules/form/commands/updateForm/updateF
 import { UpdateFormService } from './modules/form/commands/updateForm/updateForm.service';
 import { DeleteFormController } from './modules/form/commands/deleteForm/deleteForm.controller';
 import { DeleteFormService } from './modules/form/commands/deleteForm/deleteForm.service';
+import { ConnectFormController } from './modules/form/commands/connectFormToShowing/connectFormToShowing.controller';
+import { ConnectFormService } from './modules/form/commands/connectFormToShowing/connectFormToShowing.service';
 import { CalculateSectionStatusService } from './modules/showing/command/calculateSectionStatus/calculateSectionStatus.service';
 import { FileCacheService } from 'src/infrastructure/cache/fileCache/fileCache.service';
 import { UpdateEventAdminController } from './modules/event/commands/UpdateEventAdmin/updateEventAdmin.controller';
@@ -90,6 +92,7 @@ import { GetEventSpecialManagementService } from './modules/event/queries/getEve
     CreateFormController,
     UpdateFormController,
     DeleteFormController,
+    ConnectFormController,
 
     // Showing
     GetAllShowingController,
@@ -136,6 +139,7 @@ import { GetEventSpecialManagementService } from './modules/event/queries/getEve
     CreateFormService,
     UpdateFormService,
     DeleteFormService,
+    ConnectFormService,
 
     ///// Showing
     CreateShowingService,

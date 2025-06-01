@@ -61,6 +61,8 @@ import { UpdateFormController } from './modules/form/commands/updateForm/updateF
 import { UpdateFormService } from './modules/form/commands/updateForm/updateForm.service';
 import { DeleteFormController } from './modules/form/commands/deleteForm/deleteForm.controller';
 import { DeleteFormService } from './modules/form/commands/deleteForm/deleteForm.service';
+import { ConnectFormController } from './modules/form/commands/connectFormToShowing/connectFormToShowing.controller';
+import { ConnectFormService } from './modules/form/commands/connectFormToShowing/connectFormToShowing.service';
 import { CalculateSectionStatusService } from './modules/showing/command/calculateSectionStatus/calculateSectionStatus.service';
 
 @Module({
@@ -83,6 +85,7 @@ import { CalculateSectionStatusService } from './modules/showing/command/calcula
     CreateFormController,
     UpdateFormController,
     DeleteFormController,
+    ConnectFormController,
 
     // Showing
     GetAllShowingController,
@@ -125,6 +128,7 @@ import { CalculateSectionStatusService } from './modules/showing/command/calcula
     CreateFormService,
     UpdateFormService,
     DeleteFormService,
+    ConnectFormService,
 
     ///// Showing
     CreateShowingService,

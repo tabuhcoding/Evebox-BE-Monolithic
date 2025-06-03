@@ -47,7 +47,7 @@ export class getShowingDetailService {
             imgLogoUrl: event.imgLogoUrl,
             imgPosterUrl: event.imgPosterUrl,
             venue: event.venue,
-          }
+          },
         };
 
         return Ok(formattedResult);
@@ -58,6 +58,23 @@ export class getShowingDetailService {
 
       const formattedResult: ShowingDataDto = {
         ...showing,
+        TicketType: showing.TicketType.map(ticketType => ({
+          id: ticketType.id,
+          name: ticketType.name,
+          description: ticketType.description,
+          color: ticketType.color,
+          isFree: ticketType.isFree,
+          price: ticketType.price,
+          originalPrice: ticketType.originalPrice,
+          maxQtyPerOrder: ticketType.maxQtyPerOrder,
+          minQtyPerOrder: ticketType.minQtyPerOrder,
+          startTime: ticketType.startTime,
+          endTime: ticketType.endTime,
+          position: ticketType.position,
+          status: ticketType.status,
+          imageUrl: ticketType.imageUrl,
+          isHidden: ticketType.isHidden,
+        })),
         status: showingStatus,
         minPrice: showingMinPrice,
         Events: {

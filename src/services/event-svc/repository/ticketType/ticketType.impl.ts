@@ -3,6 +3,8 @@ import { PrismaService } from "src/infrastructure/database/prisma/prisma.service
 import { BaseRepository } from "src/shared/repo/base.repository";
 import { ShowingRepository } from "../showing/showing.repo";
 import { EventsRepository } from "../events/events.repo";
+import { UserRepository } from "src/services/auth-svc/repository/users/user.repository";
+import { Email } from "src/services/auth-svc/modules/user/domain/value-objects/user/email.vo";
 import { TicketType, TicketTypeRepository } from "./ticketType.repo";
 import { Prisma, TicketTypeStatus } from "@prisma/client";
 import { Result, Ok, Err } from "oxide.ts";
@@ -16,13 +18,25 @@ export class TicketTypeRepositoryImpl
   constructor(
     @Inject('ShowingRepository') private readonly showingRepository: ShowingRepository,
     @Inject('EventsRepository') private readonly eventsRepository: EventsRepository,
+    @Inject('UserRepository') private readonly userRepository: UserRepository,
     protected readonly prisma: PrismaService
   ) {
     super(prisma.ticketType, prisma);
   }
 
-  async createTicketType(dto: CreateTicketTypeDto, showingId: string): Promise<Result<[string, boolean], Error>> {
+  async createTicketType(dto: CreateTicketTypeDto, showingId: string, userEmail: string): Promise<Result<[string, boolean], Error>> {
     try {
+      const emailOrError = Email.create(userEmail);
+      if (emailOrError.isErr()) {
+        return Err(emailOrError.unwrapErr());
+      }
+      const emailUnwrapped = emailOrError.unwrap();
+      const user = await this.userRepository.findByEmail(emailUnwrapped);
+
+      if (user.role.isCustomer && (dto.isFree || dto.originalPrice > 0) ) {
+        return Err(new Error('Normal customer can only create free event'));
+      }
+
       const ticketTypeId = await this.insertOne({
         name: dto.name,
         showingId,
@@ -57,8 +71,19 @@ export class TicketTypeRepositoryImpl
     }
   }
 
-  async updateTicketType(dto: UpdateTicketTypeDto, id: string): Promise<Result<[string, boolean], Error>> {
+  async updateTicketType(dto: UpdateTicketTypeDto, id: string, userEmail: string): Promise<Result<[string, boolean], Error>> {
     try {
+      const emailOrError = Email.create(userEmail);
+      if (emailOrError.isErr()) {
+        return Err(emailOrError.unwrapErr());
+      }
+      const emailUnwrapped = emailOrError.unwrap();
+      const user = await this.userRepository.findByEmail(emailUnwrapped);
+
+      if (user.role.isCustomer && (dto.isFree || dto.originalPrice > 0) ) {
+        return Err(new Error('Normal customer can only handle free event'));
+      }
+
       const ticketType = await this.findOneById(id);
 
       const showing = await this.showingRepository.findOneById(ticketType.showingId);

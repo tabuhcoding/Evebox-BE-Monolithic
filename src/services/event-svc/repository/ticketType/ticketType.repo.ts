@@ -21,10 +21,10 @@ export type TicketTypeWithoutShowingAndSections = Prisma.TicketTypeGetPayload<{
 }>;
 export interface TicketTypeRepository extends BaseRepository<TicketType, Prisma.TicketTypeDelegate> {
   /* Create Ticket Type */
-  createTicketType(dto: CreateTicketTypeDto, showingId: string): Promise<Result<[string, boolean], Error>>;
+  createTicketType(dto: CreateTicketTypeDto, showingId: string, userEmail: string): Promise<Result<[string, boolean], Error>>;
 
   /* Update Ticket Type */
-  updateTicketType(dto: UpdateTicketTypeDto, id: string): Promise<Result<[string, boolean], Error>>;
+  updateTicketType(dto: UpdateTicketTypeDto, id: string, userEmail: string): Promise<Result<[string, boolean], Error>>;
 
   /* Delete Ticket Type */
   deleteTicketType(id: string): Promise<Result<string, Error>>;

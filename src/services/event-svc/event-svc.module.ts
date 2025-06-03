@@ -66,6 +66,8 @@ import { ConnectFormController } from './modules/form/commands/connectFormToShow
 import { ConnectFormService } from './modules/form/commands/connectFormToShowing/connectFormToShowing.service';
 import { CreateOrgPaymentInfoController } from './modules/orgPaymentInfor/commands/createOrgPaymentInfor/createOrgPaymentInfor.controller';
 import { CreateOrgPaymentInfoService } from './modules/orgPaymentInfor/commands/createOrgPaymentInfor/createOrgPaymentInfor.service';
+import { UpdateOrgPaymentInfoController } from './modules/orgPaymentInfor/commands/updateOrgPaymentInfor/updateOrgPaymentInfor.controller';
+import { UpdateOrgPaymentInfoService } from './modules/orgPaymentInfor/commands/updateOrgPaymentInfor/updateOrgPaymentInfor.service';
 import { CalculateSectionStatusService } from './modules/showing/command/calculateSectionStatus/calculateSectionStatus.service';
 
 @Module({
@@ -106,6 +108,7 @@ import { CalculateSectionStatusService } from './modules/showing/command/calcula
 
     // Org Payment info
     CreateOrgPaymentInfoController,
+    UpdateOrgPaymentInfoController,
   ],
   providers: [
     // Adapters
@@ -156,6 +159,7 @@ import { CalculateSectionStatusService } from './modules/showing/command/calcula
 
     // Org payment info
     CreateOrgPaymentInfoService,
+    UpdateOrgPaymentInfoService,
 
     // Repositories
     { provide: 'CategoriesRepository', useClass: CategoriesRepositoryImpl },

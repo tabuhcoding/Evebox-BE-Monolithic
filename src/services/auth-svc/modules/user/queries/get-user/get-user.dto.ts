@@ -35,6 +35,13 @@ class UserData {
     description: 'User phone number',
   })
   phone: string;
+
+  @ApiProperty({
+    type: 'number',
+    example: 123,
+    description: 'User avatar_id',
+  })
+  avatar_id: number;
 }
 
 export class UserResponse {

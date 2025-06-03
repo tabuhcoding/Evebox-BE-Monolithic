@@ -1,17 +1,25 @@
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { PrismaService } from "src/infrastructure/database/prisma/prisma.service";
 import { BaseRepository } from "src/shared/repo/base.repository";
 import { Form, FormRepository } from "./form.repo";
+import { ShowingRepository } from "../showing/showing.repo";
+import { EventsRepository } from "../events/events.repo";
 import { Prisma } from "@prisma/client";
 import { Result, Ok, Err } from "oxide.ts";
 import { CreateFormDto } from "../../modules/form/commands/createForm/createForm.dto";
 import { UpdateFormDto, UpdateFormInputDto } from "../../modules/form/commands/updateForm/updateForm.dto";
+import { ConnectFormDto } from "../../modules/form/commands/connectFormToShowing/connectFormToShowing.dto";
+import { ConnectFormResponseData } from "../../modules/form/commands/connectFormToShowing/connectFormToShowing-response.dto";
 
 @Injectable()
 export class FormRepositoryImpl
   extends BaseRepository<Form, Prisma.FormDelegate>
   implements FormRepository {
-  constructor(protected readonly prisma: PrismaService) {
+  constructor(
+    @Inject('ShowingRepository') private readonly showingRepository: ShowingRepository,
+    @Inject('EventsRepository') private readonly eventsRepository: EventsRepository,
+    protected readonly prisma: PrismaService,
+  ) {
     super(prisma.form, prisma);
   }
 
@@ -184,6 +192,34 @@ export class FormRepositoryImpl
     } catch (error) {
       console.error(`Failed to delete form: ${error.message}`);
       return Err(new Error(`Failed to delete form: ${error.message}`));
+    }
+  }
+
+  async connectForm(dto: ConnectFormDto): Promise<Result<[ConnectFormResponseData, boolean], Error>> {
+    try {
+      const form = await this.findOneById(Number(dto.formId));
+
+      if (!form || (form && form.deleteAt !== null)) {
+        return Err(new Error('Form not found or has been deleted'));
+      }
+
+      const updatedShowing = await this.showingRepository.updateAndFindOneById(dto.showingId, {
+        formId: dto.formId,
+      });
+
+      if (!updatedShowing) {
+        return Err(new Error(`Failed to connect form ${dto.formId} to showing ${dto.showingId}`));
+      }
+
+      const event = await this.eventsRepository.findOneById(Number(updatedShowing.eventId))
+
+      return Ok([{
+        showingId: dto.showingId, 
+        formId: dto.formId
+      }, event.isApproved]);
+    } catch (error) {
+      console.error(`Failed to connect form to showing: ${error.message}`);
+      return Err(new Error(`Failed to connect form to showing: ${error.message}`));
     }
   }
 }

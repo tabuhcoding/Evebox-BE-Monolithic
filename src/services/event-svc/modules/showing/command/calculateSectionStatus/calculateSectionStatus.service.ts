@@ -16,7 +16,7 @@ export class CalculateSectionStatusService {
     try{
       // Get all SectionTicketType
       const sectionTicketTypes = await this.ticketTypeSectionRepository.findOne({
-        ticketTypeId: { $in: ticketTypeIds },
+        ticketTypeId: { in: ticketTypeIds },
         sectionId: sectionId,
       });
 

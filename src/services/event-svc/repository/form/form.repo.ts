@@ -4,7 +4,8 @@ import { Result } from "oxide.ts";
 
 import { CreateFormDto } from "../../modules/form/commands/createForm/createForm.dto";
 import { UpdateFormDto } from "../../modules/form/commands/updateForm/updateForm.dto";
-
+import { ConnectFormDto } from "../../modules/form/commands/connectFormToShowing/connectFormToShowing.dto";
+import { ConnectFormResponseData } from "../../modules/form/commands/connectFormToShowing/connectFormToShowing-response.dto";
 
 export type Form = Prisma.FormGetPayload<{
   include: {
@@ -23,4 +24,7 @@ export interface FormRepository extends BaseRepository<Form, Prisma.FormDelegate
 
   /* Delete Form */
   deleteForm(id: number): Promise<Result<number, Error>>;
+
+  /* Connect Form to SHowing */
+  connectForm(dto: ConnectFormDto): Promise<Result<[ConnectFormResponseData, boolean], Error>>;
 }

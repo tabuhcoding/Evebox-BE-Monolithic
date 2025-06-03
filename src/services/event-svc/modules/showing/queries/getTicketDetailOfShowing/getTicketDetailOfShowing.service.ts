@@ -1,16 +1,16 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Result, Ok, Err } from 'oxide.ts';
 import { TicketTypeDetailData } from './getTicketDetailOfShowing-response.dto';
-import { UserRepositoryImpl } from 'src/services/auth-svc/repository/users/user.repository.impl';
 import { ShowingRepository } from 'src/services/event-svc/repository/showing/showing.repo';
 import { TicketRepository } from 'src/services/booking-svc/repository/ticket/ticket.repo';
 import { TicketTypeRepository } from 'src/services/event-svc/repository/ticketType/ticketType.repo';
 import { SeatmapRepository } from 'src/services/event-svc/repository/seatmap/seatmap.repo';
+import { GetAdminAccessService } from 'src/services/auth-svc/modules/user/queries/get-admin-access/get-admin-access.service';
 
 @Injectable()
 export class GetTicketDetailOfShowingService {
   constructor(
-    private readonly userRepo: UserRepositoryImpl,
+    private readonly getAdminAccessService: GetAdminAccessService,
     @Inject('ShowingRepository')  private readonly showingRepo: ShowingRepository,
     @Inject('TicketRepository')  private readonly ticketRepo: TicketRepository,
     @Inject('TicketTypeRepository')  private readonly ticketTypeRepo: TicketTypeRepository,
@@ -18,7 +18,7 @@ export class GetTicketDetailOfShowingService {
   ) {}
 
   async execute(showingId: string, ticketTypeId: string, email: string): Promise<Result<TicketTypeDetailData, Error>> {
-    const isAdmin = await this.userRepo.isAdmin(email);
+    const isAdmin = await this.getAdminAccessService.execute(email);
     if (!isAdmin) return Err(new Error('Unauthorized'));
 
     const showing = await this.showingRepo.getBasicShowingDetail(showingId, ticketTypeId);

@@ -70,6 +70,7 @@ import { TurnOffNotificationForEventController } from "./modules/user/commands/t
 import { TurnOffNotificationForOrgController } from "./modules/user/commands/turn-off-notification-org/turn-off-notification.controller";
 import { TurnOffNotificationServiceForEvent } from "./modules/user/commands/turn-off-notification-event/turn-off-notification.service";
 import { TurnOffNotificationServiceForOrg } from "./modules/user/commands/turn-off-notification-org/turn-off-notification.service";
+import { GetAdminAccessService } from "./modules/user/queries/get-admin-access/get-admin-access.service";
 
 
 @Module({
@@ -174,7 +175,8 @@ import { TurnOffNotificationServiceForOrg } from "./modules/user/commands/turn-o
     GetUsersNotifiedByEventService,
     GetUsersNotifiedByOrgService,
     TurnOffNotificationServiceForEvent,
-    TurnOffNotificationServiceForOrg
+    TurnOffNotificationServiceForOrg,
+    GetAdminAccessService
   ],
   exports: [
     UserRepositoryImpl,
@@ -183,6 +185,7 @@ import { TurnOffNotificationServiceForOrg } from "./modules/user/commands/turn-o
       useClass: UserRepositoryImpl,
     },
     CheckUserExistService,
+    GetAdminAccessService
   ],
 })
 export class AuthSvcModule { }

@@ -3,16 +3,17 @@ import { Err, Ok, Result } from 'oxide.ts';
 import { ShowingDataDto } from './getShowings-response.dto';
 import { UserRepositoryImpl } from 'src/services/auth-svc/repository/users/user.repository.impl';
 import { ShowingRepository } from '../../../../repository/showing/showing.repo';
+import { GetAdminAccessService } from 'src/services/auth-svc/modules/user/queries/get-admin-access/get-admin-access.service';
 
 @Injectable()
 export class GetShowingsByAdminService {
   constructor(
-    private readonly userRepo: UserRepositoryImpl,
+    private readonly getAdminAccessService: GetAdminAccessService,
     @Inject('ShowingRepository') private readonly showingRepo: ShowingRepository
   ) {}
 
   async execute(filters: any, email: string): Promise<Result<ShowingDataDto[], Error>> {
-    const isAdmin = await this.userRepo.isAdmin(email);
+    const isAdmin = await this.getAdminAccessService.execute(email);
     if (!isAdmin) {
       return Err(new Error('Unauthorized'));
     }

@@ -75,6 +75,7 @@ import { GetEventSpecialManagementService } from './modules/event/queries/getEve
 import { GetShowingAdminDetailController } from './modules/showing/queries/getShowingAdminDetail/getShowingAdminDetail.controller';
 import { GetShowingsByAdminController } from './modules/showing/queries/getShowingsByAdmin/getShowings.controller';
 import { GetTicketDetailOfShowingController } from './modules/showing/queries/getTicketDetailOfShowing/getTicketDetailOfShowing.controller';
+import { GetAdminAccessService } from '../auth-svc/modules/user/queries/get-admin-access/get-admin-access.service';
 
 @Module({
   imports: [ BookingSvcModule, AuthSvcModule],

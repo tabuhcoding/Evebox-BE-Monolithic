@@ -6,6 +6,7 @@ import { ShowingRepository } from '../../../../repository/showing/showing.repo';
 import { TicketRepository } from 'src/services/booking-svc/repository/ticket/ticket.repo';
 import { TicketTypeRepository } from '../../../../repository/ticketType/ticketType.repo';
 import { SeatmapRepository } from '../../../../repository/seatmap/seatmap.repo';
+import { GetAdminAccessService } from 'src/services/auth-svc/modules/user/queries/get-admin-access/get-admin-access.service';
 
 @Injectable()
 export class GetShowingAdminDetailService {
@@ -14,11 +15,11 @@ export class GetShowingAdminDetailService {
     @Inject('TicketRepository') private readonly ticketRepo: TicketRepository,
     @Inject('TicketTypeRepository') private readonly ticketTypeRepo: TicketTypeRepository,
     @Inject('SeatmapRepository') private readonly seatmapRepo: SeatmapRepository,
-    private readonly userRepo: UserRepositoryImpl,
+    private readonly getAdminAccessService: GetAdminAccessService,
   ) {}
 
   async execute(showingId: string, email: string): Promise<Result<ShowingAdminDataDto, Error>> {
-    const isAdmin = await this.userRepo.isAdmin(email);
+    const isAdmin = await this.getAdminAccessService.execute(email);
     if (!isAdmin) return Err(new Error('Unauthorized'));
 
     const showing = await this.showingRepo.findAdminShowingById(showingId);

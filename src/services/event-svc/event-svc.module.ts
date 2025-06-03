@@ -66,11 +66,14 @@ import { ConnectFormController } from './modules/form/commands/connectFormToShow
 import { ConnectFormService } from './modules/form/commands/connectFormToShowing/connectFormToShowing.service';
 import { CreateOrgPaymentInfoController } from './modules/orgPaymentInfor/commands/createOrgPaymentInfor/createOrgPaymentInfor.controller';
 import { CreateOrgPaymentInfoService } from './modules/orgPaymentInfor/commands/createOrgPaymentInfor/createOrgPaymentInfor.service';
+import { GetOrgPaymentInfoController } from './modules/orgPaymentInfor/queries/getOrgPaymentInfor/getOrgPaymentInfor.controller';
+import { GetFavoriteOrgService } from '../auth-svc/modules/user/queries/get-favorite-org/get-favorite-org.service';
 import { UpdateOrgPaymentInfoController } from './modules/orgPaymentInfor/commands/updateOrgPaymentInfor/updateOrgPaymentInfor.controller';
 import { UpdateOrgPaymentInfoService } from './modules/orgPaymentInfor/commands/updateOrgPaymentInfor/updateOrgPaymentInfor.service';
 import { DeleteOrgPaymentInfoController } from './modules/orgPaymentInfor/commands/deleteOrgPaymentInfor/deleteOrgPaymentInfor.controller';
 import { DeleteOrgPaymentInfoService } from './modules/orgPaymentInfor/commands/deleteOrgPaymentInfor/deleteOrgPaymentInfor.service';
 import { CalculateSectionStatusService } from './modules/showing/command/calculateSectionStatus/calculateSectionStatus.service';
+import { GetOrgPaymentInfoService } from './modules/orgPaymentInfor/queries/getOrgPaymentInfor/getOrgPaymentInfor.service';
 
 @Module({
   imports: [ BookingSvcModule, forwardRef(() => AuthSvcModule) ],
@@ -110,6 +113,7 @@ import { CalculateSectionStatusService } from './modules/showing/command/calcula
 
     // Org Payment info
     CreateOrgPaymentInfoController,
+    GetOrgPaymentInfoController,
     UpdateOrgPaymentInfoController,
     DeleteOrgPaymentInfoController,
   ],
@@ -162,6 +166,7 @@ import { CalculateSectionStatusService } from './modules/showing/command/calcula
 
     // Org payment info
     CreateOrgPaymentInfoService,
+    GetOrgPaymentInfoService,
     UpdateOrgPaymentInfoService,
     DeleteOrgPaymentInfoService,
 

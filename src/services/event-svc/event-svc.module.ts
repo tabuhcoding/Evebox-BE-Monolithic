@@ -1,3 +1,4 @@
+import { GetTicketDetailOfShowingService } from './modules/showing/queries/getTicketDetailOfShowing/getTicketDetailOfShowing.service';
 import { GetShowingsByAdminService } from './modules/showing/queries/getShowingsByAdmin/getShowings.service';
 import { GetShowingAdminDetailService } from './modules/showing/queries/getShowingAdminDetail/getShowingAdminDetail.service';
 import { GetEventsByAdminController } from './modules/event/queries/getEventsByAdmin/getEvents.controller';
@@ -73,6 +74,7 @@ import { GetEventSpecialManagementController } from './modules/event/queries/get
 import { GetEventSpecialManagementService } from './modules/event/queries/getEventSpecialManagement/getEventSpecialManagement.service';
 import { GetShowingAdminDetailController } from './modules/showing/queries/getShowingAdminDetail/getShowingAdminDetail.controller';
 import { GetShowingsByAdminController } from './modules/showing/queries/getShowingsByAdmin/getShowings.controller';
+import { GetTicketDetailOfShowingController } from './modules/showing/queries/getTicketDetailOfShowing/getTicketDetailOfShowing.controller';
 
 @Module({
   imports: [ BookingSvcModule, AuthSvcModule],
@@ -112,7 +114,8 @@ import { GetShowingsByAdminController } from './modules/showing/queries/getShowi
     GetEventsByAdminController,
     GetEventSpecialManagementController,
     GetShowingAdminDetailController,
-    GetShowingsByAdminController
+    GetShowingsByAdminController,
+    GetTicketDetailOfShowingController
   ],
   providers: [
     // Adapters
@@ -169,6 +172,7 @@ import { GetShowingsByAdminController } from './modules/showing/queries/getShowi
     // Admin showing
     GetShowingAdminDetailService,
     GetShowingsByAdminService,
+    GetTicketDetailOfShowingService,
 
     // Repositories
     { provide: 'CategoriesRepository', useClass: CategoriesRepositoryImpl },

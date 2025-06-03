@@ -234,4 +234,38 @@ export class ShowingRepositoryImpl
 
     return where;
   }
+
+ async getBasicShowingDetail(showingId: string, ticketTypeId: string) {
+  return this.prisma.showing.findUnique({
+    where: { id: showingId },
+    select: {
+      id: true,
+      eventId: true,
+      startTime: true,
+      endTime: true,
+      seatMapId: true,
+      Events: {
+        select: {
+          id: true,
+          title: true,
+        }
+      },
+      TicketType: {
+        where: { id: ticketTypeId },
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          price: true,
+          maxQtyPerOrder: true,
+          minQtyPerOrder: true,
+          quantity: true,
+          imageUrl: true,
+          startTime: true,
+          endTime: true
+        }
+      }
+    }
+  });
+}
 }

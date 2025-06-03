@@ -43,4 +43,5 @@ export interface ShowingRepository extends BaseRepository<Showing, Prisma.Showin
   getShowingStatusData(showingId: string): Promise<any>;
   findWithFilters(filters: any): Promise<ShowingDataDto[]>;
   count(filters: any): Promise<number>;
+  getBasicShowingDetail(showingId: string, ticketTypeId: string): Promise<any>;
 }

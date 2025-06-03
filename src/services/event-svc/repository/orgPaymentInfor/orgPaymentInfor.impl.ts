@@ -63,4 +63,26 @@ export class OrgPaymentInforRepositoryImpl
       return Err(new Error(`Failed to update payment info: ${error.message}`));
     }
   }
+
+  async deleteOrgPaymentInfo(id: string): Promise<Result<string, Error>> {
+    try {
+      const existing = await this.findOneById(id);
+      if (existing.isDeleted) {
+        return Err(new Error('This payment info has been deleted'));
+      }
+
+      const deleted = await this.updateAndFindOneById(id, {
+        isDeleted: true,
+      });
+
+      if (!deleted) {
+        return Err(new Error(`Failed to update payment info`));
+      }
+
+      return Ok(deleted.id);
+    } catch (error) {
+      console.error(`Failed to delete payment info: ${error.message}`);
+      return Err(new Error(`Failed to delete payment info: ${error.message}`));
+    }
+  }
 }

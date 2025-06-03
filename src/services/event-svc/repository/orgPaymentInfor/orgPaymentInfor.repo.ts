@@ -15,4 +15,7 @@ export interface OrgPaymentInforRepository
 
   /* Update Organizer Payment Info */
   updateOrgPaymentInfo(dto: UpdateOrgPaymentInfoDto, id: string, userEmail: string): Promise<Result<string, Error>>;
+
+  /* Delete Organizer Payment Info */
+  deleteOrgPaymentInfo(id: string): Promise<Result<string, Error>>;
 }

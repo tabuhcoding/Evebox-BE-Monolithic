@@ -68,6 +68,8 @@ import { CreateOrgPaymentInfoController } from './modules/orgPaymentInfor/comman
 import { CreateOrgPaymentInfoService } from './modules/orgPaymentInfor/commands/createOrgPaymentInfor/createOrgPaymentInfor.service';
 import { UpdateOrgPaymentInfoController } from './modules/orgPaymentInfor/commands/updateOrgPaymentInfor/updateOrgPaymentInfor.controller';
 import { UpdateOrgPaymentInfoService } from './modules/orgPaymentInfor/commands/updateOrgPaymentInfor/updateOrgPaymentInfor.service';
+import { DeleteOrgPaymentInfoController } from './modules/orgPaymentInfor/commands/deleteOrgPaymentInfor/deleteOrgPaymentInfor.controller';
+import { DeleteOrgPaymentInfoService } from './modules/orgPaymentInfor/commands/deleteOrgPaymentInfor/deleteOrgPaymentInfor.service';
 import { CalculateSectionStatusService } from './modules/showing/command/calculateSectionStatus/calculateSectionStatus.service';
 
 @Module({
@@ -109,6 +111,7 @@ import { CalculateSectionStatusService } from './modules/showing/command/calcula
     // Org Payment info
     CreateOrgPaymentInfoController,
     UpdateOrgPaymentInfoController,
+    DeleteOrgPaymentInfoController,
   ],
   providers: [
     // Adapters
@@ -160,6 +163,7 @@ import { CalculateSectionStatusService } from './modules/showing/command/calcula
     // Org payment info
     CreateOrgPaymentInfoService,
     UpdateOrgPaymentInfoService,
+    DeleteOrgPaymentInfoService,
 
     // Repositories
     { provide: 'CategoriesRepository', useClass: CategoriesRepositoryImpl },

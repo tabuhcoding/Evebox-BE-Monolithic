@@ -62,6 +62,7 @@ export class GetEventDetailRecommendService {
                 select: {
                   id: true,
                   price: true,
+                  status: true,
                 },
               },
             },

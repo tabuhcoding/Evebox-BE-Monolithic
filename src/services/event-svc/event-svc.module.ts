@@ -1,3 +1,4 @@
+import { GetEventsByAdminController } from './modules/event/queries/getEventsByAdmin/getEvents.controller';
 // event-svc.module.ts
 import { forwardRef, Module } from '@nestjs/common';
 import { CategoriesRepositoryImpl } from './repository/categories/categories.impl';
@@ -74,9 +75,15 @@ import { DeleteOrgPaymentInfoController } from './modules/orgPaymentInfor/comman
 import { DeleteOrgPaymentInfoService } from './modules/orgPaymentInfor/commands/deleteOrgPaymentInfor/deleteOrgPaymentInfor.service';
 import { CalculateSectionStatusService } from './modules/showing/command/calculateSectionStatus/calculateSectionStatus.service';
 import { GetOrgPaymentInfoService } from './modules/orgPaymentInfor/queries/getOrgPaymentInfor/getOrgPaymentInfor.service';
+import { FileCacheService } from 'src/infrastructure/cache/fileCache/fileCache.service';
+import { UpdateEventAdminController } from './modules/event/commands/UpdateEventAdmin/updateEventAdmin.controller';
+import { UpdateEventAdminService } from './modules/event/commands/UpdateEventAdmin/updateEventAdmin.service';
+import { GetEventsByAdminService } from './modules/event/queries/getEventsByAdmin/getEvents.service';
+import { GetEventSpecialManagementController } from './modules/event/queries/getEventSpecialManagement/getEventSpecialManagement.controller';
+import { GetEventSpecialManagementService } from './modules/event/queries/getEventSpecialManagement/getEventSpecialManagement.service';
 
 @Module({
-  imports: [ BookingSvcModule, forwardRef(() => AuthSvcModule) ],
+  imports: [ BookingSvcModule, AuthSvcModule],
   controllers: [
     // Categories
     GetAllCategoriesController,
@@ -116,10 +123,16 @@ import { GetOrgPaymentInfoService } from './modules/orgPaymentInfor/queries/getO
     GetOrgPaymentInfoController,
     UpdateOrgPaymentInfoController,
     DeleteOrgPaymentInfoController,
+
+    
+    UpdateEventAdminController, 
+    GetEventsByAdminController,
+    GetEventSpecialManagementController
   ],
   providers: [
     // Adapters
     SlackService,
+    FileCacheService,
 
     // Utils Command
     CalculateShowingStatusService,
@@ -169,6 +182,11 @@ import { GetOrgPaymentInfoService } from './modules/orgPaymentInfor/queries/getO
     GetOrgPaymentInfoService,
     UpdateOrgPaymentInfoService,
     DeleteOrgPaymentInfoService,
+
+
+    UpdateEventAdminService,
+    GetEventsByAdminService,
+    GetEventSpecialManagementService,
 
     // Repositories
     { provide: 'CategoriesRepository', useClass: CategoriesRepositoryImpl },

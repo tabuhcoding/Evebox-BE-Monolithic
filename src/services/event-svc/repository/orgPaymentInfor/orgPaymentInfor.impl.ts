@@ -5,6 +5,10 @@ import { Result, Ok, Err } from "oxide.ts";
 import { PrismaService } from "src/infrastructure/database/prisma/prisma.service";
 import { BaseRepository } from "src/shared/repo/base.repository";
 import { OrgPaymentInforRepository } from "./orgPaymentInfor.repo";
+import { Email } from "src/services/auth-svc/modules/user/domain/value-objects/user/email.vo";
+import { Role } from "src/services/auth-svc/modules/user/domain/value-objects/user/role.vo";
+import { UserRepository } from "src/services/auth-svc/repository/users/user.repository";
+import { AdminRepository } from "src/services/auth-svc/repository/admin/admin.repository";
 import { CreateOrgPaymentInfoDto } from "../../modules/orgPaymentInfor/commands/createOrgPaymentInfor/createOrgPaymentInfor.dto";
 import { UpdateOrgPaymentInfoDto } from "../../modules/orgPaymentInfor/commands/updateOrgPaymentInfor/updateOrgPaymentInfor.dto";
 
@@ -13,6 +17,8 @@ export class OrgPaymentInforRepositoryImpl
   extends BaseRepository<OrgPaymentInfor, Prisma.OrgPaymentInforDelegate>
   implements OrgPaymentInforRepository {
   constructor(
+    @Inject('AdminRepository') private readonly adminRepository: AdminRepository,
+    @Inject('UserRepository') private readonly userRepository: UserRepository,
     protected readonly prisma: PrismaService
   ) {
     super(prisma.orgPaymentInfor, prisma);
@@ -34,6 +40,22 @@ export class OrgPaymentInforRepositoryImpl
 
       if (!paymentInfoId || typeof paymentInfoId !== 'string' || paymentInfoId.trim() === '') {
         return Err(new Error(`Failed to create payment info of organizer ${organizerId}`));
+      }
+
+      const emailOrError = Email.create(organizerId);
+      if (emailOrError.isErr()) {
+        return Err(emailOrError.unwrapErr());
+      }
+
+      const emailUnwrapped = emailOrError.unwrap();
+      const user = await this.userRepository.findByEmail(emailUnwrapped);
+
+      if (user.role.isCustomer) {
+        const roleOrError = Role.create(3);
+        if (roleOrError.isErr()) {
+          return Err(roleOrError.unwrapErr());
+        }
+        await this.adminRepository.updateUserRole(organizerId, 2);
       }
 
       return Ok(paymentInfoId);

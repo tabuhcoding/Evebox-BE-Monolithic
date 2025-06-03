@@ -24,6 +24,7 @@ import { ShowingRepositoryImpl } from './repository/showing/showing.impl';
 import { SeatmapRepositoryImpl } from './repository/seatmap/seatmap.impl';
 import { SeatStatusRepositoryImpl } from './repository/seatStatus/seatStatus.impl';
 import { TicketTypeRepositoryImpl } from './repository/ticketType/ticketType.impl';
+import { OrgPaymentInforRepositoryImpl } from './repository/orgPaymentInfor/orgPaymentInfor.impl';
 import { CalculateShowingStatusService } from './modules/event/commands/calculateShowingStatus/calculateShowingStatus.service';
 import { UserClickHistoryRepositoryImpl } from './repository/userClickHistory/userClickHistory.impl';
 import { CreateEventController } from './modules/event/commands/createEvent/createEvent.controller';
@@ -64,7 +65,16 @@ import { DeleteFormController } from './modules/form/commands/deleteForm/deleteF
 import { DeleteFormService } from './modules/form/commands/deleteForm/deleteForm.service';
 import { ConnectFormController } from './modules/form/commands/connectFormToShowing/connectFormToShowing.controller';
 import { ConnectFormService } from './modules/form/commands/connectFormToShowing/connectFormToShowing.service';
+import { CreateOrgPaymentInfoController } from './modules/orgPaymentInfor/commands/createOrgPaymentInfor/createOrgPaymentInfor.controller';
+import { CreateOrgPaymentInfoService } from './modules/orgPaymentInfor/commands/createOrgPaymentInfor/createOrgPaymentInfor.service';
+import { GetOrgPaymentInfoController } from './modules/orgPaymentInfor/queries/getOrgPaymentInfor/getOrgPaymentInfor.controller';
+import { GetFavoriteOrgService } from '../auth-svc/modules/user/queries/get-favorite-org/get-favorite-org.service';
+import { UpdateOrgPaymentInfoController } from './modules/orgPaymentInfor/commands/updateOrgPaymentInfor/updateOrgPaymentInfor.controller';
+import { UpdateOrgPaymentInfoService } from './modules/orgPaymentInfor/commands/updateOrgPaymentInfor/updateOrgPaymentInfor.service';
+import { DeleteOrgPaymentInfoController } from './modules/orgPaymentInfor/commands/deleteOrgPaymentInfor/deleteOrgPaymentInfor.controller';
+import { DeleteOrgPaymentInfoService } from './modules/orgPaymentInfor/commands/deleteOrgPaymentInfor/deleteOrgPaymentInfor.service';
 import { CalculateSectionStatusService } from './modules/showing/command/calculateSectionStatus/calculateSectionStatus.service';
+import { GetOrgPaymentInfoService } from './modules/orgPaymentInfor/queries/getOrgPaymentInfor/getOrgPaymentInfor.service';
 import { FileCacheService } from 'src/infrastructure/cache/fileCache/fileCache.service';
 import { UpdateEventAdminController } from './modules/event/commands/UpdateEventAdmin/updateEventAdmin.controller';
 import { UpdateEventAdminService } from './modules/event/commands/UpdateEventAdmin/updateEventAdmin.service';
@@ -108,6 +118,14 @@ import { GetTicketTypeDetailService } from './modules/ticketType/queries/getTick
     CreateTicketTypeController,
     UpdateTicketTypeController,
     DeleteTicketTypeController,
+
+    // Org Payment info
+    CreateOrgPaymentInfoController,
+    GetOrgPaymentInfoController,
+    UpdateOrgPaymentInfoController,
+    DeleteOrgPaymentInfoController,
+
+    
     UpdateEventAdminController, 
     GetEventsByAdminController,
     GetEventSpecialManagementController
@@ -150,12 +168,21 @@ import { GetTicketTypeDetailService } from './modules/ticketType/queries/getTick
     GetShowingDetailService,
     GetShowingSeatmapService,
 
-    
     // Ticket type
     CreateTicketTypeService,
     UpdateTicketTypeService,
     DeleteTicketTypeService,
     GetTicketTypeDetailService,
+    
+    // Org payment info
+    CreateOrgPaymentInfoService,
+    GetOrgPaymentInfoService,
+    UpdateOrgPaymentInfoService,
+    DeleteOrgPaymentInfoService,
+
+
+    
+    
 
     // Admin Event Management
     UpdateEventAdminService,
@@ -180,6 +207,7 @@ import { GetTicketTypeDetailService } from './modules/ticketType/queries/getTick
     { provide: 'UserClickHistoryRepository', useClass: UserClickHistoryRepositoryImpl },
     { provide: 'FormRepository', useClass: FormRepositoryImpl },
     { provide: 'LocationsRepository', useClass: LocationsRepositoryImpl },
+    { provide: 'OrgPaymentInforRepository', useClass: OrgPaymentInforRepositoryImpl },
   ],
   exports: [
     GetAllEventDetailForRAGService, 

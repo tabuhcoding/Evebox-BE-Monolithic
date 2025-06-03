@@ -12,7 +12,7 @@ export class CreateFormService {
     @Inject('FormRepository') private readonly formRepository: FormRepository,
     private readonly slackService: SlackService,
     private readonly checkUserExistService: CheckUserExistService
-  ) { console.log('CreateFormService constructed'); }
+  ) { }
 
   async execute(dto: CreateFormDto, userEmail: string): Promise<Result<string, Error>> {
     try {

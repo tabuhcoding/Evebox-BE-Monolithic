@@ -8,6 +8,7 @@ import { AuthSvcModule } from './services/auth-svc/auth-svc.module';
 import { SlackService } from './infrastructure/adapters/slack/slack.service';
 import { BookingSvcModule } from './services/booking-svc/booking.module';
 import { FileCacheService } from './infrastructure/cache/fileCache/fileCache.service';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   providers: [SlackService, FileCacheService],
@@ -16,6 +17,7 @@ import { FileCacheService } from './infrastructure/cache/fileCache/fileCache.ser
       isGlobal: true, // Makes ConfigService globally available
       envFilePath: '.env', // Path to .env file
     }),
+    ScheduleModule.forRoot(),
     PrismaModule,
     CqrsModule,
     EventSvcModule,

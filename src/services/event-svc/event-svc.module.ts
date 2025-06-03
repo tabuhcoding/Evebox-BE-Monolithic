@@ -81,6 +81,7 @@ import { UpdateEventAdminService } from './modules/event/commands/UpdateEventAdm
 import { GetEventsByAdminService } from './modules/event/queries/getEventsByAdmin/getEvents.service';
 import { GetEventSpecialManagementController } from './modules/event/queries/getEventSpecialManagement/getEventSpecialManagement.controller';
 import { GetEventSpecialManagementService } from './modules/event/queries/getEventSpecialManagement/getEventSpecialManagement.service';
+import { GetTicketTypeDetailService } from './modules/ticketType/queries/getTicketTypeDetail/getTicketTypeDetail.service';
 
 @Module({
   imports: [ BookingSvcModule, AuthSvcModule],
@@ -140,43 +141,39 @@ import { GetEventSpecialManagementService } from './modules/event/queries/getEve
     // Categories
     GetAllCategoriesService,
 
-    // Event
+    /////// Event
+    // Commands
+    CreateEventService,
+    UpdateEventService,
+    DeleteEventService,
+    // Queries
     GetAllEventDetailForRAGService,
     GetEventFrontDisplayService,
     GetEventFDByIdsService,
     GetRecommendEventService,
     GetEventDetailRecommendService,
     GetEventDetailService,
-    CreateEventService,
-    UpdateEventService,
-    DeleteEventService,
 
     GetEventsByIdsService,
 
-    // Form
-    CreateFormService,
-    UpdateFormService,
-    DeleteFormService,
-    ConnectFormService,
-
     ///// Showing
+    // Commands
+    CalculateSectionStatusService,
     CreateShowingService,
     UpdateShowingService,
     DeleteShowingService,
-
-    // Ticket type
-    CreateTicketTypeService,
-    UpdateTicketTypeService,
-    DeleteTicketTypeService,
-    
-    // Commands
-    CalculateSectionStatusService,
     // Queries,
     GetAllShowingService,
     GetFormOfShowingService,
     GetShowingDetailService,
     GetShowingSeatmapService,
 
+    // Ticket type
+    CreateTicketTypeService,
+    UpdateTicketTypeService,
+    DeleteTicketTypeService,
+    GetTicketTypeDetailService,
+    
     // Org payment info
     CreateOrgPaymentInfoService,
     GetOrgPaymentInfoService,
@@ -184,9 +181,19 @@ import { GetEventSpecialManagementService } from './modules/event/queries/getEve
     DeleteOrgPaymentInfoService,
 
 
+    
+    
+
+    // Admin Event Management
     UpdateEventAdminService,
     GetEventsByAdminService,
     GetEventSpecialManagementService,
+    
+    // Form
+    CreateFormService,
+    UpdateFormService,
+    DeleteFormService,
+    ConnectFormService,
 
     // Repositories
     { provide: 'CategoriesRepository', useClass: CategoriesRepositoryImpl },
@@ -202,6 +209,13 @@ import { GetEventSpecialManagementService } from './modules/event/queries/getEve
     { provide: 'LocationsRepository', useClass: LocationsRepositoryImpl },
     { provide: 'OrgPaymentInforRepository', useClass: OrgPaymentInforRepositoryImpl },
   ],
-  exports: [GetAllEventDetailForRAGService, GetEventFrontDisplayService,GetEventsByIdsService],
+  exports: [
+    GetAllEventDetailForRAGService, 
+    GetEventFrontDisplayService,
+    GetEventsByIdsService,
+    GetShowingSeatmapService,
+    GetShowingDetailService,
+    GetTicketTypeDetailService,
+  ],
 })
 export class EventSvcModule {}

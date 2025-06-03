@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as crypto from 'crypto';
 import { Cron } from '@nestjs/schedule';
+import { SlackService } from 'src/infrastructure/adapters/slack/slack.service';
 
 interface CacheEntry {
   timestamp: number;
@@ -10,12 +11,28 @@ interface CacheEntry {
   data: any;
 }
 
+interface AggregatedDataItem {
+  id: string;
+  timestamp: number;
+  timeout: number;
+  data: any;
+}
+
+interface AggregatedCacheEntry {
+  timestamp: number;
+  timeout: number;
+  data: AggregatedDataItem[];
+}
+
+
 @Injectable()
 export class FileCacheService {
   private readonly cacheDir = path.join(process.cwd(), 'cache');
   private readonly logger = new Logger(FileCacheService.name);
 
-  constructor() {
+  constructor(
+    private readonly slackService: SlackService,
+  ) {
     if (!fs.existsSync(this.cacheDir)) {
       fs.mkdirSync(this.cacheDir, { recursive: true });
     }
@@ -67,12 +84,125 @@ export class FileCacheService {
     }
   }
 
-  // 🔁 Cron job chạy mỗi 5 phút dọn file hết hạn
-  @Cron('0 */12 * * *')
+  async cacheObject(
+    endpoint: string,
+    timeout: number,
+    filter: any,
+    data: { id: string; [key: string]: any }
+  ): Promise<boolean> {
+    const file = this.generateCacheFileName(endpoint, filter);
+    const now = Date.now();
+    const newItem: AggregatedDataItem = {
+      id: data.id,
+      timestamp: now,
+      timeout,
+      data,
+    };
+
+    let aggregated: AggregatedCacheEntry;
+
+    if (fs.existsSync(file)) {
+      try {
+        const raw = fs.readFileSync(file, 'utf-8');
+        aggregated = JSON.parse(raw);
+
+        const existingIndex = aggregated.data.findIndex((item) => item.id === data.id);
+
+        if (existingIndex !== -1) {
+          aggregated.data.splice(existingIndex, 1);
+        }
+
+        aggregated.data.push(newItem);
+        aggregated.timestamp = now;
+        aggregated.timeout = timeout;
+      } catch (err) {
+        this.logger.warn('Corrupted cache file. Overwriting.', err);
+        aggregated = {
+          timestamp: now,
+          timeout,
+          data: [newItem],
+        };
+      }
+    } else {
+      aggregated = {
+        timestamp: now,
+        timeout,
+        data: [newItem],
+      };
+    }
+
+    fs.writeFileSync(file, JSON.stringify(aggregated), 'utf-8');
+    return true;
+  }
+
+  async getCacheObject(endpoint: string, filter: any): Promise<AggregatedDataItem[]> {
+    const file = this.generateCacheFileName(endpoint, filter);
+    const now = Date.now();
+
+    if (!fs.existsSync(file)) return [];
+
+    try {
+      const raw = fs.readFileSync(file, 'utf-8');
+      const parsed: AggregatedCacheEntry = JSON.parse(raw);
+
+      // Lọc data chưa hết hạn
+      const validItems = parsed.data.filter(
+        (item) => now - item.timestamp <= item.timeout * 60 * 1000
+      );
+
+      // Nếu có phần tử nào đã hết hạn, thì ghi lại file để dọn chúng
+      if (validItems.length < parsed.data.length) {
+        parsed.data = validItems;
+        fs.writeFileSync(file, JSON.stringify(parsed), 'utf-8');
+      }
+
+      return validItems;
+    } catch (err) {
+      this.logger.error('Error reading cache object file', err);
+      return [];
+    }
+  }
+
+  async clearObject(
+    endpoint: string,
+    filter: any,
+    id: string
+  ): Promise<boolean> {
+    const file = this.generateCacheFileName(endpoint, filter);
+
+    if (!fs.existsSync(file)) {
+      return false; // Không có file cache
+    }
+
+    try {
+      const raw = fs.readFileSync(file, 'utf-8');
+      const aggregated: AggregatedCacheEntry = JSON.parse(raw);
+
+      const originalLength = aggregated.data.length;
+      aggregated.data = aggregated.data.filter((item) => item.id !== id);
+
+      if (aggregated.data.length === originalLength) {
+        return false; // Không tìm thấy item để xóa
+      }
+
+      aggregated.timestamp = Date.now(); // Cập nhật timestamp tổng thể (nếu cần)
+      fs.writeFileSync(file, JSON.stringify(aggregated), 'utf-8');
+      return true;
+    } catch (err) {
+      this.logger.error('Failed to clear cache object.', err);
+      return false;
+    }
+  }
+
+
+  // 🔁 Cron job chạy mỗi 4h dọn file hết hạn
+  @Cron('0 */4 * * *')
+  // @Cron('*/4 * * * *')
   cleanExpiredCache() {
     const files = fs.readdirSync(this.cacheDir);
     const now = Date.now();
     let deleted = 0;
+    this.slackService.sendNotice('🧹 Starting cache cleanup...')
 
     for (const file of files) {
       const filePath = path.join(this.cacheDir, file);
@@ -83,7 +213,13 @@ export class FileCacheService {
         if (now - parsed.timestamp > parsed.timeout * 60 * 1000) {
           fs.unlinkSync(filePath);
           deleted++;
+
+          // Log ra slack
+          this.slackService.sendNotice(
+            `🗑️ Cleaned expired cache file: ${file} (Timeout: ${parsed.timeout} minutes, Timestamp: ${new Date(parsed.timestamp).toISOString()})`
+          )
         }
+
       } catch (err) {
         this.logger.warn(`Skipping corrupted cache file: ${file}`);
       }

@@ -70,6 +70,8 @@ import { TurnOffNotificationForEventController } from "./modules/user/commands/t
 import { TurnOffNotificationForOrgController } from "./modules/user/commands/turn-off-notification-org/turn-off-notification.controller";
 import { TurnOffNotificationServiceForEvent } from "./modules/user/commands/turn-off-notification-event/turn-off-notification.service";
 import { TurnOffNotificationServiceForOrg } from "./modules/user/commands/turn-off-notification-org/turn-off-notification.service";
+import { GetUserPinStatusService } from "./modules/user/queries/get-pin-status/get-pin-status.service";
+import { GetUserPinStatusController } from "./modules/user/queries/get-pin-status/get-pin-status.controller";
 
 
 @Module({
@@ -116,7 +118,8 @@ import { TurnOffNotificationServiceForOrg } from "./modules/user/commands/turn-o
     GetUsersNotifiedByEventController,
     GetUsersNotifiedByOrgController,
     TurnOffNotificationForEventController,
-    TurnOffNotificationForOrgController
+    TurnOffNotificationForOrgController,
+    GetUserPinStatusController,
   ],
   providers: [
     RegisterUserService,
@@ -140,6 +143,7 @@ import { TurnOffNotificationServiceForOrg } from "./modules/user/commands/turn-o
     UnfavoriteOrgService,
     CheckUserExistService,
     SlackService,
+    GetUserPinStatusService,
 
     // Repositories
     GetFavoriteEventService,

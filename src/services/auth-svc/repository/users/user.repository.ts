@@ -8,6 +8,7 @@ import { OTP } from '../../modules/user/domain/entities/otp.entity';
 import { OTPType } from '../../modules/user/domain/enums/otp-type.enum';
 import { IOTPData } from './user.repository.interface';
 import { BaseRepository } from 'src/shared/repo/base.repository';
+import { PinStatus } from './user.repository.interface';
 
 export interface UserRepository extends BaseRepository<User, Prisma.UserDelegate> {
   findByEmail(email: Email): Promise<User | null>;
@@ -30,4 +31,7 @@ export interface UserRepository extends BaseRepository<User, Prisma.UserDelegate
   getReceiveNotiByUserId(userId: string): Promise<boolean>;
   getEmailsByIds(userIds: string[]): Promise<string[]>;
   isAdmin(email: string): Promise<boolean>;
+  findPinStatusByEmail(email: Email): Promise<PinStatus | null>;
+  createPinUser(email: Email, pin: string): Promise<void>;
+  updatePinUser(email: Email, pin: string): Promise<void>;
 }

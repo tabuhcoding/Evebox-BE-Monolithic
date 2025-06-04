@@ -17,6 +17,8 @@ import { OTP } from '../../modules/user/domain/entities/otp.entity';
 import { Avatar } from '../../modules/user/domain/value-objects/user/avatar.vo';
 import { Status } from '../../modules/user/domain/value-objects/user/status.vo';
 import { BaseRepository } from 'src/shared/repo/base.repository';
+import { PinStatus } from './user.repository.interface';
+import { UserPinStatusData } from '../../modules/user/queries/get-pin-status/get-pin-status.response.dto';
 
 @Injectable()
 export class UserRepositoryImpl extends BaseRepository<User, Prisma.UserDelegate>
@@ -193,7 +195,7 @@ export class UserRepositoryImpl extends BaseRepository<User, Prisma.UserDelegate
     }
     const role = roleOrError.unwrap();
 
-     const avatarIdOrError = Avatar.create(userRecord.avatar_id);
+    const avatarIdOrError = Avatar.create(userRecord.avatar_id);
     if (avatarIdOrError.isErr()) {
       throw new Error(avatarIdOrError.unwrapErr().message);
     }
@@ -368,34 +370,75 @@ export class UserRepositoryImpl extends BaseRepository<User, Prisma.UserDelegate
   }
 
   async setReceiveNoti(userId: string, receive: boolean): Promise<void> {
-  await this.prisma.user.update({
-    where: { id: userId },
-    data: { receiveNoti: receive },
-  });
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { receiveNoti: receive },
+    });
   }
 
   async getReceiveNotiByUserId(userId: string): Promise<boolean> {
-  const user = await this.prisma.user.findUnique({
-    where: { id: userId },
-    select: { receiveNoti: true },
-  });
-  return user?.receiveNoti ?? false;
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { receiveNoti: true },
+    });
+    return user?.receiveNoti ?? false;
   }
 
   async getEmailsByIds(userIds: string[]): Promise<string[]> {
-  const users = await this.prisma.user.findMany({
-    where: { id: { in: userIds } },
-    select: { email: true },
-  });
-  return users.map((u) => u.email);
- }
+    const users = await this.prisma.user.findMany({
+      where: { id: { in: userIds } },
+      select: { email: true },
+    });
+    return users.map((u) => u.email);
+  }
 
- async isAdmin(email: string): Promise<boolean> {
-  const user = await this.prisma.user.findUnique({
-    where: { email },
-    select: { role_id: true },
-  });
+  async isAdmin(email: string): Promise<boolean> {
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+      select: { role_id: true },
+    });
 
-  return user?.role_id === 1;
-}
+    return user?.role_id === 1;
+  }
+
+  async updatePinUser(email: Email, pin: string): Promise<void> {
+    await this.prisma.userPin.update({
+      where: { userEmail: email.value },
+      data: {
+        hashedPin: pin,
+        attempts: 0,
+        lockedUntil: null,
+        updatedAt: new Date(),
+      },
+    });
+  }
+
+  async createPinUser(email: Email, pin: string): Promise<void> {
+    await this.prisma.userPin.create({
+      data: {
+        userEmail: email.value,
+        hashedPin: pin,
+        attempts: 0,
+        lockedUntil: null,
+      }
+    });
+  }
+
+  async findPinStatusByEmail(email: Email): Promise<PinStatus | null> {
+    const pinStatusRecord = await this.prisma.userPin.findUnique({
+      where: { userEmail: email.value },
+      select: {
+        hashedPin: true,
+        attempts: true,
+        lockedUntil: true,
+        updatedAt: true,
+      },
+    });
+
+    if (!pinStatusRecord) {
+      return null;
+    }
+
+    return pinStatusRecord;
+  }
 }

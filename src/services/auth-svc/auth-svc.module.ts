@@ -183,6 +183,8 @@ import { TurnOffNotificationServiceForOrg } from "./modules/user/commands/turn-o
       useClass: UserRepositoryImpl,
     },
     CheckUserExistService,
+    UpdateUserRoleService,
+    GetUserService,
   ],
 })
 export class AuthSvcModule { }

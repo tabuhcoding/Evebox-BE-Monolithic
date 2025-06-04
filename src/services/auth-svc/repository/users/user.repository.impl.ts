@@ -16,13 +16,17 @@ import { DomainEvent } from 'src/libs/ddd/domain-event.base';
 import { OTP } from '../../modules/user/domain/entities/otp.entity';
 import { Avatar } from '../../modules/user/domain/value-objects/user/avatar.vo';
 import { Status } from '../../modules/user/domain/value-objects/user/status.vo';
+import { BaseRepository } from 'src/shared/repo/base.repository';
 
 @Injectable()
-export class UserRepositoryImpl implements UserRepository {
+export class UserRepositoryImpl extends BaseRepository<User, Prisma.UserDelegate>
+  implements UserRepository {
   constructor(
-    private readonly prisma: PrismaService,
+    protected readonly prisma: PrismaService,
     private readonly eventBus: EventBus,
-  ) { }
+  ) {
+    super(prisma.user, prisma);
+  }
 
   async findByEmail(email: Email): Promise<User | null> {
     const userRecord = await this.prisma.user.findUnique({

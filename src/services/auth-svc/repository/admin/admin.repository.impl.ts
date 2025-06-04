@@ -18,7 +18,7 @@ import { UserRole } from "../../modules/user/domain/enums/user-role.enum";
 export class AdminRepositoryImpl implements AdminRepository {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly eventBus: EventBus
+    protected readonly eventBus: EventBus
   ) { }
 
   async updateUserStatus(userId: string, status: UserStatus): Promise<void> {

@@ -43,7 +43,7 @@ export class CreateTicketTypeService {
         return Err(new Error('Ticket end time must be earlier than showing start time'));
       }
 
-      const result = await this.ticketTypeRepository.createTicketType(dto, showingId);
+      const result = await this.ticketTypeRepository.createTicketType(dto, showingId, userEmail);
       if (result.isErr()) {
         return Err(new Error(result.unwrapErr().message));
       }

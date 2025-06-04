@@ -5,10 +5,8 @@ import { Result, Ok, Err } from "oxide.ts";
 import { PrismaService } from "src/infrastructure/database/prisma/prisma.service";
 import { BaseRepository } from "src/shared/repo/base.repository";
 import { OrgPaymentInforRepository } from "./orgPaymentInfor.repo";
-import { Email } from "src/services/auth-svc/modules/user/domain/value-objects/user/email.vo";
-import { Role } from "src/services/auth-svc/modules/user/domain/value-objects/user/role.vo";
-import { UserRepository } from "src/services/auth-svc/repository/users/user.repository";
-import { AdminRepository } from "src/services/auth-svc/repository/admin/admin.repository";
+import { UpdateUserRoleService } from "src/services/auth-svc/modules/admin/commands/updateUserRole/updateUserRole.service";
+import { GetUserService } from "src/services/auth-svc/modules/user/queries/get-user/get-user.service";
 import { CreateOrgPaymentInfoDto } from "../../modules/orgPaymentInfor/commands/createOrgPaymentInfor/createOrgPaymentInfor.dto";
 import { UpdateOrgPaymentInfoDto } from "../../modules/orgPaymentInfor/commands/updateOrgPaymentInfor/updateOrgPaymentInfor.dto";
 
@@ -17,9 +15,9 @@ export class OrgPaymentInforRepositoryImpl
   extends BaseRepository<OrgPaymentInfor, Prisma.OrgPaymentInforDelegate>
   implements OrgPaymentInforRepository {
   constructor(
-    @Inject('AdminRepository') private readonly adminRepository: AdminRepository,
-    @Inject('UserRepository') private readonly userRepository: UserRepository,
-    protected readonly prisma: PrismaService
+    protected readonly prisma: PrismaService,
+    private readonly updateUserRoleService: UpdateUserRoleService,
+    private readonly getUserService: GetUserService,
   ) {
     super(prisma.orgPaymentInfor, prisma);
   }
@@ -42,20 +40,17 @@ export class OrgPaymentInforRepositoryImpl
         return Err(new Error(`Failed to create payment info of organizer ${organizerId}`));
       }
 
-      const emailOrError = Email.create(organizerId);
-      if (emailOrError.isErr()) {
-        return Err(emailOrError.unwrapErr());
+      const userData = await this.getUserService.execute(organizerId);
+      if (userData.isErr()) {
+        return Err(new Error(userData.unwrapErr().message));
       }
 
-      const emailUnwrapped = emailOrError.unwrap();
-      const user = await this.userRepository.findByEmail(emailUnwrapped);
+      if (userData.unwrap().role === 3) {
+        const updateRole = await this.updateUserRoleService.systemExecute({ role: 2 }, organizerId);
 
-      if (user.role.isCustomer) {
-        const roleOrError = Role.create(3);
-        if (roleOrError.isErr()) {
-          return Err(roleOrError.unwrapErr());
+        if (updateRole.isErr()) {
+          return Err(new Error(updateRole.unwrapErr().message));
         }
-        await this.adminRepository.updateUserRole(organizerId, 2);
       }
 
       return Ok(paymentInfoId);

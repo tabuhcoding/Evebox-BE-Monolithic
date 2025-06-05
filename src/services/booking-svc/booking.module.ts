@@ -8,6 +8,10 @@ import { SelectSeatController } from "./modules/commands/selectSeat/selectSeat.c
 import { SelectSeatService } from "./modules/commands/selectSeat/selectSeat.service";
 import { AuthSvcModule } from "../auth-svc/auth-svc.module";
 import { EventSvcModule } from "../event-svc/event-svc.module";
+import { UnSelectSeatController } from "./modules/commands/unSelectSeat/unSelectSeat.controller";
+import { GetRedisSeatController } from "./modules/queries/getRedisSeat/getRedisSeat.controller";
+import { UnSelectSeatService } from "./modules/commands/unSelectSeat/unSelectSeat.service";
+import { GetRedisSeatService } from "./modules/queries/getRedisSeat/getRedisSeat.service";
 
 @Module({
   imports: [ 
@@ -16,6 +20,8 @@ import { EventSvcModule } from "../event-svc/event-svc.module";
   ],
   controllers: [
     SelectSeatController,
+    UnSelectSeatController,
+    GetRedisSeatController,
   ],
   providers: [
     // Adapters
@@ -28,6 +34,8 @@ import { EventSvcModule } from "../event-svc/event-svc.module";
     GetTotalTicketOfTicketTypeService,
 
     SelectSeatService,
+    UnSelectSeatService,
+    GetRedisSeatService,
 
     // Repositories
     { provide: 'OrderRepository', useClass: OrderRepositoryImpl },

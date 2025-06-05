@@ -8,7 +8,7 @@ import { JwtAuthGuard } from 'src/shared/guard/jwt-auth.guard';
 import { SelectSeatResponseDto } from './selectSeat-response.dto';
 
 @ApiTags('Booking Service - Booking')
-@Controller('api/ticket')
+@Controller('api/booking')
 export class SelectSeatController {
   constructor(private readonly selectSeatService: SelectSeatService) {}
 

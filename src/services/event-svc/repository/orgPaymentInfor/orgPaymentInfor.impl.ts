@@ -5,6 +5,8 @@ import { Result, Ok, Err } from "oxide.ts";
 import { PrismaService } from "src/infrastructure/database/prisma/prisma.service";
 import { BaseRepository } from "src/shared/repo/base.repository";
 import { OrgPaymentInforRepository } from "./orgPaymentInfor.repo";
+import { UpdateUserRoleService } from "src/services/auth-svc/modules/admin/commands/updateUserRole/updateUserRole.service";
+import { GetUserService } from "src/services/auth-svc/modules/user/queries/get-user/get-user.service";
 import { CreateOrgPaymentInfoDto } from "../../modules/orgPaymentInfor/commands/createOrgPaymentInfor/createOrgPaymentInfor.dto";
 import { UpdateOrgPaymentInfoDto } from "../../modules/orgPaymentInfor/commands/updateOrgPaymentInfor/updateOrgPaymentInfor.dto";
 
@@ -13,7 +15,9 @@ export class OrgPaymentInforRepositoryImpl
   extends BaseRepository<OrgPaymentInfor, Prisma.OrgPaymentInforDelegate>
   implements OrgPaymentInforRepository {
   constructor(
-    protected readonly prisma: PrismaService
+    protected readonly prisma: PrismaService,
+    private readonly updateUserRoleService: UpdateUserRoleService,
+    private readonly getUserService: GetUserService,
   ) {
     super(prisma.orgPaymentInfor, prisma);
   }
@@ -34,6 +38,19 @@ export class OrgPaymentInforRepositoryImpl
 
       if (!paymentInfoId || typeof paymentInfoId !== 'string' || paymentInfoId.trim() === '') {
         return Err(new Error(`Failed to create payment info of organizer ${organizerId}`));
+      }
+
+      const userData = await this.getUserService.execute(organizerId);
+      if (userData.isErr()) {
+        return Err(new Error(userData.unwrapErr().message));
+      }
+
+      if (userData.unwrap().role === 3) {
+        const updateRole = await this.updateUserRoleService.systemExecute({ role: 2 }, organizerId);
+
+        if (updateRole.isErr()) {
+          return Err(new Error(updateRole.unwrapErr().message));
+        }
       }
 
       return Ok(paymentInfoId);

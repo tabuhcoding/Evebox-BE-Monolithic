@@ -186,6 +186,8 @@ import { GetAdminAccessService } from "./modules/user/queries/get-admin-access/g
     },
     CheckUserExistService,
     GetAdminAccessService
+    UpdateUserRoleService,
+    GetUserService,
   ],
 })
 export class AuthSvcModule { }

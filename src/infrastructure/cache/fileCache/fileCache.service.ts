@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as crypto from 'crypto';
@@ -28,7 +28,6 @@ interface AggregatedCacheEntry {
 @Injectable()
 export class FileCacheService {
   private readonly cacheDir = path.join(process.cwd(), 'cache');
-  private readonly logger = new Logger(FileCacheService.name);
 
   constructor(
     private readonly slackService: SlackService,
@@ -79,7 +78,7 @@ export class FileCacheService {
 
       return parsed.data;
     } catch (err) {
-      this.logger.error('Error reading cache file', err);
+      this.slackService.sendError(`FileCacheService >>> getCache: Error reading cache file for endpoint ${endpoint} error: ${err.message}`);
       return null;
     }
   }
@@ -88,12 +87,13 @@ export class FileCacheService {
     endpoint: string,
     timeout: number,
     filter: any,
-    data: { id: string; [key: string]: any }
+    id: string,
+    data: { [key: string]: any }[]
   ): Promise<boolean> {
     const file = this.generateCacheFileName(endpoint, filter);
     const now = Date.now();
     const newItem: AggregatedDataItem = {
-      id: data.id,
+      id: id,
       timestamp: now,
       timeout,
       data,
@@ -106,7 +106,7 @@ export class FileCacheService {
         const raw = fs.readFileSync(file, 'utf-8');
         aggregated = JSON.parse(raw);
 
-        const existingIndex = aggregated.data.findIndex((item) => item.id === data.id);
+        const existingIndex = aggregated.data.findIndex((item) => item.id === id);
 
         if (existingIndex !== -1) {
           aggregated.data.splice(existingIndex, 1);
@@ -116,7 +116,7 @@ export class FileCacheService {
         aggregated.timestamp = now;
         aggregated.timeout = timeout;
       } catch (err) {
-        this.logger.warn('Corrupted cache file. Overwriting.', err);
+        this.slackService.sendError(`FileCacheService >>> cacheObject: Error reading cache file for endpoint ${endpoint} error: ${err.message}`);
         aggregated = {
           timestamp: now,
           timeout,
@@ -158,8 +158,34 @@ export class FileCacheService {
 
       return validItems;
     } catch (err) {
-      this.logger.error('Error reading cache object file', err);
+      this.slackService.sendError(`FileCacheService >>> getCacheObject: Error reading cache file for endpoint ${endpoint} error: ${err.message}`);
       return [];
+    }
+  }
+
+  async getCacheObjectById(
+    endpoint: string,
+    filter: any,
+    id: string
+  ): Promise<AggregatedDataItem | null> {
+    const file = this.generateCacheFileName(endpoint, filter);
+    const now = Date.now();
+
+    if (!fs.existsSync(file)) return null;
+
+    try {
+      const raw = fs.readFileSync(file, 'utf-8');
+      const parsed: AggregatedCacheEntry = JSON.parse(raw);
+
+      const item = parsed.data.find((item) => item.id === id);
+      if (!item || now - item.timestamp > item.timeout * 60 * 1000) {
+        return null; // Không tìm thấy hoặc đã hết hạn
+      }
+
+      return item;
+    } catch (err) {
+      this.slackService.sendError(`FileCacheService >>> getCacheObjectById: Error reading cache file for endpoint ${endpoint} error: ${err.message}`);
+      return null;
     }
   }
 
@@ -189,7 +215,7 @@ export class FileCacheService {
       fs.writeFileSync(file, JSON.stringify(aggregated), 'utf-8');
       return true;
     } catch (err) {
-      this.logger.error('Failed to clear cache object.', err);
+      this.slackService.sendError(`FileCacheService >>> clearObject: Error reading cache file for endpoint ${endpoint} error: ${err.message}`);
       return false;
     }
   }
@@ -221,12 +247,12 @@ export class FileCacheService {
         }
 
       } catch (err) {
-        this.logger.warn(`Skipping corrupted cache file: ${file}`);
+        this.slackService.sendError(`FileCacheService >>> cleanExpiredCache: Error processing cache file ${file} error: ${err.message}`);
       }
     }
 
     if (deleted > 0) {
-      this.logger.log(`🧹 Cleaned ${deleted} expired cache file(s)`);
+      this.slackService.sendNotice(`🧹 Cache cleanup completed. Deleted ${deleted} expired cache files.`);
     }
   }
 }

@@ -11,11 +11,17 @@ import { CheckUserExistService } from "../../commands/checkuserExist/checkuserEx
 export class GetUserPinStatusService {
   constructor(
     @Inject('UserRepository') private readonly userRepository: UserRepository,
-    private readonly slackService: SlackService
+    private readonly slackService: SlackService,
+    private readonly checkUserExistService: CheckUserExistService,
   ) { }
 
   async execute(email: string): Promise<Result<UserPinStatusData, Error>> {
     try {
+      const userExists = await this.checkUserExistService.execute(email);
+      if (!userExists) {
+        return Err(new Error('User does not exist'));
+      }
+      
       const emailOrError = Email.create(email);
       if (emailOrError.isErr()) {
         return Err(new Error(emailOrError.unwrapErr().message));

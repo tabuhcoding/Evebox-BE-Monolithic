@@ -76,6 +76,8 @@ import { CreateUserPinService } from "./modules/user/commands/create-pin/create-
 import { CreateUserPinController } from "./modules/user/commands/create-pin/create-pin.controller";
 import { VerifyUserPinController } from "./modules/user/commands/verift-pin/verify-pin.controller";
 import { VerifyUserPinService } from "./modules/user/commands/verift-pin/verify-pin.service";
+import { ChangeUserPinController } from "./modules/user/commands/change-pin/change-pin.controller";
+import { ChangeUserPinService } from "./modules/user/commands/change-pin/change-pin.service";
 
 
 @Module({
@@ -126,6 +128,7 @@ import { VerifyUserPinService } from "./modules/user/commands/verift-pin/verify-
     GetUserPinStatusController,
     CreateUserPinController,
     VerifyUserPinController,
+    ChangeUserPinController,
   ],
   providers: [
     RegisterUserService,
@@ -152,6 +155,7 @@ import { VerifyUserPinService } from "./modules/user/commands/verift-pin/verify-
     GetUserPinStatusService,
     CreateUserPinService,
     VerifyUserPinService,
+    ChangeUserPinService,
 
     // Repositories
     GetFavoriteEventService,

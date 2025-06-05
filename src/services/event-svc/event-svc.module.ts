@@ -87,6 +87,8 @@ import { GetEventSpecialManagementService } from './modules/event/queries/getEve
 import { GetTicketTypeDetailService } from './modules/ticketType/queries/getTicketTypeDetail/getTicketTypeDetail.service';
 import { GetEventMemberController } from './modules/event/queries/getEventMembers/getEventMembers.controller';
 import { GetEventMembersService } from './modules/event/queries/getEventMembers/getEventMembers.service';
+import { GetEventOfOrgController } from './modules/event/queries/getEventOfOrg/getEventOfOrg.controller';
+import { GetEventOfOrgService } from './modules/event/queries/getEventOfOrg/getEventOfOrg.service';
 
 @Module({
   imports: [ BookingSvcModule, AuthSvcModule, CqrsModule ],
@@ -95,6 +97,7 @@ import { GetEventMembersService } from './modules/event/queries/getEventMembers/
     GetAllCategoriesController,
 
     // Event
+    GetEventOfOrgController,
     GetEventFrontDisplayController,
     GetEventFDByIdsController,
     GetRecommendedEventController,
@@ -159,6 +162,7 @@ import { GetEventMembersService } from './modules/event/queries/getEventMembers/
     GetRecommendEventService,
     GetEventDetailRecommendService,
     GetEventDetailService,
+    GetEventOfOrgService,
 
     GetEventsByIdsService,
 
@@ -185,10 +189,6 @@ import { GetEventMembersService } from './modules/event/queries/getEventMembers/
     GetOrgPaymentInfoService,
     UpdateOrgPaymentInfoService,
     DeleteOrgPaymentInfoService,
-
-
-    
-    
 
     // Admin Event Management
     UpdateEventAdminService,

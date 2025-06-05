@@ -4,6 +4,7 @@ import { CreateEventDto } from '../../modules/event/commands/createEvent/createE
 import { UpdateEventDto } from '../../modules/event/commands/updateEvent/updateEvent.dto';
 import { Prisma } from '@prisma/client';
 import { UpdateEventAdminDto } from '../../modules/event/commands/UpdateEventAdmin/updateEventAdmin.dto';
+import { EventOrgFrontDisplayDto } from '../../modules/event/queries/getEventOfOrg/getEventOfOrg-response.dto';
 
 export type Events = Prisma.EventsGetPayload<{
   include: {
@@ -51,7 +52,7 @@ export type EventsWithoutShowing = Prisma.EventsGetPayload<{
 export interface EventsRepository extends BaseRepository<Events, Prisma.EventsDelegate> {
   // Thêm các method riêng cho Events nếu cần, ví dụ:
   findManyByIdsWithDetails(ids: number[]): Promise<Events[]>;
-    updateEventFields(dto: UpdateEventAdminDto, eventId: number): Promise<any | null>;
+  updateEventFields(dto: UpdateEventAdminDto, eventId: number): Promise<any | null>;
   /* Create Event */
   createEvent(data: CreateEventDto, email: string, locationId?: number): Promise<number>;
 
@@ -69,4 +70,6 @@ export interface EventsRepository extends BaseRepository<Events, Prisma.EventsDe
   getShowingsByEventId(eventId: number): Promise<{ startTime: Date }[]>
   getSpecialEventsWithFilters(filters: any): Promise<any[]>;
   countSpecialEvents(filters: any): Promise<number>;
+
+  getEventOfOrg(email: string): Promise<Result<(EventOrgFrontDisplayDto & { role: number })[], Error>>;
 }

@@ -4,7 +4,6 @@ import { CreateEventDto } from '../../modules/event/commands/createEvent/createE
 import { UpdateEventDto } from '../../modules/event/commands/updateEvent/updateEvent.dto';
 import { Prisma } from '@prisma/client';
 import { UpdateEventAdminDto } from '../../modules/event/commands/UpdateEventAdmin/updateEventAdmin.dto';
-import { EventDataDto } from '../../modules/event/queries/getEventsByAdmin/getEvents-response.dto';
 
 export type Events = Prisma.EventsGetPayload<{
   include: {
@@ -60,7 +59,7 @@ export interface EventsRepository extends BaseRepository<Events, Prisma.EventsDe
   updateEvent(dto: UpdateEventDto, eventId: number, locationId?: number): Promise<[number, boolean]> ;
   getEventOrganizer(eventId: number): Promise<string | null>;
   getMember(eventId: number, userEmail: string): Promise<any | null>;
-  hasPermissionToManageEvent(eventId: number, userEmail: string): Promise<Result<boolean, Error>>;
+  hasPermissionToManageEvent(eventId: number, userEmail: string, permission: string): Promise<Result<boolean, Error>>;
 
   /* Delete Event */
   deleteEvent(id: number): Promise<number>;

@@ -175,7 +175,7 @@ export class EventsRepositoryImpl
     }
   }
 
-  async hasPermissionToManageEvent(eventId: number, userEmail: string): Promise<Result<boolean, Error>> {
+  async hasPermissionToManageEvent(eventId: number, userEmail: string, permission: string): Promise<Result<boolean, Error>> {
     try {
       const event = await this.findOneById(eventId);
       if (!event) {
@@ -198,7 +198,7 @@ export class EventsRepositoryImpl
         return Ok(false);
       }
 
-      return Ok(role.isEdited === true);
+      return Ok(role[permission] === true);
     } catch (error) {
       throw new Error(`Failed to check permission: ${error.message}`);
     }

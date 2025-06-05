@@ -17,17 +17,23 @@ export class SlackService {
         text: `:rotating_light: *ERROR*:\n${message}`,
       });
     } catch (err) {
-      console.error('Slack send failed:', err.message);
+      return
     }
   }
 
   async sendNotice(message: string) {
+    console.log('SlackService >>> sendNotice: message', message);
+    if (this.isDevelopment) {
+      console.log('Console error:', message);
+      
+      return;
+    }
     try {
       await axios.post(this.webhookUrl, {
         text: `:memo: *NOTICE*:\n${message}`,
       });
     } catch (err) {
-      console.error('Slack send failed:', err.message);
+      return;
     }
   }
 }

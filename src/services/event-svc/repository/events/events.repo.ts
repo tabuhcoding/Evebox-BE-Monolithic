@@ -5,6 +5,7 @@ import { UpdateEventDto } from '../../modules/event/commands/updateEvent/updateE
 import { Prisma } from '@prisma/client';
 import { UpdateEventAdminDto } from '../../modules/event/commands/UpdateEventAdmin/updateEventAdmin.dto';
 import { EventOrgFrontDisplayDto } from '../../modules/event/queries/getEventOfOrg/getEventOfOrg-response.dto';
+import { EventOrgDetailResponseDto } from '../../modules/event/queries/getEventOfOrgDetail/getEventOfOrgDetail-response.dto';
 
 export type Events = Prisma.EventsGetPayload<{
   include: {
@@ -72,4 +73,5 @@ export interface EventsRepository extends BaseRepository<Events, Prisma.EventsDe
   countSpecialEvents(filters: any): Promise<number>;
 
   getEventOfOrg(email: string): Promise<Result<(EventOrgFrontDisplayDto & { role: number })[], Error>>;
+  getEventOfOrgDetail(eventId: number, userEmail: string): Promise<Result<EventOrgDetailResponseDto, Error>>;
 }

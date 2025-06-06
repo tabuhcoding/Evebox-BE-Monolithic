@@ -11,6 +11,7 @@ import { CreateEventDto } from '../../modules/event/commands/createEvent/createE
 import { UpdateEventDto } from '../../modules/event/commands/updateEvent/updateEvent.dto';
 import { UpdateEventAdminDto } from '../../modules/event/commands/UpdateEventAdmin/updateEventAdmin.dto';
 import { EventOrgFrontDisplayDto } from '../../modules/event/queries/getEventOfOrg/getEventOfOrg-response.dto';
+import { EventOrgDetailResponseDto } from '../../modules/event/queries/getEventOfOrgDetail/getEventOfOrgDetail-response.dto';
 import { GetUserService } from 'src/services/auth-svc/modules/user/queries/get-user/get-user.service';
 
 @Injectable()
@@ -419,7 +420,7 @@ export class EventsRepositoryImpl
         results.push({
           ...event,
           startDate: startTime,
-          locationString:locationsString,
+          locationString: locationsString,
           role: 2, // Organizer role
         });
       }
@@ -439,13 +440,15 @@ export class EventsRepositoryImpl
         const { street, ward, districts } = event.locations ?? {};
         const districtName = districts?.name || '';
         const provinceName = districts?.province?.name || '';
-        const locationsString = `${street || ''}, ${ward || ''}, ${districtName}, ${provinceName}`;
+        const locationsArray = [street, ward, districtName, provinceName].filter(Boolean);
+
+        const locationsString = locationsArray.join(', ');
         const startTime = await this.caculateEventsStartDate(showings);
-  
+
         results.push({
           ...event,
           startDate: startTime,
-          locationString:locationsString,
+          locationString: locationsString,
           role: rel.role, // Other role
         });
       }
@@ -469,5 +472,37 @@ export class EventsRepositoryImpl
       }
     }
     return startTime;
+  }
+
+  async getEventOfOrgDetail(eventId: number, userEmail: string): Promise<Result<EventOrgDetailResponseDto, Error>> {
+    try {
+      const event = await this.findOneById(eventId);
+
+      if (!event) {
+        return Err(new Error('No event found'));
+      }
+
+      if (event.deleteAt !== null) {
+        return Err(new Error(`Event ${eventId} has been deleted`));
+      }
+
+      const { street, ward, districts } = event.locations ?? {};
+      const districtName = districts?.name || '';
+      const provinceName = districts?.province?.name || '';
+      const locationsArray = [street, ward, districtName, provinceName].filter(Boolean);
+
+      const locationsString = locationsArray.join(', ');
+      const eventDetail: EventOrgDetailResponseDto = {
+        ...event,
+        locationsString,
+        EventCategories: event.EventCategories.map(category => ({
+          id: category.Categories.id,
+          name: category.Categories.name
+        }))
+      };
+      return Ok(eventDetail);
+    } catch (error) {
+      return Err(new Error('Failed to retrieve detail of event of org'));
+    }
   }
 }

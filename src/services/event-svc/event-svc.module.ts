@@ -89,6 +89,8 @@ import { GetEventMemberController } from './modules/event/queries/getEventMember
 import { GetEventMembersService } from './modules/event/queries/getEventMembers/getEventMembers.service';
 import { GetEventOfOrgController } from './modules/event/queries/getEventOfOrg/getEventOfOrg.controller';
 import { GetEventOfOrgService } from './modules/event/queries/getEventOfOrg/getEventOfOrg.service';
+import { GetEventOfOrgDetailController } from './modules/event/queries/getEventOfOrgDetail/getEventOfOrgDetail.controller';
+import { GetEventOfOrgDetailService } from './modules/event/queries/getEventOfOrgDetail/getEventOfOrgDetail.service';
 
 @Module({
   imports: [ BookingSvcModule, AuthSvcModule, CqrsModule ],
@@ -98,6 +100,7 @@ import { GetEventOfOrgService } from './modules/event/queries/getEventOfOrg/getE
 
     // Event
     GetEventOfOrgController,
+    GetEventOfOrgDetailController,
     GetEventFrontDisplayController,
     GetEventFDByIdsController,
     GetRecommendedEventController,
@@ -163,6 +166,7 @@ import { GetEventOfOrgService } from './modules/event/queries/getEventOfOrg/getE
     GetEventDetailRecommendService,
     GetEventDetailService,
     GetEventOfOrgService,
+    GetEventOfOrgDetailService,
 
     GetEventsByIdsService,
 

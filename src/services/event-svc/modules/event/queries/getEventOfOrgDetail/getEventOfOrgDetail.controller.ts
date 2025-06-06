@@ -1,6 +1,6 @@
 import { Controller, Get, Res, HttpStatus, UseGuards, Request, Param } from "@nestjs/common";
 import { Response } from "express";
-import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/shared/guard/jwt-auth.guard';
 import { GetEventOfOrgDetailService } from "./getEventOfOrgDetail.service";
 import { EventOrgDetailResponse } from "./getEventOfOrgDetail-response.dto";
@@ -16,7 +16,6 @@ export class GetEventOfOrgDetailController {
 
   @UseGuards(JwtAuthGuard)
   @Get('/:id')
-  @ApiParam({ name: 'eventId', example: 123123, description: "The ID of the event" })
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Get Event Detail Of Organizer' })
   @ApiResponse({

@@ -13,6 +13,7 @@ import { UpdateEventAdminDto } from '../../modules/event/commands/UpdateEventAdm
 import { EventOrgFrontDisplayDto } from '../../modules/event/queries/getEventOfOrg/getEventOfOrg-response.dto';
 import { EventOrgDetailResponseDto } from '../../modules/event/queries/getEventOfOrgDetail/getEventOfOrgDetail-response.dto';
 import { GetUserService } from 'src/services/auth-svc/modules/user/queries/get-user/get-user.service';
+import { EVENT_ROLE } from '../../modules/event/domain/eventRole';
 
 @Injectable()
 export class EventsRepositoryImpl
@@ -474,9 +475,64 @@ export class EventsRepositoryImpl
     return startTime;
   }
 
-  async getEventOfOrgDetail(eventId: number, userEmail: string): Promise<Result<EventOrgDetailResponseDto, Error>> {
+  async getEventOfOrgDetail(eventId: number): Promise<Result<EventOrgDetailResponseDto, Error>> {
     try {
-      const event = await this.findOneById(eventId);
+      const event = await this.prisma.events.findUnique({
+        where: {
+          id: Number(eventId),
+        }, 
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          imgLogoUrl: true,
+          imgPosterUrl: true,
+          createdAt: true,
+          isOnline: true,
+          locations: {
+            select: {
+              id: true,
+              street: true,
+              ward: true,
+              districts: {
+                select:{
+                  id: true,
+                  name: true,
+                  province: {
+                    select: {
+                      id: true,
+                      name: true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          venue: true,
+          isApproved: true,
+          orgDescription: true,
+          orgName: true,
+          deleteAt: true,
+          EventCategories: {
+            select: {
+              Categories: {
+                select: {
+                  id: true,
+                  name: true
+                }
+              }
+            }
+          },
+          Showing: {
+            select: {
+                id: true,
+                isFree: true,
+                startTime: true,
+                endTime: true,
+            }
+          }
+        }
+      });
 
       if (!event) {
         return Err(new Error('No event found'));
@@ -485,12 +541,12 @@ export class EventsRepositoryImpl
       if (event.deleteAt !== null) {
         return Err(new Error(`Event ${eventId} has been deleted`));
       }
-
+      
       const { street, ward, districts } = event.locations ?? {};
       const districtName = districts?.name || '';
       const provinceName = districts?.province?.name || '';
       const locationsArray = [street, ward, districtName, provinceName].filter(Boolean);
-
+      
       const locationsString = locationsArray.join(', ');
       const eventDetail: EventOrgDetailResponseDto = {
         ...event,

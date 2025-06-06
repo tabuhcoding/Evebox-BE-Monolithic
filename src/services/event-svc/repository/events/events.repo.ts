@@ -73,5 +73,5 @@ export interface EventsRepository extends BaseRepository<Events, Prisma.EventsDe
   countSpecialEvents(filters: any): Promise<number>;
 
   getEventOfOrg(email: string): Promise<Result<(EventOrgFrontDisplayDto & { role: number })[], Error>>;
-  getEventOfOrgDetail(eventId: number, userEmail: string): Promise<Result<EventOrgDetailResponseDto, Error>>;
+  getEventOfOrgDetail(eventId: number): Promise<Result<EventOrgDetailResponseDto, Error>>;
 }

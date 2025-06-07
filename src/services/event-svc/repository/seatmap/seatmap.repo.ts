@@ -20,4 +20,5 @@ export type Seatmap = Prisma.SeatmapGetPayload<{
 }>;
 
 export interface SeatmapRepository extends BaseRepository<Seatmap, Prisma.SeatmapDelegate> {
+  getSeatMapById(seatMapId: number): Promise<any>;
 }

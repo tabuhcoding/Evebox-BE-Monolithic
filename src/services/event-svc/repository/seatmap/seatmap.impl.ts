@@ -12,4 +12,25 @@ export class SeatmapRepositoryImpl
   constructor(protected readonly prisma: PrismaService) {
     super(prisma.seatmap, prisma);
   }
+
+  async getSeatMapById(seatMapId: number): Promise<any> {
+    return this.prisma.seatmap.findFirst({
+      where: { id: seatMapId },
+      select: {
+        id: true,
+        Section: {
+          select: {
+            id: true,
+            Row: {
+              select: {
+                Seat: {
+                  select: { SeatStatus: true }
+                }
+              }
+            }
+          }
+        }
+      }
+    });
+  }
 }

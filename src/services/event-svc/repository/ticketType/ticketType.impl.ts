@@ -146,4 +146,18 @@ export class TicketTypeRepositoryImpl
       return Err(new Error(`Failed to delete ticket type: ${error.message}`));
     }
   }
+
+  getTicketTypeDetails(ticketTypeId: string): Promise<any> {
+    return this.prisma.ticketType.findUnique({
+      where: { id: ticketTypeId },
+      select: {
+        showingId: true,
+        quantity: true,
+        price: true,
+        startTime: true,
+        endTime: true,
+        sections: { select: { sectionId: true } },
+      },
+    });
+  }
 }

@@ -1,3 +1,6 @@
+import { GetTicketDetailOfShowingService } from './modules/showing/queries/getTicketDetailOfShowing/getTicketDetailOfShowing.service';
+import { GetShowingsByAdminService } from './modules/showing/queries/getShowingsByAdmin/getShowings.service';
+import { GetShowingAdminDetailService } from './modules/showing/queries/getShowingAdminDetail/getShowingAdminDetail.service';
 import { GetEventsByAdminController } from './modules/event/queries/getEventsByAdmin/getEvents.controller';
 // event-svc.module.ts
 import { forwardRef, Module } from '@nestjs/common';
@@ -91,6 +94,10 @@ import { GetEventOfOrgController } from './modules/event/queries/getEventOfOrg/g
 import { GetEventOfOrgService } from './modules/event/queries/getEventOfOrg/getEventOfOrg.service';
 import { GetEventOfOrgDetailController } from './modules/event/queries/getEventOfOrgDetail/getEventOfOrgDetail.controller';
 import { GetEventOfOrgDetailService } from './modules/event/queries/getEventOfOrgDetail/getEventOfOrgDetail.service';
+import { GetShowingAdminDetailController } from './modules/showing/queries/getShowingAdminDetail/getShowingAdminDetail.controller';
+import { GetShowingsByAdminController } from './modules/showing/queries/getShowingsByAdmin/getShowings.controller';
+import { GetTicketDetailOfShowingController } from './modules/showing/queries/getTicketDetailOfShowing/getTicketDetailOfShowing.controller';
+import { GetAdminAccessService } from '../auth-svc/modules/user/queries/get-admin-access/get-admin-access.service';
 
 @Module({
   imports: [ BookingSvcModule, AuthSvcModule, CqrsModule ],
@@ -140,7 +147,10 @@ import { GetEventOfOrgDetailService } from './modules/event/queries/getEventOfOr
     UpdateEventAdminController, 
     GetEventsByAdminController,
     GetEventSpecialManagementController,
-    GetEventMemberController,
+    GetEventMemberController,,
+    GetShowingAdminDetailController,
+    GetShowingsByAdminController,
+    GetTicketDetailOfShowingController
   ],
   providers: [
     // Adapters
@@ -195,6 +205,7 @@ import { GetEventOfOrgDetailService } from './modules/event/queries/getEventOfOr
     DeleteOrgPaymentInfoService,
 
     // Admin Event Management
+    // Admin event
     UpdateEventAdminService,
     GetEventsByAdminService,
     GetEventSpecialManagementService,
@@ -205,6 +216,11 @@ import { GetEventOfOrgDetailService } from './modules/event/queries/getEventOfOr
     UpdateFormService,
     DeleteFormService,
     ConnectFormService,
+
+    // Admin showing
+    GetShowingAdminDetailService,
+    GetShowingsByAdminService,
+    GetTicketDetailOfShowingService,
 
     // Repositories
     { provide: 'AdminRepository', useClass: AdminRepositoryImpl },

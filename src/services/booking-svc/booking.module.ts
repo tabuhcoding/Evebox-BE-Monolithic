@@ -12,6 +12,7 @@ import { UnSelectSeatController } from "./modules/commands/unSelectSeat/unSelect
 import { GetRedisSeatController } from "./modules/queries/getRedisSeat/getRedisSeat.controller";
 import { UnSelectSeatService } from "./modules/commands/unSelectSeat/unSelectSeat.service";
 import { GetRedisSeatService } from "./modules/queries/getRedisSeat/getRedisSeat.service";
+import { CountCheckedInTicketsService } from "./modules/queries/getCountCheckedInTickets/getCountCheckedInTickets.service";
 
 @Module({
   imports: [ 
@@ -37,10 +38,14 @@ import { GetRedisSeatService } from "./modules/queries/getRedisSeat/getRedisSeat
     UnSelectSeatService,
     GetRedisSeatService,
 
+    CountCheckedInTicketsService,
+
     // Repositories
     { provide: 'OrderRepository', useClass: OrderRepositoryImpl },
     { provide: 'TicketRepository', useClass: TicketRepositoryImpl },
   ],
-  exports: [GetTotalTicketOfTicketTypeService],
+  exports: [GetTotalTicketOfTicketTypeService, CountCheckedInTicketsService,
+     {provide: 'TicketRepository', useClass: TicketRepositoryImpl }
+  ],
 })
 export class BookingSvcModule {}

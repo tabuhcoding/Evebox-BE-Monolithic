@@ -28,4 +28,6 @@ export interface TicketTypeRepository extends BaseRepository<TicketType, Prisma.
 
   /* Delete Ticket Type */
   deleteTicketType(id: string): Promise<Result<string, Error>>;
+
+  getTicketTypeDetails(ticketTypeId: string): Promise<any>;
 }

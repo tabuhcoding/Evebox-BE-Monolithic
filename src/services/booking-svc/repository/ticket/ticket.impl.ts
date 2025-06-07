@@ -13,5 +13,13 @@ export class TicketRepositoryImpl
     super(prisma.ticket, prisma);
   }
 
+  countCheckedInTickets(ticketTypeIds: string[]): Promise<number> {
+    return this.prisma.ticket.count({
+      where: {
+        ticketTypeId: { in: ticketTypeIds },
+        isCheckedIn: true,
+      },
+    });
+  }
   // Thêm các phương thức riêng cho Ticket nếu cần
 }

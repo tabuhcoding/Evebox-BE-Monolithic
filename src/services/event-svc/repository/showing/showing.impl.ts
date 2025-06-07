@@ -9,6 +9,7 @@ import { Showing, ShowingRepository } from "./showing.repo";
 import { CreateShowingDto } from "../../modules/showing/command/createShowing/createShowing.dto";
 import { UpdateShowingDto } from "../../modules/showing/command/updateShowing/updateShowing.dto";
 import { Ok, Result, Err } from "oxide.ts";
+import { ShowingDataDto } from "../../modules/showing/queries/getShowingsByAdmin/getShowings-response.dto";
 
 @Injectable()
 export class ShowingRepositoryImpl
@@ -111,4 +112,161 @@ export class ShowingRepositoryImpl
       return Err(new Error(`Failed to delete showing: ${error.message}`));
     }
   }
+
+   async findAdminShowingById(showingId: string) {
+    return this.prisma.showing.findUnique({
+      where: { id: showingId, deleteAt: null },
+      select: {
+        id: true,
+        eventId: true,
+        isFree: true,
+        isSalable: true,
+        isPresale: true,
+        seatMapId: true,
+        startTime: true,
+        endTime: true,
+        isEnabledQueueWaiting: true,
+        showAllSeats: true,
+        Events: { select: { id: true, title: true } },
+        TicketType: {
+          select: {
+            id: true,
+            name: true,
+            description: true,
+            color: true,
+            isFree: true,
+            price: true,
+            originalPrice: true,
+            maxQtyPerOrder: true,
+            minQtyPerOrder: true,
+            startTime: true,
+            endTime: true,
+            position: true,
+            imageUrl: true,
+            isHidden: true,
+            quantity: true,
+          },
+        },
+      },
+    });
+  }
+
+  async getShowingStatusData(showingId: string) {
+    return this.prisma.showing.findUnique({
+      where: { id: showingId },
+      select: {
+        TicketType: { select: { id: true } },
+        seatMapId: true,
+      },
+    });
+  }
+
+   async findWithFilters(filters: any): Promise<ShowingDataDto[]> {
+    const where = this.buildWhereClause(filters);
+    const page = Number(filters.page ?? 1);
+    const limit = Number(filters.limit ?? 10);
+
+    const showings = await this.prisma.showing.findMany({
+      where,
+      skip: (page - 1) * limit,
+      take: limit,
+      select: {
+        id: true,
+        startTime: true,
+        endTime: true,
+        seatMapId: true,
+        Events: {
+          select: { id: true, title: true },
+        },
+        TicketType: {
+          select: { id: true },
+        },
+      },
+      orderBy: {
+        startTime: 'asc',
+      },
+    });
+
+    return showings.map((showing) => ({
+      id: showing.id,
+      startTime: showing.startTime,
+      endTime: showing.endTime,
+      seatmapId: showing.seatMapId,
+      eventId: showing.Events.id,
+      eventTitle: showing.Events.title,
+      event: {
+        id: showing.Events.id,
+        title: showing.Events.title,
+      },
+      ticketTypes: showing.TicketType,
+    }));
+  }
+
+  async count(filters: any): Promise<number> {
+    const where = this.buildWhereClause(filters);
+    return this.prisma.showing.count({ where });
+  }
+
+  private buildWhereClause(filters: any) {
+    const where: any = {};
+
+    if (filters.startTime || filters.endTime) {
+      where.startTime = {};
+      where.endTime = {};
+
+      if (filters.startTime) {
+        where.startTime.gte = new Date(filters.startTime);
+      }
+
+      if (filters.endTime) {
+        where.endTime.lte = new Date(filters.endTime);
+      }
+    }
+
+    if (filters.search) {
+      const keyword = filters.search.trim();
+      const isId = !isNaN(Number(keyword));
+      where.Events = {
+        ...(isId
+          ? { id: Number(keyword) }
+          : { title: { contains: keyword, mode: 'insensitive' } }),
+      };
+    }
+
+    return where;
+  }
+
+ async getBasicShowingDetail(showingId: string, ticketTypeId: string) {
+  return this.prisma.showing.findUnique({
+    where: { id: showingId },
+    select: {
+      id: true,
+      eventId: true,
+      startTime: true,
+      endTime: true,
+      seatMapId: true,
+      Events: {
+        select: {
+          id: true,
+          title: true,
+        }
+      },
+      TicketType: {
+        where: { id: ticketTypeId },
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          price: true,
+          maxQtyPerOrder: true,
+          minQtyPerOrder: true,
+          quantity: true,
+          imageUrl: true,
+          startTime: true,
+          endTime: true
+        }
+      }
+    }
+  });
+}
 }

@@ -78,6 +78,7 @@ import { VerifyUserPinController } from "./modules/user/commands/verift-pin/veri
 import { VerifyUserPinService } from "./modules/user/commands/verift-pin/verify-pin.service";
 import { ChangeUserPinController } from "./modules/user/commands/change-pin/change-pin.controller";
 import { ChangeUserPinService } from "./modules/user/commands/change-pin/change-pin.service";
+import { GetAdminAccessService } from "./modules/user/queries/get-admin-access/get-admin-access.service";
 
 
 @Module({
@@ -190,7 +191,8 @@ import { ChangeUserPinService } from "./modules/user/commands/change-pin/change-
     GetUsersNotifiedByEventService,
     GetUsersNotifiedByOrgService,
     TurnOffNotificationServiceForEvent,
-    TurnOffNotificationServiceForOrg
+    TurnOffNotificationServiceForOrg,
+    GetAdminAccessService
   ],
   exports: [
     UserRepositoryImpl,
@@ -199,6 +201,7 @@ import { ChangeUserPinService } from "./modules/user/commands/change-pin/change-
       useClass: UserRepositoryImpl,
     },
     CheckUserExistService,
+    GetAdminAccessService,
     UpdateUserRoleService,
     GetUserService,
   ],

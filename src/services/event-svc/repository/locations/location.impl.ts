@@ -100,4 +100,23 @@ export class LocationsRepositoryImpl
 
     return Array.from(grouped.values());
   }
+
+  async getLocationWithDistrictAndProvince(id: number) {
+    return this.prisma.locations.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        street: true,
+        ward: true,
+        districts: {
+          select: {
+            name: true,
+            province: {
+              select: { name: true },
+            },
+          },
+        },
+      },
+    });
+  }
 }

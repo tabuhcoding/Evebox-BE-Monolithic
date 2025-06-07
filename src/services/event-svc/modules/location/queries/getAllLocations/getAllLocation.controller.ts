@@ -5,7 +5,7 @@ import { GetAllLocationsResponseDto } from './getAllLocation-response.dto';
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/shared/guard/jwt-auth.guard';
 
-@ApiTags('Location')
+@ApiTags('Event Service - Location')
 @Controller('api')
 export class GetAllLocationsController {
   constructor(private readonly getAllLocationsService: GetAllLocationsService) {}

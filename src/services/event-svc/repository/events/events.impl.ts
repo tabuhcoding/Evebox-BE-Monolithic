@@ -561,4 +561,14 @@ export class EventsRepositoryImpl
       return Err(new Error('Failed to retrieve detail of event of org'));
     }
   }
+
+  async findEventsByOrganizerEmail(email: string) {
+    return this.prisma.events.findMany({
+      where: { organizerId: email },
+      select: {
+        locationId: true,
+        venue: true,
+      },
+    });
+  }
 }

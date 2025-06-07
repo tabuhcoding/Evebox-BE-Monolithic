@@ -74,4 +74,5 @@ export interface EventsRepository extends BaseRepository<Events, Prisma.EventsDe
 
   getEventOfOrg(email: string): Promise<Result<(EventOrgFrontDisplayDto & { role: number })[], Error>>;
   getEventOfOrgDetail(eventId: number): Promise<Result<EventOrgDetailResponseDto, Error>>;
+  findEventsByOrganizerEmail(email: string): Promise<Pick<Events, 'locationId' | 'venue'>[]>;
 }

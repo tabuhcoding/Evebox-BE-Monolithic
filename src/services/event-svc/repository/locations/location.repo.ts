@@ -13,4 +13,16 @@ export interface LocationsRepository
     organizerId?: string,
     provinceId?: number
   ): Promise<OrganizerLocationDto[]>;
+
+  getLocationWithDistrictAndProvince(id: number): Promise<{
+    id: number;
+    street: string;
+    ward: string;
+    districts: {
+      name: string;
+      province: {
+        name: string;
+      };
+    };
+  } | null>;
 }

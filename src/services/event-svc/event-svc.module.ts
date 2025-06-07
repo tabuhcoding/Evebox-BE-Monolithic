@@ -101,6 +101,8 @@ import { GetAdminAccessService } from '../auth-svc/modules/user/queries/get-admi
 import { ProvinceRepositoryImpl } from './repository/province/province.impl';
 import { GetAllDistrictsController } from './modules/location/queries/getAllDistricts/getAllDistricts.controller';
 import { GetAllDistrictsService } from './modules/location/queries/getAllDistricts/getAllDistricts.service';
+import { GetAllLocationsService } from './modules/location/queries/getAllLocations/getAllLocation.service';
+import { GetAllLocationsController } from './modules/location/queries/getAllLocations/getAllLocation.controller';
 
 @Module({
   imports: [ BookingSvcModule, AuthSvcModule, CqrsModule ],
@@ -155,6 +157,7 @@ import { GetAllDistrictsService } from './modules/location/queries/getAllDistric
     GetShowingsByAdminController,
     GetTicketDetailOfShowingController,
     GetAllDistrictsController,
+    GetAllLocationsController
   ],
   providers: [
     // Adapters
@@ -228,6 +231,7 @@ import { GetAllDistrictsService } from './modules/location/queries/getAllDistric
     
     //Location
     GetAllDistrictsService,
+    GetAllLocationsService,
 
     // Repositories
     { provide: 'AdminRepository', useClass: AdminRepositoryImpl },

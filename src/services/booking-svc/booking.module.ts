@@ -8,6 +8,7 @@ import { SelectSeatController } from "./modules/commands/selectSeat/selectSeat.c
 import { SelectSeatService } from "./modules/commands/selectSeat/selectSeat.service";
 import { AuthSvcModule } from "../auth-svc/auth-svc.module";
 import { EventSvcModule } from "../event-svc/event-svc.module";
+import { CountCheckedInTicketsService } from "./modules/queries/getCountCheckedInTickets/getCountCheckedInTickets.service";
 
 @Module({
   imports: [ 
@@ -29,11 +30,13 @@ import { EventSvcModule } from "../event-svc/event-svc.module";
 
     SelectSeatService,
 
+    CountCheckedInTicketsService,
+
     // Repositories
     { provide: 'OrderRepository', useClass: OrderRepositoryImpl },
     { provide: 'TicketRepository', useClass: TicketRepositoryImpl },
   ],
-  exports: [GetTotalTicketOfTicketTypeService, 
+  exports: [GetTotalTicketOfTicketTypeService, CountCheckedInTicketsService,
      {provide: 'TicketRepository', useClass: TicketRepositoryImpl }
   ],
 })

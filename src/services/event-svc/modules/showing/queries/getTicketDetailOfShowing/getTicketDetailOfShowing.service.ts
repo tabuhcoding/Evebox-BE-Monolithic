@@ -2,17 +2,17 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Result, Ok, Err } from 'oxide.ts';
 import { TicketTypeDetailData } from './getTicketDetailOfShowing-response.dto';
 import { ShowingRepository } from 'src/services/event-svc/repository/showing/showing.repo';
-import { TicketRepository } from 'src/services/booking-svc/repository/ticket/ticket.repo';
 import { TicketTypeRepository } from 'src/services/event-svc/repository/ticketType/ticketType.repo';
 import { SeatmapRepository } from 'src/services/event-svc/repository/seatmap/seatmap.repo';
 import { GetAdminAccessService } from 'src/services/auth-svc/modules/user/queries/get-admin-access/get-admin-access.service';
+import { CountCheckedInTicketsService } from 'src/services/booking-svc/modules/queries/getCountCheckedInTickets/getCountCheckedInTickets.service';
 
 @Injectable()
 export class GetTicketDetailOfShowingService {
   constructor(
     private readonly getAdminAccessService: GetAdminAccessService,
     @Inject('ShowingRepository')  private readonly showingRepo: ShowingRepository,
-    @Inject('TicketRepository')  private readonly ticketRepo: TicketRepository,
+    private readonly countCheckedInTicketsService: CountCheckedInTicketsService,
     @Inject('TicketTypeRepository')  private readonly ticketTypeRepo: TicketTypeRepository,
     @Inject('SeatmapRepository')  private readonly seatmapRepo: SeatmapRepository,
   ) {}
@@ -25,7 +25,7 @@ export class GetTicketDetailOfShowingService {
     if (!showing || !showing.TicketType.length) return Err(new Error('No ticket of showing found'));
 
     const ticket = showing.TicketType[0];
-    const ticketSold = await this.ticketRepo.countCheckedInTickets([ticket.id]);
+    const ticketSold = await this.countCheckedInTicketsService.execute([ticket.id]);
     const statusInfo = await this.getTicketStatus(showing.seatMapId, ticket.id);
 
     const result: TicketTypeDetailData = {

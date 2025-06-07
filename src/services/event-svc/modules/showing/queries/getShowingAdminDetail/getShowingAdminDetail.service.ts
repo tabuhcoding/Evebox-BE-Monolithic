@@ -1,18 +1,17 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Result, Ok, Err } from 'oxide.ts';
 import { ShowingAdminDataDto } from './getShowingAdminDetail-response.dto';
-import { UserRepositoryImpl } from 'src/services/auth-svc/repository/users/user.repository.impl';
 import { ShowingRepository } from '../../../../repository/showing/showing.repo';
-import { TicketRepository } from 'src/services/booking-svc/repository/ticket/ticket.repo';
 import { TicketTypeRepository } from '../../../../repository/ticketType/ticketType.repo';
 import { SeatmapRepository } from '../../../../repository/seatmap/seatmap.repo';
 import { GetAdminAccessService } from 'src/services/auth-svc/modules/user/queries/get-admin-access/get-admin-access.service';
+import { CountCheckedInTicketsService } from 'src/services/booking-svc/modules/queries/getCountCheckedInTickets/getCountCheckedInTickets.service';
 
 @Injectable()
 export class GetShowingAdminDetailService {
   constructor(
     @Inject('ShowingRepository') private readonly showingRepo: ShowingRepository,
-    @Inject('TicketRepository') private readonly ticketRepo: TicketRepository,
+    private readonly countCheckedInTicketsService: CountCheckedInTicketsService,
     @Inject('TicketTypeRepository') private readonly ticketTypeRepo: TicketTypeRepository,
     @Inject('SeatmapRepository') private readonly seatmapRepo: SeatmapRepository,
     private readonly getAdminAccessService: GetAdminAccessService,
@@ -26,9 +25,7 @@ export class GetShowingAdminDetailService {
     if (!showing) return Err(new Error('Showing not found'));
 
     const showingStatus = await this.getShowingStatus(showingId);
-    const ticketSold = await this.ticketRepo.countCheckedInTickets(
-      showing.TicketType.map(tt => tt.id),
-    );
+    const ticketSold = await this.countCheckedInTicketsService.execute( showing.TicketType.map(tt => tt.id),);
 
     const result: ShowingAdminDataDto = {
       id: showing.id,

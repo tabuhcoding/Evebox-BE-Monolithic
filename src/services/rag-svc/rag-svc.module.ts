@@ -30,7 +30,6 @@ import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
     NavigationService,
     ContentService,
     DescriptionGenerateService,
-    SlackService,
     { provide: 'ContentRepository', useClass: ContentRepositoryImpl },
   ],
 })

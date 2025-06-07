@@ -74,7 +74,6 @@ import { ConnectFormService } from './modules/form/commands/connectFormToShowing
 import { CreateOrgPaymentInfoController } from './modules/orgPaymentInfor/commands/createOrgPaymentInfor/createOrgPaymentInfor.controller';
 import { CreateOrgPaymentInfoService } from './modules/orgPaymentInfor/commands/createOrgPaymentInfor/createOrgPaymentInfor.service';
 import { GetOrgPaymentInfoController } from './modules/orgPaymentInfor/queries/getOrgPaymentInfor/getOrgPaymentInfor.controller';
-import { GetFavoriteOrgService } from '../auth-svc/modules/user/queries/get-favorite-org/get-favorite-org.service';
 import { UpdateOrgPaymentInfoController } from './modules/orgPaymentInfor/commands/updateOrgPaymentInfor/updateOrgPaymentInfor.controller';
 import { UpdateOrgPaymentInfoService } from './modules/orgPaymentInfor/commands/updateOrgPaymentInfor/updateOrgPaymentInfor.service';
 import { DeleteOrgPaymentInfoController } from './modules/orgPaymentInfor/commands/deleteOrgPaymentInfor/deleteOrgPaymentInfor.controller';
@@ -98,6 +97,8 @@ import { GetShowingAdminDetailController } from './modules/showing/queries/getSh
 import { GetShowingsByAdminController } from './modules/showing/queries/getShowingsByAdmin/getShowings.controller';
 import { GetTicketDetailOfShowingController } from './modules/showing/queries/getTicketDetailOfShowing/getTicketDetailOfShowing.controller';
 import { GetAdminAccessService } from '../auth-svc/modules/user/queries/get-admin-access/get-admin-access.service';
+import { GetUserSubmitFormService } from './modules/form/queries/getUserSubmitForm/getUserSubmitForm.service';
+import { FormResponseRepositoryImpl } from './repository/formResponse/formResponse.impl';
 
 @Module({
   imports: [ BookingSvcModule, AuthSvcModule, CqrsModule ],
@@ -147,16 +148,13 @@ import { GetAdminAccessService } from '../auth-svc/modules/user/queries/get-admi
     UpdateEventAdminController, 
     GetEventsByAdminController,
     GetEventSpecialManagementController,
-    GetEventMemberController,,
+    GetEventMemberController,
     GetShowingAdminDetailController,
     GetShowingsByAdminController,
     GetTicketDetailOfShowingController
   ],
   providers: [
     // Adapters
-    SlackService,
-    FileCacheService,
-
     // Utils Command
     CalculateShowingStatusService,
     
@@ -217,6 +215,8 @@ import { GetAdminAccessService } from '../auth-svc/modules/user/queries/get-admi
     DeleteFormService,
     ConnectFormService,
 
+    GetUserSubmitFormService,
+
     // Admin showing
     GetShowingAdminDetailService,
     GetShowingsByAdminService,
@@ -237,6 +237,7 @@ import { GetAdminAccessService } from '../auth-svc/modules/user/queries/get-admi
     { provide: 'FormRepository', useClass: FormRepositoryImpl },
     { provide: 'LocationsRepository', useClass: LocationsRepositoryImpl },
     { provide: 'OrgPaymentInforRepository', useClass: OrgPaymentInforRepositoryImpl },
+    { provide: 'FormResponseRepository', useClass: FormResponseRepositoryImpl },
   ],
   exports: [
     GetAllEventDetailForRAGService, 
@@ -245,6 +246,7 @@ import { GetAdminAccessService } from '../auth-svc/modules/user/queries/get-admi
     GetShowingSeatmapService,
     GetShowingDetailService,
     GetTicketTypeDetailService,
+    GetUserSubmitFormService,
   ],
 })
 export class EventSvcModule {}

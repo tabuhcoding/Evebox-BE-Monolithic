@@ -27,8 +27,6 @@ export class GetRedisSeatService {
         return Err(new Error('Your seat is expired.'));
       }
 
-      console.log('GetRedisSeatService >>> execute: data', data);
-
       const ticketTypeData: SelectTicketTypeData[] = data.data;
 
       let totalAmount = 0;
@@ -38,8 +36,6 @@ export class GetRedisSeatService {
         
         return Err(new Error('Your seat TicketType not valid.'));
       }
-
-      console.log('ticketTypeData', ticketTypeData);
 
       let ticketTypeSelection: TicketTypeSelectionCache[] = [];
 

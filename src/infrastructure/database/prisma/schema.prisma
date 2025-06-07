@@ -127,7 +127,7 @@ model PaymentMethodStatus {
 }
 
 model Order {
-  id             String              @id @default(uuid())
+  id             Int                @id @default(autoincrement())
   showingId      String
   formResponseId Int?
   type           BookingTicketType
@@ -146,7 +146,7 @@ model Ticket {
   qrCode       String?
   description  String
   seatId       Int?
-  orderId      String
+  orderId      Int
   ticketTypeId String?
   sectionId    Int?
   isCheckedIn  Boolean @default(false)
@@ -406,6 +406,8 @@ model TicketType {
   imageUrl       String
   maxQtyPerOrder Int
   minQtyPerOrder Int
+  deliveryType   TicketDeliveryType  @default(E_TICKET)
+  autoSendMail   Boolean             @default(false)
   isHidden       Boolean             @default(false)
   quantity       Int?                @default(0)
   deleteAt       DateTime?
@@ -497,6 +499,7 @@ enum BookingTicketStatus {
   CANCEL
   SUCCESS
   PENDING
+  PAID
 }
 
 enum SeatStatusEnum {
@@ -536,4 +539,9 @@ enum UserRole {
   ADMIN
   ORGANIZER
   CUSTOMER
+}
+
+enum TicketDeliveryType{
+  PHYSICAL_TICKET
+  E_TICKET
 }

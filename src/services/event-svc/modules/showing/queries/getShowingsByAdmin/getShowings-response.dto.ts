@@ -40,7 +40,7 @@ export class ShowingDataDto {
   event: EventData
 }
 
-export class ShowingResponseDto extends BaseResponse {
+export class ShowingByAdminResponseDto extends BaseResponse {
   @ApiProperty({ type: [ShowingDataDto], description: 'List of showing' })
   data: ShowingDataDto[];
 }

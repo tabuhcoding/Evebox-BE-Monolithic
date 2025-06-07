@@ -2,8 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Result, Ok, Err } from 'oxide.ts';
 import { UpdateEventAdminDto } from './updateEventAdmin.dto';
 import { EventDto } from './updateEventAdmin-response.dto';
-import { Email } from 'src/services/auth-svc/modules/user/domain/value-objects/user/email.vo';
-import { UserRepositoryImpl } from 'src/services/auth-svc/repository/users/user.repository.impl';
+import { EVENT_ROLE } from '../../domain/eventRole';
 import { EventsRepository } from 'src/services/event-svc/repository/events/events.repo';
 import { EventCategoriesRepository } from 'src/services/event-svc/repository/eventCategories/eventCategories.repo';
 import { SlackService } from 'src/infrastructure/adapters/slack/slack.service';
@@ -24,7 +23,7 @@ export class UpdateEventAdminService {
         return Err(new Error('User does not exist'));
       }
 
-      const hasPermisison = await this.eventRepository.hasPermissionToManageEvent(eventId, emailStr);
+      const hasPermisison = await this.eventRepository.hasPermissionToManageEvent(eventId, emailStr, EVENT_ROLE.IS_EDITED);
       if (hasPermisison.isErr()) {
         return Err(new Error('Failed to check permission'));
       }

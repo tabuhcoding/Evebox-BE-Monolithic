@@ -4,6 +4,7 @@ import { Prisma } from "@prisma/client";
 import { PrismaService } from "src/infrastructure/database/prisma/prisma.service";
 import { BaseRepository } from "src/shared/repo/base.repository";
 import { EventsRepository } from "../events/events.repo";
+import { EVENT_ROLE } from "../../modules/event/domain/eventRole";
 import { Showing, ShowingRepository } from "./showing.repo";
 import { CreateShowingDto } from "../../modules/showing/command/createShowing/createShowing.dto";
 import { UpdateShowingDto } from "../../modules/showing/command/updateShowing/updateShowing.dto";
@@ -80,7 +81,7 @@ export class ShowingRepositoryImpl
     try {
       const showing = await this.findOneById(id);
 
-      const hasPermisison = await this.eventsRepository.hasPermissionToManageEvent(showing?.eventId, userId);
+      const hasPermisison = await this.eventsRepository.hasPermissionToManageEvent(showing?.eventId, userId, EVENT_ROLE.IS_EDITED);
       if (hasPermisison.isErr()) {
         return Err(new Error('Failed to check permission'));
       }

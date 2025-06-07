@@ -5,6 +5,7 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { CategoriesRepositoryImpl } from './repository/categories/categories.impl';
 import { EventsRepositoryImpl } from './repository/events/events.impl';
 import { EventCategoriesRepositoryImpl } from './repository/eventCategories/eventCategories.impl';
+import { EventUserRelationshipRepositoryImpl } from './repository/eventUserRelationship/eventUserRelationship.impl';
 import { LocationsRepositoryImpl } from './repository/locations/location.impl';
 import { AdminRepositoryImpl } from '../auth-svc/repository/admin/admin.repository.impl';
 import { GetAllEventDetailForRAGService } from './modules/event/queries/getAllEventDetailForRAG/getAllEventDetailForRAG.service';
@@ -84,6 +85,12 @@ import { GetEventsByAdminService } from './modules/event/queries/getEventsByAdmi
 import { GetEventSpecialManagementController } from './modules/event/queries/getEventSpecialManagement/getEventSpecialManagement.controller';
 import { GetEventSpecialManagementService } from './modules/event/queries/getEventSpecialManagement/getEventSpecialManagement.service';
 import { GetTicketTypeDetailService } from './modules/ticketType/queries/getTicketTypeDetail/getTicketTypeDetail.service';
+import { GetEventMemberController } from './modules/event/queries/getEventMembers/getEventMembers.controller';
+import { GetEventMembersService } from './modules/event/queries/getEventMembers/getEventMembers.service';
+import { GetEventOfOrgController } from './modules/event/queries/getEventOfOrg/getEventOfOrg.controller';
+import { GetEventOfOrgService } from './modules/event/queries/getEventOfOrg/getEventOfOrg.service';
+import { GetEventOfOrgDetailController } from './modules/event/queries/getEventOfOrgDetail/getEventOfOrgDetail.controller';
+import { GetEventOfOrgDetailService } from './modules/event/queries/getEventOfOrgDetail/getEventOfOrgDetail.service';
 
 @Module({
   imports: [ BookingSvcModule, AuthSvcModule, CqrsModule ],
@@ -92,6 +99,8 @@ import { GetTicketTypeDetailService } from './modules/ticketType/queries/getTick
     GetAllCategoriesController,
 
     // Event
+    GetEventOfOrgController,
+    GetEventOfOrgDetailController,
     GetEventFrontDisplayController,
     GetEventFDByIdsController,
     GetRecommendedEventController,
@@ -130,7 +139,8 @@ import { GetTicketTypeDetailService } from './modules/ticketType/queries/getTick
     
     UpdateEventAdminController, 
     GetEventsByAdminController,
-    GetEventSpecialManagementController
+    GetEventSpecialManagementController,
+    GetEventMemberController,
   ],
   providers: [
     // Adapters
@@ -155,6 +165,8 @@ import { GetTicketTypeDetailService } from './modules/ticketType/queries/getTick
     GetRecommendEventService,
     GetEventDetailRecommendService,
     GetEventDetailService,
+    GetEventOfOrgService,
+    GetEventOfOrgDetailService,
 
     GetEventsByIdsService,
 
@@ -182,14 +194,11 @@ import { GetTicketTypeDetailService } from './modules/ticketType/queries/getTick
     UpdateOrgPaymentInfoService,
     DeleteOrgPaymentInfoService,
 
-
-    
-    
-
     // Admin Event Management
     UpdateEventAdminService,
     GetEventsByAdminService,
     GetEventSpecialManagementService,
+    GetEventMembersService,
     
     // Form
     CreateFormService,
@@ -202,6 +211,7 @@ import { GetTicketTypeDetailService } from './modules/ticketType/queries/getTick
     { provide: 'CategoriesRepository', useClass: CategoriesRepositoryImpl },
     { provide: 'EventsRepository', useClass: EventsRepositoryImpl },
     { provide: 'EventCategoriesRepository', useClass: EventCategoriesRepositoryImpl },
+    { provide: 'EventUserRelationshipRepository', useClass: EventUserRelationshipRepositoryImpl },
     { provide: 'ShowingRepository', useClass: ShowingRepositoryImpl },
     { provide: 'SeatmapRepository', useClass: SeatmapRepositoryImpl },
     { provide: 'SeatStatusRepository', useClass: SeatStatusRepositoryImpl},

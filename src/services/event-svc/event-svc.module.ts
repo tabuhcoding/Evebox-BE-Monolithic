@@ -101,6 +101,8 @@ import { GetTicketDetailOfShowingController } from './modules/showing/queries/ge
 import { GetAdminAccessService } from '../auth-svc/modules/user/queries/get-admin-access/get-admin-access.service';
 import { GetEventRolesController } from './modules/event/queries/getEventRoles/getEventRoles.controller';
 import { GetEventRolesService } from './modules/event/queries/getEventRoles/getEventRoles.service';
+import { GetEventRolesByIdController } from './modules/event/queries/getEventRolesById/getEventRolesById.controller';
+import { GetEventRolesByIdService } from './modules/event/queries/getEventRolesById/getEventRolesById.service';
 
 @Module({
   imports: [ BookingSvcModule, AuthSvcModule, CqrsModule ],
@@ -120,6 +122,7 @@ import { GetEventRolesService } from './modules/event/queries/getEventRoles/getE
     UpdateEventController,
     DeleteEventController,
     GetEventRolesController,
+    GetEventRolesByIdController,
 
     // Form
     CreateFormController,
@@ -184,6 +187,7 @@ import { GetEventRolesService } from './modules/event/queries/getEventRoles/getE
 
     GetEventsByIdsService,
     GetEventRolesService,
+    GetEventRolesByIdService,
 
     ///// Showing
     // Commands

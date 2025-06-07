@@ -3,14 +3,14 @@ import { Response } from 'express';
 import { ApiOperation, ApiResponse, ApiBody, ApiHeader, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { ErrorHandler } from 'src/shared/exceptions/error.handler';
 import { JwtAuthGuard } from 'src/shared/guard/jwt-auth.guard';
-import { PayOSCheckoutService } from './checkout.service';
+import { CheckoutService } from './checkout.service';
 import { CheckoutDto } from './checkout.dto';
 import { CheckoutResponseDto } from './checkout-response.dto';
 
-@ApiTags('Payment - Svc ')
+@ApiTags('Payment Service ')
 @Controller('api/payment')
 export class CheckoutController {
-  constructor(private readonly payOSCheckoutService: PayOSCheckoutService) {}
+  constructor(private readonly checkoutService: CheckoutService) {}
 
   @UseGuards(JwtAuthGuard)
   @Post('/checkout')
@@ -38,7 +38,7 @@ export class CheckoutController {
     @Body() checkoutDto: CheckoutDto, 
     @Res() res: Response) {
     const user = req.user;
-    const result = await this.payOSCheckoutService.execute(checkoutDto, user.email);
+    const result = await this.checkoutService.execute(checkoutDto, user.email);
     if (result.isErr()) {
       const error = result.unwrapErr();
       switch (error.message) {

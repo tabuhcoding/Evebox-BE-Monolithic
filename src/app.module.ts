@@ -9,9 +9,13 @@ import { SlackService } from './infrastructure/adapters/slack/slack.service';
 import { BookingSvcModule } from './services/booking-svc/booking.module';
 import { FileCacheService } from './infrastructure/cache/fileCache/fileCache.service';
 import { ScheduleModule } from '@nestjs/schedule';
+import { PaymentSvcModule } from './services/payment-svc/payment-svc.module';
+import { FileCacheModule } from './infrastructure/cache/fileCache/fileCache.module';
+import { SlackModule } from './infrastructure/adapters/slack/slack.module';
+import { PayOSModule } from './services/payment-svc/common/payOS/payOS.module';
 
 @Module({
-  providers: [SlackService, FileCacheService],
+  providers: [],
   imports: [
     ConfigModule.forRoot({
       isGlobal: true, // Makes ConfigService globally available
@@ -20,11 +24,15 @@ import { ScheduleModule } from '@nestjs/schedule';
     ScheduleModule.forRoot(),
     PrismaModule,
     CqrsModule,
+    FileCacheModule,
+    SlackModule,
+    PayOSModule,
     EventSvcModule,
     RagSvcModule,
     AuthSvcModule,
     BookingSvcModule,
+    PaymentSvcModule,
   ],
-  exports: [SlackService, FileCacheService]
+  exports: []
 })
 export class AppModule {}

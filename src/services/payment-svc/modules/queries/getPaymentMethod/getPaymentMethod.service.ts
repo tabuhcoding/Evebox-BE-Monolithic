@@ -4,7 +4,7 @@ import { getPaymentMethodResponseData } from './getPaymentMethod-response.dto';
 import { PaymentMethodStatusRepository } from 'src/services/payment-svc/repository/paymentMethodStatus/paymentMethodStatus.repo';
 
 @Injectable()
-export class getPaymentMethodService {
+export class GetPaymentMethodService {
   constructor(
     @Inject('PaymentMethodStatusRepository') private readonly paymentMethodStatusRepository: PaymentMethodStatusRepository
   ) {}

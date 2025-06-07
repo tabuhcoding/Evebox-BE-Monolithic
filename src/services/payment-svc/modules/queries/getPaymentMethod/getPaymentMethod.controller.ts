@@ -3,12 +3,12 @@ import { Response } from 'express';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ErrorHandler } from 'src/shared/exceptions/error.handler';
 import { getPaymentMethodResponseDto } from './getPaymentMethod-response.dto';
-import { getPaymentMethodService } from './getPaymentMethod.service';
+import { GetPaymentMethodService } from './getPaymentMethod.service';
 
-@ApiTags('Payment')
+@ApiTags('Payment Service')
 @Controller('api/payment')
-export class getPaymentMethodController {
-  constructor(private readonly getPaymentMethodService: getPaymentMethodService) {}
+export class GetPaymentMethodController {
+  constructor(private readonly getPaymentMethodService: GetPaymentMethodService) {}
 
   @Get('/getPaymentMethodStatus')
   @ApiOperation({ summary: 'Get status of all payment method' })

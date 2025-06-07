@@ -1,10 +1,11 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import PayOS from '@payos/node';
 import { CheckoutRequestType } from '@payos/node/lib/type';
 import { ConfigService } from '@nestjs/config';
 import { SlackService } from 'src/infrastructure/adapters/slack/slack.service';
+
 @Injectable()
-export class PayOSService implements OnModuleInit {
+export class PayOSService implements OnModuleInit, OnModuleDestroy {
   private payOS: PayOS;
 
   constructor( 

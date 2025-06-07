@@ -8,6 +8,10 @@ import { PaymentInfoRepositoryImpl } from "./repository/paymentInfo/paymentInfo.
 import { PayOSModule } from "./common/payOS/payOS.module";
 import { BookingSvcModule } from "../booking-svc/booking.module";
 import { EventSvcModule } from "../event-svc/event-svc.module";
+import { getPaymentMethodService } from "./modules/queries/getPaymentMethod/getPaymentMethod.service";
+import { PayOSCheckoutService } from "./modules/commands/payOSCheckout/payOSCheckout.service";
+import { CheckoutService } from "./modules/commands/checkout/checkout.service";
+import { CheckoutController } from "./modules/commands/checkout/checkout.controller";
 
 @Module({
   imports: [
@@ -16,11 +20,22 @@ import { EventSvcModule } from "../event-svc/event-svc.module";
     EventSvcModule,
   ],
   controllers: [
-    getPaymentMethodController
+    // Queries
+    getPaymentMethodController,
+    // Commands
+    CheckoutController,
   ],
   providers: [
     SlackService,
     FileCacheService,
+
+    PayOSCheckoutService,
+
+    // Queries
+    getPaymentMethodService,
+    
+    // Commands
+    CheckoutService,
 
     // Repositories
     {

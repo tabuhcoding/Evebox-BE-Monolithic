@@ -16,10 +16,11 @@ export class CheckoutController {
   @Post('/checkout')
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Checkout with PayOS' })
-  @ApiBody({ type: CheckoutResponseDto })
+  @ApiBody({ type: CheckoutDto })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'PayOs checkout successfully',
+    type: CheckoutResponseDto,
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
@@ -41,23 +42,13 @@ export class CheckoutController {
     const result = await this.checkoutService.execute(checkoutDto, user.email);
     if (result.isErr()) {
       const error = result.unwrapErr();
-      switch (error.message) {
-        case 'Invalid seat or ticket type':
-          return res.status(HttpStatus.NOT_FOUND).json(ErrorHandler.notFound(error.message));
-        case 'Database Error.':
-          return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(ErrorHandler.internalServerError(error.message));
-        case 'PaymentMethod not available.':
-          return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(ErrorHandler.internalServerError(error.message));
-        case 'Time remaining has expired':
-          return res.status(HttpStatus.BAD_REQUEST).json(ErrorHandler.badRequest(error.message));
-        default:
-          return res.status(HttpStatus.BAD_REQUEST).json(ErrorHandler.badRequest(error.message));
-      }
+      
+      return res.status(HttpStatus.BAD_REQUEST).json(ErrorHandler.badRequest(error.message));
     }
 
     return res.status(HttpStatus.OK).json({
       statusCode: HttpStatus.OK,
-      message: 'Seats successfully selected',
+      message: 'Order created successfully',
       data: result.unwrap(),
     });
   }

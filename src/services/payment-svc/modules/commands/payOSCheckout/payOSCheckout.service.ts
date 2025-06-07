@@ -5,7 +5,7 @@ import { SlackService } from 'src/infrastructure/adapters/slack/slack.service';
 @Injectable()
 export class PayOSCheckoutService {
   constructor(
-    // private readonly payOSService: PayOSService,
+    private readonly payOSService: PayOSService,
     private readonly slackService: SlackService,
   ) {}
 
@@ -18,23 +18,23 @@ export class PayOSCheckoutService {
     ttl: number,
   ): Promise<string | Error> {
     try {
-      // const payOSCheckout = await this.payOSService.createPaymentLink(
-      //   {
-      //     orderCode,
-      //     amount: amount,
-      //     description: "Evebox"+ " - " + Date.now(),
-      //     cancelUrl: paymentCancelUrl,
-      //     returnUrl: paymentSuccessUrl + "?orderCode=" + orderCode,
-      //     expiredAt: Math.floor(Date.now() / 1000) + ttl,
-      //   }
-      // );
+      const payOSCheckout = await this.payOSService.createPaymentLink(
+        {
+          orderCode,
+          amount: amount,
+          description: "Evebox"+ " - " + Date.now(),
+          cancelUrl: paymentCancelUrl,
+          returnUrl: paymentSuccessUrl + "?orderCode=" + orderCode,
+          expiredAt: Math.floor(Date.now() / 1000) + ttl,
+        }
+      );
       
-      // if (!payOSCheckout || !payOSCheckout.checkoutUrl) {
+      if (!payOSCheckout || !payOSCheckout.checkoutUrl) {
         
-      //   throw new Error('Failed to create PayOS checkout link.');
-      // }
+        throw new Error('Failed to create PayOS checkout link.');
+      }
 
-      // return payOSCheckout.checkoutUrl
+      return payOSCheckout.checkoutUrl
 
     } catch (error) {
       this.slackService.sendError(`Error during PayOS checkout for user ${userId} order ${orderCode}: ${error.message}`);

@@ -103,55 +103,55 @@ import { FormResponseRepositoryImpl } from './repository/formResponse/formRespon
 @Module({
   imports: [ BookingSvcModule, AuthSvcModule, CqrsModule ],
   controllers: [
-    // // Categories
-    // GetAllCategoriesController,
+    // Categories
+    GetAllCategoriesController,
 
-    // // Event
-    // GetEventOfOrgController,
-    // GetEventOfOrgDetailController,
-    // GetEventFrontDisplayController,
-    // GetEventFDByIdsController,
-    // GetRecommendedEventController,
-    // GetEventDetailRecommendController,
-    // GetEventDetailController,
-    // CreateEventController,
-    // UpdateEventController,
-    // DeleteEventController,
+    // Event
+    GetEventOfOrgController,
+    GetEventOfOrgDetailController,
+    GetEventFrontDisplayController,
+    GetEventFDByIdsController,
+    GetRecommendedEventController,
+    GetEventDetailRecommendController,
+    GetEventDetailController,
+    CreateEventController,
+    UpdateEventController,
+    DeleteEventController,
 
-    // // Form
-    // CreateFormController,
-    // UpdateFormController,
-    // DeleteFormController,
-    // ConnectFormController,
+    // Form
+    CreateFormController,
+    UpdateFormController,
+    DeleteFormController,
+    ConnectFormController,
 
-    // // Showing
-    // GetAllShowingController,
-    // GetFormOfShowingController,
-    // GetShowingDetailController,
-    // GetShowingSeatmapController,
-    // CreateShowingController,
-    // UpdateShowingController,
-    // DeleteShowingController,
+    // Showing
+    GetAllShowingController,
+    GetFormOfShowingController,
+    GetShowingDetailController,
+    GetShowingSeatmapController,
+    CreateShowingController,
+    UpdateShowingController,
+    DeleteShowingController,
 
-    // // Ticket type
-    // CreateTicketTypeController,
-    // UpdateTicketTypeController,
-    // DeleteTicketTypeController,
+    // Ticket type
+    CreateTicketTypeController,
+    UpdateTicketTypeController,
+    DeleteTicketTypeController,
 
-    // // Org Payment info
-    // CreateOrgPaymentInfoController,
-    // GetOrgPaymentInfoController,
-    // UpdateOrgPaymentInfoController,
-    // DeleteOrgPaymentInfoController,
+    // Org Payment info
+    CreateOrgPaymentInfoController,
+    GetOrgPaymentInfoController,
+    UpdateOrgPaymentInfoController,
+    DeleteOrgPaymentInfoController,
 
     
-    // UpdateEventAdminController, 
-    // GetEventsByAdminController,
-    // GetEventSpecialManagementController,
-    // GetEventMemberController,,
-    // GetShowingAdminDetailController,
-    // GetShowingsByAdminController,
-    // GetTicketDetailOfShowingController
+    UpdateEventAdminController, 
+    GetEventsByAdminController,
+    GetEventSpecialManagementController,
+    GetEventMemberController,
+    GetShowingAdminDetailController,
+    GetShowingsByAdminController,
+    GetTicketDetailOfShowingController
   ],
   providers: [
     // Adapters

@@ -52,7 +52,7 @@ export class CheckoutService {
             redisSeat.totalAmount,
             checkoutDto.paymentCancelUrl,
             checkoutDto.paymentSuccessUrl,
-            redisSeat.expiredTime
+            redisSeat.expiredTime >> 0
           )
 
           if (checkoutResult instanceof Error) {
@@ -60,6 +60,8 @@ export class CheckoutService {
             
             return Err(checkoutResult);
           }
+
+          this.slackService.sendNotice(`PayOS checkout link created successfully for user ${userId} in showing ${checkoutDto.showingID}. Link: ${checkoutResult}`);
 
           return Ok({
             paymentLink: checkoutResult,

@@ -15,10 +15,10 @@ export class CreateOrderService {
   async execue(showingID: string, totalPrice: number, userID: string): Promise<number | null> {
     try{
       const formResponseId = await this.getUserSubmitFormService.execute(showingID, 'userID'); // Replace 'userID' with actual user ID
-      if (!formResponseId) {
+      // if (!formResponseId) {
 
-        return null;
-      }
+      //   return null;
+      // }
 
       const order = await this.orderRepository.insertOneWithNumberId({
         showingId: showingID,

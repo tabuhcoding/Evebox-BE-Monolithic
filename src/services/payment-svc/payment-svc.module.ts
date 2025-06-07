@@ -11,6 +11,7 @@ import { GetPaymentMethodService } from "./modules/queries/getPaymentMethod/getP
 import { PayOSCheckoutService } from "./modules/commands/payOSCheckout/payOSCheckout.service";
 import { CheckoutService } from "./modules/commands/checkout/checkout.service";
 import { CheckoutController } from "./modules/commands/checkout/checkout.controller";
+import { PayOSService } from "./common/payOS/payOS.service";
 
 @Module({
   imports: [
@@ -25,12 +26,15 @@ import { CheckoutController } from "./modules/commands/checkout/checkout.control
     CheckoutController,
   ],
   providers: [
-    PayOSCheckoutService,
+    // Adapters
+    PayOSService,
 
     // Queries
     GetPaymentMethodService,
     
     // Commands
+    PayOSCheckoutService,
+
     CheckoutService,
 
     // Repositories

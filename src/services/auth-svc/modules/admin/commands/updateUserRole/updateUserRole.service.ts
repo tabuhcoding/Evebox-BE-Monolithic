@@ -57,4 +57,32 @@ export class UpdateUserRoleService {
       return Err(new Error(USER_MESSAGES.ERRORS.SERVER_ERROR));
     }
   }
+
+  async systemExecute(dto: UpdateUserRoleDto, userId: string): Promise<Result<void, Error>> {
+    try {
+      const emailOrError = Email.create(userId);
+      if (emailOrError.isErr()) {
+        return Err(emailOrError.unwrapErr());
+      }
+
+      const emailUnwrapped = emailOrError.unwrap();
+
+      const user = await this.userRepository.findByEmail(emailUnwrapped);
+      if (!user) {
+        return Err(new Error(USER_MESSAGES.ERRORS.USER_NOT_FOUND));
+      }
+
+      const roleOrError = Role.create(dto.role);
+      if (roleOrError.isErr()) {
+        return Err(roleOrError.unwrapErr());
+      }
+
+      await this.adminRepository.updateUserRole(userId, dto.role);
+
+      return Ok(void 0);
+    } catch (error) {
+      this.slackService.sendError(`AuthSvc >>> User - UpdateUserRoleService: ${error.message}`);
+      return Err(new Error(USER_MESSAGES.ERRORS.SERVER_ERROR));
+    }
+  }
 }

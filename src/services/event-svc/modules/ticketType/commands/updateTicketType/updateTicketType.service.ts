@@ -37,7 +37,7 @@ export class UpdateTicketTypeService {
         return Err(new Error('You do not have permission to update ticket type'));
       }
 
-      const result = await this.ticketTypeRepository.updateTicketType(dto, id);
+      const result = await this.ticketTypeRepository.updateTicketType(dto, id, userEmail);
       if (result.isErr()) {
         return Err(new Error(result.unwrapErr().message));
       }

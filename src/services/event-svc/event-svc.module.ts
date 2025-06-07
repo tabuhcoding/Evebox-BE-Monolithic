@@ -4,10 +4,12 @@ import { GetShowingAdminDetailService } from './modules/showing/queries/getShowi
 import { GetEventsByAdminController } from './modules/event/queries/getEventsByAdmin/getEvents.controller';
 // event-svc.module.ts
 import { forwardRef, Module } from '@nestjs/common';
+import { CqrsModule } from '@nestjs/cqrs';
 import { CategoriesRepositoryImpl } from './repository/categories/categories.impl';
 import { EventsRepositoryImpl } from './repository/events/events.impl';
 import { EventCategoriesRepositoryImpl } from './repository/eventCategories/eventCategories.impl';
 import { LocationsRepositoryImpl } from './repository/locations/location.impl';
+import { AdminRepositoryImpl } from '../auth-svc/repository/admin/admin.repository.impl';
 import { GetAllEventDetailForRAGService } from './modules/event/queries/getAllEventDetailForRAG/getAllEventDetailForRAG.service';
 import { GetAllCategoriesController } from './modules/categories/queries/getAllCategories.controller';
 import { GetAllCategoriesService } from './modules/categories/queries/getAllCategories.service';
@@ -91,7 +93,7 @@ import { GetTicketDetailOfShowingController } from './modules/showing/queries/ge
 import { GetAdminAccessService } from '../auth-svc/modules/user/queries/get-admin-access/get-admin-access.service';
 
 @Module({
-  imports: [ BookingSvcModule, AuthSvcModule],
+  imports: [ BookingSvcModule, AuthSvcModule, CqrsModule ],
   controllers: [
     // Categories
     GetAllCategoriesController,
@@ -212,6 +214,7 @@ import { GetAdminAccessService } from '../auth-svc/modules/user/queries/get-admi
     GetTicketDetailOfShowingService,
 
     // Repositories
+    { provide: 'AdminRepository', useClass: AdminRepositoryImpl },
     { provide: 'CategoriesRepository', useClass: CategoriesRepositoryImpl },
     { provide: 'EventsRepository', useClass: EventsRepositoryImpl },
     { provide: 'EventCategoriesRepository', useClass: EventCategoriesRepositoryImpl },

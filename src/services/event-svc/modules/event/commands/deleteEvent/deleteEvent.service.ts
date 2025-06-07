@@ -2,6 +2,7 @@ import { Inject, Injectable } from "@nestjs/common";
 import { Result, Ok, Err } from "oxide.ts";
 
 import { EventsRepository } from "src/services/event-svc/repository/events/events.repo";
+import { EVENT_ROLE } from "../../domain/eventRole";
 import { DeleteEventResponseData } from "./deleteEvent-response.dto";
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 import { CheckUserExistService } from "src/services/auth-svc/modules/user/commands/checkuserExist/checkuserExist.service";
@@ -22,7 +23,7 @@ export class DeleteEventService {
         return Err(new Error('User does not exist'));
       }
       
-      const hasPermisison = await this.eventsRepository.hasPermissionToManageEvent(Number(id), email);
+      const hasPermisison = await this.eventsRepository.hasPermissionToManageEvent(Number(id), email, EVENT_ROLE.IS_EDITED);
       if (hasPermisison.isErr()) {
         console.error('Failed to check permission');
         return Err(new Error(hasPermisison.unwrapErr().message));

@@ -8,6 +8,7 @@ import { ChatCohere } from 'src/shared/utils/rag/cohere.chat';
 import { EventDescriptionGenDto } from './descriptionGenerate.dto';
 import { transformEventsDtoToQuery } from 'src/shared/utils/rag/transform_documents';
 import { console } from 'inspector';
+import { SlackService } from 'src/infrastructure/adapters/slack/slack.service';
 
 type DGState = {
   question: string;
@@ -24,7 +25,11 @@ export class DescriptionGenerateService {
     { provider: 'gemini', keys: GEMINI_API_KEY },
     { provider: 'cohere', keys: COHERE_API_KEY },
   ];
-  constructor(private readonly vectorStore: VectorStoreService) {}
+  constructor(private readonly vectorStore: VectorStoreService,
+    private readonly slackService: SlackService,
+  ) {
+    this.slackService.sendNotice(`Service initialized.`);
+  }
 
   private isQuotaError(err: any): boolean {
     const msg = err?.message?.toLowerCase() || '';

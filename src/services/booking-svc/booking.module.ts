@@ -8,6 +8,10 @@ import { SelectSeatController } from "./modules/commands/selectSeat/selectSeat.c
 import { SelectSeatService } from "./modules/commands/selectSeat/selectSeat.service";
 import { AuthSvcModule } from "../auth-svc/auth-svc.module";
 import { EventSvcModule } from "../event-svc/event-svc.module";
+import { UnSelectSeatController } from "./modules/commands/unSelectSeat/unSelectSeat.controller";
+import { GetRedisSeatController } from "./modules/queries/getRedisSeat/getRedisSeat.controller";
+import { UnSelectSeatService } from "./modules/commands/unSelectSeat/unSelectSeat.service";
+import { GetRedisSeatService } from "./modules/queries/getRedisSeat/getRedisSeat.service";
 import { CountCheckedInTicketsService } from "./modules/queries/getCountCheckedInTickets/getCountCheckedInTickets.service";
 
 @Module({
@@ -17,6 +21,8 @@ import { CountCheckedInTicketsService } from "./modules/queries/getCountCheckedI
   ],
   controllers: [
     SelectSeatController,
+    UnSelectSeatController,
+    GetRedisSeatController,
   ],
   providers: [
     // Adapters
@@ -29,6 +35,8 @@ import { CountCheckedInTicketsService } from "./modules/queries/getCountCheckedI
     GetTotalTicketOfTicketTypeService,
 
     SelectSeatService,
+    UnSelectSeatService,
+    GetRedisSeatService,
 
     CountCheckedInTicketsService,
 

@@ -12,7 +12,8 @@ export class GetUserService {
   async execute(email: string): Promise<Result<{
     id: string, name: string, email: string, role: number, phone: string,
   }, Error>> {
-    const emailOrError = Email.create(email);
+    try {
+        const emailOrError = Email.create(email);
     if (emailOrError.isErr()) {
       return Err(emailOrError.unwrapErr());
     }
@@ -28,6 +29,9 @@ export class GetUserService {
         phone: user.phone.value,
         avatar_id: user.avatarId
       });
+    }
+    } catch (error) {
+      return Err(new Error('Failed to get user'));
     }
   }
 }

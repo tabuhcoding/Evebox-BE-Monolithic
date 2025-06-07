@@ -4,7 +4,8 @@ import { CreateEventDto } from '../../modules/event/commands/createEvent/createE
 import { UpdateEventDto } from '../../modules/event/commands/updateEvent/updateEvent.dto';
 import { Prisma } from '@prisma/client';
 import { UpdateEventAdminDto } from '../../modules/event/commands/UpdateEventAdmin/updateEventAdmin.dto';
-import { EventDataDto } from '../../modules/event/queries/getEventsByAdmin/getEvents-response.dto';
+import { EventOrgFrontDisplayDto } from '../../modules/event/queries/getEventOfOrg/getEventOfOrg-response.dto';
+import { EventOrgDetailResponseDto } from '../../modules/event/queries/getEventOfOrgDetail/getEventOfOrgDetail-response.dto';
 
 export type Events = Prisma.EventsGetPayload<{
   include: {
@@ -52,7 +53,7 @@ export type EventsWithoutShowing = Prisma.EventsGetPayload<{
 export interface EventsRepository extends BaseRepository<Events, Prisma.EventsDelegate> {
   // Thêm các method riêng cho Events nếu cần, ví dụ:
   findManyByIdsWithDetails(ids: number[]): Promise<Events[]>;
-    updateEventFields(dto: UpdateEventAdminDto, eventId: number): Promise<any | null>;
+  updateEventFields(dto: UpdateEventAdminDto, eventId: number): Promise<any | null>;
   /* Create Event */
   createEvent(data: CreateEventDto, email: string, locationId?: number): Promise<number>;
 
@@ -60,7 +61,7 @@ export interface EventsRepository extends BaseRepository<Events, Prisma.EventsDe
   updateEvent(dto: UpdateEventDto, eventId: number, locationId?: number): Promise<[number, boolean]> ;
   getEventOrganizer(eventId: number): Promise<string | null>;
   getMember(eventId: number, userEmail: string): Promise<any | null>;
-  hasPermissionToManageEvent(eventId: number, userEmail: string): Promise<Result<boolean, Error>>;
+  hasPermissionToManageEvent(eventId: number, userEmail: string, permission: string): Promise<Result<boolean, Error>>;
 
   /* Delete Event */
   deleteEvent(id: number): Promise<number>;
@@ -70,4 +71,7 @@ export interface EventsRepository extends BaseRepository<Events, Prisma.EventsDe
   getShowingsByEventId(eventId: number): Promise<{ startTime: Date }[]>
   getSpecialEventsWithFilters(filters: any): Promise<any[]>;
   countSpecialEvents(filters: any): Promise<number>;
+
+  getEventOfOrg(email: string): Promise<Result<(EventOrgFrontDisplayDto & { role: number })[], Error>>;
+  getEventOfOrgDetail(eventId: number): Promise<Result<EventOrgDetailResponseDto, Error>>;
 }

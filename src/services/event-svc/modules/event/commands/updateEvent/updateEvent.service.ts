@@ -3,6 +3,7 @@ import { Result, Ok, Err } from "oxide.ts";
 
 import { EventsRepository } from "src/services/event-svc/repository/events/events.repo";
 import { EventCategoriesRepository } from "src/services/event-svc/repository/eventCategories/eventCategories.repo";
+import { EVENT_ROLE } from "../../domain/eventRole";
 import { LocationsRepository } from "src/services/event-svc/repository/locations/location.repo";
 import { UpdateEventDto } from "./updateEvent.dto";
 import { UpdateEventResponseData } from "./updateEvent-response.dto";
@@ -27,7 +28,7 @@ export class UpdateEventService {
         return Err(new Error('User does not exist'));
       }
 
-      const hasPermisison = await this.eventsRepository.hasPermissionToManageEvent(id, email);
+      const hasPermisison = await this.eventsRepository.hasPermissionToManageEvent(id, email, EVENT_ROLE.IS_EDITED);
       if (hasPermisison.isErr()) {
         return Err(new Error('Failed to check permission'));
       }

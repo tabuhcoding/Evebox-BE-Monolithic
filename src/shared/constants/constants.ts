@@ -12,7 +12,10 @@ export const USER_MESSAGES = {
     PASSWORD_RESET: 'Password reset successful',
     OTP_VERIFIED: 'OTP verified successfully',
     OTP_SENT: 'OTP has been sent to your email',
-    OTP_RESENT: 'OTP has been resent to your email'
+    OTP_RESENT: 'OTP has been resent to your email',
+    PIN_CREATED: 'Pin created successfully',
+    PIN_CHANGED: 'Pin changed successfully',
+    PIN_VERIFIED: 'Pin verified successfully',
   },
   ERRORS: {
     USER_NOT_FOUND: 'User not found',

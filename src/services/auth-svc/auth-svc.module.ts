@@ -70,6 +70,14 @@ import { TurnOffNotificationForEventController } from "./modules/user/commands/t
 import { TurnOffNotificationForOrgController } from "./modules/user/commands/turn-off-notification-org/turn-off-notification.controller";
 import { TurnOffNotificationServiceForEvent } from "./modules/user/commands/turn-off-notification-event/turn-off-notification.service";
 import { TurnOffNotificationServiceForOrg } from "./modules/user/commands/turn-off-notification-org/turn-off-notification.service";
+import { GetUserPinStatusService } from "./modules/user/queries/get-pin-status/get-pin-status.service";
+import { GetUserPinStatusController } from "./modules/user/queries/get-pin-status/get-pin-status.controller";
+import { CreateUserPinService } from "./modules/user/commands/create-pin/create-pin.service";
+import { CreateUserPinController } from "./modules/user/commands/create-pin/create-pin.controller";
+import { VerifyUserPinController } from "./modules/user/commands/verift-pin/verify-pin.controller";
+import { VerifyUserPinService } from "./modules/user/commands/verift-pin/verify-pin.service";
+import { ChangeUserPinController } from "./modules/user/commands/change-pin/change-pin.controller";
+import { ChangeUserPinService } from "./modules/user/commands/change-pin/change-pin.service";
 import { GetAdminAccessService } from "./modules/user/queries/get-admin-access/get-admin-access.service";
 
 
@@ -117,7 +125,11 @@ import { GetAdminAccessService } from "./modules/user/queries/get-admin-access/g
     GetUsersNotifiedByEventController,
     GetUsersNotifiedByOrgController,
     TurnOffNotificationForEventController,
-    TurnOffNotificationForOrgController
+    TurnOffNotificationForOrgController,
+    GetUserPinStatusController,
+    CreateUserPinController,
+    VerifyUserPinController,
+    ChangeUserPinController,
   ],
   providers: [
     RegisterUserService,
@@ -141,6 +153,10 @@ import { GetAdminAccessService } from "./modules/user/queries/get-admin-access/g
     UnfavoriteOrgService,
     CheckUserExistService,
     SlackService,
+    GetUserPinStatusService,
+    CreateUserPinService,
+    VerifyUserPinService,
+    ChangeUserPinService,
 
     // Repositories
     GetFavoriteEventService,

@@ -24,8 +24,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   async validate(req: Request, payload: any) {
     const authHeader = req.headers.authorization;
     if (!authHeader) {
-      throw new UnauthorizedException('Authorization header missing');
+      // throw new UnauthorizedException('Authorization header missing');
+      return {};
     }
+
     const [type, token] = authHeader.split(' ');
     if (type !== 'Bearer' || !token) {
       throw new UnauthorizedException('Invalid authorization header format');

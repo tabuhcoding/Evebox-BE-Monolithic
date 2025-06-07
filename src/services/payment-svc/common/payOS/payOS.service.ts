@@ -38,4 +38,9 @@ export class PayOSService implements OnModuleInit, OnModuleDestroy {
   async cancelPaymentLink(id: string, reason: string) {
     return await this.payOS.cancelPaymentLink(id, reason);
   }
+
+  async updateWebhookUrl() {
+    const webhookUrl = this.configService.get<string>('PAYOS_WEBHOOK_URL');
+    // await this.updateWebhookUrl(webhookUrl);
+  }
 }

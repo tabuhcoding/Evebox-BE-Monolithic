@@ -98,6 +98,9 @@ import { GetShowingAdminDetailController } from './modules/showing/queries/getSh
 import { GetShowingsByAdminController } from './modules/showing/queries/getShowingsByAdmin/getShowings.controller';
 import { GetTicketDetailOfShowingController } from './modules/showing/queries/getTicketDetailOfShowing/getTicketDetailOfShowing.controller';
 import { GetAdminAccessService } from '../auth-svc/modules/user/queries/get-admin-access/get-admin-access.service';
+import { ProvinceRepositoryImpl } from './repository/province/province.impl';
+import { GetAllDistrictsController } from './modules/location/queries/getAllDistricts/getAllDistricts.controller';
+import { GetAllDistrictsService } from './modules/location/queries/getAllDistricts/getAllDistricts.service';
 
 @Module({
   imports: [ BookingSvcModule, AuthSvcModule, CqrsModule ],
@@ -147,10 +150,11 @@ import { GetAdminAccessService } from '../auth-svc/modules/user/queries/get-admi
     UpdateEventAdminController, 
     GetEventsByAdminController,
     GetEventSpecialManagementController,
-    GetEventMemberController,,
+    GetEventMemberController,
     GetShowingAdminDetailController,
     GetShowingsByAdminController,
-    GetTicketDetailOfShowingController
+    GetTicketDetailOfShowingController,
+    GetAllDistrictsController,
   ],
   providers: [
     // Adapters
@@ -221,6 +225,9 @@ import { GetAdminAccessService } from '../auth-svc/modules/user/queries/get-admi
     GetShowingAdminDetailService,
     GetShowingsByAdminService,
     GetTicketDetailOfShowingService,
+    
+    //Location
+    GetAllDistrictsService,
 
     // Repositories
     { provide: 'AdminRepository', useClass: AdminRepositoryImpl },
@@ -237,6 +244,7 @@ import { GetAdminAccessService } from '../auth-svc/modules/user/queries/get-admi
     { provide: 'FormRepository', useClass: FormRepositoryImpl },
     { provide: 'LocationsRepository', useClass: LocationsRepositoryImpl },
     { provide: 'OrgPaymentInforRepository', useClass: OrgPaymentInforRepositoryImpl },
+    { provide: 'ProvinceRepository', useClass: ProvinceRepositoryImpl },
   ],
   exports: [
     GetAllEventDetailForRAGService, 

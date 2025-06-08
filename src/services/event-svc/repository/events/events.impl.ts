@@ -1,3 +1,4 @@
+import { Ticket } from '@prisma/client';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
 import { BaseRepository } from 'src/shared/repo/base.repository';
@@ -14,6 +15,7 @@ import { EventOrgFrontDisplayDto } from '../../modules/event/queries/getEventOfO
 import { EventOrgDetailResponseDto } from '../../modules/event/queries/getEventOfOrgDetail/getEventOfOrgDetail-response.dto';
 import { GetUserService } from 'src/services/auth-svc/modules/user/queries/get-user/get-user.service';
 import { EVENT_ROLE } from '../../modules/event/domain/eventRole';
+import { OrganizerRevenueData, ShowingRevenueData } from '../../modules/statistics/queries/getOrgRevenue/getOrgRevenue-response.dto';
 
 @Injectable()
 export class EventsRepositoryImpl
@@ -569,6 +571,45 @@ export class EventsRepositoryImpl
         locationId: true,
         venue: true,
       },
+    });
+  }
+
+  async getRevenueEventsWithShowings(from?: Date, to?: Date, search?: string) {
+    const where: any = {
+      isApproved: true,
+      deleteAt: null,
+    };
+
+    if (search) {
+      where.orgName = {
+        contains: search,
+        mode: 'insensitive',
+      };
+    }
+
+    return this.prisma.events.findMany({
+      where,
+      include: {
+        Showing: {
+          where: {
+            ...(from && { startTime: { gte: from } }),
+            ...(to && { startTime: { lte: to } }),
+            deleteAt: null,
+          },
+          select: {
+            id: true,
+            startTime: true,
+            endTime: true,
+            TicketType: {
+              select: {
+                id: true,
+                name: true,
+                price: true,
+              }
+            }
+          }
+        }
+      }
     });
   }
 }

@@ -105,6 +105,8 @@ import { GetAllLocationsService } from './modules/location/queries/getAllLocatio
 import { GetAllLocationsController } from './modules/location/queries/getAllLocations/getAllLocation.controller';
 import { GetOrgLocationsController } from './modules/location/queries/getOrgLocations/getOrgLocations.controller';
 import { GetOrgLocationsService } from './modules/location/queries/getOrgLocations/getOrgLocations.service';
+import { GetOrgRevenueController } from './modules/statistics/queries/getOrgRevenue/getOrgRevenue.controller';
+import { GetOrgRevenueService } from './modules/statistics/queries/getOrgRevenue/getOrgRevenue.service';
 
 @Module({
   imports: [ BookingSvcModule, AuthSvcModule, CqrsModule ],
@@ -160,7 +162,8 @@ import { GetOrgLocationsService } from './modules/location/queries/getOrgLocatio
     GetTicketDetailOfShowingController,
     GetAllDistrictsController,
     GetAllLocationsController,
-    GetOrgLocationsController
+    GetOrgLocationsController,
+    GetOrgRevenueController
   ],
   providers: [
     // Adapters
@@ -236,6 +239,8 @@ import { GetOrgLocationsService } from './modules/location/queries/getOrgLocatio
     GetAllDistrictsService,
     GetAllLocationsService,
     GetOrgLocationsService,
+
+    GetOrgRevenueService,
 
     // Repositories
     { provide: 'AdminRepository', useClass: AdminRepositoryImpl },

@@ -13,6 +13,7 @@ import { GetRedisSeatController } from "./modules/queries/getRedisSeat/getRedisS
 import { UnSelectSeatService } from "./modules/commands/unSelectSeat/unSelectSeat.service";
 import { GetRedisSeatService } from "./modules/queries/getRedisSeat/getRedisSeat.service";
 import { CountCheckedInTicketsService } from "./modules/queries/getCountCheckedInTickets/getCountCheckedInTickets.service";
+import { TicketQueryService } from "./modules/queries/getTicketQuery/ticket-query.service";
 
 @Module({
   imports: [ 
@@ -39,12 +40,13 @@ import { CountCheckedInTicketsService } from "./modules/queries/getCountCheckedI
     GetRedisSeatService,
 
     CountCheckedInTicketsService,
+    TicketQueryService,
 
     // Repositories
     { provide: 'OrderRepository', useClass: OrderRepositoryImpl },
     { provide: 'TicketRepository', useClass: TicketRepositoryImpl },
   ],
-  exports: [GetTotalTicketOfTicketTypeService, CountCheckedInTicketsService,
+  exports: [GetTotalTicketOfTicketTypeService, CountCheckedInTicketsService, TicketQueryService,
      {provide: 'TicketRepository', useClass: TicketRepositoryImpl }
   ],
 })

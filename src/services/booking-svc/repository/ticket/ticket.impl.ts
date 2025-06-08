@@ -21,5 +21,16 @@ export class TicketRepositoryImpl
       },
     });
   }
-  // Thêm các phương thức riêng cho Ticket nếu cần
+  async getTicketsByTicketTypeIds(ticketTypeIds: string[]) {
+  return this.prisma.ticket.findMany({
+    where: {
+      ticketTypeId: {
+        in: ticketTypeIds.filter(id => id !== null),
+      },
+    },
+    select: {
+      ticketTypeId: true,
+    },
+  });
+}
 }

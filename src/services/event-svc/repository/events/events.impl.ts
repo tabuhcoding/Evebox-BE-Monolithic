@@ -641,5 +641,10 @@ export class EventsRepositoryImpl
     },
   });
 }
-
+  async findEventById(eventId: number) {
+    return this.prisma.events.findUnique({
+      where: { id: eventId },
+      select: { id: true, title: true },
+    });
+  }
 }

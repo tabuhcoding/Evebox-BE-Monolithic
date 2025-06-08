@@ -21,16 +21,24 @@ export class TicketRepositoryImpl
       },
     });
   }
-  async getTicketsByTicketTypeIds(ticketTypeIds: string[]) {
-  return this.prisma.ticket.findMany({
-    where: {
-      ticketTypeId: {
-        in: ticketTypeIds.filter(id => id !== null),
+   async countTicketsByTicketTypeIds(ticketTypeIds: string[]): Promise<Record<string, number>> {
+    const grouped = await this.prisma.ticket.groupBy({
+      by: ['ticketTypeId'],
+      where: {
+        ticketTypeId: { in: ticketTypeIds },
       },
-    },
-    select: {
-      ticketTypeId: true,
-    },
-  });
-}
+      _count: {
+        ticketTypeId: true,
+      },
+    });
+
+    const result: Record<string, number> = {};
+    grouped.forEach(group => {
+      if (group.ticketTypeId) {
+        result[group.ticketTypeId] = group._count.ticketTypeId;
+      }
+    });
+
+    return result;
+  }
 }

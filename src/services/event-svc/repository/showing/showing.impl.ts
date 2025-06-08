@@ -269,4 +269,24 @@ export class ShowingRepositoryImpl
     }
   });
 }
+
+async findShowingsByOrgAndEvent(orgId: string, eventId: number) {
+    return this.prisma.showing.findMany({
+      where: {
+        deleteAt: null,
+        eventId,
+        Events: {
+          organizerId: orgId,
+          isApproved: true,
+          deleteAt: null,
+        },
+      },
+      select: {
+        id: true,
+        startTime: true,
+        endTime: true,
+        TicketType: true
+      },
+    });
+  }
 }

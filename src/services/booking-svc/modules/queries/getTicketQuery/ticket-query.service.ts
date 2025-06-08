@@ -8,7 +8,7 @@ export class TicketQueryService {
     @Inject('TicketRepository') private readonly ticketRepo: TicketRepository
   ) {}
 
-  async getTicketsByTicketTypeIds(ticketTypeIds: string[]) {
-    return this.ticketRepo.getTicketsByTicketTypeIds(ticketTypeIds);
+ async getTicketQuantitiesByTicketTypeIds(ticketTypeIds: string[]): Promise<Record<string, number>> {
+    return this.ticketRepo.countTicketsByTicketTypeIds(ticketTypeIds);
   }
 }

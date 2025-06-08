@@ -15,6 +15,7 @@ export class CreateOrderService {
   async execue(showingID: string, totalPrice: number, userID: string): Promise<number | null> {
     try{
       const formResponseId = await this.getUserSubmitFormService.execute(showingID, 'userID'); // Replace 'userID' with actual user ID
+      // TODO: Uncomment the following line after implementing SubmitFormService
       // if (!formResponseId) {
 
       //   return null;
@@ -43,6 +44,18 @@ export class CreateOrderService {
       this.slackService.sendError(` Booking Svc >>> getTotalTicketOfTicketType : ${error.message}`)
 
       return null;
+    }
+  }
+
+  async updateOrderStatus(orderId: number, status: BookingTicketStatus): Promise<boolean> {
+    try {
+      await this.orderRepository.updateOneById(orderId, { status });
+      
+      return true;
+    } catch (error) {
+      this.slackService.sendError(` Booking Svc >>> updateOrderStatus : ${error.message}`);
+      
+      return false;
     }
   }
 }

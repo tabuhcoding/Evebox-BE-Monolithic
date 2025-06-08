@@ -107,6 +107,8 @@ import { GetUserSubmitFormService } from './modules/form/queries/getUserSubmitFo
 import { FormResponseRepositoryImpl } from './repository/formResponse/formResponse.impl';
 import { GetEventSummaryController } from './modules/event/queries/getEventSummary/getEventSummary.controller';
 import { GetEventSummaryService } from './modules/event/queries/getEventSummary/getEventSummary.service';
+import { GetFormResponseByIdService } from './modules/formResponse/queries/getFormResponseById/getFormResponseById.service';
+import { CheckUserPermissionService } from './modules/event/commands/checkUserPermission/checkUserPermission.service';
 
 @Module({
   imports: [ BookingSvcModule, AuthSvcModule, CqrsModule ],
@@ -170,6 +172,7 @@ import { GetEventSummaryService } from './modules/event/queries/getEventSummary/
     // Adapters
     // Utils Command
     CalculateShowingStatusService,
+    CheckUserPermissionService,
     
     // Categories
     GetAllCategoriesService,
@@ -234,6 +237,8 @@ import { GetEventSummaryService } from './modules/event/queries/getEventSummary/
 
     GetUserSubmitFormService,
 
+    GetFormResponseByIdService,
+
     // Admin showing
     GetShowingAdminDetailService,
     GetShowingsByAdminService,
@@ -266,6 +271,8 @@ import { GetEventSummaryService } from './modules/event/queries/getEventSummary/
     GetShowingDetailService,
     GetTicketTypeDetailService,
     GetUserSubmitFormService,
+    GetFormResponseByIdService,
+    CheckUserPermissionService
   ],
 })
 export class EventSvcModule {}

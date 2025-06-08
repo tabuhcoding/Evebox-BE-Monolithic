@@ -15,7 +15,7 @@ import { EventOrgFrontDisplayDto } from '../../modules/event/queries/getEventOfO
 import { EventOrgDetailResponseDto } from '../../modules/event/queries/getEventOfOrgDetail/getEventOfOrgDetail-response.dto';
 import { GetUserService } from 'src/services/auth-svc/modules/user/queries/get-user/get-user.service';
 import { EVENT_ROLE } from '../../modules/event/domain/eventRole';
-import { OrganizerRevenueData, ShowingRevenueData } from '../../modules/statistics/queries/getOrgRevenue/getOrgRevenue-response.dto';
+import { EventRevenueData, OrganizerRevenueData, ShowingRevenueData } from '../../modules/statistics/queries/getOrgRevenue/getOrgRevenue-response.dto';
 
 @Injectable()
 export class EventsRepositoryImpl
@@ -612,4 +612,34 @@ export class EventsRepositoryImpl
       }
     });
   }
+
+  async findEventsByOrgIdWithShowings(orgId: string) {
+  return this.prisma.events.findMany({
+    where: {
+      organizerId: orgId,
+      isApproved: true,
+      deleteAt: null,
+    },
+    select: {
+      id: true,
+      title: true,
+      Showing: {
+        where: { deleteAt: null },
+        select: {
+          id: true,
+          startTime: true,
+          endTime: true,
+          TicketType: {
+            select: {
+              id: true,
+              name: true,
+              price: true,
+            },
+          },
+        },
+      },
+    },
+  });
+}
+
 }

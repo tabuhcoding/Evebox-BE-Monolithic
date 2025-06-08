@@ -6,7 +6,7 @@ import { Prisma } from '@prisma/client';
 import { UpdateEventAdminDto } from '../../modules/event/commands/UpdateEventAdmin/updateEventAdmin.dto';
 import { EventOrgFrontDisplayDto } from '../../modules/event/queries/getEventOfOrg/getEventOfOrg-response.dto';
 import { EventOrgDetailResponseDto } from '../../modules/event/queries/getEventOfOrgDetail/getEventOfOrgDetail-response.dto';
-import { OrganizerRevenueData } from '../../modules/statistics/queries/getOrgRevenue/getOrgRevenue-response.dto';
+import { EventRevenueData, OrganizerRevenueData } from '../../modules/statistics/queries/getOrgRevenue/getOrgRevenue-response.dto';
 
 export type Events = Prisma.EventsGetPayload<{
   include: {
@@ -46,6 +46,27 @@ export type EventsWithoutShowing = Prisma.EventsGetPayload<{
     EventCategories: {
       include: {
         Categories: true;
+      };
+    };
+  };
+}>;
+
+export type EventWithShowingsAndTicketTypes = Prisma.EventsGetPayload<{
+  select: {
+    id: true;
+    title: true;
+    Showing: {
+      select: {
+        id: true;
+        startTime: true;
+        endTime: true;
+        TicketType: {
+          select: {
+            id: true;
+            name: true;
+            price: true;
+          };
+        };
       };
     };
   };
@@ -100,4 +121,6 @@ export interface EventsRepository extends BaseRepository<Events, Prisma.EventsDe
       }[];
     }[];
   }[]>;
+
+  findEventsByOrgIdWithShowings(orgId: string): Promise<EventWithShowingsAndTicketTypes[]>;
 }

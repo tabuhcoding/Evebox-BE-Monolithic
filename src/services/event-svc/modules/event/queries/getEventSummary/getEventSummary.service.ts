@@ -34,7 +34,7 @@ export class GetEventSummaryService {
         return Err(new Error(canSummarized.unwrapErr().message));
       }
 
-      if (!canSummarized) {
+      if (!canSummarized.unwrap()) {
         return Err(new Error('You do not have permisison to get event summary'));
       }
 

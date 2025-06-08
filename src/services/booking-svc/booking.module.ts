@@ -13,16 +13,21 @@ import { GetRedisSeatService } from "./modules/queries/getRedisSeat/getRedisSeat
 import { CountCheckedInTicketsService } from "./modules/queries/getCountCheckedInTickets/getCountCheckedInTickets.service";
 import { CreateOrderService } from "./modules/commands/createOrder/createOrder.service";
 import { GetPaidOrdersByShowingIdService } from "./modules/queries/getPaidOrdersByShowingId/getPaidOrdersByShowingId.service";
+import { PaymentSvcModule } from "../payment-svc/payment-svc.module";
+import { GetOrdersByShowingIdController } from "./modules/queries/getOrdersByShowingId/getOrdersByShowingId.controller";
+import { GetOrdersByShowingIdService } from "./modules/queries/getOrdersByShowingId/getOrdersByShowingId.service";
 
 @Module({
   imports: [ 
      forwardRef(() => AuthSvcModule),
      forwardRef(() => EventSvcModule),
+     forwardRef(() => PaymentSvcModule),
   ],
   controllers: [
     SelectSeatController,
     UnSelectSeatController,
     GetRedisSeatController,
+    GetOrdersByShowingIdController,
   ],
   providers: [
     // Services
@@ -36,6 +41,7 @@ import { GetPaidOrdersByShowingIdService } from "./modules/queries/getPaidOrders
     CountCheckedInTicketsService,
     CreateOrderService,
     GetPaidOrdersByShowingIdService,
+    GetOrdersByShowingIdService,
 
     // Repositories
     { provide: 'OrderRepository', useClass: OrderRepositoryImpl },

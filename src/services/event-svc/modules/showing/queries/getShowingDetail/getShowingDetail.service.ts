@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Result, Ok, Err } from 'oxide.ts';
-import { ShowingDataDto } from './getShowingDetail-response.dto';
+import { ShowingDataDto, SimpleShowingDataDto } from './getShowingDetail-response.dto';
 import { ShowingRepository } from 'src/services/event-svc/repository/showing/showing.repo';
 import { CalculateShowingStatusService } from '../../../event/commands/calculateShowingStatus/calculateShowingStatus.service';
 import { calculateShowingStatusAndMinPrice, ShowingStatus } from 'src/shared/utils/status/status';
@@ -94,4 +94,22 @@ export class getShowingDetailService {
     }
   }
 
+  async executeSimple(showingId: string): Promise<Result<SimpleShowingDataDto, Error>> {
+    try {
+      if (!showingId) {
+        return Err(new Error('Showing ID is required.'));
+      }
+
+      const showing = await this.showingRepository.findOneById(showingId);
+
+      if (!showing) {
+        return Err(new Error('Showing not found.'));
+      }
+
+      return Ok(showing);
+    } catch (error) {
+      console.error(error);
+      return Err(new Error('Failed to fetch showing data.'));
+    }
+  }
 }

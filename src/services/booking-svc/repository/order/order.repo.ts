@@ -7,6 +7,8 @@ export type Order = Prisma.OrderGetPayload<{
   }
 }>;
 
+export { BookingTicketStatus, BookingTicketType } from "@prisma/client"
+
 export interface OrderRepository extends BaseRepository<Order, Prisma.OrderDelegate> {
   // Thêm các method riêng cho Order nếu cần
 }

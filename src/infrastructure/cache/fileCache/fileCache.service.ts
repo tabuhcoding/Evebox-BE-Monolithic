@@ -224,11 +224,11 @@ export class FileCacheService {
   // 🔁 Cron job chạy mỗi 4h dọn file hết hạn
   @Cron('0 */4 * * *')
   // @Cron('*/4 * * * *')
-  cleanExpiredCache() {
+  async cleanExpiredCache() {
     const files = fs.readdirSync(this.cacheDir);
     const now = Date.now();
     let deleted = 0;
-    this.slackService.sendNotice('🧹 Starting cache cleanup...')
+    await this.slackService.sendNotice('🧹 Starting cache cleanup...')
 
     for (const file of files) {
       const filePath = path.join(this.cacheDir, file);
@@ -241,18 +241,18 @@ export class FileCacheService {
           deleted++;
 
           // Log ra slack
-          this.slackService.sendNotice(
+          await this.slackService.sendNotice(
             `🗑️ Cleaned expired cache file: ${file} (Timeout: ${parsed.timeout} minutes, Timestamp: ${new Date(parsed.timestamp).toISOString()})`
           )
         }
 
       } catch (err) {
-        this.slackService.sendError(`FileCacheService >>> cleanExpiredCache: Error processing cache file ${file} error: ${err.message}`);
+        await this.slackService.sendError(`FileCacheService >>> cleanExpiredCache: Error processing cache file ${file} error: ${err.message}`);
       }
     }
 
     if (deleted > 0) {
-      this.slackService.sendNotice(`🧹 Cache cleanup completed. Deleted ${deleted} expired cache files.`);
+      await this.slackService.sendNotice(`🧹 Cache cleanup completed. Deleted ${deleted} expired cache files.`);
     }
   }
 }

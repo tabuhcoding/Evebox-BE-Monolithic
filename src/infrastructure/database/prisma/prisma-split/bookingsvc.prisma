@@ -8,10 +8,11 @@ enum BookingTicketStatus{
   CANCEL
   SUCCESS
   PENDING
+  PAID
 }
 
 model Order {
-  id             String         @id @default(uuid())
+  id             Int  @id @default(@autoincrement())
   showingId      String
   formResponseId Int?
   type           BookingTicketType

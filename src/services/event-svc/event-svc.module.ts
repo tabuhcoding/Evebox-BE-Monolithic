@@ -9,6 +9,7 @@ import { CategoriesRepositoryImpl } from './repository/categories/categories.imp
 import { EventsRepositoryImpl } from './repository/events/events.impl';
 import { EventCategoriesRepositoryImpl } from './repository/eventCategories/eventCategories.impl';
 import { EventUserRelationshipRepositoryImpl } from './repository/eventUserRelationship/eventUserRelationship.impl';
+import { EventRoleRepositoryImpl } from './repository/eventRole/eventRole.impl';
 import { LocationsRepositoryImpl } from './repository/locations/location.impl';
 import { AdminRepositoryImpl } from '../auth-svc/repository/admin/admin.repository.impl';
 import { GetAllEventDetailForRAGService } from './modules/event/queries/getAllEventDetailForRAG/getAllEventDetailForRAG.service';
@@ -97,6 +98,10 @@ import { GetShowingAdminDetailController } from './modules/showing/queries/getSh
 import { GetShowingsByAdminController } from './modules/showing/queries/getShowingsByAdmin/getShowings.controller';
 import { GetTicketDetailOfShowingController } from './modules/showing/queries/getTicketDetailOfShowing/getTicketDetailOfShowing.controller';
 import { GetAdminAccessService } from '../auth-svc/modules/user/queries/get-admin-access/get-admin-access.service';
+import { GetEventRolesController } from './modules/event/queries/getEventRoles/getEventRoles.controller';
+import { GetEventRolesService } from './modules/event/queries/getEventRoles/getEventRoles.service';
+import { GetEventRolesByIdController } from './modules/event/queries/getEventRolesById/getEventRolesById.controller';
+import { GetEventRolesByIdService } from './modules/event/queries/getEventRolesById/getEventRolesById.service';
 import { GetUserSubmitFormService } from './modules/form/queries/getUserSubmitForm/getUserSubmitForm.service';
 import { FormResponseRepositoryImpl } from './repository/formResponse/formResponse.impl';
 
@@ -117,6 +122,8 @@ import { FormResponseRepositoryImpl } from './repository/formResponse/formRespon
     CreateEventController,
     UpdateEventController,
     DeleteEventController,
+    GetEventRolesController,
+    GetEventRolesByIdController,
 
     // Form
     CreateFormController,
@@ -177,6 +184,8 @@ import { FormResponseRepositoryImpl } from './repository/formResponse/formRespon
     GetEventOfOrgDetailService,
 
     GetEventsByIdsService,
+    GetEventRolesService,
+    GetEventRolesByIdService,
 
     ///// Showing
     // Commands
@@ -228,6 +237,7 @@ import { FormResponseRepositoryImpl } from './repository/formResponse/formRespon
     { provide: 'EventsRepository', useClass: EventsRepositoryImpl },
     { provide: 'EventCategoriesRepository', useClass: EventCategoriesRepositoryImpl },
     { provide: 'EventUserRelationshipRepository', useClass: EventUserRelationshipRepositoryImpl },
+    { provide: 'EventRoleRepository', useClass: EventRoleRepositoryImpl },
     { provide: 'ShowingRepository', useClass: ShowingRepositoryImpl },
     { provide: 'SeatmapRepository', useClass: SeatmapRepositoryImpl },
     { provide: 'SeatStatusRepository', useClass: SeatStatusRepositoryImpl},

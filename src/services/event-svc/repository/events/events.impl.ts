@@ -6,6 +6,7 @@ import { Result, Ok, Err } from 'oxide.ts';
 
 import { Events, EventsRepository } from './events.repo';
 import { ShowingRepository } from '../showing/showing.repo';
+import { ShowingWithEventRepository } from '../showing/showingWithEvent.repo';
 import { EventUserRelationshipRepository } from '../eventUserRelationship/eventUserRelationship.repo';
 import { CreateEventDto } from '../../modules/event/commands/createEvent/createEvent.dto';
 import { UpdateEventDto } from '../../modules/event/commands/updateEvent/updateEvent.dto';
@@ -13,7 +14,8 @@ import { UpdateEventAdminDto } from '../../modules/event/commands/UpdateEventAdm
 import { EventOrgFrontDisplayDto } from '../../modules/event/queries/getEventOfOrg/getEventOfOrg-response.dto';
 import { EventOrgDetailResponseDto } from '../../modules/event/queries/getEventOfOrgDetail/getEventOfOrgDetail-response.dto';
 import { GetUserService } from 'src/services/auth-svc/modules/user/queries/get-user/get-user.service';
-import { EVENT_ROLE } from '../../modules/event/domain/eventRole';
+import { GetPaidOrdersByShowingIdService } from 'src/services/booking-svc/modules/queries/getPaidOrdersByShowingId/getPaidOrdersByShowingId.service';
+import { EventSummaryData } from '../../modules/event/queries/getEventSummary/getEventSummary-response.dto';
 
 @Injectable()
 export class EventsRepositoryImpl
@@ -23,8 +25,10 @@ export class EventsRepositoryImpl
     @Inject(forwardRef(() => 'EventUserRelationshipRepository'))
     private readonly eventUserRelaRepo: EventUserRelationshipRepository,
     @Inject('ShowingRepository') private readonly showingRepository: ShowingRepository,
+    @Inject('ShowingWithEventRepository') private readonly showingWithEventRepository: ShowingWithEventRepository,
     protected readonly prisma: PrismaService,
     private readonly getUserService: GetUserService,
+    private readonly getPaidOrdersByShowingIdService: GetPaidOrdersByShowingIdService
   ) {
     super(prisma.events, prisma);
   }
@@ -480,7 +484,7 @@ export class EventsRepositoryImpl
       const event = await this.prisma.events.findUnique({
         where: {
           id: Number(eventId),
-        }, 
+        },
         select: {
           id: true,
           title: true,
@@ -495,7 +499,7 @@ export class EventsRepositoryImpl
               street: true,
               ward: true,
               districts: {
-                select:{
+                select: {
                   id: true,
                   name: true,
                   province: {
@@ -525,10 +529,10 @@ export class EventsRepositoryImpl
           },
           Showing: {
             select: {
-                id: true,
-                isFree: true,
-                startTime: true,
-                endTime: true,
+              id: true,
+              isFree: true,
+              startTime: true,
+              endTime: true,
             }
           }
         }
@@ -541,12 +545,12 @@ export class EventsRepositoryImpl
       if (event.deleteAt !== null) {
         return Err(new Error(`Event ${eventId} has been deleted`));
       }
-      
+
       const { street, ward, districts } = event.locations ?? {};
       const districtName = districts?.name || '';
       const provinceName = districts?.province?.name || '';
       const locationsArray = [street, ward, districtName, provinceName].filter(Boolean);
-      
+
       const locationsString = locationsArray.join(', ');
       const eventDetail: EventOrgDetailResponseDto = {
         ...event,
@@ -559,6 +563,77 @@ export class EventsRepositoryImpl
       return Ok(eventDetail);
     } catch (error) {
       return Err(new Error('Failed to retrieve detail of event of org'));
+    }
+  }
+
+  async getEventSummary(showingId: string): Promise<Result<EventSummaryData, Error>> {
+    try {
+      const showing = await this.showingWithEventRepository.findOneById(showingId, {
+        Events: {
+          select: {
+            id: true,
+            title: true,
+          }
+        },
+        TicketType: true
+      });
+
+      const ticketTypeData = showing?.TicketType?.map(tt => ({
+        ticketTypeId: tt.id,
+        typeName: tt.name,
+        price: tt.price,
+        showingId: tt.showingId,
+        quantity: tt.quantity || 0,
+      }));
+
+      if (!ticketTypeData) {
+        return Err(new Error('Showing has no ticket type data'));
+      }
+
+      const orders = await this.getPaidOrdersByShowingIdService.execute(showingId);
+
+      if (orders.isErr()) {
+        return Err(new Error('Failed to get paid orders of showing'));
+      }
+
+      const paidOrders = orders.unwrap();
+
+      const summary = ticketTypeData.map(tt => {
+        const matchedTickets = paidOrders.filter(
+          t => t.type === tt.typeName && t.showingId === tt.showingId
+        );
+
+        const sold = matchedTickets.length;
+
+        const revenue = matchedTickets.reduce((sum, t) => sum + t.price, 0);
+
+        return {
+          typeName: tt.typeName,
+          price: tt.price,
+          sold,
+          ratio: tt.quantity ? sold / tt.quantity : 0,
+          revenue
+        };
+      });
+
+      const totalRevenue = summary.reduce((sum, s) => sum + s.revenue, 0);
+      const ticketsSold = summary.reduce((sum, s) => sum + s.sold, 0);
+      const totalTickets = ticketTypeData.reduce((sum, tt) => sum + tt.quantity, 0);
+
+      return Ok({
+        eventId: showing.eventId,
+        eventTitle: showing.Events.title,
+        showingId,
+        startTime: showing.startTime,
+        endTime: showing.endTime,
+        totalRevenue,
+        ticketsSold,
+        totalTickets,
+        percentageSold: totalTickets ? ticketsSold / totalTickets : 0,
+        byTicketType: summary.map(({ revenue, ...rest }) => rest)
+      });
+    } catch (error) {
+      return Err(new Error('Failed to get summary of event'));
     }
   }
 }

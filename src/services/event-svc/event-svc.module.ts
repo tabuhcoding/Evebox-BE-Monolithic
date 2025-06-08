@@ -28,6 +28,7 @@ import { BookingSvcModule } from '../booking-svc/booking.module';
 import { GetEventDetailController } from './modules/event/queries/getEventDetail/getEventDetail.controller';
 import { GetEventDetailService } from './modules/event/queries/getEventDetail/getEventDetail.service';
 import { ShowingRepositoryImpl } from './repository/showing/showing.impl';
+import { ShowingWithEventRepositoryImpl } from './repository/showing/showingWithEvent.impl';
 import { SeatmapRepositoryImpl } from './repository/seatmap/seatmap.impl';
 import { SeatStatusRepositoryImpl } from './repository/seatStatus/seatStatus.impl';
 import { TicketTypeRepositoryImpl } from './repository/ticketType/ticketType.impl';
@@ -104,6 +105,8 @@ import { GetEventRolesByIdController } from './modules/event/queries/getEventRol
 import { GetEventRolesByIdService } from './modules/event/queries/getEventRolesById/getEventRolesById.service';
 import { GetUserSubmitFormService } from './modules/form/queries/getUserSubmitForm/getUserSubmitForm.service';
 import { FormResponseRepositoryImpl } from './repository/formResponse/formResponse.impl';
+import { GetEventSummaryController } from './modules/event/queries/getEventSummary/getEventSummary.controller';
+import { GetEventSummaryService } from './modules/event/queries/getEventSummary/getEventSummary.service';
 
 @Module({
   imports: [ BookingSvcModule, AuthSvcModule, CqrsModule ],
@@ -124,6 +127,9 @@ import { FormResponseRepositoryImpl } from './repository/formResponse/formRespon
     DeleteEventController,
     GetEventRolesController,
     GetEventRolesByIdController,
+
+    // Event Statistics
+    GetEventSummaryController,
 
     // Form
     CreateFormController,
@@ -187,6 +193,8 @@ import { FormResponseRepositoryImpl } from './repository/formResponse/formRespon
     GetEventRolesService,
     GetEventRolesByIdService,
 
+    GetEventSummaryService,
+
     ///// Showing
     // Commands
     CalculateSectionStatusService,
@@ -239,6 +247,7 @@ import { FormResponseRepositoryImpl } from './repository/formResponse/formRespon
     { provide: 'EventUserRelationshipRepository', useClass: EventUserRelationshipRepositoryImpl },
     { provide: 'EventRoleRepository', useClass: EventRoleRepositoryImpl },
     { provide: 'ShowingRepository', useClass: ShowingRepositoryImpl },
+    { provide: 'ShowingWithEventRepository', useClass: ShowingWithEventRepositoryImpl },
     { provide: 'SeatmapRepository', useClass: SeatmapRepositoryImpl },
     { provide: 'SeatStatusRepository', useClass: SeatStatusRepositoryImpl},
     { provide: 'TicketTypeRepository', useClass: TicketTypeRepositoryImpl},

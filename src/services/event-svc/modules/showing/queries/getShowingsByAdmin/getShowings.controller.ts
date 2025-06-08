@@ -3,7 +3,7 @@ import { Response } from "express";
 import { ApiBearerAuth, ApiHeader, ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { JwtAuthGuard } from "src/shared/guard/jwt-auth.guard";
 import { GetShowingsByAdminService } from "./getShowings.service";
-import { ShowingResponseDto } from "./getShowings-response.dto";
+import { ShowingByAdminResponseDto } from "./getShowings-response.dto";
 
 @ApiTags('Event Service - Admin - Showing Management')
 @Controller('api/admin/showing')
@@ -21,7 +21,7 @@ export class GetShowingsByAdminController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Showings retrieved successfully',
-    type: ShowingResponseDto,
+    type: ShowingByAdminResponseDto,
   })
   async getShowings(
     @Query() filters: any,

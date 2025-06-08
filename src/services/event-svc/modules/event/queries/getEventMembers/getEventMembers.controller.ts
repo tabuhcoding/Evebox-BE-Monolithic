@@ -16,7 +16,7 @@ export class GetEventMemberController {
   ) { }
 
   @UseGuards(JwtAuthGuard)
-  @Get(':eventId')
+  @Get('/:eventId')
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Get all members of an event (optionally filter by email)' })
   @ApiResponse({ status: HttpStatus.OK, description: 'List of event members', type: GetEventMembersResponseDto })

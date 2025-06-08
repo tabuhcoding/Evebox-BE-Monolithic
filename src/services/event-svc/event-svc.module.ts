@@ -75,7 +75,6 @@ import { ConnectFormService } from './modules/form/commands/connectFormToShowing
 import { CreateOrgPaymentInfoController } from './modules/orgPaymentInfor/commands/createOrgPaymentInfor/createOrgPaymentInfor.controller';
 import { CreateOrgPaymentInfoService } from './modules/orgPaymentInfor/commands/createOrgPaymentInfor/createOrgPaymentInfor.service';
 import { GetOrgPaymentInfoController } from './modules/orgPaymentInfor/queries/getOrgPaymentInfor/getOrgPaymentInfor.controller';
-import { GetFavoriteOrgService } from '../auth-svc/modules/user/queries/get-favorite-org/get-favorite-org.service';
 import { UpdateOrgPaymentInfoController } from './modules/orgPaymentInfor/commands/updateOrgPaymentInfor/updateOrgPaymentInfor.controller';
 import { UpdateOrgPaymentInfoService } from './modules/orgPaymentInfor/commands/updateOrgPaymentInfor/updateOrgPaymentInfor.service';
 import { DeleteOrgPaymentInfoController } from './modules/orgPaymentInfor/commands/deleteOrgPaymentInfor/deleteOrgPaymentInfor.controller';
@@ -103,6 +102,8 @@ import { GetEventRolesController } from './modules/event/queries/getEventRoles/g
 import { GetEventRolesService } from './modules/event/queries/getEventRoles/getEventRoles.service';
 import { GetEventRolesByIdController } from './modules/event/queries/getEventRolesById/getEventRolesById.controller';
 import { GetEventRolesByIdService } from './modules/event/queries/getEventRolesById/getEventRolesById.service';
+import { GetUserSubmitFormService } from './modules/form/queries/getUserSubmitForm/getUserSubmitForm.service';
+import { FormResponseRepositoryImpl } from './repository/formResponse/formResponse.impl';
 
 @Module({
   imports: [ BookingSvcModule, AuthSvcModule, CqrsModule ],
@@ -161,9 +162,6 @@ import { GetEventRolesByIdService } from './modules/event/queries/getEventRolesB
   ],
   providers: [
     // Adapters
-    SlackService,
-    FileCacheService,
-
     // Utils Command
     CalculateShowingStatusService,
     
@@ -226,6 +224,8 @@ import { GetEventRolesByIdService } from './modules/event/queries/getEventRolesB
     DeleteFormService,
     ConnectFormService,
 
+    GetUserSubmitFormService,
+
     // Admin showing
     GetShowingAdminDetailService,
     GetShowingsByAdminService,
@@ -247,6 +247,7 @@ import { GetEventRolesByIdService } from './modules/event/queries/getEventRolesB
     { provide: 'FormRepository', useClass: FormRepositoryImpl },
     { provide: 'LocationsRepository', useClass: LocationsRepositoryImpl },
     { provide: 'OrgPaymentInforRepository', useClass: OrgPaymentInforRepositoryImpl },
+    { provide: 'FormResponseRepository', useClass: FormResponseRepositoryImpl },
   ],
   exports: [
     GetAllEventDetailForRAGService, 
@@ -255,6 +256,7 @@ import { GetEventRolesByIdService } from './modules/event/queries/getEventRolesB
     GetShowingSeatmapService,
     GetShowingDetailService,
     GetTicketTypeDetailService,
+    GetUserSubmitFormService,
   ],
 })
 export class EventSvcModule {}

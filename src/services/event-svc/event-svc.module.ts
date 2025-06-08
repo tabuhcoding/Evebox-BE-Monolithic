@@ -111,6 +111,8 @@ import { GetOrgRevenueByIdService } from './modules/statistics/queries/getOrgRev
 import { GetOrgRevenueByIdController } from './modules/statistics/queries/getOrgRevenueById/getOrgRevenueById.controller';
 import { GetEventRevenueDetailController } from './modules/statistics/queries/getEventRevenueDetail/getEventRevenueDetail.controller';
 import { GetEventRevenueDetailService } from './modules/statistics/queries/getEventRevenueDetail/getEventRevenueDetail.service';
+import { GetSummaryTicketRevenueController } from './modules/statistics/queries/getSummaryTicketRevenue/getSummaryTicketRevenue.controller';
+import { GetSummaryTicketRevenueService } from './modules/statistics/queries/getSummaryTicketRevenue/getSummaryTicketRevenue.service';
 
 @Module({
   imports: [ BookingSvcModule, AuthSvcModule, CqrsModule ],
@@ -169,7 +171,8 @@ import { GetEventRevenueDetailService } from './modules/statistics/queries/getEv
     GetOrgLocationsController,
     GetOrgRevenueController,
     GetOrgRevenueByIdController,
-    GetEventRevenueDetailController
+    GetEventRevenueDetailController,
+    GetSummaryTicketRevenueController
   ],
   providers: [
     // Adapters
@@ -249,6 +252,7 @@ import { GetEventRevenueDetailService } from './modules/statistics/queries/getEv
     GetOrgRevenueService,
     GetOrgRevenueByIdService,
     GetEventRevenueDetailService,
+    GetSummaryTicketRevenueService,
 
     // Repositories
     { provide: 'AdminRepository', useClass: AdminRepositoryImpl },

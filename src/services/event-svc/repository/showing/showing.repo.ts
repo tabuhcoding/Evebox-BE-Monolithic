@@ -55,4 +55,23 @@ export interface ShowingRepository extends BaseRepository<Showing, Prisma.Showin
   count(filters: any): Promise<number>;
   getBasicShowingDetail(showingId: string, ticketTypeId: string): Promise<any>;
   findShowingsByOrgAndEvent(orgId: string, eventId: number): Promise<EventWithShowings[]>;
+  findOneByIdWithTicketTypes(
+  showingId: string,
+  eventId: number,
+  organizerId: string
+): Promise<{
+  id: string;
+  startTime: Date;
+  endTime: Date;
+  Events: {
+    id: number;
+    title: string;
+  };
+  TicketType: {
+    id: string;
+    name: string;
+    price: number;
+    quantity: number | null;
+  }[];
+} | null>;
 }

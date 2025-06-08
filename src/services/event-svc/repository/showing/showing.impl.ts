@@ -289,4 +289,38 @@ async findShowingsByOrgAndEvent(orgId: string, eventId: number) {
       },
     });
   }
+
+  async findOneByIdWithTicketTypes(showingId: string, eventId: number, organizerId: string) {
+  return this.prisma.showing.findFirst({
+    where: {
+      id: showingId,
+      eventId,
+      deleteAt: null,
+      Events: {
+        organizerId,
+        deleteAt: null,
+        isApproved: true,
+      }
+    },
+    select: {
+      id: true,
+      startTime: true,
+      endTime: true,
+      Events: {
+        select: {
+          id: true,
+          title: true
+        }
+      },
+      TicketType: {
+        select: {
+          id: true,
+          name: true,
+          price: true,
+          quantity: true,
+        }
+      }
+    }
+  });
+}
 }

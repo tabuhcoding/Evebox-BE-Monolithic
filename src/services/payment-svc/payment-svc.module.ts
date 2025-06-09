@@ -13,6 +13,9 @@ import { CheckoutService } from "./modules/commands/checkout/checkout.service";
 import { CheckoutController } from "./modules/commands/checkout/checkout.controller";
 import { GetPaymentInfoService } from "./modules/queries/getPaymentInfo/getPaymentInfo.service";
 import { PayOSService } from "./common/payOS/payOS.service";
+import { PayOSWebhookController } from "./modules/webhooks/payos/payosWebhook.controller";
+import { CheckoutResultService } from "./modules/commands/checkoutResult/checkoutResult.service";
+import { PayOSWebhookService } from "./modules/webhooks/payos/payosWebhook.service";
 
 @Module({
   imports: [
@@ -25,6 +28,9 @@ import { PayOSService } from "./common/payOS/payOS.service";
     
     // Commands
     CheckoutController,
+
+    // Webhooks
+    PayOSWebhookController,
   ],
   providers: [
     // Adapters
@@ -36,8 +42,10 @@ import { PayOSService } from "./common/payOS/payOS.service";
     
     // Commands
     PayOSCheckoutService,
+    PayOSWebhookService,
 
     CheckoutService,
+    CheckoutResultService,
 
     // Repositories
     {

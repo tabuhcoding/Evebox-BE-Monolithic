@@ -19,6 +19,7 @@ import { GetOrdersByShowingIdService } from "./modules/queries/getOrdersByShowin
 import { GetOrdersInShowingIdsService } from "./modules/queries/getOrdersInShowingIds/getOrdersInShowingIds.service";
 import { SubmitFormController } from "./modules/commands/submitForm/submitForm.controller";
 import { SubmitFormService } from "./modules/commands/submitForm/submitForm.service";
+import { GenerateTicketService } from "./modules/commands/generateTicket/generateTicket.service";
 
 @Module({
   imports: [ 
@@ -47,6 +48,7 @@ import { SubmitFormService } from "./modules/commands/submitForm/submitForm.serv
     GetPaidOrdersByShowingIdService,
     GetOrdersByShowingIdService,
     GetOrdersInShowingIdsService,
+    GenerateTicketService,
 
     SubmitFormService,
 
@@ -61,6 +63,7 @@ import { SubmitFormService } from "./modules/commands/submitForm/submitForm.serv
     CreateOrderService,
     GetPaidOrdersByShowingIdService,
     GetOrdersInShowingIdsService,
+    GenerateTicketService,
   ],
 })
 export class BookingSvcModule {}

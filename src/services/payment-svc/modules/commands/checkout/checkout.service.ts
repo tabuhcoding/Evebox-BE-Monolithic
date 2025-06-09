@@ -7,6 +7,7 @@ import { GetRedisSeatService } from 'src/services/booking-svc/modules/queries/ge
 import { CreateOrderService } from 'src/services/booking-svc/modules/commands/createOrder/createOrder.service';
 import { PaymentMethod } from 'src/services/payment-svc/repository/paymentMethodStatus/paymentMethodStatus.repo';
 import { PayOSCheckoutService } from '../payOSCheckout/payOSCheckout.service';
+import { FileCacheService } from 'src/infrastructure/cache/fileCache/fileCache.service';
 
 @Injectable()
 export class CheckoutService {
@@ -15,6 +16,7 @@ export class CheckoutService {
     private readonly getRedisSeat: GetRedisSeatService,  
     private readonly createOrderService: CreateOrderService,
     private readonly payOSCheckoutService: PayOSCheckoutService,
+    private readonly fileCacheService: FileCacheService,
   ) {}
 
   async execute(checkoutDto: CheckoutDto, userId: string): Promise<Result<CheckoutResponseData, Error>> {
@@ -63,8 +65,16 @@ export class CheckoutService {
 
           this.slackService.sendNotice(`PayOS checkout link created successfully for user ${userId} in showing ${checkoutDto.showingID}. Link: ${checkoutResult}`);
 
+          // Cache the payment link
+          await this.fileCacheService.cacheObject(
+            `payOS`,
+            30,{},
+            checkoutResult.paymentLinkId,
+            [redisSeat]
+          )
+
           return Ok({
-            paymentLink: checkoutResult,
+            paymentLink: checkoutResult.checkoutUrl,
           })
         default:
           this.slackService.sendError(`Payment method ${checkoutDto.paymentMethod} not available for user ${userId} in showing ${checkoutDto.showingID}`);

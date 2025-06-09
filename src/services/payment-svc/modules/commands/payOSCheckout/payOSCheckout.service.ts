@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PayOSService } from '../../../common/payOS/payOS.service';
+import { CheckoutResponseDataType, PayOSService } from '../../../common/payOS/payOS.service';
 import { SlackService } from 'src/infrastructure/adapters/slack/slack.service';
 
 @Injectable()
@@ -16,7 +16,7 @@ export class PayOSCheckoutService {
     paymentCancelUrl: string,
     paymentSuccessUrl: string,
     ttl: number,
-  ): Promise<string | Error> {
+  ): Promise<CheckoutResponseDataType | Error> {
     try {
       const payOSCheckout = await this.payOSService.createPaymentLink(
         {
@@ -34,7 +34,7 @@ export class PayOSCheckoutService {
         throw new Error('Failed to create PayOS checkout link.');
       }
 
-      return payOSCheckout.checkoutUrl
+      return payOSCheckout
 
     } catch (error) {
       this.slackService.sendError(`Error during PayOS checkout for user ${userId} order ${orderCode}: ${error.message}`);

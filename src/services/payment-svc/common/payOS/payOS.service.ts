@@ -21,12 +21,12 @@ export class PayOSService implements OnModuleInit, OnModuleDestroy {
     );
   }
 
-  onModuleInit() {
+  async onModuleInit() {
     this.slackService.sendNotice(`PayOSService initialized with Client ID: ${this.configService.get<string>('PAYOS_CLIENT_ID')}`);
     try{
-      this.updateWebhookUrl()
+      await this.updateWebhookUrl()
     } catch (error) {
-      this.slackService.sendError(`PayOSService webhook URL update failed: ${error.message}`);
+      this.slackService.sendError(`PayOSService webhook URL update failed: ${error.message} with webhook URL: ${this.configService.get<string>('PAYOS_WEBHOOK_URL')}`);
     }
   }
 

@@ -78,4 +78,9 @@ export interface EventsRepository extends BaseRepository<Events, Prisma.EventsDe
 
   /* Statistics */
   getEventSummary(showingId: string): Promise<Result<EventSummaryData, Error>>;
+  countTotalClicksByEvent(eventId: number, startDate?: string, endDate?: string): Promise<Result<number, Error>>;
+  countUniqueUsersByEvent(eventId: number, startDate?: Date, endDate?: Date): Promise<Result<number, Error>>;
+  countOrdersByEvent(eventId: number): Promise<Result<number, Error>>;
+  countBuyersByEvent(eventId: number): Promise<Result<number, Error>>;
+  getStatistics(eventId: number): Promise<Result<any, Error>>;
 }

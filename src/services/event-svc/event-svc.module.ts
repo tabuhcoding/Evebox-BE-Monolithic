@@ -109,6 +109,8 @@ import { GetEventSummaryController } from './modules/event/queries/getEventSumma
 import { GetEventSummaryService } from './modules/event/queries/getEventSummary/getEventSummary.service';
 import { GetFormResponseByIdService } from './modules/formResponse/queries/getFormResponseById/getFormResponseById.service';
 import { CheckUserPermissionService } from './modules/event/commands/checkUserPermission/checkUserPermission.service';
+import { GetAnalyticsController } from './modules/event/queries/getAnalytics/getAnalytics.controller';
+import { GetAnalyticsService } from './modules/event/queries/getAnalytics/getAnalytics.service';
 
 @Module({
   imports: [ BookingSvcModule, AuthSvcModule, CqrsModule ],
@@ -132,6 +134,7 @@ import { CheckUserPermissionService } from './modules/event/commands/checkUserPe
 
     // Event Statistics
     GetEventSummaryController,
+    GetAnalyticsController,
 
     // Form
     CreateFormController,
@@ -197,6 +200,7 @@ import { CheckUserPermissionService } from './modules/event/commands/checkUserPe
     GetEventRolesByIdService,
 
     GetEventSummaryService,
+    GetAnalyticsService,
 
     ///// Showing
     // Commands

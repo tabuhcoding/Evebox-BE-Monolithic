@@ -1,8 +1,10 @@
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import PayOS from '@payos/node';
-import { CheckoutRequestType } from '@payos/node/lib/type';
+import { CheckoutRequestType, WebhookDataType, WebhookType, CheckoutResponseDataType } from '@payos/node/lib/type';
 import { ConfigService } from '@nestjs/config';
 import { SlackService } from 'src/infrastructure/adapters/slack/slack.service';
+
+export { WebhookType, WebhookDataType, CheckoutResponseDataType }
 
 @Injectable()
 export class PayOSService implements OnModuleInit, OnModuleDestroy {
@@ -21,6 +23,11 @@ export class PayOSService implements OnModuleInit, OnModuleDestroy {
 
   onModuleInit() {
     this.slackService.sendNotice(`PayOSService initialized with Client ID: ${this.configService.get<string>('PAYOS_CLIENT_ID')}`);
+    try{
+      this.updateWebhookUrl()
+    } catch (error) {
+      this.slackService.sendError(`PayOSService webhook URL update failed: ${error.message}`);
+    }
   }
 
   onModuleDestroy() {
@@ -41,6 +48,11 @@ export class PayOSService implements OnModuleInit, OnModuleDestroy {
 
   async updateWebhookUrl() {
     const webhookUrl = this.configService.get<string>('PAYOS_WEBHOOK_URL');
-    // await this.updateWebhookUrl(webhookUrl);
+    const result = await this.payOS.confirmWebhook(webhookUrl);
+    this.slackService.sendNotice(`Webhook URL updated: ${webhookUrl} with result: ${JSON.stringify(result)}`);
+  }
+
+  async verifyWebhookData(payload: WebhookType): Promise<WebhookDataType | null>{
+    return this.payOS.verifyPaymentWebhookData(payload)
   }
 }

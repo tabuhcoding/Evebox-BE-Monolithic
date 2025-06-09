@@ -12,6 +12,7 @@ import { CheckUserExistService } from 'src/services/auth-svc/modules/user/comman
 import { ShowingSeatMapResponseDto } from 'src/services/event-svc/modules/showing/queries/getShowingSeatmap/getShowingSeatmap-response.dto';
 import { SeatStatusEnum } from 'src/services/event-svc/repository/seatStatus/seatStatus.repo';
 import { AggregatedSelectTicketTypeItem, SelectTicketTypeData } from '../../../common/type';
+import { BookingTicketStatus } from 'src/services/booking-svc/repository/order/order.repo';
 
 @Injectable()
 export class SelectSeatService {
@@ -117,6 +118,7 @@ export class SelectSeatService {
             ticketTypeId: ticketType.id,
             Order: {
               showingId: selectSeatDto.showingId,
+              status: BookingTicketStatus.SUCCESS || BookingTicketStatus.PAID,
             }
           }
         )
@@ -247,6 +249,7 @@ export class SelectSeatService {
           sectionId: ticketTypeSelection.sectionId,
           Order: {
             showingId: selectSeatDto.showingId,
+            status: BookingTicketStatus.SUCCESS || BookingTicketStatus.PAID,
           }
         });
 
@@ -362,6 +365,7 @@ export class SelectSeatService {
           seatId: { in: seatIds },
           Order: {
             showingId: selectSeatDto.showingId,
+            status: BookingTicketStatus.SUCCESS || BookingTicketStatus.PAID,
           }
         }); 
         if (existingTickets) {

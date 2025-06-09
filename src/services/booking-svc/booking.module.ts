@@ -13,6 +13,7 @@ import { GetRedisSeatService } from "./modules/queries/getRedisSeat/getRedisSeat
 import { CountCheckedInTicketsService } from "./modules/queries/getCountCheckedInTickets/getCountCheckedInTickets.service";
 import { CreateOrderService } from "./modules/commands/createOrder/createOrder.service";
 import { TicketQueryService } from "./modules/queries/getTicketQuery/ticket-query.service";
+import { GenerateTicketService } from "./modules/commands/generateTicket/generateTicket.service";
 
 @Module({
   imports: [ 
@@ -36,12 +37,13 @@ import { TicketQueryService } from "./modules/queries/getTicketQuery/ticket-quer
     CountCheckedInTicketsService,
     CreateOrderService,
     TicketQueryService,
+    GenerateTicketService,
 
     // Repositories
     { provide: 'OrderRepository', useClass: OrderRepositoryImpl },
     { provide: 'TicketRepository', useClass: TicketRepositoryImpl },
   ],
-  exports: [GetTotalTicketOfTicketTypeService, CountCheckedInTicketsService, TicketQueryService, GetRedisSeatService, CreateOrderService
+  exports: [GetTotalTicketOfTicketTypeService, CountCheckedInTicketsService, GetRedisSeatService, CreateOrderService, GenerateTicketService, TicketQueryService
   ],
 })
 export class BookingSvcModule {}

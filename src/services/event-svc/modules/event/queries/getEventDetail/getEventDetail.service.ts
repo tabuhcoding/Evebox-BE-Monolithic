@@ -74,6 +74,8 @@ export class GetEventDetailService {
         imgPosterUrl: event.imgPosterUrl,
         isOnline: event.isOnline,
         lastScore: event.lastScore,
+        totalClicks: event.totalClicks,
+        weekClicks: event.weekClicks,
         isSpecial: event.isSpecial,
         isOnlyOnEve: event.isOnlyOnEve,
         orgName: event.orgName,

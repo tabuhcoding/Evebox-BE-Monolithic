@@ -6,6 +6,17 @@ const algorithm = process.env.ENCRYPTION_ALGORITHM || 'aes-256-cbc';
 const key = Buffer.from(process.env.ENCRYPTION_KEY!, 'hex');
 const iv = Buffer.from(process.env.ENCRYPTION_IV!, 'hex');
 
+export async function generateQRCode(data: string): Promise<string> {
+  return await QRCode.toDataURL(data);
+}
+
+export function encrypt(text: string): string {
+  const cipher = crypto.createCipheriv(algorithm, key, iv);
+  let encrypted = cipher.update(text, 'utf8', 'base64');
+  encrypted += cipher.final('base64');
+  return encrypted;
+}
+
 /**
  * decrypt ciphertext base64 form to string.
  * @param encryptedText ciphertext dạng base64

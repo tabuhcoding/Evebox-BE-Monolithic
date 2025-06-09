@@ -132,6 +132,12 @@ export class EventDetailResponseDto {
 
   @ApiProperty({ example: '50' })
   lastScore: Decimal;
+  
+  @ApiProperty({ example: 601, description: 'Total clicks' })
+  totalClicks: number;
+
+  @ApiProperty({ example: 300, description: 'Weekly clicks' })
+  weekClicks: number;
 
   @ApiProperty({ example: false })
   isSpecial: boolean;

@@ -111,6 +111,14 @@ import { GetFormResponseByIdService } from './modules/formResponse/queries/getFo
 import { CheckUserPermissionService } from './modules/event/commands/checkUserPermission/checkUserPermission.service';
 import { GetAnalyticsController } from './modules/event/queries/getAnalytics/getAnalytics.controller';
 import { GetAnalyticsService } from './modules/event/queries/getAnalytics/getAnalytics.service';
+import { FormAnswerRepositoryImpl } from './repository/formAnswer/formAnswer.impl';
+import { GetFormResponseService } from './modules/formResponse/queries/getFormResponse/getFormResponse.service';
+import { DeleteFormAnswerService } from './modules/formAnswer/commands/deleteFormAnswer/deleteFormAnswer.service';
+import { UpdateFormResponseService } from './modules/formResponse/commands/updateFormResponse/updateFormResponse.service';
+import { CreateFormResponseService } from './modules/formResponse/commands/createFormResponse/createFormResponse.service';
+import { GetFormByIdService } from './modules/form/queries/getFormById/getFormById.service';
+import { FormInputRepositoryImpl } from './repository/formInput/formInput.impl';
+import { GetManyFormInputsByIdService } from './modules/formInput/queries/getManyFormInputsById/getManyFormInputsById.service';
 
 @Module({
   imports: [ BookingSvcModule, AuthSvcModule, CqrsModule ],
@@ -242,6 +250,12 @@ import { GetAnalyticsService } from './modules/event/queries/getAnalytics/getAna
     GetUserSubmitFormService,
 
     GetFormResponseByIdService,
+    GetFormResponseService,
+    CreateFormResponseService,
+    UpdateFormResponseService,
+    DeleteFormAnswerService,
+    GetFormByIdService,
+    GetManyFormInputsByIdService,
 
     // Admin showing
     GetShowingAdminDetailService,
@@ -266,6 +280,8 @@ import { GetAnalyticsService } from './modules/event/queries/getAnalytics/getAna
     { provide: 'LocationsRepository', useClass: LocationsRepositoryImpl },
     { provide: 'OrgPaymentInforRepository', useClass: OrgPaymentInforRepositoryImpl },
     { provide: 'FormResponseRepository', useClass: FormResponseRepositoryImpl },
+    { provide: 'FormAnswerRepository', useClass: FormAnswerRepositoryImpl },
+    { provide: 'FormInputRepository', useClass: FormInputRepositoryImpl },
   ],
   exports: [
     GetAllEventDetailForRAGService, 
@@ -276,7 +292,13 @@ import { GetAnalyticsService } from './modules/event/queries/getAnalytics/getAna
     GetTicketTypeDetailService,
     GetUserSubmitFormService,
     GetFormResponseByIdService,
-    CheckUserPermissionService
+    CheckUserPermissionService,
+    GetFormResponseService,
+    CreateFormResponseService,
+    UpdateFormResponseService,
+    DeleteFormAnswerService,
+    GetFormByIdService,
+    GetManyFormInputsByIdService,
   ],
 })
 export class EventSvcModule {}

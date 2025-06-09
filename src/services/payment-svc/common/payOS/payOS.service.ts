@@ -26,7 +26,7 @@ export class PayOSService implements OnModuleInit, OnModuleDestroy {
     try{
       await this.updateWebhookUrl()
     } catch (error) {
-      this.slackService.sendError(`PayOSService webhook URL update failed: ${error.message} with webhook URL: ${this.configService.get<string>('PAYOS_WEBHOOK_URL')}`);
+      this.slackService.sendError(`PayOSService webhook URL update failed: ${error} with webhook URL: ${this.configService.get<string>('PAYOS_WEBHOOK_URL')}`);
     }
   }
 

@@ -27,9 +27,7 @@ export class PayOSWebhookController {
     }
     finally {
       return res.status(HttpStatus.OK).json({
-        statusCode: HttpStatus.OK,
-        message: 'Payment Method status data retrieved successfully',
-        data: null,
+        success: true,
       });
     }
   }

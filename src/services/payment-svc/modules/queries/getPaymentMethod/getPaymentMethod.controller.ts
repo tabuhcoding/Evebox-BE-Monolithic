@@ -41,7 +41,7 @@ export class GetPaymentMethodController {
 
     const data = result.unwrap();
     return res.status(HttpStatus.OK).json({
-      statusCode: HttpStatus.OK,
+      statusCode: HttpStatus.CREATED,
       message: 'Payment Method status data retrieved successfully',
       data,
     });

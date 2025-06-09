@@ -19,6 +19,9 @@ export type TicketTypeWithoutShowingAndSections = Prisma.TicketTypeGetPayload<{
     sections: false;
   }
 }>;
+
+export {TicketDeliveryType} from '@prisma/client'
+
 export interface TicketTypeRepository extends BaseRepository<TicketType, Prisma.TicketTypeDelegate> {
   /* Create Ticket Type */
   createTicketType(dto: CreateTicketTypeDto, showingId: string, userEmail: string): Promise<Result<[string, boolean], Error>>;

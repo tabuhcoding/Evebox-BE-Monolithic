@@ -1,22 +1,29 @@
-import { Controller, Get, Query, Res, HttpStatus, Post, Body, Headers } from '@nestjs/common';
-import { Response } from 'express';
-import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { ErrorHandler } from 'src/shared/exceptions/error.handler';
+import { Controller, Post, Body } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { SlackService } from 'src/infrastructure/adapters/slack/slack.service';
+import { WebhookType } from 'src/services/payment-svc/common/payOS/payOS.service';
+import { PayOSWebhookService } from './payosWebhook.service';
 
-@ApiTags('Payment Service')
+@ApiTags('Webhooks')
 @Controller('api/payment')
-export class GetPaymentMethodController {
+export class PayOSWebhookController {
   constructor(
     private readonly slackService: SlackService,
+    private readonly payosWebhookService: PayOSWebhookService,
   ) {}
 
   @Post('/webhooks/payos')
   async getPayOSReturn(
-    @Body() payload: any,
-    @Headers('x-payos-signature') signature: string,
+    @Body() payload: WebhookType,
   ) {
+    this.slackService.sendNotice(`PayOS webhook received: ${JSON.stringify(payload)}`);
 
-    
+    try {
+      await this.payosWebhookService.verifyWebhookData(payload);
+    } catch (error) {
+      this.slackService.sendError(`PayOS webhook verification failed: ${error.message}`);
+    }
+
+    return { message: 'Webhook received and processed successfully' };
   }
 }

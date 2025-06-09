@@ -37,11 +37,13 @@ export class CheckoutResultService {
       
       // update the order status and clear the cache
       // TODO: Need to run in transaction
+      // Generate the ticket
+      await this.generateTicketService.execute(webhookData.orderCode, cachedData.data[0].ticketTypeSelection)
       await this.fileCacheService.clearObject('payOS', {}, paymentLinkID);
       await this.createOrderService.updateOrderStatus(webhookData.orderCode, BookingTicketStatus.PAID)
 
-      // Generate the ticket
-      await this.generateTicketService.execute(webhookData.orderCode, cachedData.data[0].ticketTypeSelection)
+      // Double check the order status
+      
     } catch (error) {
       this.slackService.sendError(`PaymentService >>> PayOS checkout result verification failed: ${error.message}`);
       return false;

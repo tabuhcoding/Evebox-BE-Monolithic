@@ -43,32 +43,32 @@ export class GenerateTicketService {
 
       // If seatmap ID is 0, showing not have a seatmap
       if (showing.seatMapId === 0) {
-        // return this.handleShowingWithoutSeatmap(selectSeatDto, email);
+        return this.handleShowingWithoutSeatmap(ticketData, orderId);
       }
 
       // Fetch the seatmap for the showing
       const seatmapResult = await this.getShowingSeatmapService.getSeatMap(order.showingId);
       if (seatmapResult.isErr()) {
-        return
+        throw (seatmapResult.unwrapErr());
       }
 
       const seatmap = seatmapResult.unwrap();
 
       if (!seatmap) {
-        // return Err(new Error('Seat map not found.'));
+        throw (new Error('Seat map not found.'));
       }
 
       // If the seatmap is not a seatmap
       if( seatmap.seatMapType == SeatmapType.NOT_A_SEATMAP) {
-        // return this.handleShowingWithoutSeatmap(selectSeatDto, email);
+        return this.handleShowingWithoutSeatmap(ticketData, orderId);
       }
 
       if ( seatmap.seatMapType == SeatmapType.SELECT_SECTION) {
-        // return this.handleShowingWithSelectSectionSeatmap(selectSeatDto, email);
+        return this.handleShowingWithSelectSectionSeatmap(ticketData, orderId);
       }
 
       if ( seatmap.seatMapType == SeatmapType.SELECT_SEAT) {
-        // return this.handleShowingWithSelectSeatSeatmap(selectSeatDto, email, seatmap);
+        return this.handleShowingWithSelectSeatSeatmap(ticketData, orderId);
       }
     }
     catch (error) {
@@ -78,7 +78,7 @@ export class GenerateTicketService {
     }
   }
 
-  async handleShowingWithoutSeatmap(ticketData: TicketTypeSelectionCache[], orderID: string): Promise<void> {
+  async handleShowingWithoutSeatmap(ticketData: TicketTypeSelectionCache[], orderID: number): Promise<void> {
     // If all ticketData is valid, generate tickets
     for (const ticketTypeSelection of ticketData) {
       try {        
@@ -107,7 +107,7 @@ export class GenerateTicketService {
     this.slackService.sendNotice(`Booking Svc >>> generateTicket : Tickets generated successfully for order ID ${orderID} with ticket data: ${JSON.stringify(ticketData)}`);
   }
 
-  async handleShowingWithSelectSectionSeatmap(ticketData: TicketTypeSelectionCache[], orderID: string): Promise<void> {
+  async handleShowingWithSelectSectionSeatmap(ticketData: TicketTypeSelectionCache[], orderID: number): Promise<void> {
     // If all ticketData is valid, generate tickets
     for (const ticketTypeSelection of ticketData) {
       try {
@@ -136,7 +136,7 @@ export class GenerateTicketService {
     this.slackService.sendNotice(`Booking Svc >>> generateTicket : Tickets generated successfully for order ID ${orderID} with ticket data: ${JSON.stringify(ticketData)}`);
   }
 
-  async handleShowingWithSelectSeatSeatmap(ticketData: TicketTypeSelectionCache[], orderID: string): Promise<void> {
+  async handleShowingWithSelectSeatSeatmap(ticketData: TicketTypeSelectionCache[], orderID: number): Promise<void> {
     for (const ticketTypeSelection of ticketData) {
       try{
         for ( const seat of ticketTypeSelection.seatInfo){

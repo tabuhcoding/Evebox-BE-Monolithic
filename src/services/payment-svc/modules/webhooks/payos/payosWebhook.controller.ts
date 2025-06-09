@@ -6,7 +6,7 @@ import { PayOSWebhookService } from './payosWebhook.service';
 
 @ApiTags('Webhooks')
 @Controller('api/payment')
-export class GetPaymentMethodController {
+export class PayOSWebhookController {
   constructor(
     private readonly slackService: SlackService,
     private readonly payosWebhookService: PayOSWebhookService,

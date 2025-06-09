@@ -16,6 +16,7 @@ import { GetPaidOrdersByShowingIdService } from "./modules/queries/getPaidOrders
 import { PaymentSvcModule } from "../payment-svc/payment-svc.module";
 import { GetOrdersByShowingIdController } from "./modules/queries/getOrdersByShowingId/getOrdersByShowingId.controller";
 import { GetOrdersByShowingIdService } from "./modules/queries/getOrdersByShowingId/getOrdersByShowingId.service";
+import { GetOrdersInShowingIdsService } from "./modules/queries/getOrdersInShowingIds/getOrdersInShowingIds.service";
 
 @Module({
   imports: [ 
@@ -42,6 +43,7 @@ import { GetOrdersByShowingIdService } from "./modules/queries/getOrdersByShowin
     CreateOrderService,
     GetPaidOrdersByShowingIdService,
     GetOrdersByShowingIdService,
+    GetOrdersInShowingIdsService,
 
     // Repositories
     { provide: 'OrderRepository', useClass: OrderRepositoryImpl },
@@ -53,6 +55,7 @@ import { GetOrdersByShowingIdService } from "./modules/queries/getOrdersByShowin
     GetRedisSeatService, 
     CreateOrderService,
     GetPaidOrdersByShowingIdService,
+    GetOrdersInShowingIdsService,
   ],
 })
 export class BookingSvcModule {}

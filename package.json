@@ -11,7 +11,7 @@
     "prestart": "npm run prisma:generate:all",
     "prestart:dev": "npm run prisma:generate:all",
     "prebuild": "npm run prisma:generate:all",
-    "build": "nest build",
+    "build": "npx nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",

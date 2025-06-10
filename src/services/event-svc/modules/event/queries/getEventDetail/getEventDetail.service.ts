@@ -8,6 +8,8 @@ import { calculateShowingStatusAndMinPrice, EventStatus, ShowingStatus } from "s
 import { CalculateShowingStatusService } from "../../commands/calculateShowingStatus/calculateShowingStatus.service";
 import { UserClickHistoryRepository } from "src/services/event-svc/repository/userClickHistory/userClickHistory.repo";
 import { CheckUserExistService } from "src/services/auth-svc/modules/user/commands/checkuserExist/checkuserExist.service";
+import { start } from "repl";
+import { CheckFavoriteService } from "src/services/auth-svc/modules/user/commands/check-favorite/checkFavorite.service";
 
 @Injectable()
 export class GetEventDetailService {
@@ -18,9 +20,10 @@ export class GetEventDetailService {
     private readonly slackService: SlackService,
     private readonly calculateShowingStatusService: CalculateShowingStatusService,
     private readonly checkUserExistService: CheckUserExistService,
+    private readonly checkFavoriteService: CheckFavoriteService,
   ) {}
 
-  async execute(eventId: number): Promise<Result<EventDetailResponseDto, Error>> {
+  async execute(eventId: number, userId?: string): Promise<Result<EventDetailResponseDto, Error>> {
     if (!eventId) {
       return Err(new Error("Event ID is required."));
     }
@@ -37,8 +40,8 @@ export class GetEventDetailService {
               },
             },
             where: {
-              startTime: {
-                gte: new Date(),
+              endTime: {
+                gte: new Date(new Date().setMonth(new Date().getMonth() - 1)),
               },
               deleteAt: null,
             },
@@ -63,6 +66,13 @@ export class GetEventDetailService {
       if (!event) {
         return Err(new Error("Event not found."));
       }
+
+      var [ isFavoriteEvent, isNotifiedEvent, isFavoriteOrg, isNotifiedOrg ] = [false, false, false, false];
+      // Check if user exists
+      if(userId){
+        [isFavoriteEvent, isNotifiedEvent, isFavoriteOrg, isNotifiedOrg] = await this.checkFavoriteService.execute(userId, event.organizerId, event.id);
+      }
+
 
       let eventsDto : EventDetailResponseDto = {
         id: event.id,
@@ -89,6 +99,10 @@ export class GetEventDetailService {
         showing: [],
         locationsString: "",
         minPrice: Number.MAX_VALUE,
+        isUserFavorite: isFavoriteEvent,
+        isUserNotice: isNotifiedEvent,
+        isUserFavoriteOrganizer: isFavoriteOrg,
+        isUserNoticeOrganizer: isNotifiedOrg,
       }
 
       // Location string
@@ -168,6 +182,11 @@ export class GetEventDetailService {
     }
 
     try{
+      this.eventsRepository.updateOneById(eventId, {
+        weekClicks: { increment: 1 },
+        totalClicks: { increment: 1 },
+      });
+
       // If userId is provided, update user click history
       if (userId) {
         // Check if user exists
@@ -193,11 +212,6 @@ export class GetEventDetailService {
         }
 
         // Increase post click count
-        this.eventsRepository.updateOneById(eventId, {
-          weekClicks: { increment: 1 },
-          totalClicks: { increment: 1 },
-        });
-
         this.userClickHistoryRepository.insertOne({
           userId: userId,
           eventId: eventId,

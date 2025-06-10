@@ -153,6 +153,18 @@ export class EventDetailResponseDto {
 
   @ApiProperty({ example: 222000, description: 'Min ticket price' })
   minPrice: number;
+
+  @ApiProperty({ example: true, description: 'Is the user favorite event' })
+  isUserFavorite?: boolean;
+
+  @ApiProperty({ example: true, description: 'Is the user notice event' })
+  isUserNotice?: boolean;
+
+  @ApiProperty({ example: true, description: 'Is the user favorite organizer' })
+  isUserFavoriteOrganizer?: boolean;
+
+  @ApiProperty({ example: true, description: 'Is the user notice organizer' })
+  isUserNoticeOrganizer?: boolean;
 }
 
 export class EventDetailResponse{

@@ -1,6 +1,8 @@
 import { BaseRepository } from "src/shared/repo/base.repository";
 import { Prisma } from "@prisma/client";
 
+import { CreateFormResponseDto } from "../../modules/formResponse/commands/createFormResponse/createFormResponse.dto";
+
 export type FormResponse = Prisma.FormResponseGetPayload<{
   include: {
     FormAnswer: {
@@ -19,7 +21,7 @@ export type FormResponse = Prisma.FormResponseGetPayload<{
 
 export interface FormResponseRepository extends BaseRepository<FormResponse, Prisma.FormResponseDelegate> {
   // /* Create Form Response */
-  // createFormResponse(formId: number, userEmail: string, data: Record<string, any>): Promise<FormResponse>;
+  createFormResponse(dto: CreateFormResponseDto, userId: string): Promise<FormResponse>;
 
   // /* Get Form Response by ID */
   getFormResponseById(id: number): Promise<FormResponse | null>;

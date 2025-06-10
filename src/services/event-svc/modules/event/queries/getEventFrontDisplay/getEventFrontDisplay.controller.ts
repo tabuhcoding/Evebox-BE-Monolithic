@@ -29,7 +29,7 @@ export class GetEventFrontDisplayController {
   })
   async getFrontDisplay(@Res() res: Response, @Request() req) {
     try {
-      const result = await this.frontDisplayService.execute();
+      const result = await this.frontDisplayService.execute(req.user?.email);
 
       if (result.isErr()) {
         return res

@@ -94,7 +94,7 @@ model FavoriteNotiHistory {
   eventId    Int?
   isFavorite Boolean
   isNotified Boolean
-  user       User     @relation("UserFavoriteHistory", fields: [userId], references: [id])
+  user       User     @relation("UserFavoriteHistory", fields: [userId], references: [email])
 }
 
 model PayOSInfo {
@@ -118,7 +118,7 @@ model PaymentInfo {
   method      PaymentMethod
   paymentCode Int
   paidAt      DateTime?
-  orderId     String?
+  orderId     Int?
 }
 
 model PaymentMethodStatus {
@@ -221,6 +221,7 @@ model FormResponse {
   createdAt  DateTime     @default(now())
   userId     String
   showingId  String?
+  orderId    Int?
   FormAnswer FormAnswer[]
   Form       Form         @relation(fields: [formId], references: [id], onDelete: Cascade)
   Showing    Showing?     @relation(fields: [showingId], references: [id], onDelete: Cascade)

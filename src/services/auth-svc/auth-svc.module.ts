@@ -79,6 +79,7 @@ import { VerifyUserPinService } from "./modules/user/commands/verift-pin/verify-
 import { ChangeUserPinController } from "./modules/user/commands/change-pin/change-pin.controller";
 import { ChangeUserPinService } from "./modules/user/commands/change-pin/change-pin.service";
 import { GetAdminAccessService } from "./modules/user/queries/get-admin-access/get-admin-access.service";
+import { CheckFavoriteService } from "./modules/user/commands/check-favorite/checkFavorite.service";
 
 
 @Module({
@@ -192,7 +193,8 @@ import { GetAdminAccessService } from "./modules/user/queries/get-admin-access/g
     GetUsersNotifiedByOrgService,
     TurnOffNotificationServiceForEvent,
     TurnOffNotificationServiceForOrg,
-    GetAdminAccessService
+    GetAdminAccessService,
+    CheckFavoriteService,
   ],
   exports: [
     UserRepositoryImpl,
@@ -204,6 +206,7 @@ import { GetAdminAccessService } from "./modules/user/queries/get-admin-access/g
     GetAdminAccessService,
     UpdateUserRoleService,
     GetUserService,
+    CheckFavoriteService,
   ],
 })
 export class AuthSvcModule { }

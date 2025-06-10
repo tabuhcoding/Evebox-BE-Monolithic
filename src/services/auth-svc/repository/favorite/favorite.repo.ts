@@ -4,6 +4,8 @@ import { Prisma } from "@prisma/client";
 
 export { FavoriteNotiHistory }
 
+export { ItemType } from '@prisma/client';
+
 export interface FavoriteRepository
   extends BaseRepository<FavoriteNotiHistory, Prisma.FavoriteNotiHistoryDelegate> {
     findFavorite(

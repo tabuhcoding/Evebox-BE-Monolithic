@@ -17,6 +17,8 @@ import { PaymentSvcModule } from "../payment-svc/payment-svc.module";
 import { GetOrdersByShowingIdController } from "./modules/queries/getOrdersByShowingId/getOrdersByShowingId.controller";
 import { GetOrdersByShowingIdService } from "./modules/queries/getOrdersByShowingId/getOrdersByShowingId.service";
 import { GetOrdersInShowingIdsService } from "./modules/queries/getOrdersInShowingIds/getOrdersInShowingIds.service";
+import { SubmitFormController } from "./modules/commands/submitForm/submitForm.controller";
+import { SubmitFormService } from "./modules/commands/submitForm/submitForm.service";
 import { GenerateTicketService } from "./modules/commands/generateTicket/generateTicket.service";
 
 @Module({
@@ -30,6 +32,7 @@ import { GenerateTicketService } from "./modules/commands/generateTicket/generat
     UnSelectSeatController,
     GetRedisSeatController,
     GetOrdersByShowingIdController,
+    SubmitFormController,
   ],
   providers: [
     // Services
@@ -46,6 +49,8 @@ import { GenerateTicketService } from "./modules/commands/generateTicket/generat
     GetOrdersByShowingIdService,
     GetOrdersInShowingIdsService,
     GenerateTicketService,
+
+    SubmitFormService,
 
     // Repositories
     { provide: 'OrderRepository', useClass: OrderRepositoryImpl },

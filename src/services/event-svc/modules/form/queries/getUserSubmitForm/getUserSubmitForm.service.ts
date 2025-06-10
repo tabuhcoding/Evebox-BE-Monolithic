@@ -24,6 +24,7 @@ export class GetUserSubmitFormService {
       const formResponses = await this.formResponseRepository.findOne({
         userId: userID,
         showingId: showingID,
+        orderId: null,
       });
       
       if (!formResponses) return null;

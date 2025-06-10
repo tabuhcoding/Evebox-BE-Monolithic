@@ -1,6 +1,6 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
-import { OrderRepository } from "src/services/booking-svc/repository/order/order.repo";
+import { Order, OrderRepository } from "src/services/booking-svc/repository/order/order.repo";
 import { GetUserSubmitFormService } from "src/services/event-svc/modules/form/queries/getUserSubmitForm/getUserSubmitForm.service";
 import { BookingTicketStatus, BookingTicketType } from "src/services/booking-svc/repository/order/order.repo";
 
@@ -16,10 +16,10 @@ export class CreateOrderService {
     try{
       const formResponseId = await this.getUserSubmitFormService.execute(showingID, 'userID'); // Replace 'userID' with actual user ID
       // TODO: Uncomment the following line after implementing SubmitFormService
-      // if (!formResponseId) {
+      if (!formResponseId) {
 
-      //   return null;
-      // }
+        return null;
+      }
 
       const order = await this.orderRepository.insertOneWithNumberId({
         showingId: showingID,
@@ -47,15 +47,15 @@ export class CreateOrderService {
     }
   }
 
-  async updateOrderStatus(orderId: number, status: BookingTicketStatus): Promise<boolean> {
+  async updateOrderStatus(orderId: number, status: BookingTicketStatus): Promise<Order | null> {
     try {
-      await this.orderRepository.updateOneById(orderId, { status });
+      const order = await this.orderRepository.updateAndFindOneById(orderId, { status });
       
-      return true;
+      return order;
     } catch (error) {
       this.slackService.sendError(` Booking Svc >>> updateOrderStatus : ${error.message}`);
       
-      return false;
+      return null;
     }
   }
 }

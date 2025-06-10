@@ -8,12 +8,14 @@ import { CalculateSectionStatusService } from '../../command/calculateSectionSta
 import { GetTotalTicketOfTicketTypeService } from 'src/services/booking-svc/modules/queries/getTotalTicketOfTicketType/getTotalTicketOfTicketType.service';
 import { SeatStatusEnum } from '@prisma/client';
 import { ShowingSeatMapResponseDto } from './getShowingSeatmap-response.dto';
+import { TicketTypeSectionRepository } from 'src/services/event-svc/repository/ticketTypeSection/ticketTypeSection.repo';
 
 @Injectable()
 export class getShowingSeatmapService {
   constructor(
     @Inject('SeatmapRepository') private readonly seatmapRepository: SeatmapRepository,
     @Inject('ShowingRepository') private readonly showingRepository: ShowingRepository,
+    @Inject('TicketTypeSectionRepository') private readonly ticketTypeSectionRepository: TicketTypeSectionRepository,
     private readonly slackService: SlackService,
     private readonly getSectionStatusService: CalculateSectionStatusService,
     private readonly getTotalTicketOfTicketTypeService: GetTotalTicketOfTicketTypeService,
@@ -75,11 +77,12 @@ export class getShowingSeatmapService {
           Section: seatmap.Section?.map(section => ({
             ...section,
             status: null,
+            ticketTypeId: null,
           })),
           seatMapType: seatmapType,
         };
         for (const section of formattedSeatmap.Section) {
-          section.status = await this.getSectionStatusService.calculateSectionStatus(ticketTypeIds, section.id);
+          [section.status, section.ticketTypeId] = await this.getSectionStatusService.calculateSectionStatus(ticketTypeIds, section.id);
         }
         return Ok(formattedSeatmap);
       }
@@ -94,12 +97,20 @@ export class getShowingSeatmapService {
           return Err(new Error('Failed to fetch seatmap.'));
         }
 
+        // Get all ticket type sections
+        const ticketTypeSections = await this.ticketTypeSectionRepository.findMany({
+          ticketTypeId: { in: ticketTypeIds },
+        });
+        // Map ticket type sections to a set for quick lookup
+        const ticketTypeSectionMap = new Map(ticketTypeSections.map(section => [section.sectionId, section.ticketTypeId]));
+
         // Format the seatmap
         const formattedSeatmap: ShowingSeatMapResponseDto = {
           ...seatmap,
           Section: seatmap.Section?.map(section => ({
             ...section,
             status: null,
+            ticketTypeId: ticketTypeSectionMap.get(section.id) || null,
             Row: section.Row?.map(row => ({
               ...row,
               Seat: row.Seat?.map(seat => ({

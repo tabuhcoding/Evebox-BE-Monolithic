@@ -6,6 +6,7 @@ import { EventStatus } from 'src/shared/utils/status/status';
 import { EventFrontDisplayDto } from '../getEventFrontDisplay/getEventFrontDisplay-response.dto';
 import { SlackService } from 'src/infrastructure/adapters/slack/slack.service';
 import { FileCacheService } from 'src/infrastructure/cache/fileCache/fileCache.service';
+import { CheckFavoriteService } from 'src/services/auth-svc/modules/user/commands/check-favorite/checkFavorite.service';
 
 @Injectable()
 export class GetRecommendEventService {
@@ -14,14 +15,19 @@ export class GetRecommendEventService {
     @Inject('EventsRepository') private readonly eventsRepository: EventsRepository,
     private readonly slackService: SlackService,
     private readonly fileCacheService: FileCacheService,
+    private readonly checkFavoriteService: CheckFavoriteService,
   ) {}
 
-  async getRecommendedEvents(timeWindow: "week" | "month"): Promise<Result<EventFrontDisplayDto[], Error>> {
+  async getRecommendedEvents(timeWindow: "week" | "month", userId?: string): Promise<Result<EventFrontDisplayDto[], Error>> {
     try {
       // Check cache first
-      const cacheData = await this.fileCacheService.getCache('getRecommendedEvents', { timeWindow });
+      const cacheData = await this.fileCacheService.getCache('getRecommendedEvents', { timeWindow })  as EventFrontDisplayDto[];
       if (cacheData) {
-        return Ok(cacheData as EventFrontDisplayDto[]);
+        if (userId) {
+          // Attach favorite status if userId is provided
+          await this.checkFavoriteService.attachFavorite(userId, cacheData);
+        }
+        return Ok(cacheData);
       }
 
       const now = new Date();
@@ -97,6 +103,10 @@ export class GetRecommendEventService {
       // Cache the result
       this.fileCacheService.cacheEndpoint('getRecommendedEvents', 300, { timeWindow }, filteredEventDtos);
 
+      if (userId){
+        // Attach favorite status if userId is provided
+        await this.checkFavoriteService.attachFavorite(userId, filteredEventDtos);
+      }
       // Return the result
       return Ok(filteredEventDtos);
     } catch (error) {

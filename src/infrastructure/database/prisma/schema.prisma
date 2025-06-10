@@ -221,6 +221,7 @@ model FormResponse {
   createdAt  DateTime     @default(now())
   userId     String
   showingId  String?
+  orderId    Int?
   FormAnswer FormAnswer[]
   Form       Form         @relation(fields: [formId], references: [id], onDelete: Cascade)
   Showing    Showing?     @relation(fields: [showingId], references: [id], onDelete: Cascade)

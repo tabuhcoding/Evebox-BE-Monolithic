@@ -13,6 +13,4 @@ export type Ticket = Prisma.TicketGetPayload<{
 export interface TicketRepository extends BaseRepository<Ticket, Prisma.TicketDelegate> {
   // Thêm các method riêng cho Order nếu cần
   countCheckedInTickets(ticketTypeIds: string[]): Promise<number>;
-  submitForm(dto: SubmitFormDto, userId: string): Promise<Result<any, Error>>;
-  checkValidForm(dto: SubmitFormDto): Promise<Result<boolean, Error>>;
 }

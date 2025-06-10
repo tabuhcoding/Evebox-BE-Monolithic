@@ -21,7 +21,6 @@ import { GetEventFDByIdsService } from './modules/event/queries/getEventFDByIds/
 import { GetEventFDByIdsController } from './modules/event/queries/getEventFDByIds/getEventFDByIds.controller';
 import { GetRecommendedEventController } from './modules/event/queries/getRecommendEvent/getRecommendEvent.controller';
 import { GetRecommendEventService } from './modules/event/queries/getRecommendEvent/getRecommendEvent.service';
-import { SlackService } from 'src/infrastructure/adapters/slack/slack.service';
 import { GetEventDetailRecommendController } from './modules/event/queries/getEventDetailRecommend/getEventDetailRecommend.controller';
 import { GetEventDetailRecommendService } from './modules/event/queries/getEventDetailRecommend/getEventDetailRecommend.service';
 import { BookingSvcModule } from '../booking-svc/booking.module';
@@ -82,7 +81,6 @@ import { DeleteOrgPaymentInfoController } from './modules/orgPaymentInfor/comman
 import { DeleteOrgPaymentInfoService } from './modules/orgPaymentInfor/commands/deleteOrgPaymentInfor/deleteOrgPaymentInfor.service';
 import { CalculateSectionStatusService } from './modules/showing/command/calculateSectionStatus/calculateSectionStatus.service';
 import { GetOrgPaymentInfoService } from './modules/orgPaymentInfor/queries/getOrgPaymentInfor/getOrgPaymentInfor.service';
-import { FileCacheService } from 'src/infrastructure/cache/fileCache/fileCache.service';
 import { UpdateEventAdminController } from './modules/event/commands/UpdateEventAdmin/updateEventAdmin.controller';
 import { UpdateEventAdminService } from './modules/event/commands/UpdateEventAdmin/updateEventAdmin.service';
 import { GetEventsByAdminService } from './modules/event/queries/getEventsByAdmin/getEvents.service';
@@ -98,7 +96,6 @@ import { GetEventOfOrgDetailService } from './modules/event/queries/getEventOfOr
 import { GetShowingAdminDetailController } from './modules/showing/queries/getShowingAdminDetail/getShowingAdminDetail.controller';
 import { GetShowingsByAdminController } from './modules/showing/queries/getShowingsByAdmin/getShowings.controller';
 import { GetTicketDetailOfShowingController } from './modules/showing/queries/getTicketDetailOfShowing/getTicketDetailOfShowing.controller';
-import { GetAdminAccessService } from '../auth-svc/modules/user/queries/get-admin-access/get-admin-access.service';
 import { GetEventRolesController } from './modules/event/queries/getEventRoles/getEventRoles.controller';
 import { GetEventRolesService } from './modules/event/queries/getEventRoles/getEventRoles.service';
 import { GetEventRolesByIdController } from './modules/event/queries/getEventRolesById/getEventRolesById.controller';
@@ -112,13 +109,8 @@ import { CheckUserPermissionService } from './modules/event/commands/checkUserPe
 import { GetAnalyticsController } from './modules/event/queries/getAnalytics/getAnalytics.controller';
 import { GetAnalyticsService } from './modules/event/queries/getAnalytics/getAnalytics.service';
 import { FormAnswerRepositoryImpl } from './repository/formAnswer/formAnswer.impl';
-import { GetFormResponseService } from './modules/formResponse/queries/getFormResponse/getFormResponse.service';
-import { DeleteFormAnswerService } from './modules/formAnswer/commands/deleteFormAnswer/deleteFormAnswer.service';
 import { UpdateFormResponseService } from './modules/formResponse/commands/updateFormResponse/updateFormResponse.service';
-import { CreateFormResponseService } from './modules/formResponse/commands/createFormResponse/createFormResponse.service';
-import { GetFormByIdService } from './modules/form/queries/getFormById/getFormById.service';
 import { FormInputRepositoryImpl } from './repository/formInput/formInput.impl';
-import { GetManyFormInputsByIdService } from './modules/formInput/queries/getManyFormInputsById/getManyFormInputsById.service';
 
 @Module({
   imports: [ BookingSvcModule, AuthSvcModule, CqrsModule ],
@@ -250,12 +242,7 @@ import { GetManyFormInputsByIdService } from './modules/formInput/queries/getMan
     GetUserSubmitFormService,
 
     GetFormResponseByIdService,
-    GetFormResponseService,
-    CreateFormResponseService,
     UpdateFormResponseService,
-    DeleteFormAnswerService,
-    GetFormByIdService,
-    GetManyFormInputsByIdService,
 
     // Admin showing
     GetShowingAdminDetailService,
@@ -293,12 +280,7 @@ import { GetManyFormInputsByIdService } from './modules/formInput/queries/getMan
     GetUserSubmitFormService,
     GetFormResponseByIdService,
     CheckUserPermissionService,
-    GetFormResponseService,
-    CreateFormResponseService,
     UpdateFormResponseService,
-    DeleteFormAnswerService,
-    GetFormByIdService,
-    GetManyFormInputsByIdService,
   ],
 })
 export class EventSvcModule {}

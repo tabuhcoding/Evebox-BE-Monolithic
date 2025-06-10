@@ -39,6 +39,12 @@ export class EventFrontDisplayDto {
 
   @ApiProperty({ example: EventStatus.AVAILABLE, description: 'Event Status' })
   status?: EventStatus;
+  
+  @ApiProperty({ example: true, description: 'Is the user favorite event' })
+  isUserFavorite?: boolean = false;
+
+  @ApiProperty({ example: true, description: 'Is the user notice event' })
+  isUserNotice?: boolean = false;
 }
 
 export class EventCategoriesSpectial {

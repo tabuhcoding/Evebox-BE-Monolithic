@@ -94,7 +94,7 @@ model FavoriteNotiHistory {
   eventId    Int?
   isFavorite Boolean
   isNotified Boolean
-  user       User     @relation("UserFavoriteHistory", fields: [userId], references: [id])
+  user       User     @relation("UserFavoriteHistory", fields: [userId], references: [email])
 }
 
 model PayOSInfo {

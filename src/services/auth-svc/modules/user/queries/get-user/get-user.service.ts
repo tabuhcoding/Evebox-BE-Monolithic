@@ -27,7 +27,8 @@ export class GetUserService {
         email: user.email.value,
         role: user.role.getValue(), 
         phone: user.phone.value,
-        avatar_id: user.avatarId
+        avatar_id: user.avatarId,
+        receiveNoti: user.receiveNoti,
       });
     }
     } catch (error) {

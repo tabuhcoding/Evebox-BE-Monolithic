@@ -1,27 +1,27 @@
-import { Controller, Get, Post, Query, HttpStatus, Res } from "@nestjs/common";
+import { Controller, Get, UseGuards, Query, HttpStatus, Res, Request } from "@nestjs/common";
 import { GetEventDetailService } from "./getEventDetail.service";
+import { JwtOptionalGuard } from 'src/shared/guard/jwt-optional.guard';
 import { Response } from 'express';
-import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { ErrorHandler } from 'src/shared/exceptions/error.handler';
 import { EventDetailResponse } from './getEventDetail-response.dto';
+import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 
 @ApiTags('Event Service - Event')
 @Controller('api/event/detail')
 export class GetEventDetailController {
-  constructor(private readonly eventDetailService: GetEventDetailService) {}
+  constructor(
+    private readonly slackService: SlackService,
+    private readonly eventDetailService: GetEventDetailService) {}
 
   @Get('/')
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtOptionalGuard)
   @ApiOperation({ summary: 'Get event details' })
   @ApiQuery({
     name: 'eventId',
     required: true,
     description: 'ID of the event to retrieve details for',
-    type: String,
-  })
-  @ApiQuery({
-    name: 'userId',
-    required: false,
-    description: 'ID of the user requesting the event details (optional)',
     type: String,
   })
   @ApiResponse({
@@ -44,15 +44,15 @@ export class GetEventDetailController {
   async getEventDetail(
     @Query('eventId') eventId: string,
     @Res() res: Response,
-    @Query('userId') userId?: string, 
+    @Request() req
   ) {
     void this.eventDetailService
-      .increasePostClickCount(parseInt(eventId), userId)
+      .increasePostClickCount(parseInt(eventId), req.user?.email)
       .catch((err) => {
-        console.error('Failed to increase click count:', err);
+        this.slackService.sendError(`Event Service - Event Detail >>> Increase PostClick: ${err.message}`);
       });
 
-    const result = await this.eventDetailService.execute(parseInt(eventId));
+    const result = await this.eventDetailService.execute(parseInt(eventId), req.user?.email);
     if (result.isErr()) {
       const error = result.unwrapErr();
       return res

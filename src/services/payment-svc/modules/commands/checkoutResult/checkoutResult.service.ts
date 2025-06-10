@@ -4,6 +4,7 @@ import { FileCacheService } from "src/infrastructure/cache/fileCache/fileCache.s
 import { CreateOrderService } from "src/services/booking-svc/modules/commands/createOrder/createOrder.service";
 import { GenerateTicketService } from "src/services/booking-svc/modules/commands/generateTicket/generateTicket.service";
 import { BookingTicketStatus } from "src/services/booking-svc/repository/order/order.repo";
+import { UpdateFormResponseService } from "src/services/event-svc/modules/formResponse/commands/updateFormResponse/updateFormResponse.service";
 import { WebhookDataType } from "src/services/payment-svc/common/payOS/payOS.service";
 import { AggregatedCheckoutDataItem } from "src/services/payment-svc/common/type";
 import { PaymentInfoRepository } from "src/services/payment-svc/repository/paymentInfo/paymentInfo.repo";
@@ -17,6 +18,7 @@ export class CheckoutResultService {
     private readonly fileCacheService: FileCacheService,
     private readonly createOrderService: CreateOrderService,
     private readonly generateTicketService: GenerateTicketService,
+    private readonly updateFormResponseService: UpdateFormResponseService,
     @Inject('PayOSInfoRepository') private readonly payOSInfoRepository: PayOSInfoRepository,
     @Inject('PaymentInfoRepository') private readonly paymentInfoRepository: PaymentInfoRepository 
   ) { }
@@ -45,7 +47,11 @@ export class CheckoutResultService {
       // Generate the ticket
       await this.generateTicketService.execute(webhookData.orderCode, cachedData.data[0].ticketTypeSelection)
       await this.fileCacheService.clearObject('payOS', {}, paymentLinkID);
-      await this.createOrderService.updateOrderStatus(webhookData.orderCode, BookingTicketStatus.PAID)
+      const orderUpdated = await this.createOrderService.updateOrderStatus(webhookData.orderCode, BookingTicketStatus.PAID)
+      if (!orderUpdated) {
+        this.slackService.sendError(`PaymentService >>> PayOS checkout result verification failed: Failed to update order status for order code ${webhookData.orderCode}`);
+        return false;
+      }
       await this.paymentInfoRepository.updateOne(
         {
           paymentCode: webhookData.paymentLinkId,
@@ -58,6 +64,10 @@ export class CheckoutResultService {
         {
           status: "PAID",
         }
+      )
+      await this.updateFormResponseService.updateOrderId(
+        orderUpdated.formResponseId,
+        orderUpdated.id,
       )
       // Double check the order status
       

@@ -12,7 +12,7 @@ export class UpdateFormResponseService {
     private readonly slackService: SlackService,
   ) { }
 
-  async execute(dto: UpdateFormResponseDto, id: string): Promise<Result<any, Error>> {
+  async execute(dto: UpdateFormResponseDto, id: number): Promise<Result<any, Error>> {
     try {
       const formResponse = await this.formResponseRepository.updateAndFindOneById(id,
         {
@@ -37,6 +37,15 @@ export class UpdateFormResponseService {
       this.slackService.sendError(`Event Service - Update form response >>> UpdateFormResponseService: ${error.message}`)
 
       return Err(new Error(`Failed to update form response: ${error.message}`));
+    }
+  }
+
+  async updateOrderId(formResponseId: number, orderId: number): Promise<void> {
+    try {
+      await this.formResponseRepository.updateOneById(formResponseId, { orderId });
+
+    } catch (error) {
+      this.slackService.sendError(`Event Service - Update form response >>> UpdateFormResponseService: ${error.message}`);
     }
   }
 }

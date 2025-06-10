@@ -42,6 +42,9 @@ class RowDto {
 }
 
 class SectionDto {
+  @ApiProperty({ example: '18237', description: 'Section TicketTypeId' })
+  ticketTypeId: string;
+
   @ApiProperty({ example: 2000, description: 'Section ID' })
   id: number;
 

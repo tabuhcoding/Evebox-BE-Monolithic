@@ -111,6 +111,8 @@ import { GetAnalyticsService } from './modules/event/queries/getAnalytics/getAna
 import { FormAnswerRepositoryImpl } from './repository/formAnswer/formAnswer.impl';
 import { UpdateFormResponseService } from './modules/formResponse/commands/updateFormResponse/updateFormResponse.service';
 import { FormInputRepositoryImpl } from './repository/formInput/formInput.impl';
+import { GetPreviewShowingService } from './modules/showing/queries/getPreviewShowing/getPreviewShowing.service';
+import { GetFormAnswerWithQuestionService } from './modules/formAnswer/queries/getFormAnswerWithQuestion/getFormAnswerWithQuestion.service';
 
 @Module({
   imports: [ BookingSvcModule, AuthSvcModule, CqrsModule ],
@@ -213,6 +215,7 @@ import { FormInputRepositoryImpl } from './repository/formInput/formInput.impl';
     GetFormOfShowingService,
     GetShowingDetailService,
     GetShowingSeatmapService,
+    GetPreviewShowingService,
 
     // Ticket type
     CreateTicketTypeService,
@@ -240,6 +243,7 @@ import { FormInputRepositoryImpl } from './repository/formInput/formInput.impl';
     ConnectFormService,
 
     GetUserSubmitFormService,
+    GetFormAnswerWithQuestionService,
 
     GetFormResponseByIdService,
     UpdateFormResponseService,
@@ -281,6 +285,8 @@ import { FormInputRepositoryImpl } from './repository/formInput/formInput.impl';
     GetFormResponseByIdService,
     CheckUserPermissionService,
     UpdateFormResponseService,
+    GetPreviewShowingService,
+    GetFormAnswerWithQuestionService,
   ],
 })
 export class EventSvcModule {}

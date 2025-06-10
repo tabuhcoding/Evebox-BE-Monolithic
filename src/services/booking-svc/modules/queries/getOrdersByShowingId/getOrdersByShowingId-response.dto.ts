@@ -44,9 +44,6 @@ export class PaymentInfo {
 
   @ApiProperty({ example: '2024-12-28T14:00:00.000Z', description: 'Timestamp of payment', required: false })
   paidAt?: Date;
-
-  @ApiProperty({ type: OrderInfo, description: 'Details of the ordered tickets' })
-  OrderInfo: OrderInfo;
 }
 
 export class OrderData {

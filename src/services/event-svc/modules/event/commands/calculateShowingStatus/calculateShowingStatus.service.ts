@@ -21,6 +21,12 @@ export class CalculateShowingStatusService {
   ) {}
 
   async reCalculateAllTicketTypesOfShowingStatus(showing: Showing) {
+    if (showing.id.includes('showing-')){
+      for (const ticketType of showing.TicketType) {
+        ticketType.status = TicketTypeStatus.SALE_CLOSED;
+      }
+    }
+    
     try{
       // find seatmap by id
       const seatmap = await this.seatmapRepository.findOneById(showing.seatMapId, {

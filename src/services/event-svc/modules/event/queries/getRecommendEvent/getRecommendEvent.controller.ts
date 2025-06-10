@@ -1,8 +1,9 @@
-import { Controller, Get, Query, Res, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Query, Res, HttpStatus, UseGuards, Request } from '@nestjs/common';
 import { GetRecommendEventService } from './getRecommendEvent.service';
 import { Response } from 'express';
-import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { GetRecommendEventResponse } from './getRecommendEvent-response.dto';
+import { JwtOptionalGuard } from 'src/shared/guard/jwt-optional.guard';
 
 @ApiTags('Event Service - Event')
 @Controller('api/event')
@@ -10,6 +11,8 @@ export class GetRecommendedEventController {
   constructor(private readonly frontDisplayService: GetRecommendEventService) {}
 
   @Get('/recommended-events')
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtOptionalGuard)
   @ApiOperation({ summary: 'Get recommended events' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -29,8 +32,9 @@ export class GetRecommendedEventController {
   async getRecommendedEvents(
     @Query('timeWindow') timeWindow: 'week' | 'month',
     @Res() res: Response,
+    @Request() req
   ) {
-    const result = await this.frontDisplayService.getRecommendedEvents(timeWindow);
+    const result = await this.frontDisplayService.getRecommendedEvents(timeWindow, req.user?.email);
 
     if (result.isErr()) {
       return res

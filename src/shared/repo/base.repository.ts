@@ -34,6 +34,10 @@ export class BaseRepository<
     return result.id;
   }
 
+  async insertWithoutReturn(data: any): Promise<void> {
+    await this.repo.create({ data });
+  }
+
   async insertOneWithNumberId(data: any): Promise<number> {
     const result = await this.repo.create({ data }) as unknown as { id: number };
     return result.id;

@@ -6,6 +6,9 @@ import { GenerateTicketService } from "src/services/booking-svc/modules/commands
 import { BookingTicketStatus } from "src/services/booking-svc/repository/order/order.repo";
 import { WebhookDataType } from "src/services/payment-svc/common/payOS/payOS.service";
 import { AggregatedCheckoutDataItem } from "src/services/payment-svc/common/type";
+import { PaymentInfoRepository } from "src/services/payment-svc/repository/paymentInfo/paymentInfo.repo";
+import { PaymentMethod } from "src/services/payment-svc/repository/paymentMethodStatus/paymentMethodStatus.repo";
+import { PayOSInfoRepository } from "src/services/payment-svc/repository/payOSInfo/payOsInfo.repo";
 
 @Injectable()
 export class CheckoutResultService {
@@ -14,6 +17,8 @@ export class CheckoutResultService {
     private readonly fileCacheService: FileCacheService,
     private readonly createOrderService: CreateOrderService,
     private readonly generateTicketService: GenerateTicketService,
+    @Inject('PayOSInfoRepository') private readonly payOSInfoRepository: PayOSInfoRepository,
+    @Inject('PaymentInfoRepository') private readonly paymentInfoRepository: PaymentInfoRepository 
   ) { }
 
   async payOSCheckoutResult(webhookData: WebhookDataType): Promise<Boolean> {
@@ -41,7 +46,19 @@ export class CheckoutResultService {
       await this.generateTicketService.execute(webhookData.orderCode, cachedData.data[0].ticketTypeSelection)
       await this.fileCacheService.clearObject('payOS', {}, paymentLinkID);
       await this.createOrderService.updateOrderStatus(webhookData.orderCode, BookingTicketStatus.PAID)
-
+      await this.paymentInfoRepository.updateOne(
+        {
+          paymentCode: webhookData.paymentLinkId,
+          method: PaymentMethod.PAYOS
+        },
+        { paidAt: new Date(webhookData.transactionDateTime) }
+      )
+      await this.payOSInfoRepository.updateOne(
+        { paymentLinkId: webhookData.paymentLinkId },
+        {
+          status: "PAID",
+        }
+      )
       // Double check the order status
       
     } catch (error) {

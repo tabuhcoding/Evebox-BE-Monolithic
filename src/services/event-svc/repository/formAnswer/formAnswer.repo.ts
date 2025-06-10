@@ -1,7 +1,11 @@
 import { BaseRepository } from "src/shared/repo/base.repository";
-import { FormAnswer, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 
-export { FormAnswer }
+export type FormAnswer = Prisma.FormAnswerGetPayload<{
+  include: {
+    FormInput: true;
+  };
+}>;
 
 export interface FormAnswerRepository extends BaseRepository<FormAnswer, Prisma.FormAnswerDelegate> {
 

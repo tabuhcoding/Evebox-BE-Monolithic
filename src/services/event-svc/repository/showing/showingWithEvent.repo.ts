@@ -11,6 +11,17 @@ export type ShowingWithEvent = Prisma.ShowingGetPayload<{
       select: {
         id: true,
         title: true,
+        venue: true,
+        locations: {
+          include: {
+            districts: {
+              include: {
+                province: true;
+              };
+            };
+          };
+        };
+        imgPosterUrl: true,
       }
     };
     TicketType: true

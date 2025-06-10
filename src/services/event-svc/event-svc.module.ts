@@ -28,6 +28,7 @@ import { BookingSvcModule } from '../booking-svc/booking.module';
 import { GetEventDetailController } from './modules/event/queries/getEventDetail/getEventDetail.controller';
 import { GetEventDetailService } from './modules/event/queries/getEventDetail/getEventDetail.service';
 import { ShowingRepositoryImpl } from './repository/showing/showing.impl';
+import { ShowingWithEventRepositoryImpl } from './repository/showing/showingWithEvent.impl';
 import { SeatmapRepositoryImpl } from './repository/seatmap/seatmap.impl';
 import { SeatStatusRepositoryImpl } from './repository/seatStatus/seatStatus.impl';
 import { TicketTypeRepositoryImpl } from './repository/ticketType/ticketType.impl';
@@ -104,6 +105,12 @@ import { GetEventRolesByIdController } from './modules/event/queries/getEventRol
 import { GetEventRolesByIdService } from './modules/event/queries/getEventRolesById/getEventRolesById.service';
 import { GetUserSubmitFormService } from './modules/form/queries/getUserSubmitForm/getUserSubmitForm.service';
 import { FormResponseRepositoryImpl } from './repository/formResponse/formResponse.impl';
+import { GetEventSummaryController } from './modules/event/queries/getEventSummary/getEventSummary.controller';
+import { GetEventSummaryService } from './modules/event/queries/getEventSummary/getEventSummary.service';
+import { GetFormResponseByIdService } from './modules/formResponse/queries/getFormResponseById/getFormResponseById.service';
+import { CheckUserPermissionService } from './modules/event/commands/checkUserPermission/checkUserPermission.service';
+import { GetAnalyticsController } from './modules/event/queries/getAnalytics/getAnalytics.controller';
+import { GetAnalyticsService } from './modules/event/queries/getAnalytics/getAnalytics.service';
 
 @Module({
   imports: [ BookingSvcModule, AuthSvcModule, CqrsModule ],
@@ -124,6 +131,10 @@ import { FormResponseRepositoryImpl } from './repository/formResponse/formRespon
     DeleteEventController,
     GetEventRolesController,
     GetEventRolesByIdController,
+
+    // Event Statistics
+    GetEventSummaryController,
+    GetAnalyticsController,
 
     // Form
     CreateFormController,
@@ -164,6 +175,7 @@ import { FormResponseRepositoryImpl } from './repository/formResponse/formRespon
     // Adapters
     // Utils Command
     CalculateShowingStatusService,
+    CheckUserPermissionService,
     
     // Categories
     GetAllCategoriesService,
@@ -186,6 +198,9 @@ import { FormResponseRepositoryImpl } from './repository/formResponse/formRespon
     GetEventsByIdsService,
     GetEventRolesService,
     GetEventRolesByIdService,
+
+    GetEventSummaryService,
+    GetAnalyticsService,
 
     ///// Showing
     // Commands
@@ -226,6 +241,8 @@ import { FormResponseRepositoryImpl } from './repository/formResponse/formRespon
 
     GetUserSubmitFormService,
 
+    GetFormResponseByIdService,
+
     // Admin showing
     GetShowingAdminDetailService,
     GetShowingsByAdminService,
@@ -239,6 +256,7 @@ import { FormResponseRepositoryImpl } from './repository/formResponse/formRespon
     { provide: 'EventUserRelationshipRepository', useClass: EventUserRelationshipRepositoryImpl },
     { provide: 'EventRoleRepository', useClass: EventRoleRepositoryImpl },
     { provide: 'ShowingRepository', useClass: ShowingRepositoryImpl },
+    { provide: 'ShowingWithEventRepository', useClass: ShowingWithEventRepositoryImpl },
     { provide: 'SeatmapRepository', useClass: SeatmapRepositoryImpl },
     { provide: 'SeatStatusRepository', useClass: SeatStatusRepositoryImpl},
     { provide: 'TicketTypeRepository', useClass: TicketTypeRepositoryImpl},
@@ -257,6 +275,8 @@ import { FormResponseRepositoryImpl } from './repository/formResponse/formRespon
     GetShowingDetailService,
     GetTicketTypeDetailService,
     GetUserSubmitFormService,
+    GetFormResponseByIdService,
+    CheckUserPermissionService
   ],
 })
 export class EventSvcModule {}

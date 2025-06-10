@@ -1,19 +1,31 @@
+/* Package System */
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
-import { BaseRepository } from 'src/shared/repo/base.repository';
 import { Prisma } from '@prisma/client';
 import { Result, Ok, Err } from 'oxide.ts';
+import { subMonths, startOfMonth } from 'date-fns';
 
+/* Package Application */
+// Repositories
+import { BaseRepository } from 'src/shared/repo/base.repository';
 import { Events, EventsRepository } from './events.repo';
 import { ShowingRepository } from '../showing/showing.repo';
+import { ShowingWithEventRepository } from '../showing/showingWithEvent.repo';
 import { EventUserRelationshipRepository } from '../eventUserRelationship/eventUserRelationship.repo';
+import { UserClickHistoryRepository } from '../userClickHistory/userClickHistory.repo';
+
+// Services
+import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
+import { GetUserService } from 'src/services/auth-svc/modules/user/queries/get-user/get-user.service';
+import { GetPaidOrdersByShowingIdService } from 'src/services/booking-svc/modules/queries/getPaidOrdersByShowingId/getPaidOrdersByShowingId.service';
+import { GetOrdersInShowingIdsService } from 'src/services/booking-svc/modules/queries/getOrdersInShowingIds/getOrdersInShowingIds.service';
+
+// Data
 import { CreateEventDto } from '../../modules/event/commands/createEvent/createEvent.dto';
 import { UpdateEventDto } from '../../modules/event/commands/updateEvent/updateEvent.dto';
 import { UpdateEventAdminDto } from '../../modules/event/commands/UpdateEventAdmin/updateEventAdmin.dto';
 import { EventOrgFrontDisplayDto } from '../../modules/event/queries/getEventOfOrg/getEventOfOrg-response.dto';
 import { EventOrgDetailResponseDto } from '../../modules/event/queries/getEventOfOrgDetail/getEventOfOrgDetail-response.dto';
-import { GetUserService } from 'src/services/auth-svc/modules/user/queries/get-user/get-user.service';
-import { EVENT_ROLE } from '../../modules/event/domain/eventRole';
+import { EventSummaryData } from '../../modules/event/queries/getEventSummary/getEventSummary-response.dto';
 
 @Injectable()
 export class EventsRepositoryImpl
@@ -23,8 +35,12 @@ export class EventsRepositoryImpl
     @Inject(forwardRef(() => 'EventUserRelationshipRepository'))
     private readonly eventUserRelaRepo: EventUserRelationshipRepository,
     @Inject('ShowingRepository') private readonly showingRepository: ShowingRepository,
+    @Inject('ShowingWithEventRepository') private readonly showingWithEventRepository: ShowingWithEventRepository,
+    @Inject('UserClickHistoryRepository') private readonly userClickHistoryRepository: UserClickHistoryRepository,
     protected readonly prisma: PrismaService,
     private readonly getUserService: GetUserService,
+    private readonly getPaidOrdersByShowingIdService: GetPaidOrdersByShowingIdService,
+    private readonly getOrdersInShowingIdsService: GetOrdersInShowingIdsService
   ) {
     super(prisma.events, prisma);
   }
@@ -480,7 +496,7 @@ export class EventsRepositoryImpl
       const event = await this.prisma.events.findUnique({
         where: {
           id: Number(eventId),
-        }, 
+        },
         select: {
           id: true,
           title: true,
@@ -495,7 +511,7 @@ export class EventsRepositoryImpl
               street: true,
               ward: true,
               districts: {
-                select:{
+                select: {
                   id: true,
                   name: true,
                   province: {
@@ -525,10 +541,10 @@ export class EventsRepositoryImpl
           },
           Showing: {
             select: {
-                id: true,
-                isFree: true,
-                startTime: true,
-                endTime: true,
+              id: true,
+              isFree: true,
+              startTime: true,
+              endTime: true,
             }
           }
         }
@@ -541,12 +557,12 @@ export class EventsRepositoryImpl
       if (event.deleteAt !== null) {
         return Err(new Error(`Event ${eventId} has been deleted`));
       }
-      
+
       const { street, ward, districts } = event.locations ?? {};
       const districtName = districts?.name || '';
       const provinceName = districts?.province?.name || '';
       const locationsArray = [street, ward, districtName, provinceName].filter(Boolean);
-      
+
       const locationsString = locationsArray.join(', ');
       const eventDetail: EventOrgDetailResponseDto = {
         ...event,
@@ -559,6 +575,211 @@ export class EventsRepositoryImpl
       return Ok(eventDetail);
     } catch (error) {
       return Err(new Error('Failed to retrieve detail of event of org'));
+    }
+  }
+
+  async getEventSummary(showingId: string): Promise<Result<EventSummaryData, Error>> {
+    try {
+      const showing = await this.showingWithEventRepository.findOneById(showingId, {
+        Events: {
+          select: {
+            id: true,
+            title: true,
+          }
+        },
+        TicketType: true
+      });
+
+      const ticketTypeData = showing?.TicketType?.map(tt => ({
+        ticketTypeId: tt.id,
+        typeName: tt.name,
+        price: tt.price,
+        showingId: tt.showingId,
+        quantity: tt.quantity || 0,
+      }));
+
+      if (!ticketTypeData) {
+        return Err(new Error('Showing has no ticket type data'));
+      }
+
+      const orders = await this.getPaidOrdersByShowingIdService.execute(showingId);
+
+      if (orders.isErr()) {
+        return Err(new Error('Failed to get paid orders of showing'));
+      }
+
+      const paidOrders = orders.unwrap();
+
+      const summary = ticketTypeData.map(tt => {
+        const matchedTickets = paidOrders.filter(
+          t => t.type === tt.typeName && t.showingId === tt.showingId
+        );
+
+        const sold = matchedTickets.length;
+
+        const revenue = matchedTickets.reduce((sum, t) => sum + t.price, 0);
+
+        return {
+          typeName: tt.typeName,
+          price: tt.price,
+          sold,
+          ratio: tt.quantity ? sold / tt.quantity : 0,
+          revenue
+        };
+      });
+
+      const totalRevenue = summary.reduce((sum, s) => sum + s.revenue, 0);
+      const ticketsSold = summary.reduce((sum, s) => sum + s.sold, 0);
+      const totalTickets = ticketTypeData.reduce((sum, tt) => sum + tt.quantity, 0);
+
+      return Ok({
+        eventId: showing.eventId,
+        eventTitle: showing.Events.title,
+        showingId,
+        startTime: showing.startTime,
+        endTime: showing.endTime,
+        totalRevenue,
+        ticketsSold,
+        totalTickets,
+        percentageSold: totalTickets ? ticketsSold / totalTickets : 0,
+        byTicketType: summary.map(({ revenue, ...rest }) => rest)
+      });
+    } catch (error) {
+      return Err(new Error('Failed to get summary of event'));
+    }
+  }
+
+  async countTotalClicksByEvent(eventId: number, startDate?: string, endDate?: string): Promise<Result<number, Error>> {
+    try {
+      const whereCond: any = { eventId };
+
+      if (startDate || endDate) {
+        whereCond.date = {};
+
+        if (startDate) whereCond.date.gte = new Date(startDate);
+        if (endDate) whereCond.date.lte = new Date(endDate);
+      }
+
+      const totalClicks = await this.userClickHistoryRepository.findMany({ whereCond });
+
+      return Ok(totalClicks?.length || 0);
+    } catch (error) {
+      return Err(new Error('Failed to count total clicks by event'));
+    }
+  }
+
+  async countUniqueUsersByEvent(eventId: number, startDate?: Date, endDate?: Date): Promise<Result<number, Error>> {
+    try {
+      const clicks = await this.userClickHistoryRepository.findMany({
+        eventId,
+        date: {
+          gte: startDate,
+          lte: endDate,
+        }
+      });
+
+      const uniqueUserIds = new Set(clicks.map(click => click.userId));
+
+      return Ok(uniqueUserIds?.size || 0);
+    } catch (error) {
+      return Err(new Error('Failed to count unique users by event'));
+    }
+  }
+
+  async countOrdersByEvent(eventId: number): Promise<Result<number, Error>> {
+    try {
+      const showings = await this.showingRepository.findMany({
+        eventId
+      });
+
+      const showingIds = showings.map(s => s.id);
+
+      if (showingIds.length > 0) {
+        const result = await this.getOrdersInShowingIdsService.execute(showingIds);
+
+        if (result.isErr()) {
+          return Err(new Error('Error when get orders in showing ids'));
+        }
+
+        const totalOrders = result.unwrap();
+        if (!totalOrders) {
+          return Err(new Error('Failed to get orders in showing ids'));
+        }
+
+        return Ok(totalOrders?.length || 0);
+      }
+
+      return Ok(0);
+    } catch (error) {
+      return Err(new Error('Failed to count orders by event'));
+    }
+  }
+
+  async countBuyersByEvent(eventId: number): Promise<Result<number, Error>> {
+    try {
+      const showings = await this.showingRepository.findMany({
+        eventId
+      });
+
+      const showingIds = showings.map((s) => s.id);
+
+      if (showingIds.length > 0) {
+        const result = await this.getOrdersInShowingIdsService.execute(showingIds);
+
+        if (result.isErr()) {
+          return Err(new Error('Error when get orders in showing ids'));
+        }
+
+        const orders = result.unwrap();
+        if (!orders) {
+          return Err(new Error('Failed to get orders in showing ids'));
+        }
+
+        const uniqueUserIds = new Set(orders.map((order) => order.userId));
+
+        return Ok(uniqueUserIds?.size || 0);
+      }
+
+      return Ok(0);
+    } catch (error) {
+      return Err(new Error('Failed to count buyers by event'));
+    }
+  }
+
+  async getStatistics(eventId: number): Promise<Result<any, Error>> {
+    try {
+      const now = new Date();
+      const sixMonthsAgo = subMonths(now, 5);
+      const clicks = await this.userClickHistoryRepository.findMany({
+        eventId,
+        date: {
+          gte: startOfMonth(sixMonthsAgo), // from start of 6 months ago
+          lte: now,
+        },
+      });
+
+      const statisticsMap = new Map<string, number>();
+
+      for (let i = 0; i < 6; i++) {
+        const month = subMonths(now, i);
+        const monthKey = `${month.getFullYear()}-${String(month.getMonth() + 1).padStart(2, '0')}`;
+        statisticsMap.set(monthKey, 0);
+      }
+
+      for (const click of clicks) {
+        const monthKey = `${click.date.getFullYear()}-${String(click.date.getMonth() + 1).padStart(2, '0')}`;
+        if (statisticsMap.has(monthKey)) {
+          statisticsMap.set(monthKey, (statisticsMap.get(monthKey) || 0) + 1);
+        }
+      }
+
+      const statistic = Array.from(statisticsMap.entries())
+        .map(([month, visits]) => ({ month, visits }))
+        .sort((a, b) => a.month.localeCompare(b.month));
+
+      return Ok(statistic);
+    } catch (error) {
+      return Err(new Error('Failed to get statistics of event'));
     }
   }
 }

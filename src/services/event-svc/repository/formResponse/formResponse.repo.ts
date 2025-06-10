@@ -2,6 +2,19 @@ import { BaseRepository } from "src/shared/repo/base.repository";
 import { Prisma } from "@prisma/client";
 
 export type FormResponse = Prisma.FormResponseGetPayload<{
+  include: {
+    FormAnswer: {
+      select: {
+        value: true,
+        FormInput: {
+          select: {
+            fieldName: true,
+            options: true,
+          }
+        }
+      }
+    }
+  }
 }>;
 
 export interface FormResponseRepository extends BaseRepository<FormResponse, Prisma.FormResponseDelegate> {
@@ -9,7 +22,7 @@ export interface FormResponseRepository extends BaseRepository<FormResponse, Pri
   // createFormResponse(formId: number, userEmail: string, data: Record<string, any>): Promise<FormResponse>;
 
   // /* Get Form Response by ID */
-  // getFormResponseById(id: number): Promise<FormResponse | null>;
+  getFormResponseById(id: number): Promise<FormResponse | null>;
 
   // /* Get All Form Responses for a Form */
   // getAllFormResponsesByFormId(formId: number): Promise<FormResponse[]>;

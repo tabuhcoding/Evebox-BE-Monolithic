@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Result, Ok, Err } from 'oxide.ts';
 import { CheckoutDto } from './checkout.dto';
 import { CheckoutResponseData } from './checkout-response.dto';
@@ -8,6 +8,7 @@ import { CreateOrderService } from 'src/services/booking-svc/modules/commands/cr
 import { PaymentMethod } from 'src/services/payment-svc/repository/paymentMethodStatus/paymentMethodStatus.repo';
 import { PayOSCheckoutService } from '../payOSCheckout/payOSCheckout.service';
 import { FileCacheService } from 'src/infrastructure/cache/fileCache/fileCache.service';
+import { PaymentInfoRepository } from 'src/services/payment-svc/repository/paymentInfo/paymentInfo.repo';
 
 @Injectable()
 export class CheckoutService {
@@ -17,6 +18,7 @@ export class CheckoutService {
     private readonly createOrderService: CreateOrderService,
     private readonly payOSCheckoutService: PayOSCheckoutService,
     private readonly fileCacheService: FileCacheService,
+    @Inject('PaymentInfoRepository') private readonly paymentInfoRepository: PaymentInfoRepository
   ) {}
 
   async execute(checkoutDto: CheckoutDto, userId: string): Promise<Result<CheckoutResponseData, Error>> {
@@ -63,8 +65,21 @@ export class CheckoutService {
             return Err(checkoutResult);
           }
 
-          this.slackService.sendNotice(`PayOS checkout link created successfully for user ${userId} in showing ${checkoutDto.showingID}. Link: ${checkoutResult}`);
+          this.slackService.sendNotice(`PayOS checkout link created successfully for user ${userId} in showing ${checkoutDto.showingID}. Link: ${JSON.stringify(checkoutResult)}`);
 
+          // insert paymentInfo into repository
+          const paymentInfoID = await this.paymentInfoRepository.insertOneWithNumberId({
+            method: checkoutDto.paymentMethod,
+            paymentCode: checkoutResult.paymentLinkId,
+            orderId: orderCode
+          })
+
+          if (!paymentInfoID) {
+            this.slackService.sendError(`Failed to insert payment info for user ${userId} in showing ${checkoutDto.showingID}`);
+
+            return Err(new Error('Error database server.'));
+          }
+          
           // Cache the payment link
           await this.fileCacheService.cacheObject(
             `payOS`,

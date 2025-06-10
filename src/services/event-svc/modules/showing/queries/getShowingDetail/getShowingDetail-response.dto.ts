@@ -70,6 +70,14 @@ class EventDto {
 
 }
 
+export class SimpleShowingDataDto {
+  @ApiProperty({ example: '1041811243642', description: 'Showing ID' })
+  id: string;
+
+  @ApiProperty({ example: 22911, description: 'Event ID' })
+  eventId: number;
+}
+
 export class ShowingDataDto {
   @ApiProperty({ example: '1041811243642', description: 'Showing ID' })
   id: string;

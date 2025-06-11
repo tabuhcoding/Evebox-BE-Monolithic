@@ -97,6 +97,13 @@ export class getShowingSeatmapService {
           return Err(new Error('Failed to fetch seatmap.'));
         }
 
+        const allPickedSeats = await this.getTotalTicketOfTicketTypeService.getAllSeatHasPickedInCacheOfShowing(showingId);
+        if (allPickedSeats === null) {
+          this.slackService.sendError(`Booking Svc >>> getShowingSeatmap: Failed to get all picked seats for showing ${showingId}`);
+          
+          return Err(new Error('Failed to fetch seatmap.'));
+        }
+
         // Get all ticket type sections
         const ticketTypeSections = await this.ticketTypeSectionRepository.findMany({
           ticketTypeId: { in: ticketTypeIds },
@@ -116,7 +123,7 @@ export class getShowingSeatmapService {
               Seat: row.Seat?.map(seat => ({
                 ...seat,
                 SeatStatus: null,
-                status: allSoldSeats.includes(seat.id) ? SeatStatusEnum.ESOLD : seat.SeatStatus?.[0]?.status || null,
+                status: allSoldSeats.includes(seat.id) ? SeatStatusEnum.ESOLD : allPickedSeats.includes(seat.id) ? SeatStatusEnum.INCACHE : seat.SeatStatus?.[0]?.status || null,
               })),
             })),
           })),

@@ -20,11 +20,13 @@ export class CalculateShowingStatusService {
     private readonly getTotalTicketOfTicketTypeService: GetTotalTicketOfTicketTypeService,
   ) {}
 
-  async reCalculateAllTicketTypesOfShowingStatus(showing: Showing) {
+  async reCalculateAllTicketTypesOfShowingStatus(showing: Showing, withRedisStatus: boolean = false) {
     if (showing.id.includes('showing-') || showing.endTime < new Date()) {
       for (const ticketType of showing.TicketType) {
         ticketType.status = TicketTypeStatus.SALE_CLOSED;
       }
+
+      return;
     }
     
     try{
@@ -50,7 +52,7 @@ export class CalculateShowingStatusService {
       
       // update ticket type status
       for (const ticketType of showing.TicketType) {
-        const newStatus = await this.reCalculateTicketTypeStatus(ticketType.id as string, seatmapType);
+        const newStatus = await this.reCalculateTicketTypeStatus(ticketType.id as string, seatmapType, withRedisStatus);
         if (newStatus !== undefined) {
           ticketType.status = newStatus;
         }
@@ -64,7 +66,7 @@ export class CalculateShowingStatusService {
     }
   }
 
-  async reCalculateTicketTypeStatus(ticketTypeId: string, seatmapType: SeatmapType): Promise<TicketTypeStatus | undefined> {
+  async reCalculateTicketTypeStatus(ticketTypeId: string, seatmapType: SeatmapType, withRedisStatus: boolean = false): Promise<TicketTypeStatus | undefined> {
     try{
       // Find ticket type by id
       const ticketType = await this.ticketTypeRepository.findOneById(ticketTypeId, {
@@ -177,7 +179,7 @@ export class CalculateShowingStatusService {
         }
 
         // Get all seat has sale of ticket type
-        const allSeatHasSale = await this.getTotalTicketOfTicketTypeService.getAllSeatHasSaleOfTicketType(ticketType.id);
+        var allSeatHasSale = await this.getTotalTicketOfTicketTypeService.getAllSeatHasSaleOfTicketType(ticketType.id);
 
         if (allSeatHasSale === null) {
           this.slackService.sendError(`Booking Svc >>> reCalculateTicketTypeStatus: Failed to get all seat has sale for ticket type ${ticketType.id}`);
@@ -185,8 +187,19 @@ export class CalculateShowingStatusService {
           return ticketType.status;
         }
 
-        // compare all seat status is available with all seat has sale
+        // Get all seat has picked in cache if withRedisStatus is true
+        if (withRedisStatus) {
+          const allSeatHasPicked = await this.getTotalTicketOfTicketTypeService.getAllSeatHasSaleOfShowing(ticketType.showingId);
+          if (allSeatHasPicked === null) {
+            this.slackService.sendError(`Booking Svc >>> reCalculateTicketTypeStatus: Failed to get all seat has picked for showing ${ticketType.showingId}`);
+            ticketType.status = TicketTypeStatus.NOT_OPEN;
+            return ticketType.status;
+          }
 
+          allSeatHasSale = [...allSeatHasSale, ...allSeatHasPicked];
+        }
+
+        // compare all seat status is available with all seat has sale
         // Check if there are any available seats that are not sold
         const seatStatusAvailable = allSeatOfSections.some(seatStatus => seatStatus.status === SeatStatusEnum.AVAILABLE )
         

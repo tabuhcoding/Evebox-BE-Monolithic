@@ -1,5 +1,7 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
+import { FileCacheService } from "src/infrastructure/cache/fileCache/fileCache.service";
+import { AggregatedSelectTicketTypeItem } from "src/services/booking-svc/common/type";
 import { OrderRepository } from "src/services/booking-svc/repository/order/order.repo";
 import { TicketRepository } from "src/services/booking-svc/repository/ticket/ticket.repo";
 
@@ -9,6 +11,7 @@ export class GetTotalTicketOfTicketTypeService {
     @Inject('TicketRepository') private readonly ticketRepository: TicketRepository, // Replace 'any' with the actual type of TicketRepository
     @Inject('OrderRepository') private readonly orderRepository: OrderRepository, // Replace 'any' with the actual type of OrderRepository
     private readonly slackService: SlackService,
+    private readonly fileCacheService: FileCacheService,
   ) {}
 
   async getTotalTicketOfTicketType(ticketTypeId: string): Promise<number | null> {
@@ -98,6 +101,63 @@ export class GetTotalTicketOfTicketTypeService {
     }
     catch (error) {
       this.slackService.sendError(` Booking Svc >>> getAllSeatHasSaleOfTicketType : ${error.message}`);
+      
+      return null;
+    }
+  }
+
+  async getAllSeatHasPickedInCacheOfTicketType(ticketTypeId: string, showingId: string): Promise<number[] | null> {
+    // Get total tickets in the cache
+    const data = await this.fileCacheService.getCacheObject(
+      'selectTicket',
+      {
+        showingId: showingId,
+      }
+    ) as AggregatedSelectTicketTypeItem[] | null;    
+    try{
+      var seatIds: number[] = [];
+      if (data && data.length > 0) {
+        // Filter data for the specific ticket type
+        const filteredData = data.filter(item => 
+          item.data.some(ticket => ticket.ticketTypeId === ticketTypeId)
+        );
+
+        // Extract seat IDs from the filtered data
+        seatIds = Array.from(new Set(filteredData.flatMap(item => 
+          item.data.filter(ticket => ticket.ticketTypeId === ticketTypeId).flatMap(ticket => ticket.seatId || [])
+        )));
+      }
+
+      // Return the unique seat IDs
+      return seatIds;
+    } catch (error) {
+      this.slackService.sendError(` Booking Svc >>> getAllSeatHasPickedInCacheOfTicketType : ${error.message}`);
+      
+      return null;
+    }
+  }
+
+  async getAllSeatHasPickedInCacheOfShowing(showingId: string): Promise<number[] | null> {
+    // Get total tickets in the cache
+    const data = await this.fileCacheService.getCacheObject(
+      'selectTicket',
+      {
+        showingId: showingId,
+      }
+    ) as AggregatedSelectTicketTypeItem[] | null;    
+    try{
+      var seatIds: number[] = [];
+      if (data && data.length > 0) {
+        // Extract seat IDs from the data
+        seatIds = Array.from(new Set(data.flatMap(item => 
+          item.data.flatMap(ticket => ticket.seatId || [])
+        )));
+      }
+
+      // Return the unique seat IDs
+      return seatIds;
+    } catch (error) {
+      this.slackService.sendError(` Booking Svc >>> getAllSeatHasPickedInCacheOfShowing : ${error.message}`);
       
       return null;
     }

@@ -317,8 +317,8 @@ export class GetEventFrontDisplayService {
           deleteAt: null,
           Showing: {
             some: {
-              startTime: {
-                gte: new Date(),
+              endTime: {
+                gte: new Date(new Date().setMonth(new Date().getMonth() - 1)),
               },
               deleteAt: null,
             },
@@ -338,8 +338,8 @@ export class GetEventFrontDisplayService {
             },
           },
           where: {
-            startTime: {
-              gte: new Date(),
+            endTime: {
+              gte: new Date(new Date().setMonth(new Date().getMonth() - 1)),
             },
             deleteAt: null,
           },

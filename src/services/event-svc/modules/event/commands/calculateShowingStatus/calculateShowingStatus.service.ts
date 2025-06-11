@@ -21,7 +21,7 @@ export class CalculateShowingStatusService {
   ) {}
 
   async reCalculateAllTicketTypesOfShowingStatus(showing: Showing) {
-    if (showing.id.includes('showing-')){
+    if (showing.id.includes('showing-') || showing.endTime < new Date()) {
       for (const ticketType of showing.TicketType) {
         ticketType.status = TicketTypeStatus.SALE_CLOSED;
       }

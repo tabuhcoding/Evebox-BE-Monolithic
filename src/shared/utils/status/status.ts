@@ -62,7 +62,7 @@ export async function calculateEventStatusAndMinPriceAndStartDate(event: Events)
   let minPrice = Number.MAX_VALUE;
   let showingStatusSet = new Set<ShowingStatus>();
   let startTime = new Date("9999-12-31T23:59:59.999Z");
-  let nowDate = new Date();
+  let nowDate = new Date(new Date().setMonth(new Date().getMonth() - 1));
 
   if ( !event.Showing || event.Showing?.length === 0) {
 

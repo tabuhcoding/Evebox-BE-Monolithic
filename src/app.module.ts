@@ -12,6 +12,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { PaymentSvcModule } from './services/payment-svc/payment-svc.module';
 import { FileCacheModule } from './infrastructure/cache/fileCache/fileCache.module';
 import { SlackModule } from './infrastructure/adapters/slack/slack.module';
+import { CronjobModule } from './services/cronjob/cronjob.module';
 
 @Module({
   providers: [],
@@ -30,6 +31,7 @@ import { SlackModule } from './infrastructure/adapters/slack/slack.module';
     AuthSvcModule,
     BookingSvcModule,
     PaymentSvcModule,
+    CronjobModule,
   ],
   exports: []
 })

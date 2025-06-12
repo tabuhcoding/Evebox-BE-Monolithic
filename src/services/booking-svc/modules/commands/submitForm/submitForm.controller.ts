@@ -8,7 +8,7 @@ import { JwtAuthGuard } from "src/shared/guard/jwt-auth.guard";
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 
 @ApiTags('Booking Service - Booking')
-@Controller('api/ticket')
+@Controller('api/booking')
 export class SubmitFormController {
   constructor(
     private readonly submitFormService: SubmitFormService,

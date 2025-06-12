@@ -22,7 +22,7 @@ export class GenerateTicketService {
   
     ) {}
 
-  async execute(orderId: number, ticketData: TicketTypeSelectionCache[]): Promise<void> {
+  async execute(orderId: number, ticketData: TicketTypeSelectionCache[]): Promise<SeatmapType> {
     try{
       // Double check order
       const order = await this.orderRepository.findOneById(orderId);
@@ -43,7 +43,8 @@ export class GenerateTicketService {
 
       // If seatmap ID is 0, showing not have a seatmap
       if (showing.seatMapId === 0) {
-        return this.handleShowingWithoutSeatmap(ticketData, orderId);
+        await this.handleShowingWithoutSeatmap(ticketData, orderId);
+        return SeatmapType.NOT_A_SEATMAP;
       }
 
       // Fetch the seatmap for the showing
@@ -60,16 +61,18 @@ export class GenerateTicketService {
 
       // If the seatmap is not a seatmap
       if( seatmap.seatMapType == SeatmapType.NOT_A_SEATMAP) {
-        return this.handleShowingWithoutSeatmap(ticketData, orderId);
+        await this.handleShowingWithoutSeatmap(ticketData, orderId);
       }
 
       if ( seatmap.seatMapType == SeatmapType.SELECT_SECTION) {
-        return this.handleShowingWithSelectSectionSeatmap(ticketData, orderId);
+        await this.handleShowingWithSelectSectionSeatmap(ticketData, orderId);
       }
 
       if ( seatmap.seatMapType == SeatmapType.SELECT_SEAT) {
-        return this.handleShowingWithSelectSeatSeatmap(ticketData, orderId);
+        await this.handleShowingWithSelectSeatSeatmap(ticketData, orderId);
       }
+
+      return seatmap.seatMapType;
     }
     catch (error) {
       await this.slackService.sendError(`Booking Svc >>> generateTicket : ${error.message}`);

@@ -20,6 +20,7 @@ import { GetOrdersInShowingIdsService } from "./modules/queries/getOrdersInShowi
 import { SubmitFormController } from "./modules/commands/submitForm/submitForm.controller";
 import { SubmitFormService } from "./modules/commands/submitForm/submitForm.service";
 import { GenerateTicketService } from "./modules/commands/generateTicket/generateTicket.service";
+import { GenerateQrcodeService } from "./modules/commands/generateQrcode/generateQrcode.service";
 
 @Module({
   imports: [ 
@@ -49,6 +50,7 @@ import { GenerateTicketService } from "./modules/commands/generateTicket/generat
     GetOrdersByShowingIdService,
     GetOrdersInShowingIdsService,
     GenerateTicketService,
+    GenerateQrcodeService,
 
     SubmitFormService,
 
@@ -64,6 +66,7 @@ import { GenerateTicketService } from "./modules/commands/generateTicket/generat
     GetPaidOrdersByShowingIdService,
     GetOrdersInShowingIdsService,
     GenerateTicketService,
+    GenerateQrcodeService,
   ],
 })
 export class BookingSvcModule {}

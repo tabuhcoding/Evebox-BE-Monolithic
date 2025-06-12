@@ -30,7 +30,7 @@ export class PayOSService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
-  onModuleDestroy() {
+  async onModuleDestroy() {
     await this.slackService.sendNotice(`PayOSService destroyed`);
   }
 

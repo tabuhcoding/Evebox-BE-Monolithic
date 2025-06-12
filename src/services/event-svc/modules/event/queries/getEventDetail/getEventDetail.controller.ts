@@ -49,7 +49,7 @@ export class GetEventDetailController {
     void this.eventDetailService
       .increasePostClickCount(parseInt(eventId), req.user?.email)
       .catch((err) => {
-        await this.slackService.sendError(`Event Service - Event Detail >>> Increase PostClick: ${err.message}`);
+        this.slackService.sendError(`Event Service - Event Detail >>> Increase PostClick: ${err.message}`);
       });
 
     const result = await this.eventDetailService.execute(parseInt(eventId), req.user?.email);

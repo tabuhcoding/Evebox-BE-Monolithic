@@ -2,6 +2,7 @@ import { Inject, Injectable } from "@nestjs/common";
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 import { FileCacheService } from "src/infrastructure/cache/fileCache/fileCache.service";
 import { CreateOrderService } from "src/services/booking-svc/modules/commands/createOrder/createOrder.service";
+import { GenerateQrcodeService } from "src/services/booking-svc/modules/commands/generateQrcode/generateQrcode.service";
 import { GenerateTicketService } from "src/services/booking-svc/modules/commands/generateTicket/generateTicket.service";
 import { BookingTicketStatus } from "src/services/booking-svc/repository/order/order.repo";
 import { UpdateFormResponseService } from "src/services/event-svc/modules/formResponse/commands/updateFormResponse/updateFormResponse.service";
@@ -19,6 +20,7 @@ export class CheckoutResultService {
     private readonly createOrderService: CreateOrderService,
     private readonly generateTicketService: GenerateTicketService,
     private readonly updateFormResponseService: UpdateFormResponseService,
+    private readonly generateQrcodeService: GenerateQrcodeService,
     @Inject('PayOSInfoRepository') private readonly payOSInfoRepository: PayOSInfoRepository,
     @Inject('PaymentInfoRepository') private readonly paymentInfoRepository: PaymentInfoRepository 
   ) { }
@@ -45,7 +47,7 @@ export class CheckoutResultService {
       // update the order status and clear the cache
       // TODO: Need to run in transaction
       // Generate the ticket
-      await this.generateTicketService.execute(webhookData.orderCode, cachedData.data[0].ticketTypeSelection)
+      const seatmapType = await this.generateTicketService.execute(webhookData.orderCode, cachedData.data[0].ticketTypeSelection)
       await this.fileCacheService.clearObject('payOS', {}, paymentLinkID);
       const orderUpdated = await this.createOrderService.updateOrderStatus(webhookData.orderCode, BookingTicketStatus.PAID)
       if (!orderUpdated) {
@@ -69,8 +71,13 @@ export class CheckoutResultService {
         orderUpdated.formResponseId,
         orderUpdated.id,
       )
+      // Complete the order creation process
+      await this.slackService.sendNotice(`PaymentService >>> PayOS checkout result verified successfully: Order ${webhookData.orderCode} has been generate ticket.`);
+
       // Double check the order status
-      
+      await this.generateQrcodeService.execute(webhookData.orderCode, seatmapType);
+      // Complete the QR code generation process
+      await this.slackService.sendNotice(`PaymentService >>> PayOS checkout result verified successfully: QR code generated for order ${webhookData.orderCode}.`);
     } catch (error) {
       await this.slackService.sendError(`PaymentService >>> PayOS checkout result verification failed: ${error.message}`);
       return false;

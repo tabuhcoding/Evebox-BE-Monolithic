@@ -615,7 +615,7 @@ export class EventsRepositoryImpl
           t => t.type === tt.typeName && t.showingId === tt.showingId
         );
 
-        const sold = matchedTickets.length;
+        const sold = matchedTickets.reduce((sum, t) => sum + t.Ticket.length, 0);
 
         const revenue = matchedTickets.reduce((sum, t) => sum + t.price, 0);
 

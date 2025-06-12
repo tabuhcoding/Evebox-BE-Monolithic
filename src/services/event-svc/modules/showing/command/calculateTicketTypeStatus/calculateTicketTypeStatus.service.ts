@@ -15,7 +15,7 @@ export class CalculateTicketTypeStatusService {
   
   async execute(): Promise<void> {
     // Get all showings
-    const showings = await this.showingRepository.findAll({
+    const showings = await this.showingRepository.findAll({}, {
       TicketType: true,
     });
 

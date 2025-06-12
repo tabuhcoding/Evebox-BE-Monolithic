@@ -6,6 +6,7 @@ import { GenerateQrcodeService } from "src/services/booking-svc/modules/commands
 import { GenerateTicketService } from "src/services/booking-svc/modules/commands/generateTicket/generateTicket.service";
 import { BookingTicketStatus } from "src/services/booking-svc/repository/order/order.repo";
 import { UpdateFormResponseService } from "src/services/event-svc/modules/formResponse/commands/updateFormResponse/updateFormResponse.service";
+import { GetTicketTypeDetailService } from "src/services/event-svc/modules/ticketType/queries/getTicketTypeDetail/getTicketTypeDetail.service";
 import { WebhookDataType } from "src/services/payment-svc/common/payOS/payOS.service";
 import { AggregatedCheckoutDataItem } from "src/services/payment-svc/common/type";
 import { PaymentInfoRepository } from "src/services/payment-svc/repository/paymentInfo/paymentInfo.repo";
@@ -21,6 +22,7 @@ export class CheckoutResultService {
     private readonly generateTicketService: GenerateTicketService,
     private readonly updateFormResponseService: UpdateFormResponseService,
     private readonly generateQrcodeService: GenerateQrcodeService,
+    private readonly getTicketTypeDetailService: GetTicketTypeDetailService,
     @Inject('PayOSInfoRepository') private readonly payOSInfoRepository: PayOSInfoRepository,
     @Inject('PaymentInfoRepository') private readonly paymentInfoRepository: PaymentInfoRepository 
   ) { }
@@ -46,6 +48,11 @@ export class CheckoutResultService {
       
       // update the order status and clear the cache
       // TODO: Need to run in transaction
+      // Update seat status
+      {
+        const seatIDs = cachedData.data[0].ticketTypeSelection.map(ticket => ticket.seatInfo.map(seat => seat.seatId)).flat();
+        await this.getTicketTypeDetailService.setSeatStatusToESold(cachedData.data[0].showingId, seatIDs);
+      }
       // Generate the ticket
       const seatmapType = await this.generateTicketService.execute(webhookData.orderCode, cachedData.data[0].ticketTypeSelection)
       await this.fileCacheService.clearObject('payOS', {}, paymentLinkID);

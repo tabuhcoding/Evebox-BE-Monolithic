@@ -137,11 +137,11 @@ export class GetTicketTypeDetailService {
     }
   }
 
-  async setSeatStatusToESold(showingId: string, seatIds: number): Promise<void> {
+  async setSeatStatusToESold(showingId: string, seatIds: number[]): Promise<void> {
     try {
       await this.seatStatusRepository.updateMany({
         showingId: showingId,
-        seatId: seatIds,
+        seatId: { in: seatIds},
       }, {
         status: SeatStatusEnum.ESOLD,
       })

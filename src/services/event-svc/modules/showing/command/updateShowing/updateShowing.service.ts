@@ -42,12 +42,12 @@ export class UpdateShowingService {
 
       const [showingId, isApproved] = result.unwrap();
       if (isApproved) {
-        this.slackService.sendNotice(`Event Service - Showing >>> UpdateShowingService: Event with ID ${showing.eventId} has been updated showing.`);
+        await this.slackService.sendNotice(`Event Service - Showing >>> UpdateShowingService: Event with ID ${showing.eventId} has been updated showing.`);
       }
 
       return Ok(showingId);
     } catch (error) {
-      this.slackService.sendError(`Event Service - Showing >>> UpdateShowingService: ${error.message}`);
+      await this.slackService.sendError(`Event Service - Showing >>> UpdateShowingService: ${error.message}`);
       return Err(new Error(`Error updating showwing: ${error.message}`));
     }
   }

@@ -62,7 +62,7 @@ export class GetEventFDByIdsService {
       return Ok({ event: filteredEventDtos });
 
     } catch (error) {
-      this.slackService.sendError(`Event Service - Event >>> getEventFDByIds: ${error.message}`);
+      await this.slackService.sendError(`Event Service - Event >>> getEventFDByIds: ${error.message}`);
       
       return Err(new Error("Failed to fetch events by IDs."));
     }

@@ -27,7 +27,7 @@ export class GenerateTicketService {
       // Double check order
       const order = await this.orderRepository.findOneById(orderId);
       if (!order) {
-        this.slackService.sendError(`Booking Svc >>> generateTicket : Order not found for orderId: ${orderId}`);
+        await this.slackService.sendError(`Booking Svc >>> generateTicket : Order not found for orderId: ${orderId}`);
         
         throw new Error(`Order not found for orderId: ${orderId}`);
       }
@@ -72,7 +72,7 @@ export class GenerateTicketService {
       }
     }
     catch (error) {
-      this.slackService.sendError(`Booking Svc >>> generateTicket : ${error.message}`);
+      await this.slackService.sendError(`Booking Svc >>> generateTicket : ${error.message}`);
       
       throw new Error(`Failed to generate ticket: ${error.message}`);
     }
@@ -91,20 +91,20 @@ export class GenerateTicketService {
           });
 
           if (!ticket) {
-            this.slackService.sendError(`Booking Svc >>> generateTicket : Failed to create ticket for ticket type ID ${ticketTypeSelection.tickettypeId}`);
+            await this.slackService.sendError(`Booking Svc >>> generateTicket : Failed to create ticket for ticket type ID ${ticketTypeSelection.tickettypeId}`);
             
             throw new Error(`Failed to create ticket for ticket type ID ${ticketTypeSelection.tickettypeId}`);
           }
         }
       }
       catch (error) {
-        this.slackService.sendError(`Booking Svc >>> generateTicket : Error generating ticket for ticket type selection ${JSON.stringify(ticketTypeSelection)}: ${error.message}`);
+        await this.slackService.sendError(`Booking Svc >>> generateTicket : Error generating ticket for ticket type selection ${JSON.stringify(ticketTypeSelection)}: ${error.message}`);
         
         throw new Error(`Failed to generate ticket: ${error.message}`);
       }              
     }
 
-    this.slackService.sendNotice(`Booking Svc >>> generateTicket : Tickets generated successfully for order ID ${orderID} with ticket data: ${JSON.stringify(ticketData)}`);
+    await this.slackService.sendNotice(`Booking Svc >>> generateTicket : Tickets generated successfully for order ID ${orderID} with ticket data: ${JSON.stringify(ticketData)}`);
   }
 
   async handleShowingWithSelectSectionSeatmap(ticketData: TicketTypeSelectionCache[], orderID: number): Promise<void> {
@@ -120,20 +120,20 @@ export class GenerateTicketService {
           });
           
           if (!ticket) {
-            this.slackService.sendError(`Booking Svc >>> generateTicket : Failed to create ticket for ticket type ID ${ticketTypeSelection.tickettypeId} in section ID ${ticketTypeSelection.sectionId}`);
+            await this.slackService.sendError(`Booking Svc >>> generateTicket : Failed to create ticket for ticket type ID ${ticketTypeSelection.tickettypeId} in section ID ${ticketTypeSelection.sectionId}`);
             
             throw new Error(`Failed to create ticket for ticket type ID ${ticketTypeSelection.tickettypeId} in section ID ${ticketTypeSelection.sectionId}`);
           }
         }
       }
       catch (error) {
-        this.slackService.sendError(`Booking Svc >>> generateTicket : Error generating ticket for ticket type selection ${JSON.stringify(ticketTypeSelection)}: ${error.message}`);
+        await this.slackService.sendError(`Booking Svc >>> generateTicket : Error generating ticket for ticket type selection ${JSON.stringify(ticketTypeSelection)}: ${error.message}`);
         
         throw new Error(`Failed to generate ticket: ${error.message}`);
       }
     }
 
-    this.slackService.sendNotice(`Booking Svc >>> generateTicket : Tickets generated successfully for order ID ${orderID} with ticket data: ${JSON.stringify(ticketData)}`);
+    await this.slackService.sendNotice(`Booking Svc >>> generateTicket : Tickets generated successfully for order ID ${orderID} with ticket data: ${JSON.stringify(ticketData)}`);
   }
 
   async handleShowingWithSelectSeatSeatmap(ticketData: TicketTypeSelectionCache[], orderID: number): Promise<void> {
@@ -148,19 +148,19 @@ export class GenerateTicketService {
           });
 
           if (!ticket) {
-            this.slackService.sendError(`Booking Svc >>> generateTicket : Failed to create ticket for ticket type ID ${ticketTypeSelection.tickettypeId} in seat ID ${seat.seatId}`);
+            await this.slackService.sendError(`Booking Svc >>> generateTicket : Failed to create ticket for ticket type ID ${ticketTypeSelection.tickettypeId} in seat ID ${seat.seatId}`);
             
             throw new Error(`Failed to create ticket for ticket type ID ${ticketTypeSelection.tickettypeId} in seat ID ${seat.seatId}`);
           }
         }
       }
       catch (error) {
-        this.slackService.sendError(`Booking Svc >>> generateTicket : Error generating ticket for ticket type selection ${JSON.stringify(ticketTypeSelection)}: ${error.message}`);
+        await this.slackService.sendError(`Booking Svc >>> generateTicket : Error generating ticket for ticket type selection ${JSON.stringify(ticketTypeSelection)}: ${error.message}`);
         
         throw new Error(`Failed to generate ticket: ${error.message}`);
       }
     }
 
-    this.slackService.sendNotice(`Booking Svc >>> generateTicket : Tickets generated successfully for order ID ${orderID} with ticket data: ${JSON.stringify(ticketData)}`);
+    await this.slackService.sendNotice(`Booking Svc >>> generateTicket : Tickets generated successfully for order ID ${orderID} with ticket data: ${JSON.stringify(ticketData)}`);
   }
 }

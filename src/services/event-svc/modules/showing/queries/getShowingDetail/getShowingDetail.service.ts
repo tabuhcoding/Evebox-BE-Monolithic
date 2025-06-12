@@ -24,6 +24,10 @@ export class getShowingDetailService {
 
       const showing = await this.showingRepository.findOne({
         id: showingId,
+        endTime: {
+          gte: new Date(new Date().setMonth(new Date().getMonth() - 1)),
+        },
+        deleteAt: null,
       }, {
         TicketType: true,
       });
@@ -34,6 +38,23 @@ export class getShowingDetailService {
 
       // find event of showing
       const event = await this.eventsRepository.findOneById(showing.eventId)
+
+      // if showing is ended
+      if (new Date(showing.endTime) < new Date()) {
+        const formattedResult: ShowingDataDto = {
+          ...showing,
+          status: ShowingStatus.SHOWING_OVER,
+          minPrice: 0,
+          Events: {
+            id: event.id,
+            title: event.title,
+            imgLogoUrl: event.imgLogoUrl,
+            imgPosterUrl: event.imgPosterUrl,
+            venue: event.venue,
+          },
+        };
+        return Ok(formattedResult);
+      }
 
       // Calculate showing status and minimum price
       if (!showing.TicketType || showing.TicketType.length === 0) {

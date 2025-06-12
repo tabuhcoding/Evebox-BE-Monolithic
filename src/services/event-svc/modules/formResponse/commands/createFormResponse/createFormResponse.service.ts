@@ -22,7 +22,7 @@ export class CreateFormResponseService {
 
       return Ok(formResponse);
     } catch (error) {
-      this.slackService.sendError(`Event Service - Create form response >>> UpdateFormResponseService: ${error.message}`)
+      await this.slackService.sendError(`Event Service - Create form response >>> UpdateFormResponseService: ${error.message}`)
 
       return Err(new Error(`Failed to create form response: ${error.message}`));
     }

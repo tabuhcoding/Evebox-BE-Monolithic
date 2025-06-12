@@ -16,7 +16,7 @@ export class GetUserSubmitFormService {
       // check if showing has form id
       const showing = await this.showingRepository.findOneById(showingID);
       if (!showing || !showing.formId) {
-        this.slackService.sendError(`Event Svc >>> GetUserSubmitFormService >>> execute: No form found for showing ID ${showingID}`);
+        await this.slackService.sendError(`Event Svc >>> GetUserSubmitFormService >>> execute: No form found for showing ID ${showingID}`);
         return 0;
       }
 
@@ -32,7 +32,7 @@ export class GetUserSubmitFormService {
       return formResponses.id
       
     } catch (error) {
-      this.slackService.sendError(`Event Svc >>> GetTotalTicketOfTicketTypeService >>> execute: ${error.message}`);
+      await this.slackService.sendError(`Event Svc >>> GetTotalTicketOfTicketTypeService >>> execute: ${error.message}`);
       
       return null;
     }

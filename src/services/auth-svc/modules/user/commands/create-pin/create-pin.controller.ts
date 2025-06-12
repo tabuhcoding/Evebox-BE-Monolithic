@@ -65,7 +65,7 @@ export class CreateUserPinController {
         message: USER_MESSAGES.SUCCESS.PIN_CREATED,
       });
     } catch (error) {
-      this.slackService.sendError(`Auth Service - User >>> CreateUserPinStatusController: ${error.message}`);
+      await this.slackService.sendError(`Auth Service - User >>> CreateUserPinStatusController: ${error.message}`);
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
         message: 'Internal server error',

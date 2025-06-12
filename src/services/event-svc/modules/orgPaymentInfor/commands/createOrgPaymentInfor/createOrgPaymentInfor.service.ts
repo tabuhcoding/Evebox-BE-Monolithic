@@ -40,7 +40,7 @@ export class CreateOrgPaymentInfoService {
 
       return result;
     } catch (error) {
-      this.slackService.sendError(`EventSvc - OrgPaymentInfo >>> CreateOrgPaymentInfoService: ${error.message}`);
+      await this.slackService.sendError(`EventSvc - OrgPaymentInfo >>> CreateOrgPaymentInfoService: ${error.message}`);
       return Err(new Error(`Failed to create organizer payment info: ${error.message}`));
     }
   }

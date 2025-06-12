@@ -44,7 +44,7 @@ export class DeleteEventController {
         data: result.unwrap(),
       });
     } catch (error) {
-      this.slackService.sendError(`EventSvc - Event >>> DeleteEventController: ${error.message}`);
+      await this.slackService.sendError(`EventSvc - Event >>> DeleteEventController: ${error.message}`);
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
         message: 'Internal server error',

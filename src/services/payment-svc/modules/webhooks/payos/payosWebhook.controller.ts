@@ -18,12 +18,12 @@ export class PayOSWebhookController {
     @Body() payload: WebhookType,
     @Res() res: Response,
   ) {
-    this.slackService.sendNotice(`PayOS webhook received: ${JSON.stringify(payload)}`);
+    await this.slackService.sendNotice(`PayOS webhook received: ${JSON.stringify(payload)}`);
 
     try {
       await this.payosWebhookService.verifyWebhookData(payload);
     } catch (error) {
-      this.slackService.sendError(`PayOS webhook verification failed: ${error.message}`);
+      await this.slackService.sendError(`PayOS webhook verification failed: ${error.message}`);
     }
     finally {
       return res.status(HttpStatus.OK).json({

@@ -39,7 +39,7 @@ export class UnfavoriteEventService {
       await this.favoriteRepository.updateFavoriteStatus(favorite.id, false);
       return Ok(true);
     } catch (error) {
-      this.slackService.sendError(` Auth Svc - User >>> UnfavoriteEvent: ${error}`);
+      await this.slackService.sendError(` Auth Svc - User >>> UnfavoriteEvent: ${error}`);
       
       return Err(new Error("Failed to unfavorite event"));
     }

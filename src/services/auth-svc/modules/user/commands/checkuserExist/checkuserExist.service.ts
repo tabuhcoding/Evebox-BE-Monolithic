@@ -15,7 +15,7 @@ export class CheckUserExistService {
       const userExists = await this.userRepository.isEmailExists(email);
       return userExists;
     } catch (error) {
-      this.slackService.sendError(`AuthSVC >>> Error checking user existence: ${error.message}`);
+      await this.slackService.sendError(`AuthSVC >>> Error checking user existence: ${error.message}`);
 
       return false;
     }

@@ -61,7 +61,7 @@ export class CalculateShowingStatusService {
       return;
     }
     catch (error) {
-      this.slackService.sendError(`Event Svc - Event >>> reCalculateShowingStatus: ${error.message}`);
+      await this.slackService.sendError(`Event Svc - Event >>> reCalculateShowingStatus: ${error.message}`);
       return undefined;
     }
   }
@@ -96,7 +96,7 @@ export class CalculateShowingStatusService {
         // Get total ticket of ticket type
         const totalTickets = await this.getTotalTicketOfTicketTypeService.getTotalTicketOfTicketType(ticketType.id);
         if (totalTickets === null) {
-          this.slackService.sendError(`Booking Svc >>> reCalculateTicketTypeStatus: Failed to get total tickets for ticket type ${ticketType.id}`);
+          await this.slackService.sendError(`Booking Svc >>> reCalculateTicketTypeStatus: Failed to get total tickets for ticket type ${ticketType.id}`);
           ticketType.status = TicketTypeStatus.NOT_OPEN
 
           return ticketType.status;
@@ -118,7 +118,7 @@ export class CalculateShowingStatusService {
         });
 
         if (!ticketTypeSections || ticketTypeSections.length === 0) {
-          this.slackService.sendError(`Event Svc - Event >>> reCalculateTicketTypeStatus: No ticket type sections found for ticket type ${ticketType.id}`);
+          await this.slackService.sendError(`Event Svc - Event >>> reCalculateTicketTypeStatus: No ticket type sections found for ticket type ${ticketType.id}`);
           ticketType.status = TicketTypeStatus.NOT_OPEN;
           return ticketType.status;
         }
@@ -127,7 +127,7 @@ export class CalculateShowingStatusService {
           // Get total ticket of section
           const totalTickets = await this.getTotalTicketOfTicketTypeService.getTotalTicketOfSection(ticketType.id, ticketTypeSection.sectionId);
           if (totalTickets === null) {
-            this.slackService.sendError(`Booking Svc >>> reCalculateTicketTypeStatus: Failed to get total tickets for ticket type ${ticketType.id} and section ${ticketTypeSection.sectionId}`);
+            await this.slackService.sendError(`Booking Svc >>> reCalculateTicketTypeStatus: Failed to get total tickets for ticket type ${ticketType.id} and section ${ticketTypeSection.sectionId}`);
             ticketType.status = TicketTypeStatus.NOT_OPEN;
             return ticketType.status;
           }
@@ -152,7 +152,7 @@ export class CalculateShowingStatusService {
         });
 
         if (!ticketTypeSections || ticketTypeSections.length === 0) {
-          this.slackService.sendError(`Event Svc - Event >>> reCalculateTicketTypeStatus: No ticket type sections found for ticket type ${ticketType.id}`);
+          await this.slackService.sendError(`Event Svc - Event >>> reCalculateTicketTypeStatus: No ticket type sections found for ticket type ${ticketType.id}`);
           ticketType.status = TicketTypeStatus.NOT_OPEN;
           return ticketType.status;
         }
@@ -173,7 +173,7 @@ export class CalculateShowingStatusService {
 
 
         if (!allSeatOfSections || allSeatOfSections.length === 0) {
-          this.slackService.sendError(`Event Svc - Event >>> reCalculateTicketTypeStatus: No seat status found for ticket type ${ticketType.id}`);
+          await this.slackService.sendError(`Event Svc - Event >>> reCalculateTicketTypeStatus: No seat status found for ticket type ${ticketType.id}`);
           ticketType.status = TicketTypeStatus.NOT_OPEN;
           return ticketType.status;
         }
@@ -182,7 +182,7 @@ export class CalculateShowingStatusService {
         var allSeatHasSale = await this.getTotalTicketOfTicketTypeService.getAllSeatHasSaleOfTicketType(ticketType.id);
 
         if (allSeatHasSale === null) {
-          this.slackService.sendError(`Booking Svc >>> reCalculateTicketTypeStatus: Failed to get all seat has sale for ticket type ${ticketType.id}`);
+          await this.slackService.sendError(`Booking Svc >>> reCalculateTicketTypeStatus: Failed to get all seat has sale for ticket type ${ticketType.id}`);
           ticketType.status = TicketTypeStatus.NOT_OPEN;
           return ticketType.status;
         }
@@ -191,7 +191,7 @@ export class CalculateShowingStatusService {
         if (withRedisStatus) {
           const allSeatHasPicked = await this.getTotalTicketOfTicketTypeService.getAllSeatHasSaleOfShowing(ticketType.showingId);
           if (allSeatHasPicked === null) {
-            this.slackService.sendError(`Booking Svc >>> reCalculateTicketTypeStatus: Failed to get all seat has picked for showing ${ticketType.showingId}`);
+            await this.slackService.sendError(`Booking Svc >>> reCalculateTicketTypeStatus: Failed to get all seat has picked for showing ${ticketType.showingId}`);
             ticketType.status = TicketTypeStatus.NOT_OPEN;
             return ticketType.status;
           }
@@ -224,12 +224,12 @@ export class CalculateShowingStatusService {
       }
 
       // If seatmap type is not recognized, set status to NOT_OPEN
-      this.slackService.sendError(`Event Svc - Event >>> reCalculateTicketTypeStatus: Unrecognized seatmap type for ticket type ${ticketType.id}`);
+      await this.slackService.sendError(`Event Svc - Event >>> reCalculateTicketTypeStatus: Unrecognized seatmap type for ticket type ${ticketType.id}`);
       ticketType.status = TicketTypeStatus.NOT_OPEN;
       return ticketType.status;
     }
     catch (error) {
-      this.slackService.sendError(`Event Svc - Event >>> reCalculateTicketTypeStatus: ${error.message}`);
+      await this.slackService.sendError(`Event Svc - Event >>> reCalculateTicketTypeStatus: ${error.message}`);
       return undefined;
     }
   }

@@ -32,7 +32,7 @@ export class CheckFavoriteService {
 
       return [isFavoriteEvent, isNotifiedEvent, isFavoriteOrg, isNotifiedOrg];
     } catch (error) {
-      this.slackService.sendError(`Auth Service - Check Favorite >>> ${error.message}`);
+      await this.slackService.sendError(`Auth Service - Check Favorite >>> ${error.message}`);
       
       return [false, false, false, false];
     }
@@ -50,7 +50,7 @@ export class CheckFavoriteService {
         event.isUserFavorite = isFavoriteEvent ? isFavoriteEvent.isFavorite : false;
         event.isUserNotice = isFavoriteEvent ? isFavoriteEvent.isNotified : false;
       } catch (error) {
-        this.slackService.sendError(`Auth Service - Attach Favorite >>> ${error.message}`);
+        await this.slackService.sendError(`Auth Service - Attach Favorite >>> ${error.message}`);
         event.isUserFavorite = false;
         event.isUserNotice = false;
       }

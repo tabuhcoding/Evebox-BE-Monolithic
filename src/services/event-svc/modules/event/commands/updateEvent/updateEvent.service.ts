@@ -52,7 +52,7 @@ export class UpdateEventService {
       }
 
       if (isApproved) {
-        this.slackService.sendNotice(`Event Service - Event >>> Event with ID ${eventId} has been updated.`);
+        await this.slackService.sendNotice(`Event Service - Event >>> Event with ID ${eventId} has been updated.`);
       }
 
       if (dto.categoryIds && dto.categoryIds.length > 0) {
@@ -64,7 +64,7 @@ export class UpdateEventService {
 
       return Ok({ id: eventId });
     } catch (error) {
-      this.slackService.sendError(`EventSvc - Event >>> UpdateEventService: ${error.message}`);
+      await this.slackService.sendError(`EventSvc - Event >>> UpdateEventService: ${error.message}`);
       return Err(new Error(`Error updating event: ${error.message}`));
     }
   }

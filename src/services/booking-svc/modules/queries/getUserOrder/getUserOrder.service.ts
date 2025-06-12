@@ -99,7 +99,7 @@ export class GetUserTicketService {
 
       return Ok(mappedOrders);
     } catch (error) {
-      this.slackService.sendError(`Error in GetUserTicketService: ${error.message}`);
+      await this.slackService.sendError(`Error in GetUserTicketService: ${error.message}`);
 
       return Err(new Error('Failed to select seat'));
     }
@@ -187,7 +187,7 @@ export class GetUserTicketService {
       return Ok(userOrder);
     }
     catch (error) {
-      this.slackService.sendError(`Error in GetUserTicketService: ${error.message}`);
+      await this.slackService.sendError(`Error in GetUserTicketService: ${error.message}`);
       
       return Err(new Error('Failed to select seat'));
     }

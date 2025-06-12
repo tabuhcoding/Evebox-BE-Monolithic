@@ -40,7 +40,7 @@ export class DeleteEventService {
 
       return Ok({ id: eventId });
     } catch (error) {
-      this.slackService.sendError(`EventSvc - Event >>> DeleteEventService: ${error.message}`);
+      await this.slackService.sendError(`EventSvc - Event >>> DeleteEventService: ${error.message}`);
       return Err(new Error(`Error updating event: ${error.message}`));
     }
   }

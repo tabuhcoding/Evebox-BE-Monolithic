@@ -15,7 +15,6 @@ import { VectorStoreGeminiService } from "./modules/vector_store/vector_store.ge
 import { VectorStoreService } from "./modules/vector_store/vector_store.service";
 import { ContentRepositoryImpl } from "./repository/content.impl";
 import { PrismaAIModule } from "./database/prisma-ai/prisma.module";
-import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 
 @Module({
   imports: [ PrismaAIModule ],

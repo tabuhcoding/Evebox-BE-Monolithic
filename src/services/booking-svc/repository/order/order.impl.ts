@@ -4,7 +4,7 @@ import { PrismaService } from "src/infrastructure/database/prisma/prisma.service
 import { BaseRepository } from "src/shared/repo/base.repository"
 import { Prisma } from "@prisma/client"
 import { Result, Ok, Err } from "oxide.ts"
-import { OrderData } from "../../modules/queries/getOrdersByShowingId/getOrdersByShowingId-response.dto"
+import { OrderData, TicketGroupedByTicketTypeID } from "../../modules/queries/getOrdersByShowingId/getOrdersByShowingId-response.dto"
 import { GetPaymentInfoService } from "src/services/payment-svc/modules/queries/getPaymentInfo/getPaymentInfo.service"
 import { GetFormResponseByIdService } from "src/services/event-svc/modules/formResponse/queries/getFormResponseById/getFormResponseById.service"
 
@@ -46,6 +46,31 @@ export class OrderRepositoryImpl
             return Err(new Error(`Failed to get payment info of payment ${paymentInfoId}`));
           }
 
+          const paymentInfoData = paymentInfo.unwrap();
+
+        // Struct the ticket data group by ticket type
+        // Re structure the tickets
+        const ticketsMapByTicketTypeId = new Map<string, TicketGroupedByTicketTypeID>();
+        
+        // count
+        await Promise.all(order.Ticket.map(async ticket => {
+          
+          // Check if the ticket type already exists in the map
+          // If not, fetch the ticket type details and add it to the map
+          if (!ticketsMapByTicketTypeId.has(ticket.ticketTypeId)) {
+            ticketsMapByTicketTypeId.set(ticket.ticketTypeId, {
+              id: ticket.ticketTypeId,
+              tickets: []
+            });
+          }
+          ticketsMapByTicketTypeId.get(ticket.ticketTypeId)!.tickets.push({
+            id: ticket.id,
+            seatID: ticket.seatId,
+            sectionID: ticket.sectionId,
+            qrCode: ticket.qrCode,
+            description: ticket.description,
+          });
+          }));
           orderData.push({
             id: order.id,
             status: order.status,
@@ -55,7 +80,12 @@ export class OrderRepositoryImpl
             showingId: order.showingId,
             userId: order.userId,
             formResponse: formResponse.unwrap(),
-            paymentInfo: paymentInfo.unwrap(),         
+            paymentInfo: {
+              id: paymentInfoData.id,
+              method: paymentInfoData.method,
+              paidAt: paymentInfoData.paidAt,
+            },
+            Ticket: Array.from(ticketsMapByTicketTypeId.values()),         
           });
         }
 

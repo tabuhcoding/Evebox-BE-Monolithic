@@ -24,7 +24,7 @@ export class GetTotalTicketOfTicketTypeService {
       return totalTickets;
     }
     catch (error) {
-      this.slackService.sendError(` Booking Svc >>> getTotalTicketOfTicketType : ${error.message}`)
+      await this.slackService.sendError(` Booking Svc >>> getTotalTicketOfTicketType : ${error.message}`)
 
       return null;
     }
@@ -41,7 +41,7 @@ export class GetTotalTicketOfTicketTypeService {
       return totalTickets;
     }
     catch (error) {
-      this.slackService.sendError(` Booking Svc >>> getTotalTicketOfSection : ${error.message}`)
+      await this.slackService.sendError(` Booking Svc >>> getTotalTicketOfSection : ${error.message}`)
 
       return null;
     }
@@ -76,7 +76,7 @@ export class GetTotalTicketOfTicketTypeService {
       return uniqueSeatIds;
     }
     catch (error) {
-      this.slackService.sendError(` Booking Svc >>> getAllSeatHasSaleOfShowing : ${error.message}`);
+      await this.slackService.sendError(` Booking Svc >>> getAllSeatHasSaleOfShowing : ${error.message}`);
       
       return null;
     }
@@ -100,7 +100,7 @@ export class GetTotalTicketOfTicketTypeService {
       return uniqueSeatIds;
     }
     catch (error) {
-      this.slackService.sendError(` Booking Svc >>> getAllSeatHasSaleOfTicketType : ${error.message}`);
+      await this.slackService.sendError(` Booking Svc >>> getAllSeatHasSaleOfTicketType : ${error.message}`);
       
       return null;
     }
@@ -131,7 +131,7 @@ export class GetTotalTicketOfTicketTypeService {
       // Return the unique seat IDs
       return seatIds;
     } catch (error) {
-      this.slackService.sendError(` Booking Svc >>> getAllSeatHasPickedInCacheOfTicketType : ${error.message}`);
+      await this.slackService.sendError(` Booking Svc >>> getAllSeatHasPickedInCacheOfTicketType : ${error.message}`);
       
       return null;
     }
@@ -157,7 +157,7 @@ export class GetTotalTicketOfTicketTypeService {
       // Return the unique seat IDs
       return seatIds;
     } catch (error) {
-      this.slackService.sendError(` Booking Svc >>> getAllSeatHasPickedInCacheOfShowing : ${error.message}`);
+      await this.slackService.sendError(` Booking Svc >>> getAllSeatHasPickedInCacheOfShowing : ${error.message}`);
       
       return null;
     }

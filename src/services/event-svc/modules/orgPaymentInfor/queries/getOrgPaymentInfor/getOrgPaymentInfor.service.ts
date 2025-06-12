@@ -28,7 +28,7 @@ export class GetOrgPaymentInfoService {
 
       return Ok(paymentInfo);
     } catch (error) {
-      this.slackService.sendError(`Event Service - Payment info >>> GetOrgPaymentInfoService: ${error.message}`);
+      await this.slackService.sendError(`Event Service - Payment info >>> GetOrgPaymentInfoService: ${error.message}`);
       
       return Err(new Error('Failed to fetch recommended events.'));
     }

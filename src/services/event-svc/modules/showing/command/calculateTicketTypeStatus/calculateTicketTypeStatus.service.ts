@@ -15,7 +15,7 @@ export class CalculateTicketTypeStatusService {
   
   async execute(): Promise<void> {
     // Get all showings
-    const showings = await this.showingRepository.findAll({
+    const showings = await this.showingRepository.findAll({}, {
       TicketType: true,
     });
 
@@ -37,7 +37,7 @@ export class CalculateTicketTypeStatusService {
         // Check if the status has changed
         for (const ticketType of showing.TicketType) {
           if (ticketTypeStatusMap.get(ticketType.id) !== ticketType.status) {
-            this.slackService.sendNotice(`Ticket type status changed for showing ID: ${showing.id}, Ticket Type ID: ${ticketType.id}, New Status: ${ticketType.status}`);
+            await this.slackService.sendNotice(`Ticket type status changed for showing ID: ${showing.id}, Ticket Type ID: ${ticketType.id}, New Status: ${ticketType.status}`);
             // Update the ticket type status in the database
             await this.ticketTypeRepository.updateOneById(ticketType.id, {
               status: ticketType.status,
@@ -45,7 +45,7 @@ export class CalculateTicketTypeStatusService {
           }
         }
       } catch (error) {
-        this.slackService.sendError(`Error recalculating ticket type status for showing ID: ${showing.id} - ${error.message}`);
+        await this.slackService.sendError(`Error recalculating ticket type status for showing ID: ${showing.id} - ${error.message}`);
       }
     }
   }

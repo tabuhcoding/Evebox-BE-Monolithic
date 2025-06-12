@@ -32,16 +32,16 @@ export class CreateOrderService {
       });
 
       if (!order) {
-        this.slackService.sendError(` Booking Svc >>> createOrder : Failed to create order for showingID: ${showingID} and userID: ${userID}`);
+        await this.slackService.sendError(` Booking Svc >>> createOrder : Failed to create order for showingID: ${showingID} and userID: ${userID}`);
 
         return null;
       }
 
-      this.slackService.sendNotice(` Booking Svc >>> createOrder : Order created successfully for showingID: ${showingID} and userID: ${userID} with order ID: ${order}`);
+      await this.slackService.sendNotice(` Booking Svc >>> createOrder : Order created successfully for showingID: ${showingID} and userID: ${userID} with order ID: ${order}`);
       return order
     }
     catch (error) {
-      this.slackService.sendError(` Booking Svc >>> getTotalTicketOfTicketType : ${error.message}`)
+      await this.slackService.sendError(` Booking Svc >>> getTotalTicketOfTicketType : ${error.message}`)
 
       return null;
     }
@@ -53,7 +53,7 @@ export class CreateOrderService {
       
       return order;
     } catch (error) {
-      this.slackService.sendError(` Booking Svc >>> updateOrderStatus : ${error.message}`);
+      await this.slackService.sendError(` Booking Svc >>> updateOrderStatus : ${error.message}`);
       
       return null;
     }

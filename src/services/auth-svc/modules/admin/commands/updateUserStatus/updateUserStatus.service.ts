@@ -52,7 +52,7 @@ export class UpdateUserStatusService {
 
       return Ok(void 0);
     } catch (error) {
-      this.slackService.sendError(`AuthSvc >>> User - UpdateUserStatusService: ${error.message}`);
+      await this.slackService.sendError(`AuthSvc >>> User - UpdateUserStatusService: ${error.message}`);
       return Err(new Error(USER_MESSAGES.ERRORS.SERVER_ERROR));
     }
   }

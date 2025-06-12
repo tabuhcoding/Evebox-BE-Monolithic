@@ -50,7 +50,7 @@ export class CreateFormService {
 
       return result;
     } catch (error) {
-      this.slackService.sendError(`EventSvc - Form >>> CreateFormService: ${error.message}`);
+      await this.slackService.sendError(`EventSvc - Form >>> CreateFormService: ${error.message}`);
 
       return Err(new Error(`Failed to create form: ${error.message}`));
     }

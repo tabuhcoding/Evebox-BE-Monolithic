@@ -60,7 +60,7 @@ export class SubmitFormController {
         data: result.unwrap(),
       });
     } catch (error) {
-      this.slackService.sendError(`Booking Service - Submit form >>> SubmitFormController: ${error.message}`);
+      await this.slackService.sendError(`Booking Service - Submit form >>> SubmitFormController: ${error.message}`);
 
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(ErrorHandler.internalServerError('An unexpected error occurred'));
     }

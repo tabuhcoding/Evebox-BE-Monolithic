@@ -43,7 +43,7 @@ export class DeleteTicketTypeService {
 
       return result;
     } catch (error) {
-      this.slackService.sendError(`Event Service - Ticket type >>> DeleteTicketTypeService: ${error.message}`)
+      await this.slackService.sendError(`Event Service - Ticket type >>> DeleteTicketTypeService: ${error.message}`)
       return Err(new Error(`Failed to delete showing: ${error.message}`));
     }
   }

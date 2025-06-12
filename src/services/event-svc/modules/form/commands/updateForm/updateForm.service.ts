@@ -41,7 +41,7 @@ export class UpdateFormService {
 
       return result;
     } catch (error) {
-      this.slackService.sendError(`Event Service - Form >>> UpdateFormService: ${error.message}`);
+      await this.slackService.sendError(`Event Service - Form >>> UpdateFormService: ${error.message}`);
       return Err(new Error(`Error updating form: ${error.message}`));
     }
   }

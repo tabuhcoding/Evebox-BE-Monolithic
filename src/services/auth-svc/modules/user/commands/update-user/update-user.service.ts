@@ -65,7 +65,7 @@ export class UpdateUserService {
         userId: user.id.value
       })
     } catch (error) {
-      this.slackService.sendError(`AuthSvc - User >>> UpdateUserService: ${error.message}`);
+      await this.slackService.sendError(`AuthSvc - User >>> UpdateUserService: ${error.message}`);
 
       return Err(new Error('Failed to update user info'));
     }

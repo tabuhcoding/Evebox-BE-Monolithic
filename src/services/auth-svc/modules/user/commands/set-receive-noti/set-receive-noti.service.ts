@@ -27,7 +27,7 @@ export class SetReceiveNotiService {
       await this.userRepository.setReceiveNoti(user.id.value, receive);
       return Ok(true);
     } catch(error) {
-      this.slackService.sendError(` Auth Svc - User >>> SetReceiveNoti: ${error}`);
+      await this.slackService.sendError(` Auth Svc - User >>> SetReceiveNoti: ${error}`);
       
       return Err(new Error('Failed to update notification preference'));
     }

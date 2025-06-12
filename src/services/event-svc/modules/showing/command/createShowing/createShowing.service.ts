@@ -41,12 +41,12 @@ export class CreateShowingService {
 
       const [showingId, isApproved] = result.unwrap();
       if (isApproved) {
-        this.slackService.sendNotice(`Event Service - Showing >>> CreateShowingService: Event with ID ${eventId} has been created showing.`);
+        await this.slackService.sendNotice(`Event Service - Showing >>> CreateShowingService: Event with ID ${eventId} has been created showing.`);
       }
 
       return Ok(showingId);
     } catch (error) {
-      this.slackService.sendError(`EventSvc - Showing >>> CreateShowingService: ${error.message}`);
+      await this.slackService.sendError(`EventSvc - Showing >>> CreateShowingService: ${error.message}`);
 
       return Err(new Error(`Failed to create showing: ${error.message}`));
     }

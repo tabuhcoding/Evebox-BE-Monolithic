@@ -84,7 +84,7 @@ export class GetEventFrontDisplayService {
       return Ok(result);
     } catch (error) {
       // send error to slack
-      this.slackService.sendError(`EventSvc - Event >>> GetEventFrontDisplayService: ${error.message}`);
+      await this.slackService.sendError(`EventSvc - Event >>> GetEventFrontDisplayService: ${error.message}`);
 
       return Err(new Error('Failed to fetch front display data.'));
     }

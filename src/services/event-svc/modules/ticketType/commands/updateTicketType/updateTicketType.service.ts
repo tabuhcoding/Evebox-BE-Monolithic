@@ -46,12 +46,12 @@ export class UpdateTicketTypeService {
 
       const [ticketTypeId, isApproved] = result.unwrap();
       if (isApproved) {
-        this.slackService.sendNotice(`Event Service - Showing >>> UpdateShowingService: Event with ID ${showing.eventId} has been updated showing.`);
+        await this.slackService.sendNotice(`Event Service - Showing >>> UpdateShowingService: Event with ID ${showing.eventId} has been updated showing.`);
       }
 
       return Ok(ticketTypeId);
     } catch (error) {
-      this.slackService.sendError(`Event Service - Ticket type >>> UpdateTicketTypeService: ${error.message}`);
+      await this.slackService.sendError(`Event Service - Ticket type >>> UpdateTicketTypeService: ${error.message}`);
       return Err(new Error(`Error updating showwing: ${error.message}`));
     }
   }

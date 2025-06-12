@@ -55,7 +55,7 @@ export class DeleteOrgPaymentInfoController {
         data: { id: result.unwrap() },
       });
     } catch (error) {
-      this.slackService.sendError(`Event Service - OrgPaymentInfo >>> DeleteOrgPaymentInfoController: ${error.message}`);
+      await this.slackService.sendError(`Event Service - OrgPaymentInfo >>> DeleteOrgPaymentInfoController: ${error.message}`);
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
         message: 'Internal server error',

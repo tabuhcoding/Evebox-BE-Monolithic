@@ -22,16 +22,16 @@ export class PayOSService implements OnModuleInit, OnModuleDestroy {
   }
 
   async onModuleInit() {
-    this.slackService.sendNotice(`PayOSService initialized with Client ID: ${this.configService.get<string>('PAYOS_CLIENT_ID')}`);
+    await this.slackService.sendNotice(`PayOSService initialized with Client ID: ${this.configService.get<string>('PAYOS_CLIENT_ID')}`);
     try{
       // await this.updateWebhookUrl()
     } catch (error) {
-      this.slackService.sendError(`PayOSService webhook URL update failed: ${error} with webhook URL: ${this.configService.get<string>('PAYOS_WEBHOOK_URL')}`);
+      await this.slackService.sendError(`PayOSService webhook URL update failed: ${error} with webhook URL: ${this.configService.get<string>('PAYOS_WEBHOOK_URL')}`);
     }
   }
 
   onModuleDestroy() {
-    this.slackService.sendNotice(`PayOSService destroyed`);
+    await this.slackService.sendNotice(`PayOSService destroyed`);
   }
 
   async createPaymentLink(body: CheckoutRequestType) {
@@ -49,7 +49,7 @@ export class PayOSService implements OnModuleInit, OnModuleDestroy {
   async updateWebhookUrl() {
     const webhookUrl = this.configService.get<string>('PAYOS_WEBHOOK_URL');
     const result = await this.payOS.confirmWebhook(webhookUrl);
-    this.slackService.sendNotice(`Webhook URL updated: ${webhookUrl} with result: ${JSON.stringify(result)}`);
+    await this.slackService.sendNotice(`Webhook URL updated: ${webhookUrl} with result: ${JSON.stringify(result)}`);
   }
 
   async verifyWebhookData(payload: WebhookType): Promise<WebhookDataType | null>{

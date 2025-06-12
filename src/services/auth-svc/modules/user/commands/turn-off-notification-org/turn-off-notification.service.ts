@@ -36,7 +36,7 @@ export class TurnOffNotificationServiceForOrg {
        await this.favoriteRepository.updateIsNotified(existing.id, false);
        return Ok(true);
      } catch (error) {
-       this.slackService.sendError(` Auth Svc - User >>> TurnOffNotification: ${error}`);
+       await this.slackService.sendError(` Auth Svc - User >>> TurnOffNotification: ${error}`);
       
        return Err(new Error("Failed to turn off notification."));
      }

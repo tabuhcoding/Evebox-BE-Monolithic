@@ -32,7 +32,7 @@ export class GetRedisSeatService {
       let totalAmount = 0;
 
       if (!ticketTypeData || ticketTypeData.length === 0) {
-        this.slackService.sendError(`Booking Svc >>> GetRedisSeatService >>> execute: No ticketTypeData found for showingId: ${showingId}`);
+        await this.slackService.sendError(`Booking Svc >>> GetRedisSeatService >>> execute: No ticketTypeData found for showingId: ${showingId}`);
         
         return Err(new Error('Your seat TicketType not valid.'));
       }
@@ -42,7 +42,7 @@ export class GetRedisSeatService {
       for (const ticketType of ticketTypeData) {
         const ticketTypeDetail = await this.getTicketTypeDetailService.getTicketTypeDetail(ticketType.ticketTypeId);
         if (!ticketTypeDetail) {
-          this.slackService.sendError(`Booking Svc >>> GetRedisSeatService >>> execute ticketType: ${ticketType.ticketTypeId}`);
+          await this.slackService.sendError(`Booking Svc >>> GetRedisSeatService >>> execute ticketType: ${ticketType.ticketTypeId}`);
           
           return Err(new Error('Your seat TicketType not valid.'));
         }
@@ -53,7 +53,7 @@ export class GetRedisSeatService {
         else if (ticketType.quantity && ticketType.quantity > 0) {
           totalAmount += ticketTypeDetail.price * ticketType.quantity;
         } else {
-          this.slackService.sendError(`Booking Svc >>> GetRedisSeatService >>> execute ticketType: ${ticketType.ticketTypeId} has no seatId or quantity`);
+          await this.slackService.sendError(`Booking Svc >>> GetRedisSeatService >>> execute ticketType: ${ticketType.ticketTypeId} has no seatId or quantity`);
           
           return Err(new Error('Your seat TicketType not valid.'));
         }
@@ -80,7 +80,7 @@ export class GetRedisSeatService {
       return Ok(responseData);
 
     } catch (error) {
-      this.slackService.sendError(`Booking Svc >>> GetRedisSeatService >>> execute: ${error.message}`);
+      await this.slackService.sendError(`Booking Svc >>> GetRedisSeatService >>> execute: ${error.message}`);
 
       return Err(new Error('Internal Server Error.'));
     }

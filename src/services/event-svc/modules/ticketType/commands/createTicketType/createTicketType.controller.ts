@@ -61,7 +61,7 @@ export class CreateTicketTypeController {
         data: result.unwrap(),
       });
     } catch (error) {
-      this.slackService.sendError(`EventSvc - Ticket type >>> CreateTicketTypeController: ${error.message}`);
+      await this.slackService.sendError(`EventSvc - Ticket type >>> CreateTicketTypeController: ${error.message}`);
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
         message: 'Internal server error',

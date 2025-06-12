@@ -28,7 +28,7 @@ export class DescriptionGenerateService {
   constructor(private readonly vectorStore: VectorStoreService,
     private readonly slackService: SlackService,
   ) {
-    this.slackService.sendNotice(`Service initialized.`);
+    await this.slackService.sendNotice(`Service initialized.`);
   }
 
   private isQuotaError(err: any): boolean {

@@ -73,7 +73,7 @@ export class AddToFavoriteService {
 
       return Ok(true);
     } catch (error) {
-      this.slackService.sendError(` Auth Svc - User >>> CreatFavorite: ${error}`);  
+      await this.slackService.sendError(` Auth Svc - User >>> CreatFavorite: ${error}`);  
       return Err(new Error("Failed to add event/org to favorite"));
     }
   }

@@ -92,14 +92,14 @@ export class getShowingSeatmapService {
         // Get all sold seats for the showing
         const allSoldSeats = await this.getTotalTicketOfTicketTypeService.getAllSeatHasSaleOfShowing(showingId);
         if (allSoldSeats === null) {
-          this.slackService.sendError(`Booking Svc >>> getShowingSeatmap: Failed to get all sold seats for showing ${showingId}`);
+          await this.slackService.sendError(`Booking Svc >>> getShowingSeatmap: Failed to get all sold seats for showing ${showingId}`);
           
           return Err(new Error('Failed to fetch seatmap.'));
         }
 
         const allPickedSeats = await this.getTotalTicketOfTicketTypeService.getAllSeatHasPickedInCacheOfShowing(showingId);
         if (allPickedSeats === null) {
-          this.slackService.sendError(`Booking Svc >>> getShowingSeatmap: Failed to get all picked seats for showing ${showingId}`);
+          await this.slackService.sendError(`Booking Svc >>> getShowingSeatmap: Failed to get all picked seats for showing ${showingId}`);
           
           return Err(new Error('Failed to fetch seatmap.'));
         }
@@ -135,7 +135,7 @@ export class getShowingSeatmapService {
       
       return Err(new Error('Unsupported seatmap type.'));
     } catch (error) {
-      this.slackService.sendError(`Event Svc >>> getShowingSeatmap: ${error.message}`);
+      await this.slackService.sendError(`Event Svc >>> getShowingSeatmap: ${error.message}`);
       return Err(new Error('Failed to fetch seat map data.'));
     }
   }

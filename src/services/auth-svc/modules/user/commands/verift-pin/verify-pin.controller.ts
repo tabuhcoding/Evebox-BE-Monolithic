@@ -84,7 +84,7 @@ export class VerifyUserPinController {
         }
       }
     } catch (error) {
-      this.slackService.sendError(`Auth Service - User >>> VerifyUserPinController: ${error.message}`);
+      await this.slackService.sendError(`Auth Service - User >>> VerifyUserPinController: ${error.message}`);
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
         message: 'Internal server error',

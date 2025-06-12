@@ -49,12 +49,12 @@ export class ConnectFormService {
 
       const [{ showingId, formId }, isApproved] = result.unwrap();
       if (isApproved) {
-        this.slackService.sendNotice(`Event Service - Form >>> ConnectFormService: Event with ID ${showing.eventId} has been connected form ${dto.formId} to showing ${dto.showingId}`);
+        await this.slackService.sendNotice(`Event Service - Form >>> ConnectFormService: Event with ID ${showing.eventId} has been connected form ${dto.formId} to showing ${dto.showingId}`);
       }
 
       return Ok({ showingId, formId });
     } catch (error) {
-      this.slackService.sendError(`Event Service - Showing >>> ConnectFormService: ${error.message}`);
+      await this.slackService.sendError(`Event Service - Showing >>> ConnectFormService: ${error.message}`);
       return Err(new Error(`Error connect form to showing: ${error.message}`));
     }
   }

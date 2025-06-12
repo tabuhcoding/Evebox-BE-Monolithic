@@ -18,7 +18,7 @@ export class GetUsersNotifiedByOrgService {
       const emails = await this.userRepository.getEmailsByIds(userIds.map(u => u.userId));
       return Ok(emails.map(email => ({ email })));
     } catch (error) {
-      this.slackService.sendError(` Auth Svc - User >>> GetFavoriteEvent: ${error}`);
+      await this.slackService.sendError(` Auth Svc - User >>> GetFavoriteEvent: ${error}`);
       
       return Err(new Error('Failed to fetch notified user emails for organizer'));
     }

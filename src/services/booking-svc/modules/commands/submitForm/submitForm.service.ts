@@ -25,7 +25,7 @@ export class SubmitFormService {
 
       // return Ok(formResponseFormatted);
     } catch (error) {
-      this.slackService.sendError(`Booking Svc >>> SubmitFormService : ${error.message}`);
+      await this.slackService.sendError(`Booking Svc >>> SubmitFormService : ${error.message}`);
 
       return Err(new Error('Failed to retrieve form by id'));
     }

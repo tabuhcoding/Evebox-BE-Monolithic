@@ -42,7 +42,7 @@ export class GetUserPinStatusService {
         requiresPinSetup: true,
       })
     } catch (error) {
-      this.slackService.sendError(`Auth Service - User >>> GetUserPinStatusService: ${error.message}`);
+      await this.slackService.sendError(`Auth Service - User >>> GetUserPinStatusService: ${error.message}`);
 
       return Err(new Error('Failed to get user pin status.'));
     }

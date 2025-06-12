@@ -68,7 +68,7 @@ export class GetAllEventDetailForRAGService {
         } as GetAllEventDetailForRAGResponseDto;
       });
     } catch (error) {
-      this.slackService.sendError(
+      await this.slackService.sendError(
         `Event Service - Event >>> GetAllEventDetailForRAGService - getAllEvents: ${error.message}`
       );
 

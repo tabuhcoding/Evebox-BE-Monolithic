@@ -56,7 +56,7 @@ export class TurnOnNotificationService {
       await this.favoriteRepository.updateIsNotified(existing.id, true);
       return Ok(true);
     } catch (error) {
-       this.slackService.sendError(` Auth Svc - User >>> TurnOnNotification: ${error}`);
+       await this.slackService.sendError(` Auth Svc - User >>> TurnOnNotification: ${error}`);
       
       return Err(new Error("Failed to turn on notification."));
     }

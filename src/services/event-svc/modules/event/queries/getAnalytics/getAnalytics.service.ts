@@ -82,7 +82,7 @@ export class GetAnalyticsService {
 
       return Ok(response);
     } catch (error) {
-      this.slackService.sendError(`Event Service - Event analytics >>> GetAnalyticsService: ${error.message}`);
+      await this.slackService.sendError(`Event Service - Event analytics >>> GetAnalyticsService: ${error.message}`);
 
       return Err(new Error('Failed to retrieve events'));
     }

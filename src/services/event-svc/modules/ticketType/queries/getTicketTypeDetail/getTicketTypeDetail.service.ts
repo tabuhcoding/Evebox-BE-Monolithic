@@ -27,7 +27,7 @@ export class GetTicketTypeDetailService {
       }
       return ticketType;
     } catch (error) {
-      this.slackService.sendError(`Event Svc >>> getTicketTypeDetail: ${error.message}`);
+      await this.slackService.sendError(`Event Svc >>> getTicketTypeDetail: ${error.message}`);
       
       return null;
     }
@@ -49,7 +49,7 @@ export class GetTicketTypeDetailService {
 
       return ticketTypeSection.Section.name;
     } catch (error) {
-      this.slackService.sendError(`Event Svc >>> getTicketTypeSectionname: ${error.message} with ticketTypeId: ${ticketTypeId}, sectionId: ${sectionId}`);
+      await this.slackService.sendError(`Event Svc >>> getTicketTypeSectionname: ${error.message} with ticketTypeId: ${ticketTypeId}, sectionId: ${sectionId}`);
       
       return null;
     }
@@ -90,7 +90,7 @@ export class GetTicketTypeDetailService {
 
       return [seatname, sectionname];
     } catch (error) {
-      this.slackService.sendError(`Event Svc >>> getSeatSectionName: ${error.message} with ticketTypeId: ${ticketTypeId}, sectionId: ${seatId}`);
+      await this.slackService.sendError(`Event Svc >>> getSeatSectionName: ${error.message} with ticketTypeId: ${ticketTypeId}, sectionId: ${seatId}`);
       
       return [null, null];
     }

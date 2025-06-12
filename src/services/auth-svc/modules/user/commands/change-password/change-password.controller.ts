@@ -70,7 +70,7 @@ export class ChangePasswordController {
         message: 'Password has been changed successfully',
       });
     } catch (error) {
-      this.slackService.sendError(`AuthSvc - User >>> ChangePasswordController: ${error.message}`);
+      await this.slackService.sendError(`AuthSvc - User >>> ChangePasswordController: ${error.message}`);
       return res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .json(ErrorHandler.internalServerError('Failed to change password'));

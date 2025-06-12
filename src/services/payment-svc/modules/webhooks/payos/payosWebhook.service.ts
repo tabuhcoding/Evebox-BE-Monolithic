@@ -16,7 +16,7 @@ export class PayOSWebhookService{
       const webhookData = await this.payosService.verifyWebhookData(payload);
 
       if (!webhookData) {
-        this.slackService.sendError(`PaymentService >>> PayOS webhook verification failed: No data returned`);
+        await this.slackService.sendError(`PaymentService >>> PayOS webhook verification failed: No data returned`);
         
         if( payload?.data?.paymentLinkId) {
           await this.payosService.cancelPaymentLink(payload?.data?.paymentLinkId, "Received invalid webhook data");
@@ -28,11 +28,11 @@ export class PayOSWebhookService{
       }
 
       // Process the verified webhook data
-      this.slackService.sendNotice(`PaymentService >>> PayOS webhook verified successfully: ${JSON.stringify(webhookData)}`);
+      await this.slackService.sendNotice(`PaymentService >>> PayOS webhook verified successfully: ${JSON.stringify(webhookData)}`);
       await this.checkoutResultService.payOSCheckoutResult(webhookData);
     } catch (error) {
 
-      this.slackService.sendError(`PaymentService >>> PayOS webhook verification failed: ${error.message}`);
+      await this.slackService.sendError(`PaymentService >>> PayOS webhook verification failed: ${error.message}`);
     }
   }
 }

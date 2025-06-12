@@ -109,7 +109,7 @@ export class GetEventDetailRecommendService {
 
       return Ok(filteredEventDtos);
     } catch (error) {
-      this.slackService.sendError(`Event Service - Event >>> getRecommendedEventsInDetail: ${error.message}`);
+      await this.slackService.sendError(`Event Service - Event >>> getRecommendedEventsInDetail: ${error.message}`);
 
       return Err(new Error("Event not found."));
     }

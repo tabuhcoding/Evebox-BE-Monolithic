@@ -31,7 +31,7 @@ export class GetFormAnswerWithQuestionService {
 
       return formattedAnswers;
     } catch (error) {
-      this.slackService.sendError(`Event Service - Delete form answer >>> DeleteFormAnswerService: ${error.message}`)
+      await this.slackService.sendError(`Event Service - Delete form answer >>> DeleteFormAnswerService: ${error.message}`)
 
       return [];
     }

@@ -58,7 +58,7 @@ export class GetEventSummaryController {
         data: result.unwrap()
       });
     } catch (error) {
-      this.slackService.sendError(`Event Service - Event of org >>> GetEventOfOrgController: ${error.message}`);
+      await this.slackService.sendError(`Event Service - Event of org >>> GetEventOfOrgController: ${error.message}`);
 
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,

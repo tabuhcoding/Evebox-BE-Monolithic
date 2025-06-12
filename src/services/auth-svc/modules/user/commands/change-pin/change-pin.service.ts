@@ -46,7 +46,7 @@ export class ChangeUserPinService {
 
       return Ok(true);
     } catch (error) {
-      this.slackService.sendError(`Auth Service - User >>> ChangeUserPinService: ${error.message}`);
+      await this.slackService.sendError(`Auth Service - User >>> ChangeUserPinService: ${error.message}`);
 
       return Err(new Error(`Failed to change PIN: ${error.message}`));
     }

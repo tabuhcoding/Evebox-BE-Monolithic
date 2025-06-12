@@ -2,7 +2,8 @@ import { Inject, Injectable } from "@nestjs/common";
 import { OrderRepository } from "src/services/booking-svc/repository/order/order.repo";
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 import { Result, Ok } from "oxide.ts";
-import { Order } from "@prisma/client";
+import { Order } from "../../../repository/order/order.repo";
+import { BookingTicketStatus } from 'src/services/booking-svc/repository/order/order.repo';
 
 @Injectable()
 export class GetPaidOrdersByShowingIdService {
@@ -14,13 +15,13 @@ export class GetPaidOrdersByShowingIdService {
   async execute(showingId: string): Promise<Result<Order[], Error>> {
     try {
       const orders = await this.orderRepository.findMany({
-        status: "PAID",
+        status: BookingTicketStatus.PAID || BookingTicketStatus.SUCCESS,
         showingId
       });
 
       return Ok(orders);
     } catch (error) {
-      this.slackService.sendError(` Booking Svc >>> GetOrdersByShowingIdService : ${error.message}`)
+      await this.slackService.sendError(` Booking Svc >>> GetOrdersByShowingIdService : ${error.message}`)
 
       return null;
     }

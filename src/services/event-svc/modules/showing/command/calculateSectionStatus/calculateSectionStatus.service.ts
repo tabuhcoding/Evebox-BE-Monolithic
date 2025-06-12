@@ -29,7 +29,7 @@ export class CalculateSectionStatusService {
       // Get total ticket of section
       const totalTicketOfSection = await this.getTotalTicketOfTicketTypeService.getTotalTicketOfSection(sectionTicketTypes.ticketTypeId, sectionId);
       if (totalTicketOfSection === null) {
-        this.slackService.sendError(`Booking Svc >>> getTotalTicketOfSection : Failed to get total tickets for section ${sectionId} of ticket type ${sectionTicketTypes.ticketTypeId}`);
+        await this.slackService.sendError(`Booking Svc >>> getTotalTicketOfSection : Failed to get total tickets for section ${sectionId} of ticket type ${sectionTicketTypes.ticketTypeId}`);
         return [SectionStatus.NOT_SALE, sectionTicketTypes.ticketTypeId];
       }
 
@@ -41,7 +41,7 @@ export class CalculateSectionStatusService {
       }
     }
     catch (error) {
-      this.slackService.sendError(`Event Svc >>> calculateSectionStatus: ${error.message}`);
+      await this.slackService.sendError(`Event Svc >>> calculateSectionStatus: ${error.message}`);
       return [SectionStatus.NOT_SALE, null];
     }
   }

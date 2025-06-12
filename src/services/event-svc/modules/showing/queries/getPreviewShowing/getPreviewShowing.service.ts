@@ -34,7 +34,7 @@ export class GetPreviewShowingService {
       }
     }
     catch (error) {
-      this.slackService.sendError(`Event Svc >>> GetPreviewShowingService : ${error.message}`);
+      await this.slackService.sendError(`Event Svc >>> GetPreviewShowingService : ${error.message}`);
       
       return null;
     }

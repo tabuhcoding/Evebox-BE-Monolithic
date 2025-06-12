@@ -55,7 +55,7 @@ export class ChangePasswordService {
 
       return Ok(void 0);
     } catch (error) {
-      this.slackService.sendError(`AuthSvc - User >>> ChangePasswordService: ${error.message}`);
+      await this.slackService.sendError(`AuthSvc - User >>> ChangePasswordService: ${error.message}`);
       return Err(new Error(USER_MESSAGES.ERRORS.CHANGE_PASSWORD_FAILED));
     }
   }

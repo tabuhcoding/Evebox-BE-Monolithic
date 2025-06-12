@@ -66,7 +66,7 @@ export class CreateEventService {
 
       return Ok({ id: eventId });
     } catch (error) {
-      this.slackService.sendError(`EventSvc - Event >>> CreateEventService: ${error.message}`);
+      await this.slackService.sendError(`EventSvc - Event >>> CreateEventService: ${error.message}`);
 
       return Err(new Error(`Error creating event: ${error.message}`));
     }

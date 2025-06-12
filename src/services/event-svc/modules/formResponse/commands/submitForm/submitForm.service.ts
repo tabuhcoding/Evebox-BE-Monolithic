@@ -67,7 +67,7 @@ export class SubmitFormService {
 
       return (updatedForm);
     } catch (error) {
-      this.slackService.sendError(`Event SVC >>> SubmitFormService : ${error.message}`);
+      await this.slackService.sendError(`Event SVC >>> SubmitFormService : ${error.message}`);
 
       return (new Error('Failed to submit form'));
     }
@@ -80,7 +80,7 @@ export class SubmitFormService {
       });
 
       if (!form) {
-        this.slackService.sendError(`Event SVC >>> SubmitFormService : Form with id ${dto.formId} not found`);
+        await this.slackService.sendError(`Event SVC >>> SubmitFormService : Form with id ${dto.formId} not found`);
 
         return false;
       }
@@ -90,7 +90,7 @@ export class SubmitFormService {
       });
 
       if (formInputs.length === 0) {
-        this.slackService.sendError(`Event SVC >>> SubmitFormService : No form inputs found for form id ${dto.formId}`);
+        await this.slackService.sendError(`Event SVC >>> SubmitFormService : No form inputs found for form id ${dto.formId}`);
 
         return false;
       }
@@ -98,7 +98,7 @@ export class SubmitFormService {
       for (const answer of dto.answers) {
         const formInput = formInputs.find((input) => input.id === answer.formInputId);
         if (!formInput) {
-          this.slackService.sendError(`Event SVC >>> SubmitFormService : Form input with id ${answer.formInputId} not found in form ${dto.formId}`);
+          await this.slackService.sendError(`Event SVC >>> SubmitFormService : Form input with id ${answer.formInputId} not found in form ${dto.formId}`);
 
           return (false);
         }
@@ -110,7 +110,7 @@ export class SubmitFormService {
         const regex = new RegExp(formInput.regex);
 
         if (formInput.regex && !regex.test(answer.value)) {
-          this.slackService.sendError(`Event SVC >>> SubmitFormService : Answer value "${answer.value}" does not match regex for form input ${formInput.id} in form ${dto.formId}`);
+          await this.slackService.sendError(`Event SVC >>> SubmitFormService : Answer value "${answer.value}" does not match regex for form input ${formInput.id} in form ${dto.formId}`);
           
           return (false);
         }
@@ -118,7 +118,7 @@ export class SubmitFormService {
 
       return (true);
     } catch (error) {
-      this.slackService.sendError(`Event SVC >>> SubmitFormService : ${error.message}`);
+      await this.slackService.sendError(`Event SVC >>> SubmitFormService : ${error.message}`);
 
       return (false);
     }

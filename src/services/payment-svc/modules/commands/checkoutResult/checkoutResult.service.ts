@@ -29,7 +29,7 @@ export class CheckoutResultService {
       const paymentLinkID = webhookData.paymentLinkId;
       const cachedData = await this.fileCacheService.getCacheObjectById('payOS', {}, paymentLinkID) as AggregatedCheckoutDataItem | null;
       if (!cachedData) {
-        this.slackService.sendError(`PaymentService >>> PayOS checkout result verification failed: No cached data found for payment link ID ${paymentLinkID}`);
+        await this.slackService.sendError(`PaymentService >>> PayOS checkout result verification failed: No cached data found for payment link ID ${paymentLinkID}`);
         
         return false;
       }
@@ -37,7 +37,7 @@ export class CheckoutResultService {
       // compare the amount in the cached data with the amount in the webhook data
       const cachedAmount = cachedData.data[0].totalAmount;
       if (cachedAmount !== webhookData.amount) {
-        this.slackService.sendError(`PaymentService >>> PayOS checkout result verification failed: Amount mismatch for payment link ID ${paymentLinkID}. Cached amount: ${cachedAmount}, Webhook amount: ${webhookData.amount}`);
+        await this.slackService.sendError(`PaymentService >>> PayOS checkout result verification failed: Amount mismatch for payment link ID ${paymentLinkID}. Cached amount: ${cachedAmount}, Webhook amount: ${webhookData.amount}`);
         
         return false;
       }
@@ -49,7 +49,7 @@ export class CheckoutResultService {
       await this.fileCacheService.clearObject('payOS', {}, paymentLinkID);
       const orderUpdated = await this.createOrderService.updateOrderStatus(webhookData.orderCode, BookingTicketStatus.PAID)
       if (!orderUpdated) {
-        this.slackService.sendError(`PaymentService >>> PayOS checkout result verification failed: Failed to update order status for order code ${webhookData.orderCode}`);
+        await this.slackService.sendError(`PaymentService >>> PayOS checkout result verification failed: Failed to update order status for order code ${webhookData.orderCode}`);
         return false;
       }
       await this.paymentInfoRepository.updateOne(
@@ -72,7 +72,7 @@ export class CheckoutResultService {
       // Double check the order status
       
     } catch (error) {
-      this.slackService.sendError(`PaymentService >>> PayOS checkout result verification failed: ${error.message}`);
+      await this.slackService.sendError(`PaymentService >>> PayOS checkout result verification failed: ${error.message}`);
       return false;
     }
   }

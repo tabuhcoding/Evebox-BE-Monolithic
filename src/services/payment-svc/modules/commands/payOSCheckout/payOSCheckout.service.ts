@@ -44,7 +44,7 @@ export class PayOSCheckoutService {
       return payOSCheckout
 
     } catch (error) {
-      this.slackService.sendError(`Error during PayOS checkout for user ${userId} order ${orderCode}: ${error.message}`);
+      await this.slackService.sendError(`Error during PayOS checkout for user ${userId} order ${orderCode}: ${error.message}`);
     
       return new Error(`PayOS checkout failed: ${error.message}`);
     }

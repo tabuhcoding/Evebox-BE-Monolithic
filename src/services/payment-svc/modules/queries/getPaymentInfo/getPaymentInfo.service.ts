@@ -21,7 +21,7 @@ export class GetPaymentInfoService {
       return Ok(paymentInfo);
     } catch (error) {
       console.error("🚀 ~ GetPaymentInfoService ~ execute ~ error:", error)
-      this.slackService.sendError(` Payment Svc >>> GetPaymentInfoService : ${error.message}`)
+      await this.slackService.sendError(` Payment Svc >>> GetPaymentInfoService : ${error.message}`)
 
       return Err(null);
     }
@@ -38,7 +38,7 @@ export class GetPaymentInfoService {
 
       return paymentInfo || null;
     } catch (error) {
-      this.slackService.sendError(` Payment Svc >>> GetPaymentInfoService : ${error.message}`);
+      await this.slackService.sendError(` Payment Svc >>> GetPaymentInfoService : ${error.message}`);
       
       return null;
     }

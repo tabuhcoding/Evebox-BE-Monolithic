@@ -22,7 +22,7 @@ export class GetFormResponseByIdService {
       return Ok(formResponse);
     } catch (error) {
       console.error("🚀 ~ GetFormResponseByIdService ~ execute ~ error:", error);
-      this.slackService.sendError(`Event Svc >>> GetFormResponseByIdService : ${error.message}`);
+      await this.slackService.sendError(`Event Svc >>> GetFormResponseByIdService : ${error.message}`);
 
       return Err(new Error('Failed to retrieve form response'));
     }

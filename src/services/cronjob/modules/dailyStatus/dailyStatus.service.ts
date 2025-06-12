@@ -18,14 +18,14 @@ export class DailyStatusService {
 
   @Cron('0 0 * * *')
   async executeDailyStatusUpdate() {
-    this.slackService.sendNotice('Daily status update started.');
+    await this.slackService.sendNotice('Daily status update started.');
     try {
       // Call the service to recalculate ticket type status
       await this.calculateTicketTypeStatusService.execute();
-      this.slackService.sendNotice('Daily status update completed successfully.');
+      await this.slackService.sendNotice('Daily status update completed successfully.');
     }
     catch (error) {
-      this.slackService.sendError(`Daily status update failed: ${error.message}`);
+      await this.slackService.sendError(`Daily status update failed: ${error.message}`);
     }
   }  
 }

@@ -28,7 +28,7 @@ export class GetEventOfOrgService {
 
       return Ok(result.unwrap());
     } catch (error) {
-      this.slackService.sendError(`Event Service - Event of org >>> GetEventOfOrgService: ${error.message}`);
+      await this.slackService.sendError(`Event Service - Event of org >>> GetEventOfOrgService: ${error.message}`);
 
       return Err(new Error('Failed to retrieve events'));
     }

@@ -47,7 +47,7 @@ export class GetOrdersByShowingIdService {
 
       return result;
     } catch (error) {
-      this.slackService.sendError(`Event Service - Orders of showing >>> GetOrdersByShowingIdService: ${error.message}`);
+      await this.slackService.sendError(`Event Service - Orders of showing >>> GetOrdersByShowingIdService: ${error.message}`);
 
       return Err(new Error('Failed to get orders of showing'));
     }

@@ -61,7 +61,7 @@ export class GetUserPinStatusController {
         },
       });
     } catch (error) {
-      this.slackService.sendError(`Auth Service - User >>> GetUserPinStatusController: ${error.message}`);
+      await this.slackService.sendError(`Auth Service - User >>> GetUserPinStatusController: ${error.message}`);
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
         message: 'Internal server error',

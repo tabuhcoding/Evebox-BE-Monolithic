@@ -47,7 +47,7 @@ export class GetEventFrontDisplayController {
         data,
       });
     } catch (error) {
-      this.slackService.sendError(`Event Service - Event front display >>> GetEventFrontDisplayController: ${error.message}`);
+      await this.slackService.sendError(`Event Service - Event front display >>> GetEventFrontDisplayController: ${error.message}`);
 
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,

@@ -45,7 +45,7 @@ export class GetEventSummaryService {
 
       return result;
     } catch (error) {
-      this.slackService.sendError(`Event Service - Event summary >>> GetEventSummaryService: ${error.message}`);
+      await this.slackService.sendError(`Event Service - Event summary >>> GetEventSummaryService: ${error.message}`);
 
       return Err(new Error('Failed to retrieve events'));
     }

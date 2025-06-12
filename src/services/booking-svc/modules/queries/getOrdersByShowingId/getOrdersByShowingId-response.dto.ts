@@ -1,9 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { JsonValue } from '@prisma/client/runtime/library';
 import { BaseResponse } from 'src/shared/constants/baseResponse';
+import { BookingTicketStatus, BookingTicketType } from 'src/services/booking-svc/repository/order/order.repo';
+import { PaymentMethod } from 'src/services/payment-svc/repository/paymentMethodStatus/paymentMethodStatus.repo';
+import { TicketWithTicketTypeDto } from '../getUserOrder/getUserOrder-response.dto';
 
 
-export class FormInput {
+class FormInput {
   @ApiProperty({ example: 'Full Name', description: 'Field name of the form input' })
   fieldName: string;
 
@@ -11,7 +14,7 @@ export class FormInput {
   options?: JsonValue;
 }
 
-export class FormAnswer {
+class FormAnswer {
   @ApiProperty({ example: 'John Doe', description: 'Answer value submitted by the user' })
   value: string;
 
@@ -19,51 +22,67 @@ export class FormAnswer {
   FormInput: FormInput;
 }
 
-export class FormResponse {
+class FormResponse {
   @ApiProperty({ type: [FormAnswer], description: 'All answers submitted in the form' })
   FormAnswer: FormAnswer[];
 }
 
-export class OrderInfo {
-  @ApiProperty({ example: 1, description: 'Ticket type ID' })
-  ticketTypeId: string;
-
-  @ApiProperty({ example: 2, description: 'Quantity of tickets in this order item' })
-  quantity: number;
-
-  @ApiProperty({ example: 'A12', description: 'Seat ID (if available)', required: false })
-  seatId: number[];
-
-  @ApiProperty({ example: 'completed', description: 'Order status' })
-  status: number;
-}
-
-export class PaymentInfo {
+class PaymentInfo {
   @ApiProperty({ example: 1032, description: 'Payment info ID' })
   id: number;
 
-  @ApiProperty({ example: '2024-12-28T14:00:00.000Z', description: 'Timestamp of payment', required: false })
-  paidAt?: Date;
+  @ApiProperty( {example: PaymentMethod.PAYOS, description: 'The payment method' })
+  method: PaymentMethod;
+
+  @ApiProperty( {example: '2021-10-10T10:00:00Z', description: 'The payment time' })
+  paidAt: Date;
+}
+
+class TicketDto {
+  @ApiProperty( {example: '12345678-1234-1234-1234-123456789012', description: 'The id of the ticket' })
+  id: string;
+
+  @ApiProperty( {example: 'L8', description: 'The seat number of the ticket' })
+  seatID?: number;
+  
+  @ApiProperty( {example: 'Section A', description: 'The section name of the ticket' })
+  sectionID?: number;  
+
+  // Details
+  
+  @ApiProperty( {example: 'asdhjksahdak', description: 'The qrcode of the ticket' })
+  qrCode?: string;
+  
+  @ApiProperty( {example: 'VIP Seat', description: 'The description of the ticket type' })
+  description?: string;
+}
+
+export class TicketGroupedByTicketTypeID {
+  @ApiProperty( {example: '12345678-1234-1234-1234-123456789012', description: 'The id of the ticket type' })
+  id: string;
+
+  @ApiProperty( {type: [TicketDto], description: 'The tickets of the ticket type' })
+  tickets: TicketDto[];
 }
 
 export class OrderData {
-  @ApiProperty({ example: 'tk_9as823js92', description: 'Order ID' })
+  @ApiProperty( {example: 248558, description: 'The id of the ticket' })
   id: number;
 
-  @ApiProperty({ examples: ['PAID', 'PENDING', 'CANCEL', 'SUCCESS'], description: 'Order status' })
-  status: string;
+  @ApiProperty( {example: '169898227', description: 'The showing id of the order' })
+  showingId: string;
 
-  @ApiProperty({ example: 250000, description: 'Order price' })
+  @ApiProperty( {example: BookingTicketStatus.PAID, description: 'The status of the order' })
+  status: BookingTicketStatus;
+
+  @ApiProperty( {example: BookingTicketType.E_TICKET, description: 'Type of order' })
+  type: BookingTicketType;
+
+  @ApiProperty( {example: 540000, description: 'The price of the order' })
   price: number;
-
-  @ApiProperty({ example: 'general', description: 'Order type' })
-  type: string;
 
   @ApiProperty({ example: true, description: 'Whether the order confirmation mail was sent' })
   mailSent: boolean;
-
-  @ApiProperty({ example: '1041811243642', description: 'Showing ID' })
-  showingId: string;
 
   @ApiProperty({ example: 'dattruong01082@gmail.com', description: 'User email associated with the order' })
   userId: string;
@@ -73,6 +92,9 @@ export class OrderData {
 
   @ApiProperty({ type: PaymentInfo, description: 'Payment information associated with the order', required: false })
   paymentInfo?: PaymentInfo;
+
+  @ApiProperty( {type: [TicketGroupedByTicketTypeID], description: 'The tickets of the order' })
+  Ticket?: TicketGroupedByTicketTypeID[];
 }
 
 export class GetOrdersResponse extends BaseResponse {

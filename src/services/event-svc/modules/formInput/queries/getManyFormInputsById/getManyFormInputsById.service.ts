@@ -21,7 +21,7 @@ export class GetManyFormInputsByIdService {
       return Ok(formInputs);
     } catch (error) {
       console.error("🚀 ~ GetManyFormInputsByIdService ~ execute ~ error:", error);
-      this.slackService.sendError(`Event Svc >>> GetManyFormInputsByIdService : ${error.message}`);
+      await this.slackService.sendError(`Event Svc >>> GetManyFormInputsByIdService : ${error.message}`);
 
       return Err(new Error('Failed to retrieve many form inputs by id'));
     }

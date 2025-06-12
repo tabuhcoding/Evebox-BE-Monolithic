@@ -22,7 +22,7 @@ export class GetOrdersInShowingIdsService {
 
       return Ok(totalOrders);
     } catch (error) {
-      this.slackService.sendError(` Booking Svc >>> GetOrdersInShowingIdsService : ${error.message}`)
+      await this.slackService.sendError(` Booking Svc >>> GetOrdersInShowingIdsService : ${error.message}`)
 
       return null;
     }

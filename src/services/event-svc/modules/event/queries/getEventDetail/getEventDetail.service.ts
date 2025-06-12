@@ -171,7 +171,7 @@ export class GetEventDetailService {
 
       return Ok(eventsDto);
     } catch (error) {
-      this.slackService.sendError(` Event Svc - Event >>> GetEventDetail: ${error}`);
+      await this.slackService.sendError(` Event Svc - Event >>> GetEventDetail: ${error}`);
       
       return Err(new Error("Failed to fetch event detail data."));
     }
@@ -194,7 +194,7 @@ export class GetEventDetailService {
         // Check if user exists
         const userExists = await this.checkUserExistService.execute(userId);
         if (!userExists) {
-          // this.slackService.sendError(`Event Svc - Event >>> GetEventDetail Increase Post Click Count: User with ID ${userId} does not exist.`);
+          // await this.slackService.sendError(`Event Svc - Event >>> GetEventDetail Increase Post Click Count: User with ID ${userId} does not exist.`);
           
           return;
         }
@@ -222,7 +222,7 @@ export class GetEventDetailService {
       }
 
     } catch (error) {
-      this.slackService.sendError(` Event Svc - Event >>> GetEventDetail Increase Post Click Count: ${error}`);
+      await this.slackService.sendError(` Event Svc - Event >>> GetEventDetail Increase Post Click Count: ${error}`);
     }
   }
 }

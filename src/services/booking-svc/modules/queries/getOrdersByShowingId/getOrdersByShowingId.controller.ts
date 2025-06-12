@@ -60,6 +60,8 @@ export class GetOrdersByShowingIdController {
         data: result.unwrap(),
       });
     } catch (error) {
+      await this.slackService.sendError(`Error in GetOrdersByShowingIdController: ${error.message}`);
+
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
         message: 'Internal server error',

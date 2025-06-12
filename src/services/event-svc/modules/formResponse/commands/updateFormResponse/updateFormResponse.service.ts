@@ -34,7 +34,7 @@ export class UpdateFormResponseService {
 
       return Ok(formResponse);
     } catch (error) {
-      this.slackService.sendError(`Event Service - Update form response >>> UpdateFormResponseService: ${error.message}`)
+      await this.slackService.sendError(`Event Service - Update form response >>> UpdateFormResponseService: ${error.message}`)
 
       return Err(new Error(`Failed to update form response: ${error.message}`));
     }
@@ -45,7 +45,7 @@ export class UpdateFormResponseService {
       await this.formResponseRepository.updateOneById(formResponseId, { orderId });
 
     } catch (error) {
-      this.slackService.sendError(`Event Service - Update form response >>> UpdateFormResponseService: ${error.message}`);
+      await this.slackService.sendError(`Event Service - Update form response >>> UpdateFormResponseService: ${error.message}`);
     }
   }
 }

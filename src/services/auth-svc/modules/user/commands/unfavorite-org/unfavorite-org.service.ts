@@ -39,7 +39,7 @@ export class UnfavoriteOrgService {
       await this.favoriteRepository.updateFavoriteStatus(favorite.id, false);
       return Ok(true);
     } catch (error) {
-      this.slackService.sendError(` Auth Svc - User >>> UnfavoriteOrg: ${error}`);
+      await this.slackService.sendError(` Auth Svc - User >>> UnfavoriteOrg: ${error}`);
       
       return Err(new Error("Failed to unfavorite organization"));
     }

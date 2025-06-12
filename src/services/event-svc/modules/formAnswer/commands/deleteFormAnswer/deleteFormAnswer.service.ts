@@ -19,7 +19,7 @@ export class DeleteFormAnswerService {
 
       return Ok(null);
     } catch (error) {
-      this.slackService.sendError(`Event Service - Delete form answer >>> DeleteFormAnswerService: ${error.message}`)
+      await this.slackService.sendError(`Event Service - Delete form answer >>> DeleteFormAnswerService: ${error.message}`)
 
       return Err(new Error('Failed to delete form response'));
     }

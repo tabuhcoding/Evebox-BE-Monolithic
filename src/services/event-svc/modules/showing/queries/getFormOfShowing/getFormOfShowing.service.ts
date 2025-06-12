@@ -13,16 +13,13 @@ export class getFormOfShowingService {
     try {
       const form = await this.formRepository.findOne({
         Showing: {
-          every: {
+          some: {
             id: showingId,
             deleteAt: null,
-            startTime: {
-              lte: new Date(),
-            },
             endTime: {
               gte: new Date(),
             },
-          }
+          },
         }
       },
       {

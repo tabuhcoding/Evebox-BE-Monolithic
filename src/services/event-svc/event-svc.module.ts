@@ -114,6 +114,7 @@ import { FormInputRepositoryImpl } from './repository/formInput/formInput.impl';
 import { GetPreviewShowingService } from './modules/showing/queries/getPreviewShowing/getPreviewShowing.service';
 import { GetFormAnswerWithQuestionService } from './modules/formAnswer/queries/getFormAnswerWithQuestion/getFormAnswerWithQuestion.service';
 import { CalculateTicketTypeStatusService } from './modules/showing/command/calculateTicketTypeStatus/calculateTicketTypeStatus.service';
+import { SubmitFormResponseService } from './modules/formResponse/commands/submitForm/submitForm.service';
 
 @Module({
   imports: [ BookingSvcModule, AuthSvcModule, CqrsModule ],
@@ -246,6 +247,7 @@ import { CalculateTicketTypeStatusService } from './modules/showing/command/calc
 
     GetUserSubmitFormService,
     GetFormAnswerWithQuestionService,
+    SubmitFormResponseService,
 
     GetFormResponseByIdService,
     UpdateFormResponseService,
@@ -290,6 +292,7 @@ import { CalculateTicketTypeStatusService } from './modules/showing/command/calc
     GetPreviewShowingService,
     GetFormAnswerWithQuestionService,
     CalculateTicketTypeStatusService,
+    SubmitFormResponseService,
   ],
 })
 export class EventSvcModule {}

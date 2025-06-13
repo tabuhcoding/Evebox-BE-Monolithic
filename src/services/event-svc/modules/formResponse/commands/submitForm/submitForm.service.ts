@@ -7,7 +7,7 @@ import { FormRepository } from "src/services/event-svc/repository/form/form.repo
 import { FormInputRepository } from "src/services/event-svc/repository/formInput/formInput.repo";
 
 @Injectable()
-export class SubmitFormService {
+export class SubmitFormResponseService {
   constructor(
     @Inject('FormResponseRepository') private readonly formResponseRepository: FormResponseRepository,
     @Inject('FormAnswerRepository') private readonly formAnswerReposiotory: FormAnswerRepository,

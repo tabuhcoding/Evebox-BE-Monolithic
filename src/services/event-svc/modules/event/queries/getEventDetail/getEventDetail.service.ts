@@ -8,7 +8,6 @@ import { calculateShowingStatusAndMinPrice, EventStatus, ShowingStatus } from "s
 import { CalculateShowingStatusService } from "../../commands/calculateShowingStatus/calculateShowingStatus.service";
 import { UserClickHistoryRepository } from "src/services/event-svc/repository/userClickHistory/userClickHistory.repo";
 import { CheckUserExistService } from "src/services/auth-svc/modules/user/commands/checkuserExist/checkuserExist.service";
-import { start } from "repl";
 import { CheckFavoriteService } from "src/services/auth-svc/modules/user/commands/check-favorite/checkFavorite.service";
 
 @Injectable()
@@ -124,7 +123,15 @@ export class GetEventDetailService {
       else{
         for (const showing of event.Showing) {
           await this.calculateShowingStatusService.reCalculateAllTicketTypesOfShowingStatus(showing);
-          const [showingStatus, showingMinPrice] = await calculateShowingStatusAndMinPrice(showing.TicketType);
+          var showingStatus: ShowingStatus;
+          var showingMinPrice: number;
+          if (showing.endTime < nowDate) {
+            showingStatus = ShowingStatus.SHOWING_OVER;
+            showingMinPrice = 0;
+          }
+          else {
+            [showingStatus, showingMinPrice] = await calculateShowingStatusAndMinPrice(showing.TicketType);
+          }
           showingStatusSet.add(showingStatus);
 
           // Update min price

@@ -47,6 +47,8 @@ export class SubmitFormResponseService {
           return (new Error('Failed to create new form response'));
         }
 
+        existForm = {} as FormResponse;
+
         existForm.id = newFormResponse
       }
       // Insert new answers
@@ -67,7 +69,7 @@ export class SubmitFormResponseService {
 
       return (updatedForm);
     } catch (error) {
-      await this.slackService.sendError(`Event SVC >>> SubmitFormService : ${error.message}`);
+      await this.slackService.sendError(`Event SVC >>> SubmitFormService 1 : ${error.message}, dto: ${JSON.stringify(dto)}`);
 
       return (new Error('Failed to submit form'));
     }
@@ -118,7 +120,7 @@ export class SubmitFormResponseService {
 
       return (true);
     } catch (error) {
-      await this.slackService.sendError(`Event SVC >>> SubmitFormService : ${error.message}`);
+      await this.slackService.sendError(`Event SVC >>> SubmitFormService 2 : ${error.message} for dto: ${JSON.stringify(dto)}`);
 
       return (false);
     }

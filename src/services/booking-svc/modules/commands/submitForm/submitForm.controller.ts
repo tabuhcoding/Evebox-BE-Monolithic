@@ -50,7 +50,7 @@ export class SubmitFormController {
 
       if (result.isErr()) {
         const error = result.unwrapErr();
-        const status = error.message === 'Invalid form data' ? HttpStatus.BAD_REQUEST : HttpStatus.INTERNAL_SERVER_ERROR;
+        const status = HttpStatus.BAD_REQUEST ;
         return res.status(status).json(ErrorHandler.badRequest(error.message));
       }
 

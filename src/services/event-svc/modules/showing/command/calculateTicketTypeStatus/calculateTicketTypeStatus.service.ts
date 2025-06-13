@@ -37,7 +37,7 @@ export class CalculateTicketTypeStatusService {
         // Check if the status has changed
         for (const ticketType of showing.TicketType) {
           if (ticketTypeStatusMap.get(ticketType.id) !== ticketType.status) {
-            await this.slackService.sendNotice(`Ticket type status changed for showing ID: ${showing.id}, Ticket Type ID: ${ticketType.id}, New Status: ${ticketType.status}`);
+            // await this.slackService.sendNotice(`Ticket type status changed for showing ID: ${showing.id}, Ticket Type ID: ${ticketType.id}, New Status: ${ticketType.status}`);
             // Update the ticket type status in the database
             await this.ticketTypeRepository.updateOneById(ticketType.id, {
               status: ticketType.status,

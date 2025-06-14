@@ -63,7 +63,7 @@ export class CheckoutResultService {
       }
       await this.paymentInfoRepository.updateOne(
         {
-          paymentCode: webhookData.paymentLinkId,
+          paymentCode: webhookData.orderCode,
           method: PaymentMethod.PAYOS
         },
         { paidAt: new Date(webhookData.transactionDateTime) }
@@ -85,6 +85,61 @@ export class CheckoutResultService {
       await this.generateQrcodeService.execute(webhookData.orderCode, seatmapType);
       // Complete the QR code generation process
       await this.slackService.sendNotice(`PaymentService >>> PayOS checkout result verified successfully: QR code generated for order ${webhookData.orderCode}.`);
+    } catch (error) {
+      await this.slackService.sendError(`PaymentService >>> PayOS checkout result verification failed: ${error.message}`);
+      return false;
+    }
+  }
+
+  async payOSCheckoutResultWithoutCheck(orderId: number): Promise<Boolean> {
+    try{
+      const paymentInfo = await this.paymentInfoRepository.findOne({ orderId: orderId });
+      if (!paymentInfo) {
+        await this.slackService.sendError(`PaymentService >>> PayOS checkout result verification failed: No payment info found for order ID ${orderId}`);
+        return false;
+      }
+      if (paymentInfo.method !== PaymentMethod.PAYOS) {
+        await this.slackService.sendError(`PaymentService >>> PayOS checkout result verification failed: Payment method is not PayOS for order ID ${orderId}`);
+        return false;
+      }
+
+      const payOSInfo = await this.payOSInfoRepository.findOne({ orderCode: paymentInfo.paymentCode });
+      if (!payOSInfo) {
+        await this.slackService.sendError(`PaymentService >>> PayOS checkout result verification failed: No PayOS info found for order ID ${orderId}`);
+        return false;
+      }
+
+      const cachedData = await this.fileCacheService.getCacheObjectById('payOS', {}, payOSInfo.paymentLinkId) as AggregatedCheckoutDataItem | null;
+      if (!cachedData) {
+        await this.slackService.sendError(`PaymentService >>> PayOS checkout result verification failed: No cached data found for payment link ID ${payOSInfo.paymentLinkId}`);
+        return false;
+      }
+
+      {
+        const seatIDs = cachedData.data[0].ticketTypeSelection.map(ticket => ticket.seatInfo.map(seat => seat.seatId)).flat();
+        await this.getTicketTypeDetailService.setSeatStatusToESold(cachedData.data[0].showingId, seatIDs);
+      }
+
+      // Generate the ticket
+      const seatmapType = await this.generateTicketService.execute(paymentInfo.paymentCode, cachedData.data[0].ticketTypeSelection);
+      await this.fileCacheService.clearObject('payOS', {}, payOSInfo.paymentLinkId);
+      const orderUpdated = await this.createOrderService.updateOrderStatus(orderId, BookingTicketStatus.PAID)
+      if (!orderUpdated) {
+        await this.slackService.sendError(`PaymentService >>> PayOS checkout result verification failed: Failed to update order status for order code ${orderId}`);
+        return false;
+      }
+      await this.updateFormResponseService.updateOrderId(
+        orderUpdated.formResponseId,
+        orderUpdated.id,
+      )
+
+      // Complete the order creation process
+      await this.slackService.sendNotice(`PaymentService >>> PayOS checkout result verified successfully: Order ${paymentInfo.paymentCode} has been generate ticket.`);
+      // Double check the order status
+      await this.generateQrcodeService.execute(paymentInfo.paymentCode, seatmapType);
+      // Complete the QR code generation process
+      await this.slackService.sendNotice(`PaymentService >>> PayOS checkout result verified successfully: QR code generated for order ${paymentInfo.paymentCode}.`);
+      return true;      
     } catch (error) {
       await this.slackService.sendError(`PaymentService >>> PayOS checkout result verification failed: ${error.message}`);
       return false;

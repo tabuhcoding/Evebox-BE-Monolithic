@@ -134,7 +134,10 @@ import { GetSummaryTicketRevenueController } from './modules/statistics/queries/
 import { GetSummaryTicketRevenueService } from './modules/statistics/queries/getSummaryTicketRevenue/getSummaryTicketRevenue.service';
 
 @Module({
-  imports: [ BookingSvcModule, AuthSvcModule, CqrsModule ],
+  imports: [ 
+    BookingSvcModule, 
+    AuthSvcModule, 
+    CqrsModule ],
   controllers: [
     // Categories
     GetAllCategoriesController,

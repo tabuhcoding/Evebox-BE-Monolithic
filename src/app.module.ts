@@ -26,8 +26,9 @@ import { CronjobModule } from './services/cronjob/cronjob.module';
     CqrsModule,
     FileCacheModule,
     SlackModule,
-    EventSvcModule,
     RagSvcModule,
+
+    EventSvcModule,
     AuthSvcModule,
     BookingSvcModule,
     PaymentSvcModule,

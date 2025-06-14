@@ -359,8 +359,14 @@ export class SelectSeatService {
           return Err(new Error('Seat information is required'));
         }
 
-        // Check if one of the seat IDs is be bought in ticket repo
         const seatIds = ticketTypeSelection.seatInfo.map(seat => seat.seatId);
+
+        // check if the seat IDs length is larger than the maximum quantity
+        if (seatIds.length < ticketType.minQtyPerOrder || seatIds.length > ticketType.maxQtyPerOrder) {
+          return Err(new Error(`Quantity must be between ${ticketType.minQtyPerOrder} and ${ticketType.maxQtyPerOrder}`));
+        }
+
+        // Check if one of the seat IDs is be bought in ticket repo
         const existingTickets = await this.ticketRepository.findOne({
           seatId: { in: seatIds },
           Order: {

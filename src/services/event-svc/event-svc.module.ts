@@ -115,6 +115,8 @@ import { GetPreviewShowingService } from './modules/showing/queries/getPreviewSh
 import { GetFormAnswerWithQuestionService } from './modules/formAnswer/queries/getFormAnswerWithQuestion/getFormAnswerWithQuestion.service';
 import { CalculateTicketTypeStatusService } from './modules/showing/command/calculateTicketTypeStatus/calculateTicketTypeStatus.service';
 import { SubmitFormResponseService } from './modules/formResponse/commands/submitForm/submitForm.service';
+import { SearchEventController } from './modules/event/queries/getEventsWithFilter/getEventsWithFilter.controller';
+import { SearchEventService } from './modules/event/queries/getEventsWithFilter/getEventsWithFilter.service';
 
 @Module({
   imports: [ BookingSvcModule, AuthSvcModule, CqrsModule ],
@@ -135,6 +137,7 @@ import { SubmitFormResponseService } from './modules/formResponse/commands/submi
     DeleteEventController,
     GetEventRolesController,
     GetEventRolesByIdController,
+    SearchEventController,
 
     // Event Statistics
     GetEventSummaryController,
@@ -199,6 +202,7 @@ import { SubmitFormResponseService } from './modules/formResponse/commands/submi
     GetEventDetailService,
     GetEventOfOrgService,
     GetEventOfOrgDetailService,
+    SearchEventService,
 
     GetEventsByIdsService,
     GetEventRolesService,

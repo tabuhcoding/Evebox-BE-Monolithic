@@ -21,6 +21,7 @@ import { SubmitFormController } from "./modules/commands/submitForm/submitForm.c
 import { SubmitFormService } from "./modules/commands/submitForm/submitForm.service";
 import { GenerateTicketService } from "./modules/commands/generateTicket/generateTicket.service";
 import { GenerateQrcodeService } from "./modules/commands/generateQrcode/generateQrcode.service";
+import { RecheckOrderMissedService } from "./modules/commands/recheckOrderMissed/recheckOrderMissed.service";
 
 @Module({
   imports: [ 
@@ -51,6 +52,7 @@ import { GenerateQrcodeService } from "./modules/commands/generateQrcode/generat
     GetOrdersInShowingIdsService,
     GenerateTicketService,
     GenerateQrcodeService,
+    RecheckOrderMissedService,
 
     SubmitFormService,
 
@@ -67,6 +69,7 @@ import { GenerateQrcodeService } from "./modules/commands/generateQrcode/generat
     GetOrdersInShowingIdsService,
     GenerateTicketService,
     GenerateQrcodeService,
+    RecheckOrderMissedService,
   ],
 })
 export class BookingSvcModule {}

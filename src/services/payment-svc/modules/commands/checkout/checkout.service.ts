@@ -70,7 +70,7 @@ export class CheckoutService {
           // insert paymentInfo into repository
           const paymentInfoID = await this.paymentInfoRepository.insertOneWithNumberId({
             method: checkoutDto.paymentMethod,
-            paymentCode: checkoutResult.paymentLinkId,
+            paymentCode: checkoutResult.orderCode,
             orderId: orderCode
           })
 
@@ -83,7 +83,7 @@ export class CheckoutService {
           // Cache the payment link
           await this.fileCacheService.cacheObject(
             `payOS`,
-            30,{},
+            60*5,{},
             checkoutResult.paymentLinkId,
             [redisSeat]
           )

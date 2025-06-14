@@ -150,6 +150,8 @@ export class EventsRepositoryImpl
         }
       }
 
+      updateData.updatedAt = new Date();
+
       // updateData.isApproved = false
       // TODO: handle after update
 

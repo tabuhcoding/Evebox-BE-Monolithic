@@ -140,4 +140,32 @@ export class getShowingSeatmapService {
     }
   }
 
+  async getSeatMapType(showingId: string): Promise<SeatmapType> {
+    try {
+      // Fetch the showing details
+      const showing = await this.showingRepository.findOneById(showingId, {
+        select: {
+          seatMapId: true,
+        },
+      });
+
+      if (!showing) {
+        throw new Error('Showing not found.');
+      }
+
+      // Fetch the seatmap associated with the showing
+      const seatmap = await this.seatmapRepository.findOneById(showing.seatMapId);
+
+      if (!seatmap) {
+        throw new Error('Seatmap not found.');
+      }
+
+      // Get seatmap type
+      return getSeatmapType(seatmap);
+    } catch (error) {
+      await this.slackService.sendError(`Event Svc >>> getShowingSeatmap: ${error.message}`);
+      throw new Error('Failed to fetch seat map type.');
+    }
+  }
+
 }

@@ -108,6 +108,8 @@ export class TicketTypeRepositoryImpl
       const startTimeValid = dto.startTime || ticketType.startTime;
       const endTimeValid = dto.endTime || ticketType.endTime;
 
+      updateData.updatedAt = new Date();
+
       if (startTimeValid && endTimeValid && new Date(startTimeValid) > new Date(endTimeValid)) {
         return Err(new Error('Showing startTime must be before endTime'));
       }

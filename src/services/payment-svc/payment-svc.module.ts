@@ -16,6 +16,7 @@ import { PayOSService } from "./common/payOS/payOS.service";
 import { PayOSWebhookController } from "./modules/webhooks/payos/payosWebhook.controller";
 import { CheckoutResultService } from "./modules/commands/checkoutResult/checkoutResult.service";
 import { PayOSWebhookService } from "./modules/webhooks/payos/payosWebhook.service";
+import { GetPaymentStatusService } from "./modules/queries/getPaymentStatus/getPaymentStatus.service";
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { PayOSWebhookService } from "./modules/webhooks/payos/payosWebhook.servi
     // Queries
     GetPaymentMethodService,
     GetPaymentInfoService,
+    GetPaymentStatusService,
     
     // Commands
     PayOSCheckoutService,
@@ -59,7 +61,7 @@ import { PayOSWebhookService } from "./modules/webhooks/payos/payosWebhook.servi
     }
   ],
   exports: [
-    GetPaymentInfoService,
+    GetPaymentInfoService, GetPaymentStatusService, CheckoutResultService
   ],
 })
 export class PaymentSvcModule {}

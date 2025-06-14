@@ -79,7 +79,7 @@ export class SelectSeatService {
       
       return Ok(false);
     } catch (error) {
-      this.slackService.sendError(`Booking Svc >>> selectSeat: ${error.message} with data: ${JSON.stringify(selectSeatDto)}`);
+      await this.slackService.sendError(`Booking Svc >>> selectSeat: ${error.message} with data: ${JSON.stringify(selectSeatDto)}`);
 
       return Err(new Error('Failed to select seat'));
     }
@@ -150,7 +150,7 @@ export class SelectSeatService {
         // This ticketTypeSelection pass all checks, cache it after loop
       }
       catch (error) {
-        this.slackService.sendError(`Booking Svc >>> CheckFailedWithoutSM: ${error.message} with data: ${JSON.stringify(selectSeatDto)}`);
+        await this.slackService.sendError(`Booking Svc >>> CheckFailedWithoutSM: ${error.message} with data: ${JSON.stringify(selectSeatDto)}`);
 
         return Err(new Error('Failed to handle showing without seatmap'));
       }
@@ -195,7 +195,7 @@ export class SelectSeatService {
       return Ok(true);
     }
     catch (error) {
-      this.slackService.sendError(`Booking Svc >>> CacheWithoutSM: ${error.message} with data: ${JSON.stringify(selectSeatDto)}`);
+      await this.slackService.sendError(`Booking Svc >>> CacheWithoutSM: ${error.message} with data: ${JSON.stringify(selectSeatDto)}`);
       
       return Err(new Error('Failed to handle showing without seatmap'));
     }
@@ -277,7 +277,7 @@ export class SelectSeatService {
           return Err(new Error('Selected quantity exceeds available tickets for this ticket type in the specified section'));
         }
       } catch (error) {
-        this.slackService.sendError(`Booking Svc >>> selectSeatWithSSM: ${error.message} with data: ${JSON.stringify(selectSeatDto)}`);
+        await this.slackService.sendError(`Booking Svc >>> selectSeatWithSSM: ${error.message} with data: ${JSON.stringify(selectSeatDto)}`);
         
         return Err(new Error('Failed to handle showing with select section seatmap'));
       }
@@ -319,7 +319,7 @@ export class SelectSeatService {
       }
       return Ok(true);
     } catch (error) {
-      this.slackService.sendError(`Booking Svc >>> CacheWithSMSection: ${error.message} with data: ${JSON.stringify(selectSeatDto)}`);
+      await this.slackService.sendError(`Booking Svc >>> CacheWithSMSection: ${error.message} with data: ${JSON.stringify(selectSeatDto)}`);
       
       return Err(new Error('Failed to handle showing with select section seatmap'));
     }
@@ -359,8 +359,14 @@ export class SelectSeatService {
           return Err(new Error('Seat information is required'));
         }
 
-        // Check if one of the seat IDs is be bought in ticket repo
         const seatIds = ticketTypeSelection.seatInfo.map(seat => seat.seatId);
+
+        // check if the seat IDs length is larger than the maximum quantity
+        if (seatIds.length < ticketType.minQtyPerOrder || seatIds.length > ticketType.maxQtyPerOrder) {
+          return Err(new Error(`Quantity must be between ${ticketType.minQtyPerOrder} and ${ticketType.maxQtyPerOrder}`));
+        }
+
+        // Check if one of the seat IDs is be bought in ticket repo
         const existingTickets = await this.ticketRepository.findOne({
           seatId: { in: seatIds },
           Order: {
@@ -423,7 +429,7 @@ export class SelectSeatService {
         }
         
       } catch (error) {
-        this.slackService.sendError(`Booking Svc >>> selectSeat: ${error.message} with data: ${JSON.stringify(selectSeatDto)}`);
+        await this.slackService.sendError(`Booking Svc >>> selectSeat: ${error.message} with data: ${JSON.stringify(selectSeatDto)}`);
         
         return Err(new Error('Failed to handle showing with select seat seatmap'));
       }
@@ -464,7 +470,7 @@ export class SelectSeatService {
       }
       return Ok(true);
     } catch (error) {
-      this.slackService.sendError(`Booking Svc >>> CacheWithSMSeat: ${error.message} with data: ${JSON.stringify(selectSeatDto)}`);
+      await this.slackService.sendError(`Booking Svc >>> CacheWithSMSeat: ${error.message} with data: ${JSON.stringify(selectSeatDto)}`);
       
       return Err(new Error('Failed to handle showing with select seat seatmap'));
     }

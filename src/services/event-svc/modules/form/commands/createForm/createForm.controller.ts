@@ -53,7 +53,7 @@ export class CreateFormController {
         data: { formId: result.unwrap() },
       });
     } catch (error) {
-      this.slackService.sendError(`EventSvc - Form >>> CreateFormController: ${error.message}`);
+      await this.slackService.sendError(`EventSvc - Form >>> CreateFormController: ${error.message}`);
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
         message: 'Internal server error',

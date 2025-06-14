@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Query, HttpStatus, Res } from "@nestjs/common";
+import { Controller, Get, Post, Query, HttpStatus, Res, UseGuards, Request } from "@nestjs/common";
 import { GetEventDetailRecommendService } from "./getEventDetailRecommend.service";
 import { Response } from 'express';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ErrorHandler } from 'src/shared/exceptions/error.handler';
 import { GetEventDetailRecommendResponse } from "./getEventDetailRecommend-response.dto";
+import { JwtOptionalGuard } from "src/shared/guard/jwt-optional.guard";
 
 @ApiTags('Event Service - Event')
 @Controller('api/event/detail')
@@ -11,6 +12,8 @@ export class GetEventDetailRecommendController {
   constructor(private readonly eventDetailService: GetEventDetailRecommendService) {}
 
   @Get('/recommended-events')
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtOptionalGuard)
   @ApiOperation({ summary: 'Get recommended events' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -29,10 +32,12 @@ export class GetEventDetailRecommendController {
     @Query('eventId') eventId: string,
     @Query('limit') limit: string,
     @Res() res: Response,
+    @Request() req
   ) {
     const result = await this.eventDetailService.getRecommendedEventsInDetail(
       parseInt(eventId),
       limit,
+      req.user?.email
     );
 
     if (result.isErr()) {

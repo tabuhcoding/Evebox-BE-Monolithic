@@ -37,7 +37,7 @@ export class UpdateOrgPaymentInfoService {
 
       return result;
     } catch (error) {
-      this.slackService.sendError(`Event Service - OrgPaymentInfo >>> UpdateOrgPaymentInfoService: ${error.message}`);
+      await this.slackService.sendError(`Event Service - OrgPaymentInfo >>> UpdateOrgPaymentInfoService: ${error.message}`);
       return Err(new Error(`Error updating payment info: ${error.message}`));
     }
   }

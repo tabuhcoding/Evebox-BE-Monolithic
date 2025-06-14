@@ -209,6 +209,8 @@ export class UserRepositoryImpl extends BaseRepository<User, Prisma.UserDelegate
 
     const createAt = userRecord.created_at;
 
+    const receiveNoti = userRecord.receiveNoti ?? false;
+
     const userOrError = User.createExisting(
       userId,
       name,
@@ -218,7 +220,8 @@ export class UserRepositoryImpl extends BaseRepository<User, Prisma.UserDelegate
       role,
       avatarId,
       status,
-      createAt
+      createAt,
+      receiveNoti,
     );
     if (userOrError.isErr()) {
       throw new Error(userOrError.unwrapErr().message);

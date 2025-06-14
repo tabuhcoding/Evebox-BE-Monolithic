@@ -12,18 +12,30 @@ import { UnSelectSeatService } from "./modules/commands/unSelectSeat/unSelectSea
 import { GetRedisSeatService } from "./modules/queries/getRedisSeat/getRedisSeat.service";
 import { CountCheckedInTicketsService } from "./modules/queries/getCountCheckedInTickets/getCountCheckedInTickets.service";
 import { CreateOrderService } from "./modules/commands/createOrder/createOrder.service";
+import { GetPaidOrdersByShowingIdService } from "./modules/queries/getPaidOrdersByShowingId/getPaidOrdersByShowingId.service";
+import { PaymentSvcModule } from "../payment-svc/payment-svc.module";
+import { GetOrdersByShowingIdController } from "./modules/queries/getOrdersByShowingId/getOrdersByShowingId.controller";
+import { GetOrdersByShowingIdService } from "./modules/queries/getOrdersByShowingId/getOrdersByShowingId.service";
+import { GetOrdersInShowingIdsService } from "./modules/queries/getOrdersInShowingIds/getOrdersInShowingIds.service";
+import { SubmitFormController } from "./modules/commands/submitForm/submitForm.controller";
+import { SubmitFormService } from "./modules/commands/submitForm/submitForm.service";
 import { TicketQueryService } from "./modules/queries/getTicketQuery/ticket-query.service";
 import { GenerateTicketService } from "./modules/commands/generateTicket/generateTicket.service";
+import { GenerateQrcodeService } from "./modules/commands/generateQrcode/generateQrcode.service";
+import { RecheckOrderMissedService } from "./modules/commands/recheckOrderMissed/recheckOrderMissed.service";
 
 @Module({
   imports: [ 
      forwardRef(() => AuthSvcModule),
      forwardRef(() => EventSvcModule),
+     forwardRef(() => PaymentSvcModule),
   ],
   controllers: [
     SelectSeatController,
     UnSelectSeatController,
     GetRedisSeatController,
+    GetOrdersByShowingIdController,
+    SubmitFormController,
   ],
   providers: [
     // Services
@@ -36,14 +48,30 @@ import { GenerateTicketService } from "./modules/commands/generateTicket/generat
 
     CountCheckedInTicketsService,
     CreateOrderService,
+    GetPaidOrdersByShowingIdService,
+    GetOrdersByShowingIdService,
+    GetOrdersInShowingIdsService,
     TicketQueryService,
     GenerateTicketService,
+    GenerateQrcodeService,
+    RecheckOrderMissedService,
+
+    SubmitFormService,
 
     // Repositories
     { provide: 'OrderRepository', useClass: OrderRepositoryImpl },
     { provide: 'TicketRepository', useClass: TicketRepositoryImpl },
   ],
-  exports: [GetTotalTicketOfTicketTypeService, CountCheckedInTicketsService, GetRedisSeatService, CreateOrderService, GenerateTicketService, TicketQueryService
+  exports: [
+    GetTotalTicketOfTicketTypeService,
+    CountCheckedInTicketsService, 
+    GetRedisSeatService, 
+    CreateOrderService,
+    GetPaidOrdersByShowingIdService,
+    GetOrdersInShowingIdsService,
+    GenerateTicketService,
+    GenerateQrcodeService,
+    RecheckOrderMissedService,, TicketQueryService
   ],
 })
 export class BookingSvcModule {}

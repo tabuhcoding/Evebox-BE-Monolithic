@@ -34,6 +34,10 @@ model Events {
   imgLogoUrl                        String?
   imgPosterUrl                      String?
   createdAt                         DateTime                @default(now())
+  updatedAt                         DateTime                @default(now())
+  minTicketPrice                    Int?
+  nearlyStartDate                   DateTime?
+  nearlyEndDate                     DateTime?
   isOnlyOnEve                       Boolean                 @default(false)
   isSpecial                         Boolean                 @default(false)
   lastScore                         Decimal                 @db.Decimal(10, 2)
@@ -54,8 +58,11 @@ model Events {
 
 model Showing {
   id                    String         @id @default(uuid())
+  createdAt             DateTime       @default(now())
+  updatedAt             DateTime       @default(now())  
   eventId               Int
   isFree                Boolean
+  minTicketPrice        Int?
   isSalable             Boolean
   isPresale             Boolean
   seatMapId             Int
@@ -80,6 +87,8 @@ enum TicketDeliveryType{
 
 model TicketType {
   id             String              @id @default(uuid())
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @default(now())
   showingId      String
   status         TicketTypeStatus
   name           String

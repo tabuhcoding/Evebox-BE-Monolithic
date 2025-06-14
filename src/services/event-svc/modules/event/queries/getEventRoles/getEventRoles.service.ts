@@ -54,7 +54,7 @@ export class GetEventRolesService {
 
       return Ok(resRoles);
     } catch (error) {
-      this.slackService.sendError(`Event Service - Event role >>> GetEventRolesService: ${error.message}`);
+      await this.slackService.sendError(`Event Service - Event role >>> GetEventRolesService: ${error.message}`);
 
       return Err(new Error('Failed to retrieve events'));
     }

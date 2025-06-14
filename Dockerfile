@@ -27,3 +27,51 @@ EXPOSE 8005
 
 # Run the application
 CMD ["npm", "run", "start:prod"]
+
+# # Stage 1: Install dependencies and build
+# FROM node:20-alpine AS builder
+
+# # Install dependencies for native builds (like Prisma binary)
+# RUN apk add --no-cache libc6-compat
+
+# WORKDIR /app
+
+# # Copy only the package files first for better layer caching
+# COPY package*.json ./
+
+# # Install only production dependencies (can be `npm ci` for exact versions)
+# RUN npm install --frozen-lockfile
+
+# # Copy the rest of the app
+# COPY . .
+
+# # Generate Prisma client for Alpine (Linux musl)
+# RUN npx prisma generate
+
+# # Build the NestJS application
+# RUN npm run build
+
+# # Remove dev dependencies to keep only prod
+# RUN npm prune --production
+
+# # Stage 2: Final minimal runtime
+# FROM node:20-alpine
+
+# # Set working directory
+# WORKDIR /app
+
+# # Install minimal runtime dependencies for Prisma (binary)
+# RUN apk add --no-cache libc6-compat
+
+# # Copy only necessary build artifacts and node_modules from builder
+# COPY --from=builder /app/node_modules ./node_modules
+# COPY --from=builder /app/dist ./dist
+# COPY --from=builder /app/prisma ./prisma
+# COPY --from=builder /app/.env .env
+# COPY --from=builder /app/package.json ./
+
+# # Expose port
+# EXPOSE 8005
+
+# # Run the app
+# CMD ["node", "dist/main"]

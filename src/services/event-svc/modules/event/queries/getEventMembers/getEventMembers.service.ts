@@ -71,7 +71,7 @@ export class GetEventMembersService {
 
       return Ok(response);
     } catch (error) {
-      this.slackService.sendError(`Event Service - Event member >>> GetEventMemberService: ${error.message}`);
+      await this.slackService.sendError(`Event Service - Event member >>> GetEventMemberService: ${error.message}`);
       return Err(new Error('Failed to fetch members'));
     }
   }

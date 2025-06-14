@@ -77,7 +77,7 @@ export class GetEventRolesByIdController {
         data: result.unwrap(),
       });
     } catch (error) {
-      this.slackService.sendError(`Event Service - Event role by id >>> GetEventRolesByIdController: ${error.message}`);
+      await this.slackService.sendError(`Event Service - Event role by id >>> GetEventRolesByIdController: ${error.message}`);
 
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,

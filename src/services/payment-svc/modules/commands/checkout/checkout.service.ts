@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Result, Ok, Err } from 'oxide.ts';
 import { CheckoutDto } from './checkout.dto';
 import { CheckoutResponseData } from './checkout-response.dto';
@@ -8,6 +8,7 @@ import { CreateOrderService } from 'src/services/booking-svc/modules/commands/cr
 import { PaymentMethod } from 'src/services/payment-svc/repository/paymentMethodStatus/paymentMethodStatus.repo';
 import { PayOSCheckoutService } from '../payOSCheckout/payOSCheckout.service';
 import { FileCacheService } from 'src/infrastructure/cache/fileCache/fileCache.service';
+import { PaymentInfoRepository } from 'src/services/payment-svc/repository/paymentInfo/paymentInfo.repo';
 
 @Injectable()
 export class CheckoutService {
@@ -17,6 +18,7 @@ export class CheckoutService {
     private readonly createOrderService: CreateOrderService,
     private readonly payOSCheckoutService: PayOSCheckoutService,
     private readonly fileCacheService: FileCacheService,
+    @Inject('PaymentInfoRepository') private readonly paymentInfoRepository: PaymentInfoRepository
   ) {}
 
   async execute(checkoutDto: CheckoutDto, userId: string): Promise<Result<CheckoutResponseData, Error>> {
@@ -24,7 +26,7 @@ export class CheckoutService {
       // Get user's seat information from Redis
       const redisSeatResult = await this.getRedisSeat.execute(checkoutDto.showingID, userId);
       if (redisSeatResult.isErr()) {
-        this.slackService.sendError(`Error getting Redis seat for user ${userId}: ${redisSeatResult.unwrapErr().message}`);
+        await this.slackService.sendError(`Error getting Redis seat for user ${userId}: ${redisSeatResult.unwrapErr().message}`);
 
         return Err(new Error('Failed to retrieve seat information.'));
       }
@@ -32,7 +34,7 @@ export class CheckoutService {
       const redisSeat = redisSeatResult.unwrap();
       // Check if the seat is not null or not expired
       if (!redisSeat || redisSeat.expiredTime <= 0) {
-        this.slackService.sendError(`Seat not found or expired for user ${userId} in showing ${checkoutDto.showingID}`);
+        await this.slackService.sendError(`Seat not found or expired for user ${userId} in showing ${checkoutDto.showingID}`);
         
         return Err(new Error('Invalid seat or ticket type'));
       }
@@ -40,7 +42,7 @@ export class CheckoutService {
       // Create the order code
       const orderCode = await this.createOrderService.execue(checkoutDto.showingID, redisSeat.totalAmount, userId);
       if (!orderCode) {
-        this.slackService.sendError(`Failed to create order for user ${userId} in showing ${checkoutDto.showingID}`);
+        await this.slackService.sendError(`Failed to create order for user ${userId} in showing ${checkoutDto.showingID}`);
         
         return Err(new Error('Failed to create order.'));
       }
@@ -58,17 +60,30 @@ export class CheckoutService {
           )
 
           if (checkoutResult instanceof Error) {
-            this.slackService.sendError(`PayOS checkout failed for user ${userId} in showing ${checkoutDto.showingID}: ${checkoutResult.message}`);
+            await this.slackService.sendError(`PayOS checkout failed for user ${userId} in showing ${checkoutDto.showingID}: ${checkoutResult.message}`);
             
             return Err(checkoutResult);
           }
 
-          this.slackService.sendNotice(`PayOS checkout link created successfully for user ${userId} in showing ${checkoutDto.showingID}. Link: ${checkoutResult}`);
+          await this.slackService.sendNotice(`PayOS checkout link created successfully for user ${userId} in showing ${checkoutDto.showingID}. Link: ${JSON.stringify(checkoutResult)}`);
 
+          // insert paymentInfo into repository
+          const paymentInfoID = await this.paymentInfoRepository.insertOneWithNumberId({
+            method: checkoutDto.paymentMethod,
+            paymentCode: checkoutResult.orderCode,
+            orderId: orderCode
+          })
+
+          if (!paymentInfoID) {
+            await this.slackService.sendError(`Failed to insert payment info for user ${userId} in showing ${checkoutDto.showingID}`);
+
+            return Err(new Error('Error database server.'));
+          }
+          
           // Cache the payment link
           await this.fileCacheService.cacheObject(
             `payOS`,
-            30,{},
+            60*5,{},
             checkoutResult.paymentLinkId,
             [redisSeat]
           )
@@ -77,12 +92,12 @@ export class CheckoutService {
             paymentLink: checkoutResult.checkoutUrl,
           })
         default:
-          this.slackService.sendError(`Payment method ${checkoutDto.paymentMethod} not available for user ${userId} in showing ${checkoutDto.showingID}`);
+          await this.slackService.sendError(`Payment method ${checkoutDto.paymentMethod} not available for user ${userId} in showing ${checkoutDto.showingID}`);
           
           return Err(new Error('PaymentMethod not available.'));
       }
     } catch (error) {
-      this.slackService.sendError(`Error during checkout with ${checkoutDto.paymentMethod}: ${error.message}`);
+      await this.slackService.sendError(`Error during checkout with ${checkoutDto.paymentMethod}: ${error.message}`);
       
       return Err(new Error('PaymentMethod not available.'));
     }

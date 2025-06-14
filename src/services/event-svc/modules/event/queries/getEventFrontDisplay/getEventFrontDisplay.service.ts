@@ -6,6 +6,7 @@ import { calculateEventStatusAndMinPriceAndStartDate, EventStatus } from 'src/sh
 import { CategoriesRepository } from 'src/services/event-svc/repository/categories/categories.repo';
 import { SlackService } from 'src/infrastructure/adapters/slack/slack.service';
 import { FileCacheService } from 'src/infrastructure/cache/fileCache/fileCache.service';
+import { CheckFavoriteService } from 'src/services/auth-svc/modules/user/commands/check-favorite/checkFavorite.service';
 
 @Injectable()
 export class GetEventFrontDisplayService {
@@ -14,14 +15,24 @@ export class GetEventFrontDisplayService {
     @Inject('CategoriesRepository') private readonly categoriesRepository: CategoriesRepository,
     private readonly slackService: SlackService,
     private readonly fileCacheService: FileCacheService,
+    private readonly checkFavoriteService: CheckFavoriteService,
   ) {}
 
-  async execute(): Promise<Result<GetEventFrontDisplayDTO, Error>> {
+  async execute(userId?: string): Promise<Result<GetEventFrontDisplayDTO, Error>> {
     try {
       // Check if data is cached
-      const cachedData = await this.fileCacheService.getCache('getEventFrontDisplay', {});
+      const cachedData = await this.fileCacheService.getCache('getEventFrontDisplay', {}) as GetEventFrontDisplayDTO;
       if (cachedData) {
-        return Ok(cachedData as GetEventFrontDisplayDTO);
+        // Attach favorite status to cached data
+        if (userId) {
+          await this.checkFavoriteService.attachFavorite(userId, cachedData.specialEvents);
+          await this.checkFavoriteService.attachFavorite(userId, cachedData.trendingEvents);
+          await this.checkFavoriteService.attachFavorite(userId, cachedData.onlyOnEve);
+          for (const category of cachedData.categorySpecial) {
+            await this.checkFavoriteService.attachFavorite(userId, category.events);
+          }
+        }
+        return Ok(cachedData);
       }
 
       // Fetch special events, trending events, only on eve events, and special events by category
@@ -58,12 +69,22 @@ export class GetEventFrontDisplayService {
       };
 
       // Cache the result without await
-      this.fileCacheService.cacheEndpoint('getEventFrontDisplay', 720, {}, result); // Cache for 12 hour
+      this.fileCacheService.cacheEndpoint('getEventFrontDisplay', 360, {}, result); // Cache for 12 hour
+
+      // Attach favorite status if userId is provided
+      if (userId) {
+        await this.checkFavoriteService.attachFavorite(userId, result.specialEvents);
+        await this.checkFavoriteService.attachFavorite(userId, result.trendingEvents);
+        await this.checkFavoriteService.attachFavorite(userId, result.onlyOnEve);
+        for (const category of result.categorySpecial) {
+          await this.checkFavoriteService.attachFavorite(userId, category.events);
+        }
+      }
 
       return Ok(result);
     } catch (error) {
       // send error to slack
-      this.slackService.sendError(`EventSvc - Event >>> GetEventFrontDisplayService: ${error.message}`);
+      await this.slackService.sendError(`EventSvc - Event >>> GetEventFrontDisplayService: ${error.message}`);
 
       return Err(new Error('Failed to fetch front display data.'));
     }
@@ -296,8 +317,8 @@ export class GetEventFrontDisplayService {
           deleteAt: null,
           Showing: {
             some: {
-              startTime: {
-                gte: new Date(),
+              endTime: {
+                gte: new Date(new Date().setMonth(new Date().getMonth() - 1)),
               },
               deleteAt: null,
             },
@@ -317,8 +338,8 @@ export class GetEventFrontDisplayService {
             },
           },
           where: {
-            startTime: {
-              gte: new Date(),
+            endTime: {
+              gte: new Date(new Date().setMonth(new Date().getMonth() - 1)),
             },
             deleteAt: null,
           },

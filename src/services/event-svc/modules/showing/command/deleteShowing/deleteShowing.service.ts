@@ -41,7 +41,7 @@ export class DeleteShowingService {
 
       return result;
     } catch (error) {
-      this.slackService.sendError(`Event Service - Showing >>> DeleteShowingService: ${error.message}`)
+      await this.slackService.sendError(`Event Service - Showing >>> DeleteShowingService: ${error.message}`)
       return Err(new Error(`Failed to delete showing: ${error.message}`));
     }
   }

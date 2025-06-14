@@ -79,7 +79,7 @@ export class UpdateEventAdminService {
       return Ok(eventDto);
     } catch (error) {
       console.error(error);
-       this.slackService.sendError(` Event Svc - Admin >>> UpdateEventAdmin: ${error}`);
+       await this.slackService.sendError(` Event Svc - Admin >>> UpdateEventAdmin: ${error}`);
        return Err(new Error('Failed to update event'));
     }
   }

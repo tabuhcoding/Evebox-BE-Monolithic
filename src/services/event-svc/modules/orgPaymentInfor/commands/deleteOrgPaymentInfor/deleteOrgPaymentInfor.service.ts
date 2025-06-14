@@ -36,7 +36,7 @@ export class DeleteOrgPaymentInfoService {
 
       return result;
     } catch (error) {
-      this.slackService.sendError(`Event Service - OrgPaymentInfo >>> DeleteOrgPaymentInfoService: ${error.message}`);
+      await this.slackService.sendError(`Event Service - OrgPaymentInfo >>> DeleteOrgPaymentInfoService: ${error.message}`);
       return Err(new Error(`Error deleting payment info: ${error.message}`));
     }
   }

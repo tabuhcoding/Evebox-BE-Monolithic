@@ -78,7 +78,7 @@ export class FileCacheService {
 
       return parsed.data;
     } catch (err) {
-      this.slackService.sendError(`FileCacheService >>> getCache: Error reading cache file for endpoint ${endpoint} error: ${err.message}`);
+      await this.slackService.sendError(`FileCacheService >>> getCache: Error reading cache file for endpoint ${endpoint} error: ${err.message}`);
       return null;
     }
   }
@@ -116,7 +116,7 @@ export class FileCacheService {
         aggregated.timestamp = now;
         aggregated.timeout = timeout;
       } catch (err) {
-        this.slackService.sendError(`FileCacheService >>> cacheObject: Error reading cache file for endpoint ${endpoint} error: ${err.message}`);
+        await this.slackService.sendError(`FileCacheService >>> cacheObject: Error reading cache file for endpoint ${endpoint} error: ${err.message}`);
         aggregated = {
           timestamp: now,
           timeout,
@@ -158,7 +158,7 @@ export class FileCacheService {
 
       return validItems;
     } catch (err) {
-      this.slackService.sendError(`FileCacheService >>> getCacheObject: Error reading cache file for endpoint ${endpoint} error: ${err.message}`);
+      await this.slackService.sendError(`FileCacheService >>> getCacheObject: Error reading cache file for endpoint ${endpoint} error: ${err.message}`);
       return [];
     }
   }
@@ -184,7 +184,7 @@ export class FileCacheService {
 
       return item;
     } catch (err) {
-      this.slackService.sendError(`FileCacheService >>> getCacheObjectById: Error reading cache file for endpoint ${endpoint} error: ${err.message}`);
+      await this.slackService.sendError(`FileCacheService >>> getCacheObjectById: Error reading cache file for endpoint ${endpoint} error: ${err.message}`);
       return null;
     }
   }
@@ -215,7 +215,7 @@ export class FileCacheService {
       fs.writeFileSync(file, JSON.stringify(aggregated), 'utf-8');
       return true;
     } catch (err) {
-      this.slackService.sendError(`FileCacheService >>> clearObject: Error reading cache file for endpoint ${endpoint} error: ${err.message}`);
+      await this.slackService.sendError(`FileCacheService >>> clearObject: Error reading cache file for endpoint ${endpoint} error: ${err.message}`);
       return false;
     }
   }

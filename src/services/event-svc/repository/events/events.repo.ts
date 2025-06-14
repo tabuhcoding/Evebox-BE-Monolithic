@@ -6,6 +6,7 @@ import { Prisma } from '@prisma/client';
 import { UpdateEventAdminDto } from '../../modules/event/commands/UpdateEventAdmin/updateEventAdmin.dto';
 import { EventOrgFrontDisplayDto } from '../../modules/event/queries/getEventOfOrg/getEventOfOrg-response.dto';
 import { EventOrgDetailResponseDto } from '../../modules/event/queries/getEventOfOrgDetail/getEventOfOrgDetail-response.dto';
+import { EventSummaryData } from '../../modules/event/queries/getEventSummary/getEventSummary-response.dto';
 import { EventRevenueData, OrganizerRevenueData } from '../../modules/statistics/queries/getOrgRevenue/getOrgRevenue-response.dto';
 
 export type Events = Prisma.EventsGetPayload<{
@@ -98,6 +99,14 @@ export interface EventsRepository extends BaseRepository<Events, Prisma.EventsDe
 
   getEventOfOrg(email: string): Promise<Result<(EventOrgFrontDisplayDto & { role: number })[], Error>>;
   getEventOfOrgDetail(eventId: number): Promise<Result<EventOrgDetailResponseDto, Error>>;
+
+  /* Statistics */
+  getEventSummary(showingId: string): Promise<Result<EventSummaryData, Error>>;
+  countTotalClicksByEvent(eventId: number, startDate?: string, endDate?: string): Promise<Result<number, Error>>;
+  countUniqueUsersByEvent(eventId: number, startDate?: Date, endDate?: Date): Promise<Result<number, Error>>;
+  countOrdersByEvent(eventId: number): Promise<Result<number, Error>>;
+  countBuyersByEvent(eventId: number): Promise<Result<number, Error>>;
+  getStatistics(eventId: number): Promise<Result<any, Error>>;
   findEventsByOrganizerEmail(email: string): Promise<Pick<Events, 'locationId' | 'venue'>[]>;
   getRevenueEventsWithShowings(
     from?: Date,

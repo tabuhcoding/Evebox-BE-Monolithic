@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Result, Ok, Err } from 'oxide.ts';
-import { ShowingDataDto } from './getShowingDetail-response.dto';
+import { ShowingDataDto, SimpleShowingDataDto } from './getShowingDetail-response.dto';
 import { ShowingRepository } from 'src/services/event-svc/repository/showing/showing.repo';
 import { CalculateShowingStatusService } from '../../../event/commands/calculateShowingStatus/calculateShowingStatus.service';
 import { calculateShowingStatusAndMinPrice, ShowingStatus } from 'src/shared/utils/status/status';
@@ -24,6 +24,10 @@ export class getShowingDetailService {
 
       const showing = await this.showingRepository.findOne({
         id: showingId,
+        endTime: {
+          gte: new Date(new Date().setMonth(new Date().getMonth() - 1)),
+        },
+        deleteAt: null,
       }, {
         TicketType: true,
       });
@@ -34,6 +38,23 @@ export class getShowingDetailService {
 
       // find event of showing
       const event = await this.eventsRepository.findOneById(showing.eventId)
+
+      // if showing is ended
+      if (new Date(showing.endTime) < new Date()) {
+        const formattedResult: ShowingDataDto = {
+          ...showing,
+          status: ShowingStatus.SHOWING_OVER,
+          minPrice: 0,
+          Events: {
+            id: event.id,
+            title: event.title,
+            imgLogoUrl: event.imgLogoUrl,
+            imgPosterUrl: event.imgPosterUrl,
+            venue: event.venue,
+          },
+        };
+        return Ok(formattedResult);
+      }
 
       // Calculate showing status and minimum price
       if (!showing.TicketType || showing.TicketType.length === 0) {
@@ -94,4 +115,22 @@ export class getShowingDetailService {
     }
   }
 
+  async executeSimple(showingId: string): Promise<Result<SimpleShowingDataDto, Error>> {
+    try {
+      if (!showingId) {
+        return Err(new Error('Showing ID is required.'));
+      }
+
+      const showing = await this.showingRepository.findOneById(showingId);
+
+      if (!showing) {
+        return Err(new Error('Showing not found.'));
+      }
+
+      return Ok(showing);
+    } catch (error) {
+      console.error(error);
+      return Err(new Error('Failed to fetch showing data.'));
+    }
+  }
 }

@@ -18,7 +18,7 @@ export class GetUsersNotifiedByEventService {
       const emails = await this.userRepository.getEmailsByIds(userIds.map((u) => u.userId));
       return Ok(emails.map((e) => ({ email: e })));
     } catch (error) {
-      this.slackService.sendError(` Auth Svc - User >>> GetUsersNotifiedByEvent: ${error}`);
+      await this.slackService.sendError(` Auth Svc - User >>> GetUsersNotifiedByEvent: ${error}`);
       
       return Err(new Error('Failed to fetch notified user emails'));
     }

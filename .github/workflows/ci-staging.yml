@@ -1,0 +1,48 @@
+name: CI on PR to Staging
+
+on:
+  pull_request:
+    branches: [staging]
+    types: [opened, synchronize, reopened]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Cache npm
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run build
+        run: npm run build
+
+  # notify:
+  #   needs: build-and-test
+  #   if: always()  # chạy bất kể test thành công hay thất bại
+  #   runs-on: ubuntu-latest
+
+  #   steps:
+  #     - name: Comment build result on PR
+  #       uses: peter-evans/create-or-update-comment@v4
+  #       with:
+  #         token: ${{ secrets.GITHUB_TOKEN }}
+  #         issue-number: ${{ github.event.pull_request.number }}
+  #         body: |
+  #           🧪 **CI Result**:
+  #           - Status: ${{ needs.build-and-test.result }}
+
+  #           Commit: `${{ github.event.pull_request.head.sha }}`

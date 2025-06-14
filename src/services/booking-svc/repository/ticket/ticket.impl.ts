@@ -9,7 +9,9 @@ export class TicketRepositoryImpl
   extends BaseRepository<Ticket, Prisma.TicketDelegate>
   implements TicketRepository
 {
-  constructor(protected readonly prisma: PrismaService) {
+  constructor(
+    protected readonly prisma: PrismaService,
+  ) {
     super(prisma.ticket, prisma);
   }
 

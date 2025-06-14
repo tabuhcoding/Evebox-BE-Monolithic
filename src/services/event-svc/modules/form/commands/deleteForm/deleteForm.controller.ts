@@ -51,7 +51,7 @@ export class DeleteFormController {
         data: { formId: result.unwrap() },
       });
     } catch (error) {
-      this.slackService.sendError(`EventSvc - Form >>> DeleteFormController: ${error.message}`);
+      await this.slackService.sendError(`EventSvc - Form >>> DeleteFormController: ${error.message}`);
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
         message: 'Internal server error',

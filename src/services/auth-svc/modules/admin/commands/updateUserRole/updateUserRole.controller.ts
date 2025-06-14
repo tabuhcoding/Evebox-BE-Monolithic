@@ -77,7 +77,7 @@ export class UpdateUserRoleController {
         message: 'Update role user successfully',
       });
     } catch (error) {
-      this.slackService.sendError(`AuthSvc - User >>> UpdateUserRoleController: ${error.message}`);
+      await this.slackService.sendError(`AuthSvc - User >>> UpdateUserRoleController: ${error.message}`);
       return res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .json(

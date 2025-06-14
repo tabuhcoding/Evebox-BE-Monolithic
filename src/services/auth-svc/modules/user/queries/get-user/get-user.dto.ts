@@ -42,6 +42,13 @@ class UserData {
     description: 'User avatar_id',
   })
   avatar_id: number;
+
+  @ApiProperty({
+    type: "boolean",
+    example: true,
+    description: 'Is user receive notifications',
+  })
+  receiveNoti: boolean;
 }
 
 export class UserResponse {

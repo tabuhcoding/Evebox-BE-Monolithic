@@ -1,6 +1,6 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
-import { OrderRepository } from "src/services/booking-svc/repository/order/order.repo";
+import { Order, OrderRepository } from "src/services/booking-svc/repository/order/order.repo";
 import { GetUserSubmitFormService } from "src/services/event-svc/modules/form/queries/getUserSubmitForm/getUserSubmitForm.service";
 import { BookingTicketStatus, BookingTicketType } from "src/services/booking-svc/repository/order/order.repo";
 
@@ -16,10 +16,10 @@ export class CreateOrderService {
     try{
       const formResponseId = await this.getUserSubmitFormService.execute(showingID, 'userID'); // Replace 'userID' with actual user ID
       // TODO: Uncomment the following line after implementing SubmitFormService
-      // if (!formResponseId) {
+      if (!formResponseId) {
 
-      //   return null;
-      // }
+        return null;
+      }
 
       const order = await this.orderRepository.insertOneWithNumberId({
         showingId: showingID,
@@ -32,30 +32,30 @@ export class CreateOrderService {
       });
 
       if (!order) {
-        this.slackService.sendError(` Booking Svc >>> createOrder : Failed to create order for showingID: ${showingID} and userID: ${userID}`);
+        await this.slackService.sendError(` Booking Svc >>> createOrder : Failed to create order for showingID: ${showingID} and userID: ${userID}`);
 
         return null;
       }
 
-      this.slackService.sendNotice(` Booking Svc >>> createOrder : Order created successfully for showingID: ${showingID} and userID: ${userID} with order ID: ${order}`);
+      await this.slackService.sendNotice(` Booking Svc >>> createOrder : Order created successfully for showingID: ${showingID} and userID: ${userID} with order ID: ${order}`);
       return order
     }
     catch (error) {
-      this.slackService.sendError(` Booking Svc >>> getTotalTicketOfTicketType : ${error.message}`)
+      await this.slackService.sendError(` Booking Svc >>> getTotalTicketOfTicketType : ${error.message}`)
 
       return null;
     }
   }
 
-  async updateOrderStatus(orderId: number, status: BookingTicketStatus): Promise<boolean> {
+  async updateOrderStatus(orderId: number, status: BookingTicketStatus): Promise<Order | null> {
     try {
-      await this.orderRepository.updateOneById(orderId, { status });
+      const order = await this.orderRepository.updateAndFindOneById(orderId, { status });
       
-      return true;
+      return order;
     } catch (error) {
-      this.slackService.sendError(` Booking Svc >>> updateOrderStatus : ${error.message}`);
+      await this.slackService.sendError(` Booking Svc >>> updateOrderStatus : ${error.message}`);
       
-      return false;
+      return null;
     }
   }
 }

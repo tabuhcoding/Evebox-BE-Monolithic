@@ -8,6 +8,7 @@ import { calculateShowingStatusAndMinPrice, EventStatus, ShowingStatus } from "s
 import { CalculateShowingStatusService } from "../../commands/calculateShowingStatus/calculateShowingStatus.service";
 import { UserClickHistoryRepository } from "src/services/event-svc/repository/userClickHistory/userClickHistory.repo";
 import { CheckUserExistService } from "src/services/auth-svc/modules/user/commands/checkuserExist/checkuserExist.service";
+import { CheckFavoriteService } from "src/services/auth-svc/modules/user/commands/check-favorite/checkFavorite.service";
 
 @Injectable()
 export class GetEventDetailService {
@@ -18,9 +19,10 @@ export class GetEventDetailService {
     private readonly slackService: SlackService,
     private readonly calculateShowingStatusService: CalculateShowingStatusService,
     private readonly checkUserExistService: CheckUserExistService,
+    private readonly checkFavoriteService: CheckFavoriteService,
   ) {}
 
-  async execute(eventId: number): Promise<Result<EventDetailResponseDto, Error>> {
+  async execute(eventId: number, userId?: string): Promise<Result<EventDetailResponseDto, Error>> {
     if (!eventId) {
       return Err(new Error("Event ID is required."));
     }
@@ -37,8 +39,8 @@ export class GetEventDetailService {
               },
             },
             where: {
-              startTime: {
-                gte: new Date(),
+              endTime: {
+                gte: new Date(new Date().setMonth(new Date().getMonth() - 1)),
               },
               deleteAt: null,
             },
@@ -63,6 +65,13 @@ export class GetEventDetailService {
       if (!event) {
         return Err(new Error("Event not found."));
       }
+
+      var [ isFavoriteEvent, isNotifiedEvent, isFavoriteOrg, isNotifiedOrg ] = [false, false, false, false];
+      // Check if user exists
+      if(userId){
+        [isFavoriteEvent, isNotifiedEvent, isFavoriteOrg, isNotifiedOrg] = await this.checkFavoriteService.execute(userId, event.organizerId, event.id);
+      }
+
 
       let eventsDto : EventDetailResponseDto = {
         id: event.id,
@@ -91,6 +100,10 @@ export class GetEventDetailService {
         showing: [],
         locationsString: "",
         minPrice: Number.MAX_VALUE,
+        isUserFavorite: isFavoriteEvent,
+        isUserNotice: isNotifiedEvent,
+        isUserFavoriteOrganizer: isFavoriteOrg,
+        isUserNoticeOrganizer: isNotifiedOrg,
       }
 
       // Location string
@@ -110,7 +123,15 @@ export class GetEventDetailService {
       else{
         for (const showing of event.Showing) {
           await this.calculateShowingStatusService.reCalculateAllTicketTypesOfShowingStatus(showing);
-          const [showingStatus, showingMinPrice] = await calculateShowingStatusAndMinPrice(showing.TicketType);
+          var showingStatus: ShowingStatus;
+          var showingMinPrice: number;
+          if (showing.endTime < nowDate) {
+            showingStatus = ShowingStatus.SHOWING_OVER;
+            showingMinPrice = 0;
+          }
+          else {
+            [showingStatus, showingMinPrice] = await calculateShowingStatusAndMinPrice(showing.TicketType);
+          }
           showingStatusSet.add(showingStatus);
 
           // Update min price
@@ -157,7 +178,7 @@ export class GetEventDetailService {
 
       return Ok(eventsDto);
     } catch (error) {
-      this.slackService.sendError(` Event Svc - Event >>> GetEventDetail: ${error}`);
+      await this.slackService.sendError(` Event Svc - Event >>> GetEventDetail: ${error}`);
       
       return Err(new Error("Failed to fetch event detail data."));
     }
@@ -170,12 +191,17 @@ export class GetEventDetailService {
     }
 
     try{
+      this.eventsRepository.updateOneById(eventId, {
+        weekClicks: { increment: 1 },
+        totalClicks: { increment: 1 },
+      });
+
       // If userId is provided, update user click history
       if (userId) {
         // Check if user exists
         const userExists = await this.checkUserExistService.execute(userId);
         if (!userExists) {
-          // this.slackService.sendError(`Event Svc - Event >>> GetEventDetail Increase Post Click Count: User with ID ${userId} does not exist.`);
+          // await this.slackService.sendError(`Event Svc - Event >>> GetEventDetail Increase Post Click Count: User with ID ${userId} does not exist.`);
           
           return;
         }
@@ -195,11 +221,6 @@ export class GetEventDetailService {
         }
 
         // Increase post click count
-        this.eventsRepository.updateOneById(eventId, {
-          weekClicks: { increment: 1 },
-          totalClicks: { increment: 1 },
-        });
-
         this.userClickHistoryRepository.insertOne({
           userId: userId,
           eventId: eventId,
@@ -208,7 +229,7 @@ export class GetEventDetailService {
       }
 
     } catch (error) {
-      this.slackService.sendError(` Event Svc - Event >>> GetEventDetail Increase Post Click Count: ${error}`);
+      await this.slackService.sendError(` Event Svc - Event >>> GetEventDetail Increase Post Click Count: ${error}`);
     }
   }
 }

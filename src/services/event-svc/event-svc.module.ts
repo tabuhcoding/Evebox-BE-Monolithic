@@ -21,13 +21,13 @@ import { GetEventFDByIdsService } from './modules/event/queries/getEventFDByIds/
 import { GetEventFDByIdsController } from './modules/event/queries/getEventFDByIds/getEventFDByIds.controller';
 import { GetRecommendedEventController } from './modules/event/queries/getRecommendEvent/getRecommendEvent.controller';
 import { GetRecommendEventService } from './modules/event/queries/getRecommendEvent/getRecommendEvent.service';
-import { SlackService } from 'src/infrastructure/adapters/slack/slack.service';
 import { GetEventDetailRecommendController } from './modules/event/queries/getEventDetailRecommend/getEventDetailRecommend.controller';
 import { GetEventDetailRecommendService } from './modules/event/queries/getEventDetailRecommend/getEventDetailRecommend.service';
 import { BookingSvcModule } from '../booking-svc/booking.module';
 import { GetEventDetailController } from './modules/event/queries/getEventDetail/getEventDetail.controller';
 import { GetEventDetailService } from './modules/event/queries/getEventDetail/getEventDetail.service';
 import { ShowingRepositoryImpl } from './repository/showing/showing.impl';
+import { ShowingWithEventRepositoryImpl } from './repository/showing/showingWithEvent.impl';
 import { SeatmapRepositoryImpl } from './repository/seatmap/seatmap.impl';
 import { SeatStatusRepositoryImpl } from './repository/seatStatus/seatStatus.impl';
 import { TicketTypeRepositoryImpl } from './repository/ticketType/ticketType.impl';
@@ -81,7 +81,6 @@ import { DeleteOrgPaymentInfoController } from './modules/orgPaymentInfor/comman
 import { DeleteOrgPaymentInfoService } from './modules/orgPaymentInfor/commands/deleteOrgPaymentInfor/deleteOrgPaymentInfor.service';
 import { CalculateSectionStatusService } from './modules/showing/command/calculateSectionStatus/calculateSectionStatus.service';
 import { GetOrgPaymentInfoService } from './modules/orgPaymentInfor/queries/getOrgPaymentInfor/getOrgPaymentInfor.service';
-import { FileCacheService } from 'src/infrastructure/cache/fileCache/fileCache.service';
 import { UpdateEventAdminController } from './modules/event/commands/UpdateEventAdmin/updateEventAdmin.controller';
 import { UpdateEventAdminService } from './modules/event/commands/UpdateEventAdmin/updateEventAdmin.service';
 import { GetEventsByAdminService } from './modules/event/queries/getEventsByAdmin/getEvents.service';
@@ -97,13 +96,27 @@ import { GetEventOfOrgDetailService } from './modules/event/queries/getEventOfOr
 import { GetShowingAdminDetailController } from './modules/showing/queries/getShowingAdminDetail/getShowingAdminDetail.controller';
 import { GetShowingsByAdminController } from './modules/showing/queries/getShowingsByAdmin/getShowings.controller';
 import { GetTicketDetailOfShowingController } from './modules/showing/queries/getTicketDetailOfShowing/getTicketDetailOfShowing.controller';
-import { GetAdminAccessService } from '../auth-svc/modules/user/queries/get-admin-access/get-admin-access.service';
 import { GetEventRolesController } from './modules/event/queries/getEventRoles/getEventRoles.controller';
 import { GetEventRolesService } from './modules/event/queries/getEventRoles/getEventRoles.service';
 import { GetEventRolesByIdController } from './modules/event/queries/getEventRolesById/getEventRolesById.controller';
 import { GetEventRolesByIdService } from './modules/event/queries/getEventRolesById/getEventRolesById.service';
 import { GetUserSubmitFormService } from './modules/form/queries/getUserSubmitForm/getUserSubmitForm.service';
 import { FormResponseRepositoryImpl } from './repository/formResponse/formResponse.impl';
+import { GetEventSummaryController } from './modules/event/queries/getEventSummary/getEventSummary.controller';
+import { GetEventSummaryService } from './modules/event/queries/getEventSummary/getEventSummary.service';
+import { GetFormResponseByIdService } from './modules/formResponse/queries/getFormResponseById/getFormResponseById.service';
+import { CheckUserPermissionService } from './modules/event/commands/checkUserPermission/checkUserPermission.service';
+import { GetAnalyticsController } from './modules/event/queries/getAnalytics/getAnalytics.controller';
+import { GetAnalyticsService } from './modules/event/queries/getAnalytics/getAnalytics.service';
+import { FormAnswerRepositoryImpl } from './repository/formAnswer/formAnswer.impl';
+import { UpdateFormResponseService } from './modules/formResponse/commands/updateFormResponse/updateFormResponse.service';
+import { FormInputRepositoryImpl } from './repository/formInput/formInput.impl';
+import { GetPreviewShowingService } from './modules/showing/queries/getPreviewShowing/getPreviewShowing.service';
+import { GetFormAnswerWithQuestionService } from './modules/formAnswer/queries/getFormAnswerWithQuestion/getFormAnswerWithQuestion.service';
+import { CalculateTicketTypeStatusService } from './modules/showing/command/calculateTicketTypeStatus/calculateTicketTypeStatus.service';
+import { SubmitFormResponseService } from './modules/formResponse/commands/submitForm/submitForm.service';
+import { SearchEventController } from './modules/event/queries/getEventsWithFilter/getEventsWithFilter.controller';
+import { SearchEventService } from './modules/event/queries/getEventsWithFilter/getEventsWithFilter.service';
 import { ProvinceRepositoryImpl } from './repository/province/province.impl';
 import { GetAllDistrictsController } from './modules/location/queries/getAllDistricts/getAllDistricts.controller';
 import { GetAllDistrictsService } from './modules/location/queries/getAllDistricts/getAllDistricts.service';
@@ -139,6 +152,11 @@ import { GetSummaryTicketRevenueService } from './modules/statistics/queries/get
     DeleteEventController,
     GetEventRolesController,
     GetEventRolesByIdController,
+    SearchEventController,
+
+    // Event Statistics
+    GetEventSummaryController,
+    GetAnalyticsController,
 
     // Form
     CreateFormController,
@@ -187,6 +205,8 @@ import { GetSummaryTicketRevenueService } from './modules/statistics/queries/get
     // Adapters
     // Utils Command
     CalculateShowingStatusService,
+    CheckUserPermissionService,
+    CalculateTicketTypeStatusService,
     
     // Categories
     GetAllCategoriesService,
@@ -205,10 +225,14 @@ import { GetSummaryTicketRevenueService } from './modules/statistics/queries/get
     GetEventDetailService,
     GetEventOfOrgService,
     GetEventOfOrgDetailService,
+    SearchEventService,
 
     GetEventsByIdsService,
     GetEventRolesService,
     GetEventRolesByIdService,
+
+    GetEventSummaryService,
+    GetAnalyticsService,
 
     ///// Showing
     // Commands
@@ -221,6 +245,7 @@ import { GetSummaryTicketRevenueService } from './modules/statistics/queries/get
     GetFormOfShowingService,
     GetShowingDetailService,
     GetShowingSeatmapService,
+    GetPreviewShowingService,
 
     // Ticket type
     CreateTicketTypeService,
@@ -248,6 +273,11 @@ import { GetSummaryTicketRevenueService } from './modules/statistics/queries/get
     ConnectFormService,
 
     GetUserSubmitFormService,
+    GetFormAnswerWithQuestionService,
+    SubmitFormResponseService,
+
+    GetFormResponseByIdService,
+    UpdateFormResponseService,
 
     // Admin showing
     GetShowingAdminDetailService,
@@ -272,6 +302,7 @@ import { GetSummaryTicketRevenueService } from './modules/statistics/queries/get
     { provide: 'EventUserRelationshipRepository', useClass: EventUserRelationshipRepositoryImpl },
     { provide: 'EventRoleRepository', useClass: EventRoleRepositoryImpl },
     { provide: 'ShowingRepository', useClass: ShowingRepositoryImpl },
+    { provide: 'ShowingWithEventRepository', useClass: ShowingWithEventRepositoryImpl },
     { provide: 'SeatmapRepository', useClass: SeatmapRepositoryImpl },
     { provide: 'SeatStatusRepository', useClass: SeatStatusRepositoryImpl},
     { provide: 'TicketTypeRepository', useClass: TicketTypeRepositoryImpl},
@@ -281,6 +312,8 @@ import { GetSummaryTicketRevenueService } from './modules/statistics/queries/get
     { provide: 'LocationsRepository', useClass: LocationsRepositoryImpl },
     { provide: 'OrgPaymentInforRepository', useClass: OrgPaymentInforRepositoryImpl },
     { provide: 'FormResponseRepository', useClass: FormResponseRepositoryImpl },
+    { provide: 'FormAnswerRepository', useClass: FormAnswerRepositoryImpl },
+    { provide: 'FormInputRepository', useClass: FormInputRepositoryImpl },
     { provide: 'ProvinceRepository', useClass: ProvinceRepositoryImpl },
   ],
   exports: [
@@ -291,6 +324,13 @@ import { GetSummaryTicketRevenueService } from './modules/statistics/queries/get
     GetShowingDetailService,
     GetTicketTypeDetailService,
     GetUserSubmitFormService,
+    GetFormResponseByIdService,
+    CheckUserPermissionService,
+    UpdateFormResponseService,
+    GetPreviewShowingService,
+    GetFormAnswerWithQuestionService,
+    CalculateTicketTypeStatusService,
+    SubmitFormResponseService,
   ],
 })
 export class EventSvcModule {}

@@ -1,12 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { CheckoutResponseDataType, PayOSService } from '../../../common/payOS/payOS.service';
 import { SlackService } from 'src/infrastructure/adapters/slack/slack.service';
+import { PayOSInfoRepository } from 'src/services/payment-svc/repository/payOSInfo/payOsInfo.repo';
 
 @Injectable()
 export class PayOSCheckoutService {
   constructor(
     private readonly payOSService: PayOSService,
     private readonly slackService: SlackService,
+    @Inject('PayOSInfoRepository') private readonly payOSInfoRepository: PayOSInfoRepository,
   ) {}
 
   async execute(
@@ -34,10 +36,15 @@ export class PayOSCheckoutService {
         throw new Error('Failed to create PayOS checkout link.');
       }
 
+      // Save the PayOS checkout information to the repository
+      await this.payOSInfoRepository.insertWithoutReturn({
+        ...payOSCheckout
+      })
+
       return payOSCheckout
 
     } catch (error) {
-      this.slackService.sendError(`Error during PayOS checkout for user ${userId} order ${orderCode}: ${error.message}`);
+      await this.slackService.sendError(`Error during PayOS checkout for user ${userId} order ${orderCode}: ${error.message}`);
     
       return new Error(`PayOS checkout failed: ${error.message}`);
     }

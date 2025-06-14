@@ -84,7 +84,7 @@ export class VerifyUserPinService {
         });
       }
     } catch (error) {
-      this.slackService.sendError(`Auth Service - User >>> VerifyUserPinService: ${error.message}`);
+      await this.slackService.sendError(`Auth Service - User >>> VerifyUserPinService: ${error.message}`);
 
       return Err(new Error(`Failed to verify PIN: ${error.message}`));
     }

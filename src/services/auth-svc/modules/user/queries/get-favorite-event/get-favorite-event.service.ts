@@ -31,7 +31,7 @@ constructor(
       const events = await this.getEventsByIdsService.getEventsByIds(eventIds);
       return Ok(events);
     } catch (error) {
-      this.slackService.sendError(` Auth Svc - User >>> GetFavoriteEvent: ${error}`);
+      await this.slackService.sendError(` Auth Svc - User >>> GetFavoriteEvent: ${error}`);
       
       return Err(new Error("Failed to retrieve events"));
     }

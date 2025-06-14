@@ -1,8 +1,9 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, Res, HttpStatus } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { SlackService } from 'src/infrastructure/adapters/slack/slack.service';
 import { WebhookType } from 'src/services/payment-svc/common/payOS/payOS.service';
 import { PayOSWebhookService } from './payosWebhook.service';
+import { Response } from 'express';
 
 @ApiTags('Webhooks')
 @Controller('api/payment')
@@ -15,15 +16,19 @@ export class PayOSWebhookController {
   @Post('/webhooks/payos')
   async getPayOSReturn(
     @Body() payload: WebhookType,
+    @Res() res: Response,
   ) {
-    this.slackService.sendNotice(`PayOS webhook received: ${JSON.stringify(payload)}`);
+    await this.slackService.sendNotice(`PayOS webhook received: ${JSON.stringify(payload)}`);
 
     try {
       await this.payosWebhookService.verifyWebhookData(payload);
     } catch (error) {
-      this.slackService.sendError(`PayOS webhook verification failed: ${error.message}`);
+      await this.slackService.sendError(`PayOS webhook verification failed: ${error.message}`);
     }
-
-    return { message: 'Webhook received and processed successfully' };
+    finally {
+      return res.status(HttpStatus.OK).json({
+        success: true,
+      });
+    }
   }
 }

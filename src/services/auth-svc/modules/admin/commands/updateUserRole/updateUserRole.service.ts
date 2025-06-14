@@ -53,7 +53,7 @@ export class UpdateUserRoleService {
 
       return Ok(void 0);
     } catch (error) {
-      this.slackService.sendError(`AuthSvc >>> User - UpdateUserRoleService: ${error.message}`);
+      await this.slackService.sendError(`AuthSvc >>> User - UpdateUserRoleService: ${error.message}`);
       return Err(new Error(USER_MESSAGES.ERRORS.SERVER_ERROR));
     }
   }
@@ -81,7 +81,7 @@ export class UpdateUserRoleService {
 
       return Ok(void 0);
     } catch (error) {
-      this.slackService.sendError(`AuthSvc >>> User - UpdateUserRoleService: ${error.message}`);
+      await this.slackService.sendError(`AuthSvc >>> User - UpdateUserRoleService: ${error.message}`);
       return Err(new Error(USER_MESSAGES.ERRORS.SERVER_ERROR));
     }
   }

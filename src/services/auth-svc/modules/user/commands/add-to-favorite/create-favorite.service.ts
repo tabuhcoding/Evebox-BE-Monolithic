@@ -28,14 +28,12 @@ export class AddToFavoriteService {
       return Err(new Error('User not found'));
     }
 
-    const userId: UserId = user.id;
-
     try {
      let existing;
 
     if (dto.itemType == 'EVENT'){
       existing = await this.favoriteRepository.findFavorite(
-        userId.value,
+        email.value,
         dto.itemType,
         undefined,
         parseInt(dto.itemId),
@@ -43,7 +41,7 @@ export class AddToFavoriteService {
     }
     else{
        existing = await this.favoriteRepository.findFavorite(
-        userId.value,
+        email.value,
         dto.itemType,
         dto.itemId,
         undefined,
@@ -65,7 +63,7 @@ export class AddToFavoriteService {
       const orgId = isEvent ? null : dto.itemId;
 
       await this.favoriteRepository.addFavorite(
-        userId.value,
+        email.value,
         dto.itemType,
         orgId,
         eventId,
@@ -73,7 +71,7 @@ export class AddToFavoriteService {
 
       return Ok(true);
     } catch (error) {
-      this.slackService.sendError(` Auth Svc - User >>> CreatFavorite: ${error}`);  
+      await this.slackService.sendError(` Auth Svc - User >>> CreatFavorite: ${error}`);  
       return Err(new Error("Failed to add event/org to favorite"));
     }
   }

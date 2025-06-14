@@ -41,7 +41,7 @@ export class CreateUserPinService {
       
       return Ok(true);
     } catch (error) {
-      this.slackService.sendError(`Auth Service - User >>> GetUserPinStatusService: ${error.message}`);
+      await this.slackService.sendError(`Auth Service - User >>> GetUserPinStatusService: ${error.message}`);
 
       return Err(new Error(`Failed to create PIN: ${error.message}`));
     }

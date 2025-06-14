@@ -51,12 +51,12 @@ export class CreateTicketTypeService {
       const [ticketTypeId, isApproved] = result.unwrap();
 
       if (isApproved) {
-        this.slackService.sendNotice(`Event Service - Showing >>> CreateTicketTypeService: Event with ID ${event.id} has been created ticket type.`);
+        await this.slackService.sendNotice(`Event Service - Showing >>> CreateTicketTypeService: Event with ID ${event.id} has been created ticket type.`);
       }
 
       return Ok(ticketTypeId);
     } catch (error) {
-      this.slackService.sendError(`EventSvc - Showing >>> CreateTicketTypeService: ${error.message}`);
+      await this.slackService.sendError(`EventSvc - Showing >>> CreateTicketTypeService: ${error.message}`);
 
       return Err(new Error(`Failed to create ticket type: ${error.message}`));
     }

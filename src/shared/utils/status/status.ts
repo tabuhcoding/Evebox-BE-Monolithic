@@ -10,6 +10,7 @@ export enum ShowingStatus {
  NOT_OPEN = 'NOT_OPEN',
  REGISTER_CLOSE = 'REGISTER_CLOSED',
  SALE_CLOSE = 'SALE_CLOSED', 
+ SHOWING_OVER = 'SHOWING_OVER',
 }
 
 export enum EventStatus {
@@ -62,7 +63,7 @@ export async function calculateEventStatusAndMinPriceAndStartDate(event: Events)
   let minPrice = Number.MAX_VALUE;
   let showingStatusSet = new Set<ShowingStatus>();
   let startTime = new Date("9999-12-31T23:59:59.999Z");
-  let nowDate = new Date();
+  let nowDate = new Date(new Date().setMonth(new Date().getMonth() - 1));
 
   if ( !event.Showing || event.Showing?.length === 0) {
 
@@ -72,7 +73,11 @@ export async function calculateEventStatusAndMinPriceAndStartDate(event: Events)
   for (const showing of event.Showing) {
     // Calculate showing status and min price
     const [showingStatus, showingMinPrice] = await calculateShowingStatusAndMinPrice(showing.TicketType);
-    showingStatusSet.add(showingStatus);
+    if (new Date(showing.endTime) < nowDate) {
+      showingStatusSet.add(ShowingStatus.SHOWING_OVER);
+      continue;
+    }
+    else showingStatusSet.add(showingStatus);
     // Update min price
     if (showingMinPrice < minPrice) {
       minPrice = showingMinPrice;

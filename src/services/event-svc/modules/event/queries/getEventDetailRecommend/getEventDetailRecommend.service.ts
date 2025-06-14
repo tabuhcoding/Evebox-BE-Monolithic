@@ -4,6 +4,7 @@ import { EventsRepository } from "src/services/event-svc/repository/events/event
 import { GetEventFrontDisplayService } from "../getEventFrontDisplay/getEventFrontDisplay.service";
 import { EventFrontDisplayDto } from "../getEventFrontDisplay/getEventFrontDisplay-response.dto";
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
+import { CheckFavoriteService } from "src/services/auth-svc/modules/user/commands/check-favorite/checkFavorite.service";
 
 @Injectable()
 export class GetEventDetailRecommendService {
@@ -11,9 +12,10 @@ export class GetEventDetailRecommendService {
     @Inject('EventsRepository') private readonly eventsRepository: EventsRepository,
     private readonly getEventFrontDisplayService: GetEventFrontDisplayService,
     private readonly slackService: SlackService,
+    private readonly checkFavoriteService: CheckFavoriteService,
   ) {}
 
-  async getRecommendedEventsInDetail(eventId: number, limit: string): Promise<Result<EventFrontDisplayDto[], Error>> {
+  async getRecommendedEventsInDetail(eventId: number, limit: string, userId?: string): Promise<Result<EventFrontDisplayDto[], Error>> {
     if (!eventId) {
       return Err(new Error("Event ID is required."));
     }
@@ -101,9 +103,13 @@ export class GetEventDetailRecommendService {
         && event.status !== 'SALE_CLOSE'
       ) as EventFrontDisplayDto[];
 
+      if (userId) {
+        await this.checkFavoriteService.attachFavorite(userId, filteredEventDtos);
+      }
+
       return Ok(filteredEventDtos);
     } catch (error) {
-      this.slackService.sendError(`Event Service - Event >>> getRecommendedEventsInDetail: ${error.message}`);
+      await this.slackService.sendError(`Event Service - Event >>> getRecommendedEventsInDetail: ${error.message}`);
 
       return Err(new Error("Event not found."));
     }

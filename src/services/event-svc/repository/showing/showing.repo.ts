@@ -29,6 +29,16 @@ export type Showing = Prisma.ShowingGetPayload<{
   };
 }>;
 
+export type EventWithShowings = Prisma.ShowingGetPayload<{
+  select: {
+    id: true;
+    startTime: true;
+    endTime: true;
+    TicketType: true;
+  };
+}>;
+
+
 export interface ShowingRepository extends BaseRepository<Showing, Prisma.ShowingDelegate> {
   checkAuthor(id: string, userId: string): Promise<Result<boolean, Error>>;
   /* Create Showing */
@@ -44,4 +54,24 @@ export interface ShowingRepository extends BaseRepository<Showing, Prisma.Showin
   findWithFilters(filters: any): Promise<ShowingDataDto[]>;
   count(filters: any): Promise<number>;
   getBasicShowingDetail(showingId: string, ticketTypeId: string): Promise<any>;
+  findShowingsByOrgAndEvent(orgId: string, eventId: number): Promise<EventWithShowings[]>;
+  findOneByIdWithTicketTypes(
+  showingId: string,
+  eventId: number,
+  organizerId: string
+): Promise<{
+  id: string;
+  startTime: Date;
+  endTime: Date;
+  Events: {
+    id: number;
+    title: string;
+  };
+  TicketType: {
+    id: string;
+    name: string;
+    price: number;
+    quantity: number | null;
+  }[];
+} | null>;
 }

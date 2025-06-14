@@ -5,7 +5,6 @@ import { TicketRepository } from "src/services/booking-svc/repository/ticket/tic
 import { GetTicketTypeDetailService } from "src/services/event-svc/modules/ticketType/queries/getTicketTypeDetail/getTicketTypeDetail.service";
 import { SeatmapType } from "src/shared/utils/status/seatmap";
 import { TicketGroupedByTicketTypeID } from "../../queries/getOrdersByShowingId/getOrdersByShowingId-response.dto";
-import { T } from "oxide.ts/dist/common";
 import { encrypt, generateQRCode } from "src/shared/utils/qrcode/utils";
 import { Cron } from "@nestjs/schedule";
 
@@ -196,7 +195,7 @@ export class GenerateQrcodeService {
     }
   }
 
-  @Cron('0 48 1 * * 0')
+  @Cron('0 14 2 * * 0')
   async generateQrcodeForAllTicket(): Promise<void> {
     try {
       // Fetch all orders that are not yet processed

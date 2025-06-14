@@ -64,6 +64,8 @@ export class ShowingRepositoryImpl
         return Err(new Error('Showing startTime must be before endTime'));
       }
 
+      updateData.updatedAt = new Date();
+
       const updatedShowing = await this.updateAndFindOneById(id, updateData);
       if (!updatedShowing) {
         return Err(new Error('Failed to update showing'));

@@ -19,6 +19,7 @@ import { GetOrdersByShowingIdService } from "./modules/queries/getOrdersByShowin
 import { GetOrdersInShowingIdsService } from "./modules/queries/getOrdersInShowingIds/getOrdersInShowingIds.service";
 import { SubmitFormController } from "./modules/commands/submitForm/submitForm.controller";
 import { SubmitFormService } from "./modules/commands/submitForm/submitForm.service";
+import { TicketQueryService } from "./modules/queries/getTicketQuery/ticket-query.service";
 import { GenerateTicketService } from "./modules/commands/generateTicket/generateTicket.service";
 import { GenerateQrcodeService } from "./modules/commands/generateQrcode/generateQrcode.service";
 import { RecheckOrderMissedService } from "./modules/commands/recheckOrderMissed/recheckOrderMissed.service";
@@ -50,6 +51,7 @@ import { RecheckOrderMissedService } from "./modules/commands/recheckOrderMissed
     GetPaidOrdersByShowingIdService,
     GetOrdersByShowingIdService,
     GetOrdersInShowingIdsService,
+    TicketQueryService,
     GenerateTicketService,
     GenerateQrcodeService,
     RecheckOrderMissedService,
@@ -69,7 +71,7 @@ import { RecheckOrderMissedService } from "./modules/commands/recheckOrderMissed
     GetOrdersInShowingIdsService,
     GenerateTicketService,
     GenerateQrcodeService,
-    RecheckOrderMissedService,
+    RecheckOrderMissedService,, TicketQueryService
   ],
 })
 export class BookingSvcModule {}

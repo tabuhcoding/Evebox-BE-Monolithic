@@ -23,5 +23,24 @@ export class TicketRepositoryImpl
       },
     });
   }
-  // Thêm các phương thức riêng cho Ticket nếu cần
+   async countTicketsByTicketTypeIds(ticketTypeIds: string[]): Promise<Record<string, number>> {
+    const grouped = await this.prisma.ticket.groupBy({
+      by: ['ticketTypeId'],
+      where: {
+        ticketTypeId: { in: ticketTypeIds },
+      },
+      _count: {
+        ticketTypeId: true,
+      },
+    });
+
+    const result: Record<string, number> = {};
+    grouped.forEach(group => {
+      if (group.ticketTypeId) {
+        result[group.ticketTypeId] = group._count.ticketTypeId;
+      }
+    });
+
+    return result;
+  }
 }

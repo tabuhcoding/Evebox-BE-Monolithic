@@ -7,6 +7,7 @@ import { UpdateEventAdminDto } from '../../modules/event/commands/UpdateEventAdm
 import { EventOrgFrontDisplayDto } from '../../modules/event/queries/getEventOfOrg/getEventOfOrg-response.dto';
 import { EventOrgDetailResponseDto } from '../../modules/event/queries/getEventOfOrgDetail/getEventOfOrgDetail-response.dto';
 import { EventSummaryData } from '../../modules/event/queries/getEventSummary/getEventSummary-response.dto';
+import { EventRevenueData, OrganizerRevenueData } from '../../modules/statistics/queries/getOrgRevenue/getOrgRevenue-response.dto';
 
 export type Events = Prisma.EventsGetPayload<{
   include: {
@@ -51,6 +52,29 @@ export type EventsWithoutShowing = Prisma.EventsGetPayload<{
   };
 }>;
 
+export type EventWithShowingsAndTicketTypes = Prisma.EventsGetPayload<{
+  select: {
+    id: true;
+    title: true;
+    Showing: {
+      select: {
+        id: true;
+        startTime: true;
+        endTime: true;
+        TicketType: {
+          select: {
+            id: true;
+            name: true;
+            price: true;
+          };
+        };
+      };
+    };
+  };
+}>;
+
+
+
 export interface EventsRepository extends BaseRepository<Events, Prisma.EventsDelegate> {
   // Thêm các method riêng cho Events nếu cần, ví dụ:
   findManyByIdsWithDetails(ids: number[]): Promise<Events[]>;
@@ -83,4 +107,31 @@ export interface EventsRepository extends BaseRepository<Events, Prisma.EventsDe
   countOrdersByEvent(eventId: number): Promise<Result<number, Error>>;
   countBuyersByEvent(eventId: number): Promise<Result<number, Error>>;
   getStatistics(eventId: number): Promise<Result<any, Error>>;
+  findEventsByOrganizerEmail(email: string): Promise<Pick<Events, 'locationId' | 'venue'>[]>;
+  getRevenueEventsWithShowings(
+    from?: Date,
+    to?: Date,
+    search?: string
+  ): Promise<{
+    id: number;
+    title: string;
+    description: string;
+    organizerId: string;
+    orgName: string;
+    isApproved: boolean;
+    deleteAt: Date | null;
+    Showing: {
+      id: string;
+      startTime: Date;
+      endTime: Date;
+      TicketType: {
+        id: string;
+        name: string;
+        price: number;
+      }[];
+    }[];
+  }[]>;
+
+  findEventsByOrgIdWithShowings(orgId: string): Promise<EventWithShowingsAndTicketTypes[]>;
+  findEventById(eventId: number): Promise<{ id: number; title: string } | null>;
 }

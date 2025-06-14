@@ -24,7 +24,8 @@ export class RecheckOrderMissedService {
     const missedOrders = await this.orderRepository.findAll({
       status: BookingTicketStatus.PENDING || BookingTicketStatus.PAID,
       createdAt: {
-        lte: new Date(Date.now() - 3 * 60 * 60 * 1000), 
+        gte: new Date(Date.now() - 4 * 60 * 60 * 1000), 
+        lte: new Date(Date.now() - 30 * 60 * 1000),
       },
     })
 

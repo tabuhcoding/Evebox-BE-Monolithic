@@ -117,9 +117,27 @@ import { CalculateTicketTypeStatusService } from './modules/showing/command/calc
 import { SubmitFormResponseService } from './modules/formResponse/commands/submitForm/submitForm.service';
 import { SearchEventController } from './modules/event/queries/getEventsWithFilter/getEventsWithFilter.controller';
 import { SearchEventService } from './modules/event/queries/getEventsWithFilter/getEventsWithFilter.service';
+import { ProvinceRepositoryImpl } from './repository/province/province.impl';
+import { GetAllDistrictsController } from './modules/location/queries/getAllDistricts/getAllDistricts.controller';
+import { GetAllDistrictsService } from './modules/location/queries/getAllDistricts/getAllDistricts.service';
+import { GetAllLocationsService } from './modules/location/queries/getAllLocations/getAllLocation.service';
+import { GetAllLocationsController } from './modules/location/queries/getAllLocations/getAllLocation.controller';
+import { GetOrgLocationsController } from './modules/location/queries/getOrgLocations/getOrgLocations.controller';
+import { GetOrgLocationsService } from './modules/location/queries/getOrgLocations/getOrgLocations.service';
+import { GetOrgRevenueController } from './modules/statistics/queries/getOrgRevenue/getOrgRevenue.controller';
+import { GetOrgRevenueService } from './modules/statistics/queries/getOrgRevenue/getOrgRevenue.service';
+import { GetOrgRevenueByIdService } from './modules/statistics/queries/getOrgRevenueById/getOrgRevenueById.service';
+import { GetOrgRevenueByIdController } from './modules/statistics/queries/getOrgRevenueById/getOrgRevenueById.controller';
+import { GetEventRevenueDetailController } from './modules/statistics/queries/getEventRevenueDetail/getEventRevenueDetail.controller';
+import { GetEventRevenueDetailService } from './modules/statistics/queries/getEventRevenueDetail/getEventRevenueDetail.service';
+import { GetSummaryTicketRevenueController } from './modules/statistics/queries/getSummaryTicketRevenue/getSummaryTicketRevenue.controller';
+import { GetSummaryTicketRevenueService } from './modules/statistics/queries/getSummaryTicketRevenue/getSummaryTicketRevenue.service';
 
 @Module({
-  imports: [ BookingSvcModule, AuthSvcModule, CqrsModule ],
+  imports: [ 
+    BookingSvcModule, 
+    AuthSvcModule, 
+    CqrsModule ],
   controllers: [
     // Categories
     GetAllCategoriesController,
@@ -174,9 +192,17 @@ import { SearchEventService } from './modules/event/queries/getEventsWithFilter/
     GetEventsByAdminController,
     GetEventSpecialManagementController,
     GetEventMemberController,
+    GetEventMemberController,
     GetShowingAdminDetailController,
     GetShowingsByAdminController,
-    GetTicketDetailOfShowingController
+    GetTicketDetailOfShowingController,
+    GetAllDistrictsController,
+    GetAllLocationsController,
+    GetOrgLocationsController,
+    GetOrgRevenueController,
+    GetOrgRevenueByIdController,
+    GetEventRevenueDetailController,
+    GetSummaryTicketRevenueController
   ],
   providers: [
     // Adapters
@@ -260,6 +286,16 @@ import { SearchEventService } from './modules/event/queries/getEventsWithFilter/
     GetShowingAdminDetailService,
     GetShowingsByAdminService,
     GetTicketDetailOfShowingService,
+    
+    //Location
+    GetAllDistrictsService,
+    GetAllLocationsService,
+    GetOrgLocationsService,
+
+    GetOrgRevenueService,
+    GetOrgRevenueByIdService,
+    GetEventRevenueDetailService,
+    GetSummaryTicketRevenueService,
 
     // Repositories
     { provide: 'AdminRepository', useClass: AdminRepositoryImpl },
@@ -281,6 +317,7 @@ import { SearchEventService } from './modules/event/queries/getEventsWithFilter/
     { provide: 'FormResponseRepository', useClass: FormResponseRepositoryImpl },
     { provide: 'FormAnswerRepository', useClass: FormAnswerRepositoryImpl },
     { provide: 'FormInputRepository', useClass: FormInputRepositoryImpl },
+    { provide: 'ProvinceRepository', useClass: ProvinceRepositoryImpl },
   ],
   exports: [
     GetAllEventDetailForRAGService, 

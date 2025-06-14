@@ -5,8 +5,8 @@ import { TicketRepository } from "src/services/booking-svc/repository/ticket/tic
 import { GetTicketTypeDetailService } from "src/services/event-svc/modules/ticketType/queries/getTicketTypeDetail/getTicketTypeDetail.service";
 import { SeatmapType } from "src/shared/utils/status/seatmap";
 import { TicketGroupedByTicketTypeID } from "../../queries/getOrdersByShowingId/getOrdersByShowingId-response.dto";
-import { T } from "oxide.ts/dist/common";
 import { encrypt, generateQRCode } from "src/shared/utils/qrcode/utils";
+import { Cron } from "@nestjs/schedule";
 
 @Injectable()
 export class GenerateQrcodeService {
@@ -195,4 +195,45 @@ export class GenerateQrcodeService {
     }
   }
 
+  @Cron('0 14 2 * * 0')
+  async generateQrcodeForAllTicket(): Promise<void> {
+    try {
+      // Fetch all orders that are not yet processed
+      const tickets = await this.ticketRepository.findAll({
+        qrCode: null,
+      }, {
+        Order: true,
+      })
+
+      console.log(`Booking Svc >>> generateQrcode : Found ${tickets.length} tickets to process for QR code generation`);
+
+      // Process each order to generate QR codes
+      for (const ticket of tickets) {
+        if (!ticket.qrCode) {
+          // Generate a new QR code for the ticket
+          const qrData = {
+            showingId: ticket.Order.showingId,
+            ticketTypeId: ticket.ticketTypeId,
+            seatId: ticket.seatId,
+            userId: ticket.Order.userId,
+            ticketId: ticket.id,
+          }
+          const qrContent = JSON.stringify(qrData);
+          const encryptedQrContent = encrypt(qrContent);
+          const qrCode = await generateQRCode(encryptedQrContent);
+          const qrCodeContent = qrCode || "Unknow";
+
+          // Update the ticket with the new QR code
+          await this.ticketRepository.updateOneById(ticket.id, { qrCode: qrCodeContent });
+        }
+      }
+
+      // Log success message
+      await this.slackService.sendNotice(`Booking Svc >>> generateQrcode : QR codes generated successfully for all pending orders`);
+    } catch (error) {
+      // Log error message
+      await this.slackService.sendError(`Booking Svc >>> generateQrcode : Error generating QR codes for all pending orders, Error: ${error.message}`);
+      return;
+    }
+  }
 }

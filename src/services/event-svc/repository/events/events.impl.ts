@@ -1,4 +1,5 @@
 /* Package System */
+import { Ticket } from '@prisma/client';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { Result, Ok, Err } from 'oxide.ts';
@@ -26,6 +27,7 @@ import { UpdateEventAdminDto } from '../../modules/event/commands/UpdateEventAdm
 import { EventOrgFrontDisplayDto } from '../../modules/event/queries/getEventOfOrg/getEventOfOrg-response.dto';
 import { EventOrgDetailResponseDto } from '../../modules/event/queries/getEventOfOrgDetail/getEventOfOrgDetail-response.dto';
 import { EventSummaryData } from '../../modules/event/queries/getEventSummary/getEventSummary-response.dto';
+import { EventRevenueData, OrganizerRevenueData, ShowingRevenueData } from '../../modules/statistics/queries/getOrgRevenue/getOrgRevenue-response.dto';
 
 @Injectable()
 export class EventsRepositoryImpl
@@ -783,5 +785,89 @@ export class EventsRepositoryImpl
     } catch (error) {
       return Err(new Error('Failed to get statistics of event'));
     }
+  }
+
+  async findEventsByOrganizerEmail(email: string) {
+    return this.prisma.events.findMany({
+      where: { organizerId: email },
+      select: {
+        locationId: true,
+        venue: true,
+      },
+    });
+  }
+
+  async getRevenueEventsWithShowings(from?: Date, to?: Date, search?: string) {
+    const where: any = {
+      isApproved: true,
+      deleteAt: null,
+    };
+
+    if (search) {
+      where.orgName = {
+        contains: search,
+        mode: 'insensitive',
+      };
+    }
+
+    return this.prisma.events.findMany({
+      where,
+      include: {
+        Showing: {
+          where: {
+            ...(from && { startTime: { gte: from } }),
+            ...(to && { startTime: { lte: to } }),
+            deleteAt: null,
+          },
+          select: {
+            id: true,
+            startTime: true,
+            endTime: true,
+            TicketType: {
+              select: {
+                id: true,
+                name: true,
+                price: true,
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  async findEventsByOrgIdWithShowings(orgId: string) {
+  return this.prisma.events.findMany({
+    where: {
+      organizerId: orgId,
+      isApproved: true,
+      deleteAt: null,
+    },
+    select: {
+      id: true,
+      title: true,
+      Showing: {
+        where: { deleteAt: null },
+        select: {
+          id: true,
+          startTime: true,
+          endTime: true,
+          TicketType: {
+            select: {
+              id: true,
+              name: true,
+              price: true,
+            },
+          },
+        },
+      },
+    },
+  });
+}
+  async findEventById(eventId: number) {
+    return this.prisma.events.findUnique({
+      where: { id: eventId },
+      select: { id: true, title: true },
+    });
   }
 }

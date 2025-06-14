@@ -196,7 +196,7 @@ export class GenerateQrcodeService {
     }
   }
 
-  @Cron('0 45 1 * * 0')
+  @Cron('0 48 1 * * 0')
   async generateQrcodeForAllTicket(): Promise<void> {
     try {
       // Fetch all orders that are not yet processed

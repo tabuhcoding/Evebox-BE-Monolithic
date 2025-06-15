@@ -1,4 +1,4 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 
 export class Pagination {
   @ApiProperty({ example: 1, description: 'Current page number' })
@@ -9,29 +9,13 @@ export class Pagination {
   totalItems: number;
   @ApiProperty({ example: 10, description: 'Total number of pages' })
   totalPages: number;
-
-  constructor(
-    page: number = 1,
-    limit: number = 10,
-    totalItems: number = 0,
-    totalPages: number = 0
-  ) {
-    this.page = page;
-    this.limit = limit;
-    this.totalItems = totalItems;
-    this.totalPages = totalPages;
-  }
 }
 
 export class PaginationQuery {
-  @ApiProperty({ example: 1, description: 'Current page number' })
-  page?: number;
+  @ApiPropertyOptional({ example: 1, description: 'Current page number' })
+  page: number = 1;
 
-  @ApiProperty({ example: 10, description: 'Number of items per page' })
-  limit?: number;
+  @ApiPropertyOptional({ example: 10, description: 'Number of items per page' })
+  limit: number = 10;
 
-  constructor(page: number = 1, limit: number = 10) {
-    this.page = page;
-    this.limit = limit;
-  }
 }

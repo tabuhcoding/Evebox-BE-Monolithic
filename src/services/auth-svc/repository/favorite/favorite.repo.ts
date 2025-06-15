@@ -27,7 +27,7 @@ export interface FavoriteRepository
 
   getFavoriteEventIds(userId: string, pagination: PaginationQuery): Promise<[number[], Pagination]>;
 
-  getFavoriteOrgs(userId: string): Promise<{ orgId: string }[]>;
+  getFavoriteOrgs(userId: string, pagination: PaginationQuery): Promise<[{ orgId: string }[], Pagination]>;
   updateIsNotified(id: string, isNotified: boolean): Promise<void>;
   getUserIdsNotifiedByEvent(eventId: number): Promise<{ userId: string }[]>;
   getUserIdsNotifiedByOrganizer(orgId: string): Promise<{ userId: string }[]>;

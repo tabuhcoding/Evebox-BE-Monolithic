@@ -5,6 +5,7 @@ import { Email } from 'src/services/auth-svc/modules/user/domain/value-objects/u
 import { FavoriteRepository } from 'src/services/auth-svc/repository/favorite/favorite.repo';
 import { UserRepositoryImpl } from 'src/services/auth-svc/repository/users/user.repository.impl';
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
+import { Pagination, PaginationQuery } from 'src/shared/constants/pagination';
 
 @Injectable()
 export class GetFavoriteOrgService {
@@ -14,7 +15,7 @@ export class GetFavoriteOrgService {
     private readonly slackService: SlackService
   ) {}
 
-  async execute(emailStr: string): Promise<Result<{ orgId: string }[], Error>> {
+  async execute(emailStr: string, pagination: PaginationQuery): Promise<Result<[{ orgId: string }[], Pagination], Error>> {
     const emailOrError = Email.create(emailStr);
     if (emailOrError.isErr()) {
       return Err(new Error('Invalid email format'));
@@ -27,7 +28,7 @@ export class GetFavoriteOrgService {
     }
 
     try {
-      const orgs = await this.favoriteRepository.getFavoriteOrgs(email.value);
+      const orgs = await this.favoriteRepository.getFavoriteOrgs(email.value, pagination);
       return Ok(orgs);
     } catch (error) {
       await this.slackService.sendError(` Auth Svc - User >>> GetFavoriteOrg: ${error}`);

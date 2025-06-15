@@ -16,21 +16,18 @@ export class GetFavoriteEventController {
   @UseGuards(JwtAuthGuard)
   @Get('favorite/event')
   @ApiBearerAuth('access-token')
-  @ApiQuery({
-    name: 'pagination',
-    type: PaginationQuery,
-    required: false,
-    description: 'Pagination parameters for the request',
-  })
   @ApiOperation({ summary: 'Get all favorited events' })
   @ApiResponse({ status: 200, type: GetFavoriteEventResponse })
   async getFavoriteEvent(
     @Req() req: any, 
     @Res() res: Response,
-    @Query('pagination') pagination: PaginationQuery = new PaginationQuery(1, 10)
+    @Query() pagination: PaginationQuery
   ) {
     const email = req.user.email;
-    const result = await this.getFavoriteEventService.execute(email, pagination);
+    const result = await this.getFavoriteEventService.execute(email, {
+      page: pagination.page >> 0 || 1,
+      limit: pagination.limit >> 0 || 10,
+    });
 
     if (result.isOk()) {
       return res.status(HttpStatus.OK).json({

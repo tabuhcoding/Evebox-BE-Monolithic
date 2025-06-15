@@ -26,9 +26,10 @@ export class UnfavoriteEventService {
     }
 
     const favorite = await this.favoriteRepository.findFavorite(
-      user.id.value,
+      email.value,
       'EVENT',
-      eventId.toString()
+      null,
+      eventId,
     );
 
     if (!favorite || !favorite.isFavorite) {

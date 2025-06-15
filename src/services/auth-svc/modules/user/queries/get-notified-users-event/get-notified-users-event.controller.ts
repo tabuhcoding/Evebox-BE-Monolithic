@@ -1,9 +1,10 @@
-import { Controller, Get, Param, HttpStatus, Res, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, HttpStatus, Res, UseGuards, Query } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiResponse, ApiOperation } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/shared/guard/jwt-auth.guard';
 import { Response } from 'express';
 import { GetUsersNotifiedByEventService } from './get-notified-users-event.service';
 import { GetNotifiedUsersResponse } from './get-notified-users-event.dto';
+import { PaginationQuery } from 'src/shared/constants/pagination';
 
 @ApiTags('Auth Service - User')
 @Controller('api/user')
@@ -15,13 +16,22 @@ export class GetUsersNotifiedByEventController {
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Get users who turned on notifications for an event' })
   @ApiResponse({ status: 200, type: GetNotifiedUsersResponse })
-  async getNotifiedUsers(@Param('eventId') eventId: string, @Res() res: Response) {
+  async getNotifiedUsers(
+    @Param('eventId') eventId: string, 
+    @Res() res: Response,
+    @Query() paginationQuery: PaginationQuery
+  ) {
     const parsedId = parseInt(eventId);
     if (isNaN(parsedId)) {
       return res.status(HttpStatus.BAD_REQUEST).json({ message: 'Invalid event ID' });
     }
 
-    const result = await this.getUsersNotifiedService.execute(parsedId);
+    const result = await this.getUsersNotifiedService.execute(parsedId,
+      {
+        page: paginationQuery.page >> 0 || 1,
+        limit: paginationQuery.limit >> 0 || 10,
+      }
+    );
 
     if (result.isErr()) {
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({

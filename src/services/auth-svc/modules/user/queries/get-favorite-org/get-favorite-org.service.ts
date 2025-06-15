@@ -27,7 +27,7 @@ export class GetFavoriteOrgService {
     }
 
     try {
-      const orgs = await this.favoriteRepository.getFavoriteOrgs(user.id.value);
+      const orgs = await this.favoriteRepository.getFavoriteOrgs(email.value);
       return Ok(orgs);
     } catch (error) {
       await this.slackService.sendError(` Auth Svc - User >>> GetFavoriteOrg: ${error}`);

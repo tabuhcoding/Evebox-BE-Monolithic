@@ -7,6 +7,7 @@ import { GetEventsByIdsService } from 'src/services/event-svc/modules/event/quer
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 import { GetEventDetailDto } from 'src/services/event-svc/modules/event/queries/getEventsById/GetEventsByIds.dto';
 import { Pagination, PaginationQuery } from 'src/shared/constants/pagination';
+import { FavoriteEventResponseData } from './get-favorite-event.dto';
 
 @Injectable()
 export class GetFavoriteEventService {
@@ -17,7 +18,7 @@ constructor(
     private readonly slackService: SlackService,
   ) {}
   
- async execute(email: string, pagination: PaginationQuery): Promise<Result<[GetEventDetailDto[], Pagination], Error>> {
+ async execute(email: string, pagination: PaginationQuery): Promise<Result<[FavoriteEventResponseData[], Pagination], Error>> {
     const emailOrError = Email.create(email);
     if (emailOrError.isErr()) {
       return Err(new Error('Invalid email format'));
@@ -30,7 +31,7 @@ constructor(
     if (!eventIds.length) return Ok([[], new Pagination()]);
 
     try {
-      const events = await this.getEventsByIdsService.getEventsByIds(eventIds);
+      const events = await this.getEventsByIdsService.getFavEventsByIds(eventIds);
       return Ok([events, paginationResponse]);
     } catch (error) {
       await this.slackService.sendError(` Auth Svc - User >>> GetFavoriteEvent: ${error}`);

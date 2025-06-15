@@ -24,7 +24,7 @@ constructor(
     const user = await this.userRepository.findByEmail(emailStr);
     if (!user) return Err(new Error('User not found'));
 
-    const eventIds = await this.favoriteRepository.getFavoriteEventIds(user.id.value);
+    const eventIds = await this.favoriteRepository.getFavoriteEventIds(emailStr.value);
     if (!eventIds.length) return Ok([]);
 
     try {

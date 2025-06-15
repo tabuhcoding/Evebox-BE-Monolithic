@@ -19,7 +19,7 @@ export class CalculateTicketTypeStatusService {
     // Get all showings
     const showings = await this.showingRepository.findAll({
       deleteAt: null,
-      isAproved: true,
+      isApproved: true,
       endTime:{
         // Endtime should be greater than or equal to the month ago since now
         gte: new Date(new Date().setMonth(new Date().getMonth() - 1)),

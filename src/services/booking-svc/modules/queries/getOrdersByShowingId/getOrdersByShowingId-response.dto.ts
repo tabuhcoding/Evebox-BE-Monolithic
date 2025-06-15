@@ -4,6 +4,7 @@ import { BaseResponse } from 'src/shared/constants/baseResponse';
 import { BookingTicketStatus, BookingTicketType } from 'src/services/booking-svc/repository/order/order.repo';
 import { PaymentMethod } from 'src/services/payment-svc/repository/paymentMethodStatus/paymentMethodStatus.repo';
 import { TicketWithTicketTypeDto } from '../getUserOrder/getUserOrder-response.dto';
+import { Pagination } from 'src/shared/constants/pagination';
 
 
 class FormInput {
@@ -100,4 +101,7 @@ export class OrderData {
 export class GetOrdersResponse extends BaseResponse {
   @ApiProperty({ type: [OrderData], description: 'List of all tickets/orders of the showing' })
   data: OrderData[];
+
+  @ApiProperty({ type: Pagination, description: 'Pagination information' })
+  pagination?: Pagination;
 }

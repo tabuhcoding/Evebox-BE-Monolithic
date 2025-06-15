@@ -33,7 +33,8 @@ export class GetFavoriteEventController {
       return res.status(HttpStatus.OK).json({
         statusCode: 200,
         message: 'Get favorite events successfully',
-        data: result.unwrap(),
+        data: result.unwrap()[0],
+        pagination: result.unwrap()[1],
       });
     }
 

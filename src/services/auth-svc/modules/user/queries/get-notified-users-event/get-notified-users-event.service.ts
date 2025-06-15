@@ -15,8 +15,7 @@ export class GetUsersNotifiedByEventService {
   async execute(eventId: number): Promise<Result<{ email: string }[], Error>> {
     try {
       const userIds = await this.favoriteRepository.getUserIdsNotifiedByEvent(eventId);
-      const emails = await this.userRepository.getEmailsByIds(userIds.map((u) => u.userId));
-      return Ok(emails.map((e) => ({ email: e })));
+      return Ok(userIds.map(user => ({ email: user.userId })));
     } catch (error) {
       await this.slackService.sendError(` Auth Svc - User >>> GetUsersNotifiedByEvent: ${error}`);
       

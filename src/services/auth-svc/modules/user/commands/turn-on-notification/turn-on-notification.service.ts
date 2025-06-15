@@ -27,15 +27,13 @@ export class TurnOnNotificationService {
           return Err(new Error('User not found'));
         }
     
-    const userId: UserId = user.id;
-
-    const receiveNoti = await this.userRepository.getReceiveNotiByUserId(userId.value);
+    const receiveNoti = await this.userRepository.getReceiveNotiByUserId(email.value);
     if (!receiveNoti) return Err(new Error('You must enable notifications in your profile.'));
     let existing;
 
     if (dto.itemType == 'EVENT'){
       existing = await this.favoriteRepository.findFavorite(
-        userId.value,
+        email.value,
         dto.itemType,
         undefined,
         parseInt(dto.itemId),
@@ -43,7 +41,7 @@ export class TurnOnNotificationService {
     }
     else{
        existing = await this.favoriteRepository.findFavorite(
-        userId.value,
+        email.value,
         dto.itemType,
         dto.itemId,
         undefined,

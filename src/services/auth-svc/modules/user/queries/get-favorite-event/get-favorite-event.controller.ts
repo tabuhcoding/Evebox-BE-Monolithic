@@ -1,9 +1,10 @@
-import { Controller, Get, Req, Res, UseGuards, HttpStatus } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Controller, Get, Req, Res, UseGuards, HttpStatus, Query } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/shared/guard/jwt-auth.guard';
 import { GetFavoriteEventService } from './get-favorite-event.service';
 import { GetFavoriteEventResponse } from './get-favorite-event.dto';
 import { Response } from 'express';
+import { PaginationQuery } from 'src/shared/constants/pagination';
 
 @ApiTags('Auth Service - User')
 @Controller('api/user')
@@ -17,9 +18,16 @@ export class GetFavoriteEventController {
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Get all favorited events' })
   @ApiResponse({ status: 200, type: GetFavoriteEventResponse })
-  async getFavoriteEvent(@Req() req: any, @Res() res: Response) {
+  async getFavoriteEvent(
+    @Req() req: any, 
+    @Res() res: Response,
+    @Query() pagination: PaginationQuery
+  ) {
     const email = req.user.email;
-    const result = await this.getFavoriteEventService.execute(email);
+    const result = await this.getFavoriteEventService.execute(email, {
+      page: pagination.page >> 0 || 1,
+      limit: pagination.limit >> 0 || 10,
+    });
 
     if (result.isOk()) {
       return res.status(HttpStatus.OK).json({

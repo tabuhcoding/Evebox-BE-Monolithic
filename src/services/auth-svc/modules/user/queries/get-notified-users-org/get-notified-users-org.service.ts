@@ -12,11 +12,10 @@ export class GetUsersNotifiedByOrgService {
       private readonly slackService: SlackService,
   ) {}
 
-  async execute(orgId: string): Promise<Result<{ email: string }[], Error>> {
+  async execute(orgId: string): Promise<Result<{ userId: string }[], Error>> {
     try {
       const userIds = await this.favoriteRepository.getUserIdsNotifiedByOrganizer(orgId);
-      const emails = await this.userRepository.getEmailsByIds(userIds.map(u => u.userId));
-      return Ok(emails.map(email => ({ email })));
+      return Ok(userIds);
     } catch (error) {
       await this.slackService.sendError(` Auth Svc - User >>> GetFavoriteEvent: ${error}`);
       

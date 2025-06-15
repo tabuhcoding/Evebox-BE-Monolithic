@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Pagination } from 'src/shared/constants/pagination';
 
 class EventImage {
   @ApiProperty({ example: 1 })
@@ -37,4 +38,7 @@ export class GetFavoriteEventResponse {
 
   @ApiProperty({ type: [FavoriteEventResponseData] })
   data: FavoriteEventResponseData[];
+
+  @ApiProperty({ type: Pagination ,description: 'pagination' })
+  pagination: Pagination;
 }

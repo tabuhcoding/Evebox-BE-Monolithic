@@ -25,7 +25,7 @@ export class TurnOffNotificationServiceForEvent {
     if (isNaN(eventId)) return Err(new Error('Invalid event ID'));
 
     const existing = await this.favoriteRepository.findFavorite(
-        user.id.value,
+        user.email.value,
         'EVENT',
         undefined,
         eventId,

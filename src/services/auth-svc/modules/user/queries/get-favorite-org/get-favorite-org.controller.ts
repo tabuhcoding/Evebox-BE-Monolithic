@@ -1,9 +1,10 @@
 import { GetFavoriteOrgService } from './get-favorite-org.service';
 import { GetFavoriteOrgResponse } from './get-favorite-org.response';
-import { Controller, Get, HttpStatus, Req, Res, UseGuards } from '@nestjs/common';
+import { Controller, Get, HttpStatus, Query, Req, Res, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/shared/guard/jwt-auth.guard';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
+import { PaginationQuery } from 'src/shared/constants/pagination';
 
 @ApiTags('Auth Service - User')
 @Controller('api/user')
@@ -17,9 +18,18 @@ export class GetFavoriteOrgController {
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Get all favorited organizer IDs' })
   @ApiResponse({ status: 200, type: GetFavoriteOrgResponse })
-  async getFavoriteOrg(@Req() req: any, @Res() res: Response) {
+  async getFavoriteOrg(
+    @Req() req: any, 
+    @Res() res: Response,
+    @Query() pagination: PaginationQuery
+  ) {
     const email = req.user.email;
-    const result = await this.getFavoriteOrgService.execute(email);
+    const result = await this.getFavoriteOrgService.execute(email,
+      {
+        page: pagination.page >> 0 || 1,
+        limit: pagination.limit >> 0 || 10,
+      }
+    );
 
     if (result.isOk()) {
       return res.status(HttpStatus.OK).json({

@@ -3,6 +3,7 @@ import { Prisma } from "@prisma/client";
 
 import { OrderData } from "../../modules/queries/getOrdersByShowingId/getOrdersByShowingId-response.dto";
 import { Result } from "oxide.ts";
+import { Pagination, PaginationQuery } from "src/shared/constants/pagination";
 
 export type Order = Prisma.OrderGetPayload<{
   include: {
@@ -14,5 +15,5 @@ export { BookingTicketStatus, BookingTicketType } from "@prisma/client"
 
 export interface OrderRepository extends BaseRepository<Order, Prisma.OrderDelegate> {
   // Thêm các method riêng cho Order nếu cần
-  getOrders(showingId: string): Promise<Result<OrderData[], Error>>;
+  getOrders(showingId: string, paginationQuery: PaginationQuery): Promise<Result<[OrderData[], Pagination], Error>>;
 }

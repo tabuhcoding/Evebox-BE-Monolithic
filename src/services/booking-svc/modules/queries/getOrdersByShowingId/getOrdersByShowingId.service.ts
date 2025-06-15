@@ -8,6 +8,7 @@ import { getShowingDetailService } from "src/services/event-svc/modules/showing/
 import { CheckUserExistService } from "src/services/auth-svc/modules/user/commands/checkuserExist/checkuserExist.service";
 import { CheckUserPermissionService } from "src/services/event-svc/modules/event/commands/checkUserPermission/checkUserPermission.service";
 import { EVENT_ROLE } from "src/services/event-svc/modules/event/domain/eventRole";
+import { Pagination, PaginationQuery } from "src/shared/constants/pagination";
 
 @Injectable()
 export class GetOrdersByShowingIdService {
@@ -19,7 +20,7 @@ export class GetOrdersByShowingIdService {
     private readonly checkUserPermissionService: CheckUserPermissionService,
   ) {}
 
-  async execute(showingId: string, organizerId: string): Promise<Result<OrderData[], Error>> {
+  async execute(showingId: string, organizerId: string, paginationQuery: PaginationQuery): Promise<Result<[OrderData[], Pagination], Error>> {
     try {
       const showing = await this.getShowingDetailService.executeSimple(showingId);
       if (showing.isErr()) {
@@ -40,7 +41,7 @@ export class GetOrdersByShowingIdService {
         return Err(new Error('You do not have permisison to get orders of showing'));
       }
 
-      const result = await this.orderRepository.getOrders(showingId);
+      const result = await this.orderRepository.getOrders(showingId, paginationQuery);
       if (result.isErr()) {
         return Err(new Error(result.unwrapErr().message));
       }

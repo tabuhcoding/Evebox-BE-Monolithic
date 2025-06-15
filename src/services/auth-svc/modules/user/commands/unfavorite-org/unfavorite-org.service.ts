@@ -26,7 +26,7 @@ export class UnfavoriteOrgService {
     }
 
     const favorite = await this.favoriteRepository.findFavorite(
-      user.id.value,
+      email.value,
       'ORG', // assuming 2 = organization itemType
       orgId
     );

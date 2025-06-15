@@ -1,6 +1,7 @@
 import { FavoriteNotiHistory, ItemType} from '@prisma/client';
 import { BaseRepository } from "src/shared/repo/base.repository";
 import { Prisma } from "@prisma/client";
+import { Pagination, PaginationQuery } from 'src/shared/constants/pagination';
 
 export { FavoriteNotiHistory }
 
@@ -24,7 +25,7 @@ export interface FavoriteRepository
     eventId?: number,
   ): Promise<void>;
 
-  getFavoriteEventIds(userId: string): Promise<number[]>;
+  getFavoriteEventIds(userId: string, pagination: PaginationQuery): Promise<[number[], Pagination]>;
 
   getFavoriteOrgs(userId: string): Promise<{ orgId: string }[]>;
   updateIsNotified(id: string, isNotified: boolean): Promise<void>;

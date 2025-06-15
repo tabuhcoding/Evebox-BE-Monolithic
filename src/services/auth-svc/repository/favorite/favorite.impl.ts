@@ -3,6 +3,7 @@ import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service
 import { BaseRepository } from 'src/shared/repo/base.repository';
 import { FavoriteNotiHistory, ItemType, Prisma } from '@prisma/client';
 import { FavoriteRepository } from './favorite.repo';
+import { Pagination, PaginationQuery } from 'src/shared/constants/pagination';
 
 @Injectable()
 export class FavoriteRepositoryImpl 
@@ -53,20 +54,46 @@ implements FavoriteRepository {
     });
   }
 
-  async getFavoriteEventIds(userId: string): Promise<number[]> {
-  const records = await this.prisma.favoriteNotiHistory.findMany({
-    where: {
-      userId,
-      isFavorite: true,
-      itemType: 'EVENT',
-    },
-    select: {
-      eventId: true,
-    },
-  });
+  async getFavoriteEventIds(
+    userId: string,
+    paginationQuery: PaginationQuery
+  ): Promise<[number[], Pagination]> {
+    const page = paginationQuery.page ?? 1;
+    const limit = paginationQuery.limit ?? 10;
+    const skip = (page - 1) * limit;
 
-  return records.map(r => r.eventId!).filter(id => id !== null);
-}
+    // Lấy tổng số bản ghi thỏa mãn điều kiện
+    const totalItems = await this.prisma.favoriteNotiHistory.count({
+      where: {
+        userId,
+        isFavorite: true,
+        itemType: 'EVENT',
+      },
+    });
+
+    // Tính tổng số trang
+    const totalPages = Math.ceil(totalItems / limit);
+
+    // Lấy bản ghi theo phân trang
+    const records = await this.prisma.favoriteNotiHistory.findMany({
+      where: {
+        userId,
+        isFavorite: true,
+        itemType: 'EVENT',
+      },
+      select: {
+        eventId: true,
+      },
+      skip,
+      take: limit,
+    });
+
+    const eventIds = records.map(r => r.eventId!).filter(id => id !== null);
+
+    const pagination = new Pagination(page, limit, totalItems, totalPages);
+    return [eventIds, pagination];
+  }
+
 
 async getFavoriteOrgs(userId: string): Promise<{ orgId: string }[]> {
   return this.prisma.favoriteNotiHistory.findMany({

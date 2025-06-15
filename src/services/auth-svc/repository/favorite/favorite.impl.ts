@@ -152,50 +152,18 @@ async getFavoriteOrgs(userId: string, pagination: PaginationQuery): Promise<[{ o
     });
   }
 
-  async getUserIdsNotifiedByEvent(eventId: number, paginationQuery: PaginationQuery): Promise<[{ userId: string }[], Pagination]> {
-    const page = paginationQuery.page ?? 1;
-    const limit = paginationQuery.limit ?? 10;
-    const skip = (page - 1) * limit;
-
-    // Lấy tổng số bản ghi thoa
-    const totalItems = await this.prisma.favoriteNotiHistory.count({
-      where: {
-        itemType: 'EVENT',
-        eventId,
-        isNotified: true,
-        isFavorite: true,
-      },
-    });
-
-    // Tính tổng số trang
-    const totalPages = Math.ceil(totalItems / limit);
-    // Lấy bản ghi theo phân trang
-    const records = await this.prisma.favoriteNotiHistory.findMany({
-      where: {
-        itemType: 'EVENT',
-        eventId,
-        isNotified: true,
-        isFavorite: true,
-      },
-      select: {
-        userId: true,
-      },
-      skip,
-      take: limit,
-      orderBy: {
-        id: 'desc', 
-      }
-    });
-
-    const userIds = records.map(r => ({ userId: r.userId! })).filter(user => user.userId !== null);
-    const pagination: Pagination = {
-      page,
-      limit,
-      totalItems,
-      totalPages,
-    };
-
-    return [userIds, pagination];
+  async getUserIdsNotifiedByEvent(eventId: number): Promise<{ userId: string }[]> {
+  return this.prisma.favoriteNotiHistory.findMany({
+    where: {
+      itemType: 'EVENT',
+      eventId,
+      isNotified: true,
+      isFavorite: true,
+    },
+    select: {
+      userId: true,
+    },
+  });
   }
 
   async getUserIdsNotifiedByOrganizer(orgId: string): Promise<{ userId: string }[]> {

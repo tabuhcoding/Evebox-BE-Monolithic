@@ -24,7 +24,7 @@ export class TurnOffNotificationServiceForOrg {
      if (!ordId) return Err(new Error('Invalid org ID'));
  
      const existing = await this.favoriteRepository.findFavorite(
-         user.id.value,
+         user.email.value,
          'ORG',
          ordId,
          undefined,

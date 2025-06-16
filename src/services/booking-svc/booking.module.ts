@@ -25,6 +25,8 @@ import { GenerateQrcodeService } from "./modules/commands/generateQrcode/generat
 import { RecheckOrderMissedService } from "./modules/commands/recheckOrderMissed/recheckOrderMissed.service";
 import { GetUserOrderController } from "./modules/queries/getUserOrder/getUserOrder.controller";
 import { GetUserOrderService } from "./modules/queries/getUserOrder/getUserOrder.service";
+import { GetTicketQrCodeController } from "./modules/queries/getTicketQrCode/getTicketQrCode.controller";
+import { GetTicketQrCodeService } from "./modules/queries/getTicketQrCode/getTicketQrCode.service";
 
 @Module({
   imports: [ 
@@ -39,6 +41,7 @@ import { GetUserOrderService } from "./modules/queries/getUserOrder/getUserOrder
     GetOrdersByShowingIdController,
     SubmitFormController,
     GetUserOrderController,
+    GetTicketQrCodeController,
   ],
   providers: [
     // Services
@@ -59,6 +62,7 @@ import { GetUserOrderService } from "./modules/queries/getUserOrder/getUserOrder
     GenerateQrcodeService,
     RecheckOrderMissedService,
     GetUserOrderService,
+    GetTicketQrCodeService,
 
     SubmitFormService,
 

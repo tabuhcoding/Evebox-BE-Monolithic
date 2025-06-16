@@ -146,7 +146,7 @@ export class GenerateQrcodeService {
         // Check if any seat in the order has a QR code already
         const seatHasQRCode = await this.ticketRepository.findAll(
           {
-            showingId: order.showingId,
+            Order: { showingId: order.showingId },
             seatId: { in: seatIDs },
             qrCode: { $ne: null }
           }
@@ -195,7 +195,7 @@ export class GenerateQrcodeService {
     }
   }
 
-  @Cron('0 14 2 * * 0')
+  // @Cron('0 14 2 * * 0')
   async generateQrcodeForAllTicket(): Promise<void> {
     try {
       // Fetch all orders that are not yet processed
@@ -204,8 +204,6 @@ export class GenerateQrcodeService {
       }, {
         Order: true,
       })
-
-      console.log(`Booking Svc >>> generateQrcode : Found ${tickets.length} tickets to process for QR code generation`);
 
       // Process each order to generate QR codes
       for (const ticket of tickets) {

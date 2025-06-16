@@ -1,6 +1,5 @@
 import { BaseRepository } from "src/shared/repo/base.repository";
 import { Prisma, SeatStatusEnum } from "@prisma/client";
-import { from } from "rxjs";
 
 export type SeatStatus = Prisma.SeatStatusGetPayload<{
   include: {

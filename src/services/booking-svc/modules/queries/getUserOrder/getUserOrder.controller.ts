@@ -79,4 +79,31 @@ export class GetUserOrderController {
       data,
     });
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/getOrderByOriginalId')
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Get order by orderId' })
+  @ApiQuery({ name: 'orderId', required: true, type: String, description: 'The ID of the order to retrieve' })
+  async getOrderByOriginalId(
+    @Query('orderId') orderId: string,
+    @Res() res: Response,
+    @Request() req
+  ) {
+    const email = req.user.email;
+    
+    const result = await this.getUserOrderService.executeByOriginalOrderId(parseInt(orderId), email);
+    if (result.isErr()) {
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json(ErrorHandler.internalServerError(result.unwrapErr().message));
+    }
+
+    const data = result.unwrap();
+    return res.status(HttpStatus.OK).json({
+      statusCode: HttpStatus.OK,
+      message: 'Order data retrieved successfully',
+      data,
+    });
+  }
 }

@@ -193,6 +193,90 @@ export class GetUserTicketService {
     }
   }
 
+  async executeByOriginalOrderId(originalOrderId: number, email: string): Promise<Result<UserOrderDto, Error>> {
+    try {
+
+      const order = await this.orderRepository.findOneById(originalOrderId, {
+        Ticket: true,
+      });
+
+      if (!order) {
+        return Err(new Error('Order not found'));
+      }
+
+      if (order.userId !== email) {
+        return Err(new Error('Unauthorized access to this order'));
+      }
+
+      // Get payment info for the order
+      const paymentInfo = await this.paymentInfoService.getPaymentInfoByOrderId(order.id);
+      // Get showing details for the order
+      const showing = await this.getPreviewShowingService.execute(order.showingId);
+      // Re structure the tickets
+      const ticketsMapByTicketTypeId = new Map<string, TicketWithTicketTypeDto>();
+      // Get form response for order
+      var formResponses : UserFormAnserDto[] = [];
+      if (order.formResponseId) {
+        formResponses = await this.getFormAnswerWithQuestionService.execute(order.formResponseId);
+      }
+      // count
+      await Promise.all(order.Ticket.map(async ticket => {
+        // Check if the ticket type already exists in the map
+        // If not, fetch the ticket type details and add it to the map
+        if (!ticketsMapByTicketTypeId.has(ticket.ticketTypeId)) {
+          const ticketTypeDetail = await this.getTicketTypeDetailService.getTicketTypeDetail(ticket.ticketTypeId);
+          ticketsMapByTicketTypeId.set(ticket.ticketTypeId, {
+            id: ticketTypeDetail.id,
+            name: ticketTypeDetail.name,
+            description: ticketTypeDetail.description,
+            price: ticketTypeDetail.price,
+            tickets: []
+          });
+        }
+        var seatname = null;
+        var sectionname = null;
+
+        if(ticket.sectionId){
+          sectionname = await this.getTicketTypeDetailService.getTicketTypeSectionname(ticket.ticketTypeId, ticket.sectionId);
+        }
+
+        if(ticket.seatId){
+          [seatname, sectionname] = await this.getTicketTypeDetailService.getSeatSectionName(ticket.ticketTypeId, ticket.seatId);
+        }
+        // Fetch the seatname or section name based on the ticket type
+        ticketsMapByTicketTypeId.get(ticket.ticketTypeId)!.tickets.push({
+          id: ticket.id,
+          seatname: seatname,
+          sectionname: sectionname,
+        });
+      }));
+
+      const userOrder: UserOrderDto = {
+        id: this.hashids.encode(order.id),
+        showingId: order.showingId,
+        status: order.status,
+        type: order.type,
+        price: order.totalPrice,
+        PaymentInfo: paymentInfo ? {
+          method: paymentInfo.method,
+          paidAt: paymentInfo.paidAt,
+        } : undefined,
+        Showing: showing,
+        Ticket: Array.from(ticketsMapByTicketTypeId.values()),
+        count: order.Ticket.length,
+        formResponse: formResponses,
+      };
+
+      return Ok(userOrder);
+    }
+    catch (error) {
+      await this.slackService.sendError(`Error in GetUserTicketService: ${error.message}`);
+      
+      return Err(new Error('Failed to select seat'));
+    }
+  }
+
+
   decodeId(hash: string): number {
     const [id] = this.hashids.decode(hash) as number[];
     if (typeof id !== 'number') return null;

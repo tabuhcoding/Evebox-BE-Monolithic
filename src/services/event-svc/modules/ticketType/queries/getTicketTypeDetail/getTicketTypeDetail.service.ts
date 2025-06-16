@@ -1,6 +1,7 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 import { SeatmapRepository } from "src/services/event-svc/repository/seatmap/seatmap.repo";
+import { SeatRepository } from "src/services/event-svc/repository/seatRepository/seatRepository.repo";
 import { SeatStatusEnum, SeatStatusRepository } from "src/services/event-svc/repository/seatStatus/seatStatus.repo";
 import { TicketType, TicketTypeRepository } from "src/services/event-svc/repository/ticketType/ticketType.repo";
 import { TicketTypeSectionRepository } from "src/services/event-svc/repository/ticketTypeSection/ticketTypeSection.repo";
@@ -13,6 +14,7 @@ export class GetTicketTypeDetailService {
     @Inject('TicketTypeSectionRepository') private readonly ticketTypeSectionRepository: TicketTypeSectionRepository,
     @Inject('SeatmapRepository') private readonly seatmapRepository: SeatmapRepository,
     @Inject("SeatStatusRepository") private readonly seatStatusRepository: SeatStatusRepository,
+    @Inject('SeatRepository') private readonly seatRepository: SeatRepository,
   ){}
 
   async getTicketTypeDetail(ticketTypeId: string): Promise<TicketType | null> {
@@ -70,7 +72,7 @@ export class GetTicketTypeDetailService {
         return null;
       }
 
-      return ticketTypeSection.Section.name;
+      return ticketTypeSection.Section.name.replace(/"/g, '');
     } catch (error) {
       await this.slackService.sendError(`Event Svc >>> getTicketTypeSectionname: ${error.message} with ticketTypeId: ${ticketTypeId}, sectionId: ${sectionId}`);
       
@@ -91,25 +93,21 @@ export class GetTicketTypeDetailService {
         return null;
       }
 
-      const seatmap = await this.seatmapRepository.findOneById(ticketType.Showing.seatMapId,
-        {
-          Section: {
-            include: {
-              Row: {
-                include: {
-                  Seat: {
-                    where: {
-                      id: seatId
-                    }
-                  },
-                },
+      const seat = await this.seatRepository.findOneById(seatId, {
+        Row: {
+          include: {
+            Section: {
+              include: {
+                Seatmap: true,
               },
-            }
-          }
-        }
-      )
-      const sectionname = seatmap?.Section[0]?.name || null;
-      const seatname = seatmap?.Section[0]?.Row[0]?.name + '-' + seatmap?.Section[0]?.Row[0]?.Seat[0]?.name || null;
+            },
+          },
+        },
+      });
+      
+      const sectionname = seat?.Row?.Section?.name?.replace(/"/g, '') || null;
+      const seatname = seat ? `${seat.Row.name}-${seat.name}`.replace(/"/g, '') : null;
+
 
       return [seatname, sectionname];
     } catch (error) {

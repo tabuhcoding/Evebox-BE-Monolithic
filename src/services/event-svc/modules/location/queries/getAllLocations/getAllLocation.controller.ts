@@ -38,7 +38,7 @@ export class GetAllLocationsController {
     }
     try {
       const result = await this.getAllLocationsService.getAllLocations(user,organizerId, province);
-      console.log(result);
+
       return res.status(HttpStatus.OK).json(result.unwrap());
     } catch (error) {
           console.error('[GetAllLocationsController] ERROR:', error); // ← LOG HERE

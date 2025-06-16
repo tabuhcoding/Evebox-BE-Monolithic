@@ -23,6 +23,8 @@ import { TicketQueryService } from "./modules/queries/getTicketQuery/ticket-quer
 import { GenerateTicketService } from "./modules/commands/generateTicket/generateTicket.service";
 import { GenerateQrcodeService } from "./modules/commands/generateQrcode/generateQrcode.service";
 import { RecheckOrderMissedService } from "./modules/commands/recheckOrderMissed/recheckOrderMissed.service";
+import { GetUserOrderController } from "./modules/queries/getUserOrder/getUserOrder.controller";
+import { GetUserOrderService } from "./modules/queries/getUserOrder/getUserOrder.service";
 
 @Module({
   imports: [ 
@@ -36,6 +38,7 @@ import { RecheckOrderMissedService } from "./modules/commands/recheckOrderMissed
     GetRedisSeatController,
     GetOrdersByShowingIdController,
     SubmitFormController,
+    GetUserOrderController,
   ],
   providers: [
     // Services
@@ -55,6 +58,7 @@ import { RecheckOrderMissedService } from "./modules/commands/recheckOrderMissed
     GenerateTicketService,
     GenerateQrcodeService,
     RecheckOrderMissedService,
+    GetUserOrderService,
 
     SubmitFormService,
 

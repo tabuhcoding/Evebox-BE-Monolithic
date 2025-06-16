@@ -3,7 +3,7 @@ import { Response } from 'express';
 import { ApiHeader, ApiOperation, ApiQuery, ApiResponse, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { ErrorHandler } from 'src/shared/exceptions/error.handler';
 import { JwtAuthGuard } from 'src/shared/guard/jwt-auth.guard';
-import { GetUserTicketService as GetUserOrderService } from './getUserOrder.service';
+import { GetUserOrderService } from './getUserOrder.service';
 import { GetUserTicketResponseDto } from './getUserOrder-response.dto';
 
 @ApiTags('Booking Service - Booking')
@@ -66,6 +66,33 @@ export class GetUserOrderController {
     const email = req.user.email;
     
     const result = await this.getUserOrderService.executeByOrderId(orderId, email);
+    if (result.isErr()) {
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json(ErrorHandler.internalServerError(result.unwrapErr().message));
+    }
+
+    const data = result.unwrap();
+    return res.status(HttpStatus.OK).json({
+      statusCode: HttpStatus.OK,
+      message: 'Order data retrieved successfully',
+      data,
+    });
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/getOrderByOriginalId')
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Get order by orderId' })
+  @ApiQuery({ name: 'orderId', required: true, type: String, description: 'The ID of the order to retrieve' })
+  async getOrderByOriginalId(
+    @Query('orderId') orderId: string,
+    @Res() res: Response,
+    @Request() req
+  ) {
+    const email = req.user.email;
+    
+    const result = await this.getUserOrderService.executeByOriginalOrderId(parseInt(orderId), email);
     if (result.isErr()) {
       return res
         .status(HttpStatus.BAD_REQUEST)

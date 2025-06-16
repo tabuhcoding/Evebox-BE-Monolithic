@@ -24,7 +24,7 @@ import { GenerateTicketService } from "./modules/commands/generateTicket/generat
 import { GenerateQrcodeService } from "./modules/commands/generateQrcode/generateQrcode.service";
 import { RecheckOrderMissedService } from "./modules/commands/recheckOrderMissed/recheckOrderMissed.service";
 import { GetUserOrderController } from "./modules/queries/getUserOrder/getUserOrder.controller";
-import { GetUserService } from "../auth-svc/modules/user/queries/get-user/get-user.service";
+import { GetUserOrderService } from "./modules/queries/getUserOrder/getUserOrder.service";
 
 @Module({
   imports: [ 
@@ -58,7 +58,7 @@ import { GetUserService } from "../auth-svc/modules/user/queries/get-user/get-us
     GenerateTicketService,
     GenerateQrcodeService,
     RecheckOrderMissedService,
-    GetUserService,
+    GetUserOrderService,
 
     SubmitFormService,
 

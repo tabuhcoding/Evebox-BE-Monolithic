@@ -10,7 +10,7 @@ import Hashids from 'hashids';
 import { GetFormAnswerWithQuestionService } from 'src/services/event-svc/modules/formAnswer/queries/getFormAnswerWithQuestion/getFormAnswerWithQuestion.service';
 
 @Injectable()
-export class GetUserTicketService {
+export class GetUserOrderService {
   private hashids: Hashids;
 
   constructor(

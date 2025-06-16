@@ -3,7 +3,7 @@ import { Response } from 'express';
 import { ApiHeader, ApiOperation, ApiQuery, ApiResponse, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { ErrorHandler } from 'src/shared/exceptions/error.handler';
 import { JwtAuthGuard } from 'src/shared/guard/jwt-auth.guard';
-import { GetUserTicketService as GetUserOrderService } from './getUserOrder.service';
+import { GetUserOrderService } from './getUserOrder.service';
 import { GetUserTicketResponseDto } from './getUserOrder-response.dto';
 
 @ApiTags('Booking Service - Booking')

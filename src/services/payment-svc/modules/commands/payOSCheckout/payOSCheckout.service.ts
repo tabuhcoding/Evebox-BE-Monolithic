@@ -38,7 +38,8 @@ export class PayOSCheckoutService {
 
       // Save the PayOS checkout information to the repository
       await this.payOSInfoRepository.insertWithoutReturn({
-        ...payOSCheckout
+        ...payOSCheckout,
+        expiredAt: payOSCheckout.expiredAt.toString(),
       })
 
       return payOSCheckout

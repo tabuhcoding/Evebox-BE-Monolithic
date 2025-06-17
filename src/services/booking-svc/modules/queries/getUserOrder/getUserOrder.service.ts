@@ -240,8 +240,126 @@ export class GetUserOrderService {
     }
   }
 
-  async executeByOriginalOrderId(originalOrderId: number, email: string): Promise<Result<UserOrderDto, Error>> {
+  async executeByOriginalOrderIdWithoutCheck(originalOrderId: number): Promise<[UserOrderDto, string] | null>{
     try {
+      var order : Order | null = null;
+      var count = 0;
+      var max_count = 10;
+
+      do {
+        order = await this.orderRepository.findOne({
+          id: originalOrderId,
+          status: {
+            not: BookingTicketStatus.PENDING
+          },
+        }, {
+        Ticket: true,
+        });
+
+        if (!order) {
+          return null;
+        }
+
+        if ( count >= max_count ||
+          (order.status === BookingTicketStatus.PENDING && count > 3)){
+          const showing = await this.getPreviewShowingService.execute(order.showingId);
+          
+          return ([{
+            id: this.hashids.encode(order.id),
+            showingId: order.showingId,
+            status: OrderStatus.PENDING,
+            type: order.type,
+            price: order.totalPrice,
+            createdAt: order.createdAt,
+            PaymentInfo: undefined,
+            Ticket: [],
+            Showing: showing,
+          }, order.userId]);
+        }
+
+        if (order.status === BookingTicketStatus.CANCEL || order.status === BookingTicketStatus.SUCCESS) {
+          break;
+        }
+
+        await new Promise(resolve => setTimeout(resolve, 15000));
+        count++;
+      } while (order.status === BookingTicketStatus.PENDING || BookingTicketStatus.PAID)
+
+      // Get payment info for the order
+      const paymentInfo = await this.paymentInfoService.getPaymentInfoByOrderId(order.id);
+      // Get showing details for the order
+      const showing = await this.getPreviewShowingService.execute(order.showingId);
+      // Re structure the tickets
+      const ticketsMapByTicketTypeId = new Map<string, TicketWithTicketTypeDto>();
+      // Get form response for order
+      var formResponses : UserFormAnserDto[] = [];
+      if (order.formResponseId) {
+        formResponses = await this.getFormAnswerWithQuestionService.execute(order.formResponseId);
+      }
+      // count
+      for (const ticket of order.Ticket) {
+        if (!ticketsMapByTicketTypeId.has(ticket.ticketTypeId)) {
+          const ticketTypeDetail = await this.getTicketTypeDetailService.getTicketTypeDetail(ticket.ticketTypeId);
+          ticketsMapByTicketTypeId.set(ticket.ticketTypeId, {
+            id: ticketTypeDetail.id,
+            name: ticketTypeDetail.name,
+            description: ticketTypeDetail.description,
+            price: ticketTypeDetail.price,
+            tickets: []
+          });
+        }
+
+        let seatname: string | null = null;
+        let sectionname: string | null = null;
+
+        if (ticket.seatId) {
+          [seatname, sectionname] = await this.getTicketTypeDetailService.getSeatSectionName(ticket.ticketTypeId, ticket.seatId);
+        } else if (ticket.sectionId) {
+          sectionname = await this.getTicketTypeDetailService.getTicketTypeSectionname(ticket.ticketTypeId, ticket.sectionId);
+        }
+
+        ticketsMapByTicketTypeId.get(ticket.ticketTypeId)!.tickets.push({
+          id: ticket.id,
+          seatname,
+          sectionname,
+          description: ticket.description,
+          qrcode: ticket.qrCode,
+        });
+      }
+
+
+      const userOrder: UserOrderDto = {
+        id: this.hashids.encode(order.id),
+        showingId: order.showingId,
+        status: (
+          order.status === BookingTicketStatus.PAID ? OrderStatus.PENDING :
+          order.status === BookingTicketStatus.SUCCESS ? OrderStatus.SUCCESS :
+          order.status === BookingTicketStatus.CANCEL ? OrderStatus.CANCELLED :
+          OrderStatus.PENDING
+        ),
+        type: order.type,
+        price: order.totalPrice,
+        PaymentInfo: paymentInfo ? {
+          method: paymentInfo.method,
+          paidAt: paymentInfo.paidAt,
+        } : undefined,
+        Showing: showing,
+        Ticket: Array.from(ticketsMapByTicketTypeId.values()),
+        count: order.Ticket.length,
+        formResponse: formResponses,
+      };
+
+      return ([userOrder, order.userId]);
+    }
+    catch (error) {
+      await this.slackService.sendError(`Error in GetUserTicketByOriginalService: ${error.message}`);
+      
+      return null;
+    }
+  }
+
+  async executeByOriginalOrderId(originalOrderId: number, email: string): Promise<Result<UserOrderDto, Error>> {
+      try {
       var order : Order | null = null;
       var count = 0;
       var max_count = 10;
@@ -360,8 +478,6 @@ export class GetUserOrderService {
       return Err(new Error('Failed to select seat'));
     }
   }
-
-
   decodeId(hash: string): number {
     const [id] = this.hashids.decode(hash) as number[];
     if (typeof id !== 'number') return null;

@@ -58,6 +58,9 @@ class TicketDto {
   
   @ApiProperty( {example: 'VIP Seat', description: 'The description of the ticket type' })
   description?: string;
+
+  @ApiProperty( {example: 'asjdskdsdj', description: 'The QR code of the ticket' })
+  qrcode?: string;
 }
 
 export class TicketWithTicketTypeDto {

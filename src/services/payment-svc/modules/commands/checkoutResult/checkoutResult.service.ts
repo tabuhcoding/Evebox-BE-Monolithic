@@ -50,8 +50,8 @@ export class CheckoutResultService {
       // TODO: Need to run in transaction
       // Update seat status
       {
-        const seatIDs = cachedData.data[0].ticketTypeSelection.map(ticket => ticket.seatInfo.map(seat => seat.seatId)).flat();
-        await this.getTicketTypeDetailService.setSeatStatusToESold(cachedData.data[0].showingId, seatIDs);
+        const seatIDs = cachedData.data[0].ticketTypeSelection?.map(ticket => ticket.seatInfo?.map(seat => seat.seatId)).flat();
+        if ( seatIDs.length > 0 )await this.getTicketTypeDetailService.setSeatStatusToESold(cachedData.data[0].showingId, seatIDs);
       }
       // Generate the ticket
       const seatmapType = await this.generateTicketService.execute(webhookData.orderCode, cachedData.data[0].ticketTypeSelection)

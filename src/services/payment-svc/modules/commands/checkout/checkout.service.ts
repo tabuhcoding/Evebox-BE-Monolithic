@@ -65,7 +65,7 @@ export class CheckoutService {
             return Err(checkoutResult);
           }
 
-          await this.slackService.sendNotice(`PayOS checkout link created successfully for user ${userId} in showing ${checkoutDto.showingID}. Link: ${JSON.stringify(checkoutResult)}`);
+          await this.slackService.sendNotice(`PayOS checkout link created successfully for user ${userId} in showing ${checkoutDto.showingID}. Link: ${JSON.stringify(checkoutResult)}. DTO: ${JSON.stringify(checkoutDto)}`);
 
           // insert paymentInfo into repository
           const paymentInfoID = await this.paymentInfoRepository.insertOneWithNumberId({

@@ -82,7 +82,6 @@ export class GetEventSpecialManagementController {
         }
       });
     } catch (error) {
-      console.log("🚀 ~ GetEventSpecialManagementController ~ error:", error);
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
         message: 'Internal server error',

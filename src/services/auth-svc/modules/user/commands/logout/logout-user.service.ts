@@ -13,7 +13,6 @@ export class LogoutUserService {
     try {
       // Revoke token if valid
       await this.userRepository.revokeAllRefreshTokens(email);
-      console.log('Revoke all refresh tokens for user:', email);
       
       return Ok(void 0);
     } catch (error) {

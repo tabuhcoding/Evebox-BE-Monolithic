@@ -46,7 +46,6 @@ export class GetEventRevenueDetailController {
         data: result.unwrap(),
       });
     } catch (error) {
-      console.log("🚀 ~ GetEventRevenueDetailController ~ error:", error)
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
         message: 'Internal server error',

@@ -370,6 +370,10 @@ export class GetUserOrderService {
           status: {
             not: BookingTicketStatus.PENDING
           },
+          createdAt: {
+            // Only check orders created within the last 30 minutes
+            gte: new Date(Date.now() - 30 * 60 * 1000), // last 30 minutes
+          }
         }, {
         Ticket: true,
         });

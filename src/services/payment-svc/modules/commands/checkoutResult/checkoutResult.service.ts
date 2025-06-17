@@ -118,7 +118,8 @@ export class CheckoutResultService {
       }
 
       {
-        const seatIDs = cachedData.data[0].ticketTypeSelection.map(ticket => ticket.seatInfo.map(seat => seat.seatId)).flat();
+        const seatIDs = cachedData.data[0].ticketTypeSelection?.map(ticket => ticket.seatInfo?.map(seat => seat.seatId)).flat();
+        if ( seatIDs.length > 0 )
         await this.getTicketTypeDetailService.setSeatStatusToESold(cachedData.data[0].showingId, seatIDs);
       }
 

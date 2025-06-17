@@ -4,6 +4,7 @@ import { EventsRepository } from 'src/services/event-svc/repository/events/event
 import { EventFrontDisplayDto } from '../getEventFrontDisplay/getEventFrontDisplay-response.dto';
 import { CheckFavoriteService } from 'src/services/auth-svc/modules/user/commands/check-favorite/checkFavorite.service';
 import { SlackService } from 'src/infrastructure/adapters/slack/slack.service';
+import { Pagination } from 'src/shared/constants/pagination';
 
 @Injectable()
 export class SearchEventService {
@@ -20,10 +21,10 @@ export class SearchEventService {
     endDate?: string,
     minPrice?: number,
     maxPrice?: number,
-    take?: number,
-    skip?: number,
+    page?: number,
+    limit?: number,
     userId?: string,
-  ): Promise<Result<EventFrontDisplayDto[], Error>> {
+  ): Promise<Result<[EventFrontDisplayDto[], Pagination], Error>> {
     try {
       const titleFilter = title
         ? {
@@ -88,6 +89,24 @@ export class SearchEventService {
             }
           : undefined;
 
+      const totalItems = await this.eventsRepository.count(
+        {
+          deleteAt: null,
+          isApproved: true,
+          ...(titleFilter && titleFilter),
+          ...(categoryFilter && categoryFilter),
+          ...(dateRangeOverlapFilter && dateRangeOverlapFilter),
+          ...(priceFilter && priceFilter),
+        }
+      );
+
+      const totalPages = Math.ceil(totalItems / (limit || 10));
+      const pagination: Pagination = {
+        totalItems,
+        totalPages,
+        page,
+        limit,
+      };
       const events = await this.eventsRepository.findMany(
         {
           deleteAt: null,
@@ -100,8 +119,8 @@ export class SearchEventService {
         {
             nearlyEndDate: 'asc',
         },
-          skip,
-          take,
+          (page > 1 ? page - 1 : 1) * (limit || 10),
+          limit || 10,
       );
 
       const formattedEvents = events.map((event): EventFrontDisplayDto => ({
@@ -121,7 +140,7 @@ export class SearchEventService {
         await this.checkFavoriteService.attachFavorite(userId, formattedEvents);
       }
 
-      return Ok(formattedEvents); // Assuming you're using Result<T, E> style
+      return Ok([formattedEvents, pagination]); // Assuming you're using Result<T, E> style
     } catch (error) {
       await this.slackService.sendError(`Error searching events: ${error.message}`);
       return Err(new Error(`Internal server error`));

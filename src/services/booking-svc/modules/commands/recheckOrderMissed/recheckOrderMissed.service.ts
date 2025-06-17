@@ -32,6 +32,8 @@ export class RecheckOrderMissedService {
     found = missedOrders.length;
 
     if (missedOrders.length === 0) {
+      await this.slackService.sendNotice(`RecheckOrderMissedService >>> No missed orders found.`);
+      
       return;
     }
 

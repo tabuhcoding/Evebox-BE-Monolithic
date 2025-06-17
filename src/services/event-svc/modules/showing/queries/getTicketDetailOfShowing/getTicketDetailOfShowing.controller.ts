@@ -55,7 +55,6 @@ export class GetTicketDetailOfShowingController {
         data: result.unwrap(),
       });
     } catch (error) {
-      console.log("🚀 ~ getShowingAdminDetailController ~ error:", error)
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
         message: 'Internal server error',

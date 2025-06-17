@@ -478,9 +478,8 @@ export class GenerateQrcodeService {
 
   // Test at tuesday 2:14 AM every week
   // Uncomment the following line to enable the cron job
-  @Cron('0 14 22 * * 2')
+  // @Cron('0 14 22 * * 2')
   async testGenerateTicketEmail(): Promise<void> {
-    console.log("testGenerateTicketEmail");
     try {
       const [sampleOrder, userId] = await this.getUserOrderService.executeByOriginalOrderIdWithoutCheck(238689)
       if (!sampleOrder) {

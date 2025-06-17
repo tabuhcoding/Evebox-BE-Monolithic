@@ -27,12 +27,14 @@ import { GetUserOrderController } from "./modules/queries/getUserOrder/getUserOr
 import { GetUserOrderService } from "./modules/queries/getUserOrder/getUserOrder.service";
 import { GetTicketQrCodeController } from "./modules/queries/getTicketQrCode/getTicketQrCode.controller";
 import { GetTicketQrCodeService } from "./modules/queries/getTicketQrCode/getTicketQrCode.service";
+import { EmailModule } from "src/infrastructure/adapters/email/email.module";
 
 @Module({
   imports: [ 
      forwardRef(() => AuthSvcModule),
      forwardRef(() => EventSvcModule),
      forwardRef(() => PaymentSvcModule),
+     EmailModule,
   ],
   controllers: [
     SelectSeatController,

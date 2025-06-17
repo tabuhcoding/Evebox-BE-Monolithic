@@ -28,6 +28,11 @@ EXPOSE 8005
 # Run the application
 CMD ["npm", "run", "start:prod"]
 
+
+
+#############################################################
+
+
 # # Stage 1: Install dependencies and build
 # FROM node:20-alpine AS builder
 
@@ -75,3 +80,37 @@ CMD ["npm", "run", "start:prod"]
 
 # # Run the app
 # CMD ["node", "dist/main"]
+
+
+###########################################################
+
+# # ---- Stage 1: Build ----
+# FROM node:20-alpine AS builder
+
+# WORKDIR /app
+
+# COPY package*.json ./
+# RUN npm ci --force
+
+# COPY .env .env
+
+# COPY . .
+# RUN npx prisma generate
+# RUN npm run build
+
+# # ---- Stage 2: Production ----
+# FROM node:20-alpine AS production
+
+# WORKDIR /app
+
+# ENV NODE_ENV=production
+
+# COPY package*.json ./
+# COPY --from=builder /app/dist ./dist
+# COPY --from=builder /app/node_modules ./node_modules
+# COPY --from=builder /app/prisma ./prisma
+# COPY --from=builder /app/.env .env
+
+# EXPOSE 8005
+
+# CMD ["node", "dist/main.js"]

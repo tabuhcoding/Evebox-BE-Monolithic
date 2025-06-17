@@ -74,7 +74,7 @@ export class GenerateQrcodeService {
           const ticketHasQRCode = await this.ticketRepository.findAll(
             {
               ticketTypeId: ticketTypeId,
-              qrCode: { $ne: null }
+              qrCode: { not: null }
             }
           )
           if (ticketType.quantity < ticketHasQRCode.length + ticketGroup.tickets.length) {
@@ -123,7 +123,7 @@ export class GenerateQrcodeService {
               {
                 ticketTypeId: ticketTypeId,
                 sectionId: sectionId,
-                qrCode: { $ne: null }
+                qrCode: { not: null }
               }
             )
             if (ticketTypeSection.quantity < ticketHasQRCode.length + ticketGroup.tickets.length) {
@@ -148,7 +148,7 @@ export class GenerateQrcodeService {
           {
             Order: { showingId: order.showingId },
             seatId: { in: seatIDs },
-            qrCode: { $ne: null }
+            qrCode: { not: null }
           }
         );
         if (seatHasQRCode.length > 0) {

@@ -71,17 +71,16 @@ export class GetUserOrderService {
         return Ok([[], { page: paginationQuery.page, limit: paginationQuery.limit, totalPages: 0, totalItems: 0 }]);
       }
 
-      const mappedOrders = await Promise.all(orders.map(async order => {
+      for (const order of orders) {
         // Get payment info for each order
         const paymentInfo = await this.paymentInfoService.getPaymentInfoByOrderId(order.id);
-        
         // Get showing details for each order
         const showing = await this.getPreviewShowingService.execute(order.showingId);
-
         // Re structure the tickets
         const ticketsMapByTicketTypeId = new Map<string, TicketWithTicketTypeDto>();
-        
+
         // count
+        var mappedOrders: UserOrderDto[] = [];
         for (const ticket of order.Ticket) {
           if (!ticketsMapByTicketTypeId.has(ticket.ticketTypeId)) {
             const ticketTypeDetail = await this.getTicketTypeDetailService.getTicketTypeDetail(ticket.ticketTypeId);
@@ -111,8 +110,8 @@ export class GetUserOrderService {
           });
         }
 
-
-        return {
+        // Map the order to UserOrderDto
+        mappedOrders.push({
           id: this.hashids.encode(order.id),
           showingId: order.showingId,
           type: order.type,
@@ -131,9 +130,8 @@ export class GetUserOrderService {
           Showing: showing,
           Ticket: Array.from(ticketsMapByTicketTypeId.values()),
           count: order.Ticket.length,
-        };
-      }));
-      
+        });
+      }
 
       return Ok([mappedOrders, pagination]);
     } catch (error) {

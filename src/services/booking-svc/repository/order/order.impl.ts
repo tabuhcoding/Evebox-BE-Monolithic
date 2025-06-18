@@ -58,29 +58,29 @@ export class OrderRepositoryImpl
 
           const paymentInfoData = paymentInfo.unwrap();
 
-        // Struct the ticket data group by ticket type
-        // Re structure the tickets
-        const ticketsMapByTicketTypeId = new Map<string, TicketGroupedByTicketTypeID>();
-        
-        // count
-        await Promise.all(order.Ticket.map(async ticket => {
+          // Struct the ticket data group by ticket type
+          // Re structure the tickets
+          const ticketsMapByTicketTypeId = new Map<string, TicketGroupedByTicketTypeID>();
           
-          // Check if the ticket type already exists in the map
-          // If not, fetch the ticket type details and add it to the map
-          if (!ticketsMapByTicketTypeId.has(ticket.ticketTypeId)) {
-            ticketsMapByTicketTypeId.set(ticket.ticketTypeId, {
-              id: ticket.ticketTypeId,
-              tickets: []
+          // count
+          for (const ticket of order.Ticket) {
+            // Check if the ticket type already exists in the map
+            // If not, fetch the ticket type details and add it to the map
+            if (!ticketsMapByTicketTypeId.has(ticket.ticketTypeId)) {
+              ticketsMapByTicketTypeId.set(ticket.ticketTypeId, {
+                id: ticket.ticketTypeId,
+                tickets: []
+              });
+            }
+
+            ticketsMapByTicketTypeId.get(ticket.ticketTypeId)!.tickets.push({
+              id: ticket.id,
+              seatID: ticket.seatId,
+              sectionID: ticket.sectionId,
+              qrCode: ticket.qrCode,
+              description: ticket.description,
             });
           }
-          ticketsMapByTicketTypeId.get(ticket.ticketTypeId)!.tickets.push({
-            id: ticket.id,
-            seatID: ticket.seatId,
-            sectionID: ticket.sectionId,
-            qrCode: ticket.qrCode,
-            description: ticket.description,
-          });
-          }));
           orderData.push({
             id: order.id,
             status: order.status,

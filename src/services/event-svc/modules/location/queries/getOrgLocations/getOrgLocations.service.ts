@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Result, Ok, Err } from 'oxide.ts';
-import { GetOrgLocationsResponseDto } from './getOrgLocations-response.dto';
+import { GetOrgLocationsResponseDto, LocationDto } from './getOrgLocations-response.dto';
 import { EventsRepository } from 'src/services/event-svc/repository/events/events.repo';
 import { LocationsRepository } from "../../../../repository/locations/location.repo";
 
@@ -15,20 +15,25 @@ export class GetOrgLocationsService {
     try {
       const events = await this.eventsRepo.findEventsByOrganizerEmail(email);
 
-      const results = await Promise.all(events.map(async (event) => {
-        if (!event.locationId) return null;
+      var results: LocationDto[] = [];
+      for (const event of events) {
+        if (!event.locationId) {
+          continue; // Skip events without a location
+        }
         const location = await this.locationRepo.getLocationWithDistrictAndProvince(event.locationId);
-        if (!location) return null;
-
-        return {
+        if (!location) {
+          continue; // Skip events with invalid locations
+        }
+        
+        results.push({
           id: location.id,
           street: location.street,
           ward: location.ward,
           district: location.districts.name,
           province: location.districts.province.name,
           venue: event.venue || '',
-        };
-      }));
+        });
+      }
 
       const data = results.filter(Boolean);
 

@@ -74,4 +74,6 @@ export interface ShowingRepository extends BaseRepository<Showing, Prisma.Showin
     quantity: number | null;
   }[];
 } | null>;
+
+  findAllWithTicketTypesByEventId(eventId: number): Promise<any[]>;
 }

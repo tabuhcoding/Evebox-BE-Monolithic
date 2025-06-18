@@ -71,7 +71,8 @@ import { RecheckOrderMissedService } from "./modules/commands/recheckOrderMissed
     GetOrdersInShowingIdsService,
     GenerateTicketService,
     GenerateQrcodeService,
-    RecheckOrderMissedService,, TicketQueryService
+    RecheckOrderMissedService,
+    TicketQueryService
   ],
 })
 export class BookingSvcModule {}

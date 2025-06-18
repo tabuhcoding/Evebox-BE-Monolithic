@@ -1,3 +1,4 @@
+import { GetAllShowingDetailOfEventService } from './modules/showing/queries/getAllShowingDetailOfEvent/getAllShowingDetailOfEvent.service';
 import { GetTicketDetailOfShowingService } from './modules/showing/queries/getTicketDetailOfShowing/getTicketDetailOfShowing.service';
 import { GetShowingsByAdminService } from './modules/showing/queries/getShowingsByAdmin/getShowings.service';
 import { GetShowingAdminDetailService } from './modules/showing/queries/getShowingAdminDetail/getShowingAdminDetail.service';
@@ -132,6 +133,7 @@ import { GetEventRevenueDetailController } from './modules/statistics/queries/ge
 import { GetEventRevenueDetailService } from './modules/statistics/queries/getEventRevenueDetail/getEventRevenueDetail.service';
 import { GetSummaryTicketRevenueController } from './modules/statistics/queries/getSummaryTicketRevenue/getSummaryTicketRevenue.controller';
 import { GetSummaryTicketRevenueService } from './modules/statistics/queries/getSummaryTicketRevenue/getSummaryTicketRevenue.service';
+import { GetAllShowingDetailOfEventController } from './modules/showing/queries/getAllShowingDetailOfEvent/getAllShowingDetailOfEvent.controller';
 
 @Module({
   imports: [ BookingSvcModule, AuthSvcModule, CqrsModule ],
@@ -199,7 +201,8 @@ import { GetSummaryTicketRevenueService } from './modules/statistics/queries/get
     GetOrgRevenueController,
     GetOrgRevenueByIdController,
     GetEventRevenueDetailController,
-    GetSummaryTicketRevenueController
+    GetSummaryTicketRevenueController,
+    GetAllShowingDetailOfEventController
   ],
   providers: [
     // Adapters
@@ -293,6 +296,7 @@ import { GetSummaryTicketRevenueService } from './modules/statistics/queries/get
     GetOrgRevenueByIdService,
     GetEventRevenueDetailService,
     GetSummaryTicketRevenueService,
+    GetAllShowingDetailOfEventService,
 
     // Repositories
     { provide: 'AdminRepository', useClass: AdminRepositoryImpl },

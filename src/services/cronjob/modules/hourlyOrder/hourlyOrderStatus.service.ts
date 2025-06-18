@@ -27,4 +27,15 @@ export class HourlyOrderStatusService {
       await this.slackService.sendError(`Hourly order status update failed: ${error.message}`);
     }
   }  
+
+  // Temp Cron job to run at 1h40 sunday
+  // @Cron('0 40 1 * * 0')
+  // async executeTempCron() {
+  //   await this.slackService.sendNotice('Temporary cron job executed.');
+  //   try {
+  //     // Add any temporary logic here if needed
+  //   } catch (error) {
+  //     await this.slackService.sendError(`Temporary cron job failed: ${error.message}`);
+  //   }
+  // }
 }

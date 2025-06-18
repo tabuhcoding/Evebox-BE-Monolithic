@@ -31,15 +31,15 @@ export class DailyStatusService {
 
   // Cron job to run at 15h10 every day 
   // @Cron('47 16 * * *')
-  async executeDailyStatusUpdateAt15h10() {
-    await this.slackService.sendNotice('Daily status update at 15h10 started.');
-    try {
-      // Call the service to recalculate ticket type status
-      await this.calculateTicketTypeStatusService.updateEvents();
-      await this.slackService.sendNotice('Daily status update at 15h10 completed successfully.');
-    }
-    catch (error) {
-      await this.slackService.sendError(`Daily status update at 15h10 failed: ${error.message}`);
-    }
-  }
+  // async executeDailyStatusUpdateAt15h10() {
+  //   await this.slackService.sendNotice('Daily status update at 15h10 started.');
+  //   try {
+  //     // Call the service to recalculate ticket type status
+  //     await this.calculateTicketTypeStatusService.updateEvents();
+  //     await this.slackService.sendNotice('Daily status update at 15h10 completed successfully.');
+  //   }
+  //   catch (error) {
+  //     await this.slackService.sendError(`Daily status update at 15h10 failed: ${error.message}`);
+  //   }
+  // }
 }

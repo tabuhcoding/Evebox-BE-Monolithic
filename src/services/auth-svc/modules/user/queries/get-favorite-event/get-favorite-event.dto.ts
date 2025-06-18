@@ -1,12 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Pagination } from 'src/shared/constants/pagination';
 
-class EventImage {
-  @ApiProperty({ example: 1 })
-  id: number;
-
-  @ApiProperty({ example: 'https://example.com/image.jpg' })
-  imageUrl: string;
-}
 
 export class FavoriteEventResponseData {
   @ApiProperty({ example: 22911 })
@@ -15,17 +9,11 @@ export class FavoriteEventResponseData {
   @ApiProperty()
   title: string;
 
-  @ApiProperty()
-  startDate: string;
-
-  @ApiProperty({ type: EventImage })
-  Images_Events_imgLogoIdToImages: EventImage;
-
-  @ApiProperty({ type: EventImage })
-  Images_Events_imgPosterIdToImages: EventImage;
+  @ApiProperty({ example: 'https://example.com/image.jpg' })
+  imageUrl: string;
 
   @ApiProperty()
-  venue: string;
+  description: string;
 }
 
 export class GetFavoriteEventResponse {
@@ -37,4 +25,7 @@ export class GetFavoriteEventResponse {
 
   @ApiProperty({ type: [FavoriteEventResponseData] })
   data: FavoriteEventResponseData[];
+
+  @ApiProperty({ type: Pagination ,description: 'pagination' })
+  pagination: Pagination;
 }

@@ -1,6 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { BookingTicketStatus, BookingTicketType } from 'src/services/booking-svc/repository/order/order.repo';
+import { BookingTicketType } from 'src/services/booking-svc/repository/order/order.repo';
 import { PaymentMethod } from 'src/services/payment-svc/repository/paymentMethodStatus/paymentMethodStatus.repo';
+import { OrderStatus } from './getUserOrder.dto';
+import { Pagination } from 'src/shared/constants/pagination';
+import { VerifyPinData } from 'src/services/auth-svc/modules/user/commands/verift-pin/verify-pin.dto';
+import { BaseResponse } from 'src/shared/constants/baseResponse';
 
 export class PreviewShowingDto {
   @ApiProperty( {example: 'The Batman', description: 'The title of the event' })
@@ -52,11 +56,11 @@ class TicketDto {
 
   // Details
   
-  @ApiProperty( {example: 'asdhjksahdak', description: 'The qrcode of the ticket' })
-  qrCode?: string;
-  
   @ApiProperty( {example: 'VIP Seat', description: 'The description of the ticket type' })
   description?: string;
+
+  @ApiProperty( {example: 'asjdskdsdj', description: 'The QR code of the ticket' })
+  qrcode?: string;
 }
 
 export class TicketWithTicketTypeDto {
@@ -83,14 +87,17 @@ export class UserOrderDto {
   @ApiProperty( {example: '169898227', description: 'The showing id of the order' })
   showingId: string;
 
-  @ApiProperty( {example: BookingTicketStatus.PAID, description: 'The status of the order' })
-  status: BookingTicketStatus;
+  @ApiProperty( {example: OrderStatus.SUCCESS, description: 'The status of the order' })
+  status: OrderStatus;
 
   @ApiProperty( {example: BookingTicketType.E_TICKET, description: 'Type of order' })
   type: BookingTicketType;
 
   @ApiProperty( {example: 540000, description: 'The price of the order' })
   price: number;
+
+  @ApiProperty( {example: '2023-10-01T12:00:00Z', description: 'The creation time of the order' })
+  createdAt?: Date;
 
   @ApiProperty( {type: UserPaymentInfoDto, description: 'The payment info of the order' })
   PaymentInfo?: UserPaymentInfoDto;
@@ -102,20 +109,22 @@ export class UserOrderDto {
   Showing?: PreviewShowingDto;
 
   @ApiProperty( {example: 2, description: 'The number of tickets' })
-  count: number;
+  count?: number;
 
   // Details
   @ApiProperty( {type: [UserFormAnserDto], description: 'The form response of the ticket' })
   formResponse?: UserFormAnserDto[];
 }
 
-export class GetUserTicketResponseDto {
-  @ApiProperty({ example: 200, description: 'status code' })
-  statusCode: number;
-
-  @ApiProperty({ example: 'Get redis seat successfully', description: 'message' })
-  message: string;
-
+export class GetUserTicketResponseDto extends BaseResponse {
   @ApiProperty({ type: [UserOrderDto], description: 'The order data' })
   data: UserOrderDto[];
+
+  @ApiProperty({ type: Object, description: 'Pagination data', required: false })
+  pagination?: Pagination;
+}
+
+export class GetUserOrderByOriginalIdResponseDto extends BaseResponse {
+  @ApiProperty({ type: UserOrderDto, description: 'The order data' })
+  data: UserOrderDto;
 }

@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Pagination } from 'src/shared/constants/pagination';
 
 export class FavoriteOrgResponseData {
   @ApiProperty({ example: 'org_abc123' })
@@ -14,4 +15,7 @@ export class GetFavoriteOrgResponse {
 
   @ApiProperty({ type: [FavoriteOrgResponseData] })
   data: FavoriteOrgResponseData[];
+
+  @ApiProperty({ type: Pagination, description: 'Pagination information' })
+  pagination?: Pagination;
 }

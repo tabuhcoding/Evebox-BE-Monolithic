@@ -34,9 +34,7 @@ export class UpdateEventAdminService {
 
 
     try {
-      console.log(eventId);
       const event = await this.eventRepository.updateEventFields(dto, eventId);
-      console.log(event);
 
       if (!event) {
         return Err(new Error('Failed to update event'));
@@ -74,7 +72,6 @@ export class UpdateEventAdminService {
         isOnline: event.isOnline,
         categories,
       };
-      console.log(eventDto);
 
       return Ok(eventDto);
     } catch (error) {

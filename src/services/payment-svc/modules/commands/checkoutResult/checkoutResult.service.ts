@@ -50,8 +50,13 @@ export class CheckoutResultService {
       // TODO: Need to run in transaction
       // Update seat status
       {
-        const seatIDs = cachedData.data[0].ticketTypeSelection.map(ticket => ticket.seatInfo.map(seat => seat.seatId)).flat();
-        await this.getTicketTypeDetailService.setSeatStatusToESold(cachedData.data[0].showingId, seatIDs);
+        const seatIDs = cachedData.data[0].ticketTypeSelection
+          ?.flatMap(ticket => ticket.seatInfo?.map(seat => seat.seatId).filter(Boolean) || []);
+
+        if (seatIDs.length > 0) {
+          await this.getTicketTypeDetailService.setSeatStatusToESold(cachedData.data[0].showingId, seatIDs);
+        }
+
       }
       // Generate the ticket
       const seatmapType = await this.generateTicketService.execute(webhookData.orderCode, cachedData.data[0].ticketTypeSelection)
@@ -84,6 +89,8 @@ export class CheckoutResultService {
       // Double check the order status
       await this.generateQrcodeService.execute(webhookData.orderCode, seatmapType);
       // Complete the QR code generation process
+      // Send Ticket QR code to User Email
+      await this.generateQrcodeService.sendTicketEmailToUser(webhookData.orderCode);
       await this.slackService.sendNotice(`PaymentService >>> PayOS checkout result verified successfully: QR code generated for order ${webhookData.orderCode}.`);
     } catch (error) {
       await this.slackService.sendError(`PaymentService >>> PayOS checkout result verification failed: ${error.message}`);
@@ -116,8 +123,12 @@ export class CheckoutResultService {
       }
 
       {
-        const seatIDs = cachedData.data[0].ticketTypeSelection.map(ticket => ticket.seatInfo.map(seat => seat.seatId)).flat();
-        await this.getTicketTypeDetailService.setSeatStatusToESold(cachedData.data[0].showingId, seatIDs);
+        const seatIDs = cachedData.data[0].ticketTypeSelection
+          ?.flatMap(ticket => ticket.seatInfo?.map(seat => seat.seatId).filter(Boolean) || []);
+
+        if (seatIDs.length > 0) {
+          await this.getTicketTypeDetailService.setSeatStatusToESold(cachedData.data[0].showingId, seatIDs);
+        }
       }
 
       // Generate the ticket

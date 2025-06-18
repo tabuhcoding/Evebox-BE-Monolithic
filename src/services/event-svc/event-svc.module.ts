@@ -133,10 +133,14 @@ import { GetEventRevenueDetailController } from './modules/statistics/queries/ge
 import { GetEventRevenueDetailService } from './modules/statistics/queries/getEventRevenueDetail/getEventRevenueDetail.service';
 import { GetSummaryTicketRevenueController } from './modules/statistics/queries/getSummaryTicketRevenue/getSummaryTicketRevenue.controller';
 import { GetSummaryTicketRevenueService } from './modules/statistics/queries/getSummaryTicketRevenue/getSummaryTicketRevenue.service';
+import { SeatRepositoryImpl } from './repository/seatRepository/seatRepository.impl';
 import { GetAllShowingDetailOfEventController } from './modules/showing/queries/getAllShowingDetailOfEvent/getAllShowingDetailOfEvent.controller';
 
 @Module({
-  imports: [ BookingSvcModule, AuthSvcModule, CqrsModule ],
+  imports: [ 
+    BookingSvcModule, 
+    AuthSvcModule, 
+    CqrsModule ],
   controllers: [
     // Categories
     GetAllCategoriesController,
@@ -319,6 +323,7 @@ import { GetAllShowingDetailOfEventController } from './modules/showing/queries/
     { provide: 'FormAnswerRepository', useClass: FormAnswerRepositoryImpl },
     { provide: 'FormInputRepository', useClass: FormInputRepositoryImpl },
     { provide: 'ProvinceRepository', useClass: ProvinceRepositoryImpl },
+    { provide: 'SeatRepository', useClass: SeatRepositoryImpl },
   ],
   exports: [
     GetAllEventDetailForRAGService, 

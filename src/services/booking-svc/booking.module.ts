@@ -23,12 +23,18 @@ import { TicketQueryService } from "./modules/queries/getTicketQuery/ticket-quer
 import { GenerateTicketService } from "./modules/commands/generateTicket/generateTicket.service";
 import { GenerateQrcodeService } from "./modules/commands/generateQrcode/generateQrcode.service";
 import { RecheckOrderMissedService } from "./modules/commands/recheckOrderMissed/recheckOrderMissed.service";
+import { GetUserOrderController } from "./modules/queries/getUserOrder/getUserOrder.controller";
+import { GetUserOrderService } from "./modules/queries/getUserOrder/getUserOrder.service";
+import { GetTicketQrCodeController } from "./modules/queries/getTicketQrCode/getTicketQrCode.controller";
+import { GetTicketQrCodeService } from "./modules/queries/getTicketQrCode/getTicketQrCode.service";
+import { EmailModule } from "src/infrastructure/adapters/email/email.module";
 
 @Module({
   imports: [ 
      forwardRef(() => AuthSvcModule),
      forwardRef(() => EventSvcModule),
      forwardRef(() => PaymentSvcModule),
+     EmailModule,
   ],
   controllers: [
     SelectSeatController,
@@ -36,6 +42,8 @@ import { RecheckOrderMissedService } from "./modules/commands/recheckOrderMissed
     GetRedisSeatController,
     GetOrdersByShowingIdController,
     SubmitFormController,
+    GetUserOrderController,
+    GetTicketQrCodeController,
   ],
   providers: [
     // Services
@@ -55,6 +63,8 @@ import { RecheckOrderMissedService } from "./modules/commands/recheckOrderMissed
     GenerateTicketService,
     GenerateQrcodeService,
     RecheckOrderMissedService,
+    GetUserOrderService,
+    GetTicketQrCodeService,
 
     SubmitFormService,
 

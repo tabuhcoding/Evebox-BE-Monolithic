@@ -1,10 +1,11 @@
-import { Controller, Get, Res, HttpStatus, UseGuards, Param, Request } from "@nestjs/common";
+import { Controller, Get, Res, HttpStatus, UseGuards, Param, Request, Query } from "@nestjs/common";
 import { Response } from "express";
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from "src/shared/guard/jwt-auth.guard";
 import { GetOrdersByShowingIdService } from "./getOrdersByShowingId.service";
 import { GetOrdersResponse } from "./getOrdersByShowingId-response.dto";
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
+import { PaginationQuery } from "src/shared/constants/pagination";
 
 @ApiTags('Event Service - Organizer - Statistics')
 @Controller('api/org/statistics')
@@ -24,6 +25,7 @@ export class GetOrdersByShowingIdController {
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Internal server error' })
   async getOrders(@Res() res: Response,
     @Param('showingId') showingId: string,
+    @Query() pagination: PaginationQuery,
     @Request() req,
   ){
     try {
@@ -45,6 +47,10 @@ export class GetOrdersByShowingIdController {
       const result = await this.getOrdersByShowingIdService.execute(
         showingId,
         email,
+        {
+          page: pagination.page >> 0 || 1,
+          limit: pagination.limit >> 0 || 10,
+        }
       );
 
       if (result.isErr()) {
@@ -57,7 +63,8 @@ export class GetOrdersByShowingIdController {
       return res.status(HttpStatus.OK).json({
         statusCode: HttpStatus.OK,
         message: 'Orders retrieved successfully',
-        data: result.unwrap(),
+        data: result.unwrap()[0],
+        pagination: result.unwrap()[1],
       });
     } catch (error) {
       await this.slackService.sendError(`Error in GetOrdersByShowingIdController: ${error.message}`);

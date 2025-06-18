@@ -5,6 +5,9 @@ import { UserRepositoryImpl } from 'src/services/auth-svc/repository/users/user.
 import { Email } from '../../domain/value-objects/user/email.vo';
 import { GetEventsByIdsService } from 'src/services/event-svc/modules/event/queries/getEventsById/GetEventsByIds.service';
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
+import { GetEventDetailDto } from 'src/services/event-svc/modules/event/queries/getEventsById/GetEventsByIds.dto';
+import { Pagination, PaginationQuery } from 'src/shared/constants/pagination';
+import { FavoriteEventResponseData } from './get-favorite-event.dto';
 
 @Injectable()
 export class GetFavoriteEventService {
@@ -15,7 +18,7 @@ constructor(
     private readonly slackService: SlackService,
   ) {}
   
- async execute(email: string): Promise<Result<any[], Error>> {
+ async execute(email: string, pagination: PaginationQuery): Promise<Result<[FavoriteEventResponseData[], Pagination], Error>> {
     const emailOrError = Email.create(email);
     if (emailOrError.isErr()) {
       return Err(new Error('Invalid email format'));
@@ -24,12 +27,12 @@ constructor(
     const user = await this.userRepository.findByEmail(emailStr);
     if (!user) return Err(new Error('User not found'));
 
-    const eventIds = await this.favoriteRepository.getFavoriteEventIds(user.id.value);
-    if (!eventIds.length) return Ok([]);
+    const [eventIds, paginationResponse] = await this.favoriteRepository.getFavoriteEventIds(emailStr.value, pagination);
+    if (!eventIds.length) return Ok([[], new Pagination()]);
 
     try {
-      const events = await this.getEventsByIdsService.getEventsByIds(eventIds);
-      return Ok(events);
+      const events = await this.getEventsByIdsService.getFavEventsByIds(eventIds);
+      return Ok([events, paginationResponse]);
     } catch (error) {
       await this.slackService.sendError(` Auth Svc - User >>> GetFavoriteEvent: ${error}`);
       

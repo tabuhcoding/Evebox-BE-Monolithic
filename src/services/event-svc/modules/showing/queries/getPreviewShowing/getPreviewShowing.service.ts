@@ -13,7 +13,23 @@ export class GetPreviewShowingService {
   async execute(id: string): Promise<PreviewShowingDto | null> {
     try{
       const showing = await this.showingRepository.findOneById(id, {
-        Events: true,
+        Events: {
+          select: {
+            id: true,
+            title: true,
+            venue: true,
+            locations: {
+              include: {
+                districts: {
+                  include: {
+                    province: true
+                  }
+                }
+              }
+            },
+            imgPosterUrl: true,
+          }
+        },
       })
 
       if (!showing) {

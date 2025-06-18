@@ -7,6 +7,7 @@ import { Result, Ok, Err } from "oxide.ts"
 import { OrderData, TicketGroupedByTicketTypeID } from "../../modules/queries/getOrdersByShowingId/getOrdersByShowingId-response.dto"
 import { GetPaymentInfoService } from "src/services/payment-svc/modules/queries/getPaymentInfo/getPaymentInfo.service"
 import { GetFormResponseByIdService } from "src/services/event-svc/modules/formResponse/queries/getFormResponseById/getFormResponseById.service"
+import { Pagination, PaginationQuery } from "src/shared/constants/pagination"
 
 @Injectable()
 export class OrderRepositoryImpl
@@ -21,14 +22,23 @@ export class OrderRepositoryImpl
       super(prisma.order, prisma)
     }
 
-    async getOrders(showingId: string): Promise<Result<OrderData[], Error>> {
+    async getOrders(showingId: string, paginationQuery: PaginationQuery): Promise<Result<[OrderData[], Pagination], Error>> {
       try {
-        const orders = await this.findMany({
+        // count the total number of orders for pagination
+        const totalOrders = await this.count({
           showingId
         });
+        
+        const totalPages = Math.ceil(totalOrders / paginationQuery.limit);
+
+        const orders = await this.findMany({
+          showingId
+        }, {}, {
+          createdAt: 'desc',
+        }, (paginationQuery.page - 1) * paginationQuery.limit, paginationQuery.limit);
 
         if (!orders) {
-          return Ok([]);
+          return Ok([[], null]);
         }
 
         let orderData: OrderData[] = [];
@@ -48,29 +58,29 @@ export class OrderRepositoryImpl
 
           const paymentInfoData = paymentInfo.unwrap();
 
-        // Struct the ticket data group by ticket type
-        // Re structure the tickets
-        const ticketsMapByTicketTypeId = new Map<string, TicketGroupedByTicketTypeID>();
-        
-        // count
-        await Promise.all(order.Ticket.map(async ticket => {
+          // Struct the ticket data group by ticket type
+          // Re structure the tickets
+          const ticketsMapByTicketTypeId = new Map<string, TicketGroupedByTicketTypeID>();
           
-          // Check if the ticket type already exists in the map
-          // If not, fetch the ticket type details and add it to the map
-          if (!ticketsMapByTicketTypeId.has(ticket.ticketTypeId)) {
-            ticketsMapByTicketTypeId.set(ticket.ticketTypeId, {
-              id: ticket.ticketTypeId,
-              tickets: []
+          // count
+          for (const ticket of order.Ticket) {
+            // Check if the ticket type already exists in the map
+            // If not, fetch the ticket type details and add it to the map
+            if (!ticketsMapByTicketTypeId.has(ticket.ticketTypeId)) {
+              ticketsMapByTicketTypeId.set(ticket.ticketTypeId, {
+                id: ticket.ticketTypeId,
+                tickets: []
+              });
+            }
+
+            ticketsMapByTicketTypeId.get(ticket.ticketTypeId)!.tickets.push({
+              id: ticket.id,
+              seatID: ticket.seatId,
+              sectionID: ticket.sectionId,
+              qrCode: ticket.qrCode,
+              description: ticket.description,
             });
           }
-          ticketsMapByTicketTypeId.get(ticket.ticketTypeId)!.tickets.push({
-            id: ticket.id,
-            seatID: ticket.seatId,
-            sectionID: ticket.sectionId,
-            qrCode: ticket.qrCode,
-            description: ticket.description,
-          });
-          }));
           orderData.push({
             id: order.id,
             status: order.status,
@@ -89,7 +99,12 @@ export class OrderRepositoryImpl
           });
         }
 
-        return Ok(orderData);
+        return Ok([orderData, {
+          page: paginationQuery.page,
+          limit: paginationQuery.limit,
+          totalItems: totalOrders,
+          totalPages: totalPages,
+        }]);
       } catch (error) {
         return Err(new Error('Failed to get orders of showing'));
       }

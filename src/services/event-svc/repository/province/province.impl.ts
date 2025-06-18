@@ -7,7 +7,7 @@ export class ProvinceRepositoryImpl implements ProvinceRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async getAllWithDistricts() {
-    return this.prisma.province.findMany({
+    const province = await this.prisma.province.findMany({
       select: {
         id: true,
         name: true,
@@ -19,5 +19,22 @@ export class ProvinceRepositoryImpl implements ProvinceRepository {
         }
       }
     });
+
+    const result = province.map((item) => ({
+      id: item.id,
+      name: {
+        en: "EN will be able later",
+        vi: item.name
+      },
+      districts: item.districts.map((district) => ({
+        id: district.id,
+        name: {
+          en: "EN will be able later",
+          vi: district.name
+        }
+      }))
+    }));
+
+    return result;
   }
 }

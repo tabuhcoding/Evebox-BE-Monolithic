@@ -870,4 +870,18 @@ export class EventsRepositoryImpl
       select: { id: true, title: true },
     });
   }
+
+  async isEventOwner(email: string, eventId: number): Promise<Result<boolean, Error>> {
+  try {
+    const event = await this.prisma.events.findUnique({
+      where: { id: eventId },
+      select: { organizerId: true },
+    });
+
+    if (!event) return Ok(false);
+    return Ok(event.organizerId === email);
+  } catch {
+    return Err(new Error('Failed to check event author'));
+  }
+}
 }

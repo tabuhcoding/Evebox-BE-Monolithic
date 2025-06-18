@@ -1,6 +1,20 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-class District {
+export class I18nName {
+  @ApiProperty({
+    description: 'Vi name',
+    example: 'vi',
+  })
+  vi: string;
+
+  @ApiProperty({
+    description: 'En name',
+    example: 'TP HCM',
+  })
+  en: string;
+}
+
+class DistrictDTO {
   @ApiProperty({
     description: 'District ID',
     example: 1,
@@ -9,12 +23,12 @@ class District {
 
   @ApiProperty({
     description: 'District Name',
-    example: 'Quan 1',
+    type: I18nName,
   })
-  name: string;
+  name: I18nName;
 }
 
-export class Province{
+export class ProvinceDTO{
   @ApiProperty({
     description: 'Province ID',
     example: 1,
@@ -23,15 +37,15 @@ export class Province{
 
   @ApiProperty({
     description: 'Province Name',
-    example: 'TP HCM',
+    type: I18nName,
   })
-  name: string;
+  name: I18nName;
 
   @ApiProperty({
     description: 'List of districts',
-    type: [District],
+    type: [DistrictDTO],
   })
-  districts: District[];
+  districts: DistrictDTO[];
 }
 
 export class GetAllDistrictsResponseDto {
@@ -45,7 +59,7 @@ export class GetAllDistrictsResponseDto {
   message: string;
 
   @ApiProperty({
-    type: [Province],
+    type: [ProvinceDTO],
   })
-  data: Province[];
+  data: ProvinceDTO[];
 }

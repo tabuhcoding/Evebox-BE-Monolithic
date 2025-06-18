@@ -85,15 +85,15 @@ export class GetEventDetailRecommendService {
       }
 
       // Map to EventFrontDisplayDto
-      const recommendedEventsDto = await Promise.all(
-        recommendedEvents.map(async (event) => {
-          const result = await this.getEventFrontDisplayService.caculateEventStatusAndMinPriceAndStartDate(event);
-          if (result.isErr()) {
-            return null;
-          }
-          return result.unwrap();
+      var recommendedEventsDto: (EventFrontDisplayDto)[] = [];
+
+      for (const event of recommendedEvents) {
+        const result = await this.getEventFrontDisplayService.caculateEventStatusAndMinPriceAndStartDate(event);
+        if (result.isErr()) {
+          continue; // Skip this event if there's an error
         }
-      ));
+        recommendedEventsDto.push(result.unwrap());
+      }
 
       // Filter out any null results
       const filteredEventDtos = recommendedEventsDto.filter((event) => event !== null

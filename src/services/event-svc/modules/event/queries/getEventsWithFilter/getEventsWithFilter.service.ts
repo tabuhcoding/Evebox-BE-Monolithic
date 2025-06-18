@@ -119,7 +119,7 @@ export class SearchEventService {
         {
             nearlyEndDate: 'asc',
         },
-          (page > 1 ? page - 1 : 1) * (limit || 10),
+          (page > 0 ? page - 1 : 0) * (limit || 10),
           limit || 10,
       );
 

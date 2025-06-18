@@ -56,7 +56,7 @@ export class SearchEventController {
       maxPriceNum,
       page >> 0 || 1,
       limit >> 0 || 10,
-      req.user?.id || null,
+      req.user?.email || null,
     );
 
     if (result.isErr()) {

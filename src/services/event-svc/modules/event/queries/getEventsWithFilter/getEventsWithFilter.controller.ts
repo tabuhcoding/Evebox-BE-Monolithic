@@ -20,6 +20,7 @@ export class SearchEventController {
   @ApiQuery({ name: 'endDate', required: false, type: String, description: 'End date of the event' })
   @ApiQuery({ name: 'minPrice', required: false, type: String, description: 'Minimum price of the event' })
   @ApiQuery({ name: 'maxPrice', required: false, type: String, description: 'Maximum price of the event' })
+  @ApiQuery({ name: 'provinceId', required: false, type: Number, description: 'Province ID of the event' })
   @ApiQuery({ name: 'page', required: false, type: String, description: 'Number of pages to return' })
   @ApiQuery({ name: 'limit', required: false, type: String, description: 'Number of events to return' })
   @ApiOperation({ summary: 'Search events by title' })
@@ -41,6 +42,7 @@ export class SearchEventController {
     @Query('endDate') endDate?: string, 
     @Query('minPrice') minPrice?: string,
     @Query('maxPrice') maxPrice?: string, 
+    @Query('provinceId') provinceId?: number,
     @Query('page') page?: number,
     @Query('limit') limit?: number,
   ) {
@@ -54,6 +56,7 @@ export class SearchEventController {
       endDate, 
       minPriceNum, 
       maxPriceNum,
+      provinceId >> 0,
       page >> 0 || 1,
       limit >> 0 || 10,
       req.user?.email || null,

@@ -21,6 +21,7 @@ export class SearchEventService {
     endDate?: string,
     minPrice?: number,
     maxPrice?: number,
+    provinceId?: number,
     page?: number,
     limit?: number,
     userId?: string,
@@ -93,6 +94,13 @@ export class SearchEventService {
         {
           deleteAt: null,
           isApproved: true,
+          ...(provinceId && {
+            locations: {
+              districts: {
+                  provinceId: provinceId,
+              },
+            },
+          }),
           ...(titleFilter && titleFilter),
           ...(categoryFilter && categoryFilter),
           ...(dateRangeOverlapFilter && dateRangeOverlapFilter),
@@ -111,6 +119,13 @@ export class SearchEventService {
         {
           deleteAt: null,
           isApproved: true,
+          ...(provinceId && {
+            locations: {
+              districts: {
+                  provinceId: provinceId,
+              },
+            },
+          }),
           ...(titleFilter && titleFilter),
           ...(categoryFilter && categoryFilter),
           ...(dateRangeOverlapFilter && dateRangeOverlapFilter),

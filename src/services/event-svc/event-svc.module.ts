@@ -1,3 +1,4 @@
+import { GetAllShowingDetailOfEventService } from './modules/showing/queries/getAllShowingDetailOfEvent/getAllShowingDetailOfEvent.service';
 import { GetTicketDetailOfShowingService } from './modules/showing/queries/getTicketDetailOfShowing/getTicketDetailOfShowing.service';
 import { GetShowingsByAdminService } from './modules/showing/queries/getShowingsByAdmin/getShowings.service';
 import { GetShowingAdminDetailService } from './modules/showing/queries/getShowingAdminDetail/getShowingAdminDetail.service';
@@ -133,6 +134,7 @@ import { GetEventRevenueDetailService } from './modules/statistics/queries/getEv
 import { GetSummaryTicketRevenueController } from './modules/statistics/queries/getSummaryTicketRevenue/getSummaryTicketRevenue.controller';
 import { GetSummaryTicketRevenueService } from './modules/statistics/queries/getSummaryTicketRevenue/getSummaryTicketRevenue.service';
 import { SeatRepositoryImpl } from './repository/seatRepository/seatRepository.impl';
+import { GetAllShowingDetailOfEventController } from './modules/showing/queries/getAllShowingDetailOfEvent/getAllShowingDetailOfEvent.controller';
 
 @Module({
   imports: [ 
@@ -203,7 +205,8 @@ import { SeatRepositoryImpl } from './repository/seatRepository/seatRepository.i
     GetOrgRevenueController,
     GetOrgRevenueByIdController,
     GetEventRevenueDetailController,
-    GetSummaryTicketRevenueController
+    GetSummaryTicketRevenueController,
+    GetAllShowingDetailOfEventController
   ],
   providers: [
     // Adapters
@@ -297,6 +300,7 @@ import { SeatRepositoryImpl } from './repository/seatRepository/seatRepository.i
     GetOrgRevenueByIdService,
     GetEventRevenueDetailService,
     GetSummaryTicketRevenueService,
+    GetAllShowingDetailOfEventService,
 
     // Repositories
     { provide: 'AdminRepository', useClass: AdminRepositoryImpl },

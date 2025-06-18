@@ -325,4 +325,39 @@ async findShowingsByOrgAndEvent(orgId: string, eventId: number) {
     }
   });
 }
+
+  async findAllWithTicketTypesByEventId(eventId: number): Promise<any[]> {
+  return this.prisma.showing.findMany({
+    where: {
+      eventId,
+      deleteAt: null,
+    },
+    select: {
+      id: true,
+      startTime: true,
+      endTime: true,
+      eventId: true,
+      seatMapId: true,
+      TicketType: {
+        where: { deleteAt: null },
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          color: true,
+          isFree: true,
+          originalPrice: true,
+          startTime: true,
+          endTime: true,
+          position: true,
+          quantity: true,
+          maxQtyPerOrder: true,
+          minQtyPerOrder: true,
+          imageUrl: true,
+          isHidden: true,
+        },
+      },
+    },
+  });
+}
 }

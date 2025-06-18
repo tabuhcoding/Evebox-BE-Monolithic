@@ -134,4 +134,5 @@ export interface EventsRepository extends BaseRepository<Events, Prisma.EventsDe
 
   findEventsByOrgIdWithShowings(orgId: string): Promise<EventWithShowingsAndTicketTypes[]>;
   findEventById(eventId: number): Promise<{ id: number; title: string } | null>;
+  isEventOwner(email: string, eventId: number): Promise<Result<boolean, Error>>;
 }

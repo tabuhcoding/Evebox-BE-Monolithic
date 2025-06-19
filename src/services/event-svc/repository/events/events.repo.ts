@@ -8,6 +8,8 @@ import { EventOrgFrontDisplayDto } from '../../modules/event/queries/getEventOfO
 import { EventOrgDetailResponseDto } from '../../modules/event/queries/getEventOfOrgDetail/getEventOfOrgDetail-response.dto';
 import { EventSummaryData } from '../../modules/event/queries/getEventSummary/getEventSummary-response.dto';
 import { EventRevenueData, OrganizerRevenueData } from '../../modules/statistics/queries/getOrgRevenue/getOrgRevenue-response.dto';
+import { Pagination, PaginationQuery } from 'src/shared/constants/pagination';
+import { EventWithShowings } from '../../modules/statistics/queries/getOrgRevenue/getOrgRevenue-response.dto';
 
 export type Events = Prisma.EventsGetPayload<{
   include: {
@@ -109,28 +111,11 @@ export interface EventsRepository extends BaseRepository<Events, Prisma.EventsDe
   getStatistics(eventId: number): Promise<Result<any, Error>>;
   findEventsByOrganizerEmail(email: string): Promise<Pick<Events, 'locationId' | 'venue'>[]>;
   getRevenueEventsWithShowings(
+    paginationQuery: PaginationQuery,
     from?: Date,
     to?: Date,
     search?: string
-  ): Promise<{
-    id: number;
-    title: string;
-    description: string;
-    organizerId: string;
-    orgName: string;
-    isApproved: boolean;
-    deleteAt: Date | null;
-    Showing: {
-      id: string;
-      startTime: Date;
-      endTime: Date;
-      TicketType: {
-        id: string;
-        name: string;
-        price: number;
-      }[];
-    }[];
-  }[]>;
+  ): Promise<[EventWithShowings[], Pagination]>;
 
   findEventsByOrgIdWithShowings(orgId: string): Promise<EventWithShowingsAndTicketTypes[]>;
   findEventById(eventId: number): Promise<{ id: number; title: string } | null>;

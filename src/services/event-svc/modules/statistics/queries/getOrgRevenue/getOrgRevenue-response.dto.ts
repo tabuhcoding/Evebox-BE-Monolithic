@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { BaseResponse } from "src/shared/constants/baseResponse";
+import { Pagination } from "src/shared/constants/pagination";
 
 export class TicketTypeRevenueData {
   @ApiProperty({ example: "abc-123", description: "Ticket type ID" })
@@ -75,7 +76,63 @@ export class OrganizerRevenueData {
   events: EventRevenueData[];
 }
 
+// Ticket Type Raw
+export class TicketTypeRaw {
+  @ApiProperty({ example: 'vip-001', description: 'Ticket type ID' })
+  id: string;
+
+  @ApiProperty({ example: 'VIP', description: 'Ticket type name' })
+  name: string;
+
+  @ApiProperty({ example: 500000, description: 'Ticket price' })
+  price: number;
+}
+
+// Showing Raw
+export class ShowingRaw {
+  @ApiProperty({ example: 'showing-uuid-001', description: 'Showing ID' })
+  id: string;
+
+  @ApiProperty({ example: '2025-01-25T00:00:00.000Z', description: 'Start time of showing' })
+  startTime: Date;
+
+  @ApiProperty({ example: '2025-01-25T02:00:00.000Z', description: 'End time of showing' })
+  endTime: Date;
+
+  @ApiProperty({ type: [TicketTypeRaw], description: 'List of ticket types for this showing' })
+  TicketType: TicketTypeRaw[];
+}
+
+export class EventWithShowings {
+  @ApiProperty({ example: 101, description: 'Event id' })
+  id: number;
+
+  @ApiProperty({ example: 'Live Concert 2025', description: 'Event title' })
+  title: string;
+
+  @ApiProperty({ example: 'Annual event description', description: 'Event description' })
+  description: string;
+
+  @ApiProperty({ example: 'org-123', description: 'Organizer ID' })
+  organizerId: string;
+
+  @ApiProperty({ example: 'Anh Trai Say Hi', description: 'Organizer name' })
+  orgName: string;
+
+  @ApiProperty({ example: true, description: 'Is event approved?' })
+  isApproved: boolean;
+
+  @ApiProperty({ example: null, description: 'DeleteAt (null if not deleted)' })
+  deleteAt: Date | null;
+
+  @ApiProperty({ type: [ShowingRaw], description: 'List of showings for this event' })
+  Showing: ShowingRaw[];
+}
+
 export class OrganizerRevenueResponseDto extends BaseResponse {
   @ApiProperty({ type: [OrganizerRevenueData], description: "Danh sách doanh thu theo nhà tổ chức" })
   data: OrganizerRevenueData[];
+
+  @ApiProperty({ type: Pagination, description: 'Pagination information' })
+  pagination?: Pagination;
 }

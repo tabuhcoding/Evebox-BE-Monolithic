@@ -5,11 +5,15 @@ import { GetOrgRevenueService } from "./getOrgRevenue.service";
 import { OrganizerRevenueResponseDto } from "./getOrgRevenue-response.dto";
 import { JwtAuthGuard } from "src/shared/guard/jwt-auth.guard";
 import { PaginationQuery } from "src/shared/constants/pagination";
+import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 
 @ApiTags('Event Service - Admin - Statistics')
 @Controller('api/admin')
 export class GetOrgRevenueController {
-  constructor(private readonly getOrgRevenueService: GetOrgRevenueService) { }
+  constructor(
+    private readonly getOrgRevenueService: GetOrgRevenueService,
+    private readonly slackService: SlackService
+  ) { }
 
   @UseGuards(JwtAuthGuard)
   @Get('/revenue')
@@ -66,7 +70,7 @@ export class GetOrgRevenueController {
         pagination: paginationResult,
       });
     } catch (error) {
-      console.error("🚀 ~ GetOrgRevenueController ~ error:", error)
+      await this.slackService.sendError(`Error in Event Svc >> Admin - Statistics >> GetOrgRevenueController: ${error.message}`);
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
         message: 'Internal server error',

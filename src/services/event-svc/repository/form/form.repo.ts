@@ -6,6 +6,7 @@ import { CreateFormDto } from "../../modules/form/commands/createForm/createForm
 import { UpdateFormDto } from "../../modules/form/commands/updateForm/updateForm.dto";
 import { ConnectFormDto } from "../../modules/form/commands/connectFormToShowing/connectFormToShowing.dto";
 import { ConnectFormResponseData } from "../../modules/form/commands/connectFormToShowing/connectFormToShowing-response.dto";
+import { BasicFormDto } from '../../modules/form/queries/getAllForms/getAllFroms-response.dto';
 
 export type Form = Prisma.FormGetPayload<{
   include: {
@@ -27,4 +28,6 @@ export interface FormRepository extends BaseRepository<Form, Prisma.FormDelegate
 
   /* Connect Form to SHowing */
   connectForm(dto: ConnectFormDto): Promise<Result<[ConnectFormResponseData, boolean], Error>>;
+
+  findAllByOrganizerEmail(email: string): Promise<BasicFormDto[]>;
 }

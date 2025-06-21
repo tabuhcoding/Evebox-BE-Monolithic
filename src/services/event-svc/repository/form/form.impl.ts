@@ -10,6 +10,7 @@ import { CreateFormDto } from "../../modules/form/commands/createForm/createForm
 import { UpdateFormDto, UpdateFormInputDto } from "../../modules/form/commands/updateForm/updateForm.dto";
 import { ConnectFormDto } from "../../modules/form/commands/connectFormToShowing/connectFormToShowing.dto";
 import { ConnectFormResponseData } from "../../modules/form/commands/connectFormToShowing/connectFormToShowing-response.dto";
+import { BasicFormDto } from "../../modules/form/queries/getAllForms/getAllFroms-response.dto";
 
 @Injectable()
 export class FormRepositoryImpl
@@ -221,5 +222,27 @@ export class FormRepositoryImpl
       console.error(`Failed to connect form to showing: ${error.message}`);
       return Err(new Error(`Failed to connect form to showing: ${error.message}`));
     }
+  }
+
+   async findAllByOrganizerEmail(email: string): Promise<BasicFormDto[]> {
+    const fixedFormIds = [12608, 12472, 12404, 12518, 12500];
+
+    const forms = await this.prisma.form.findMany({
+      where: {
+        deleteAt: null,
+        OR: [
+          { id: { in: fixedFormIds } },
+          { createdBy: email },
+        ]
+      },
+      select: {
+        id: true,
+        name: true,
+        createdBy: true,
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return forms;
   }
 }

@@ -194,7 +194,7 @@ export class EmailService implements OnModuleInit {
                       data.Ticket.map((ticket) => `
                       </p>
                     <p>${ticket.name}</p>
-                    <p>${ticket.price.toLocaleString()} x ${data.count}
+                    <p>${ticket.price.toLocaleString()} x ${ticket.tickets.length}
                       <span style="float: right; font-weight: bold;">
                         ${(ticket.price * ticket.tickets.length).toLocaleString()} VNĐ
                       </span>
@@ -207,7 +207,7 @@ export class EmailService implements OnModuleInit {
                     <hr>
                     <p style="font-weight: bold; color: #0C4762; font-size: 18px;">Tổng tiền 
                       <span style="float: right;">
-                        ${(data.price * data.count).toLocaleString()} VNĐ
+                        ${(data.price).toLocaleString()} VNĐ
                       </span>
                     </p>
                 </div>

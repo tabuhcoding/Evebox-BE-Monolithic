@@ -4,11 +4,16 @@ import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@ne
 import { GetOrgRevenueService } from "./getOrgRevenue.service";
 import { OrganizerRevenueResponseDto } from "./getOrgRevenue-response.dto";
 import { JwtAuthGuard } from "src/shared/guard/jwt-auth.guard";
+import { PaginationQuery } from "src/shared/constants/pagination";
+import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 
 @ApiTags('Event Service - Admin - Statistics')
 @Controller('api/admin')
 export class GetOrgRevenueController {
-  constructor(private readonly getOrgRevenueService: GetOrgRevenueService) {}
+  constructor(
+    private readonly getOrgRevenueService: GetOrgRevenueService,
+    private readonly slackService: SlackService
+  ) { }
 
   @UseGuards(JwtAuthGuard)
   @Get('/revenue')
@@ -17,6 +22,9 @@ export class GetOrgRevenueController {
   @ApiQuery({ name: 'fromDate', required: false, type: String })
   @ApiQuery({ name: 'toDate', required: false, type: String })
   @ApiQuery({ name: 'search', required: false, type: String })
+  @ApiQuery({ name: 'search', required: false, type: String })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
   @ApiResponse({ status: HttpStatus.OK, description: 'Organizer revenue retrieved successfully', type: OrganizerRevenueResponseDto })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid input' })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Internal server error' })
@@ -25,13 +33,26 @@ export class GetOrgRevenueController {
     @Query('fromDate') fromDate: string,
     @Query('toDate') toDate: string,
     @Query('search') search: string,
+    @Query() paginationQuery: PaginationQuery,
     @Res() res: Response,
     @Request() req,
   ) {
     try {
       const email = req.user?.email;
 
-      const result = await this.getOrgRevenueService.execute(email, fromDate, toDate, search);
+      if (!email) {
+        return res.status(HttpStatus.UNAUTHORIZED).json({
+          statusCode: HttpStatus.UNAUTHORIZED,
+          message: 'Unauthorized',
+        });
+      }
+
+      const pagination: PaginationQuery = {
+        page: paginationQuery.page >> 0 || 1,
+        limit: paginationQuery.limit >> 0 || 10,
+      };
+
+      const result = await this.getOrgRevenueService.execute(email, pagination, fromDate, toDate, search);
 
       if (result.isErr()) {
         return res.status(HttpStatus.BAD_REQUEST).json({
@@ -39,18 +60,21 @@ export class GetOrgRevenueController {
           message: result.unwrapErr().message,
         });
       }
-      
+
+      const [data, paginationResult] = result.unwrap();
+
       return res.status(HttpStatus.OK).json({
         statusCode: HttpStatus.OK,
         message: 'Organizer revenue retrieved successfully',
-        data: result.unwrap(),
+        data,
+        pagination: paginationResult,
       });
     } catch (error) {
-      console.error("🚀 ~ GetOrgRevenueController ~ error:", error)
+      await this.slackService.sendError(`Error in Event Svc >> Admin - Statistics >> GetOrgRevenueController: ${error.message}`);
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
         message: 'Internal server error',
       });
-    }  
+    }
   }
 }

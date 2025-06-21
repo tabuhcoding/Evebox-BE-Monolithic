@@ -239,6 +239,16 @@ export class FormRepositoryImpl
         id: true,
         name: true,
         createdBy: true,
+        FormInput: {
+          select: {
+            id: true,
+            fieldName: true,
+            type: true,
+            required: true,
+            regex: true,
+            options: true,
+          }
+        },
       },
       orderBy: { createdAt: 'desc' },
     });

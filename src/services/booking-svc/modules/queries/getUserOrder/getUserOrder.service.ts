@@ -70,7 +70,7 @@ export class GetUserOrderService {
       if (!orders || orders.length === 0) {
         return Ok([[], { page: paginationQuery.page, limit: paginationQuery.limit, totalPages: 0, totalItems: 0 }]);
       }
-
+      var mappedOrders: UserOrderDto[] = [];
       for (const order of orders) {
         // Get payment info for each order
         const paymentInfo = await this.paymentInfoService.getPaymentInfoByOrderId(order.id);
@@ -80,7 +80,6 @@ export class GetUserOrderService {
         const ticketsMapByTicketTypeId = new Map<string, TicketWithTicketTypeDto>();
 
         // count
-        var mappedOrders: UserOrderDto[] = [];
         for (const ticket of order.Ticket) {
           if (!ticketsMapByTicketTypeId.has(ticket.ticketTypeId)) {
             const ticketTypeDetail = await this.getTicketTypeDetailService.getTicketTypeDetail(ticket.ticketTypeId);

@@ -135,6 +135,8 @@ import { GetSummaryTicketRevenueController } from './modules/statistics/queries/
 import { GetSummaryTicketRevenueService } from './modules/statistics/queries/getSummaryTicketRevenue/getSummaryTicketRevenue.service';
 import { SeatRepositoryImpl } from './repository/seatRepository/seatRepository.impl';
 import { GetAllShowingDetailOfEventController } from './modules/showing/queries/getAllShowingDetailOfEvent/getAllShowingDetailOfEvent.controller';
+import { GetAllFormsService } from './modules/form/queries/getAllForms/getAllForms.service';
+import { GetAllFormsController } from './modules/form/queries/getAllForms/getAllForms.controller';
 
 @Module({
   imports: [ 
@@ -206,7 +208,8 @@ import { GetAllShowingDetailOfEventController } from './modules/showing/queries/
     GetOrgRevenueByIdController,
     GetEventRevenueDetailController,
     GetSummaryTicketRevenueController,
-    GetAllShowingDetailOfEventController
+    GetAllShowingDetailOfEventController,
+    GetAllFormsController
   ],
   providers: [
     // Adapters
@@ -301,6 +304,8 @@ import { GetAllShowingDetailOfEventController } from './modules/showing/queries/
     GetEventRevenueDetailService,
     GetSummaryTicketRevenueService,
     GetAllShowingDetailOfEventService,
+
+    GetAllFormsService,
 
     // Repositories
     { provide: 'AdminRepository', useClass: AdminRepositoryImpl },

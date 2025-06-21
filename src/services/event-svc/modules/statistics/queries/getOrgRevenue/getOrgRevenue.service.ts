@@ -1,8 +1,9 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { Result, Err, Ok } from "oxide.ts";
-import { OrganizerRevenueData, ShowingRevenueData, TicketTypeRevenueData } from "./getOrgRevenue-response.dto";
+import { OrganizerRevenueData, ShowingRevenueData, TicketTypeRevenueData, EventWithShowings } from "./getOrgRevenue-response.dto";
 import { GetAdminAccessService } from "src/services/auth-svc/modules/user/queries/get-admin-access/get-admin-access.service";
 import { EventsRepository } from "src/services/event-svc/repository/events/events.repo";
+import { Pagination, PaginationQuery } from "src/shared/constants/pagination";
 
 const FEE_PERCENT = 10; // default, or can be got from OrgPaymentInfo table
 
@@ -15,10 +16,11 @@ export class GetOrgRevenueService {
 
    async execute(
     email: string,
+    paginationQuery: PaginationQuery,
     fromDate?: string,
     toDate?: string,
     search?: string
-  ): Promise<Result<OrganizerRevenueData[], Error>> {
+  ): Promise<Result<[OrganizerRevenueData[], Pagination], Error>> {
     const isAdmin = await this.getAdminAccessService.execute(email);
     if (!isAdmin) return Err(new Error('You do not have permission to get organizer revenue'));
 
@@ -29,7 +31,9 @@ export class GetOrgRevenueService {
       return Err(new Error("fromDate must be earlier than or equal to toDate"));
     }
 
-    const events = await this.eventsRepo.getRevenueEventsWithShowings(from, to, search);
+    const [events, pagination] = await this.eventsRepo.getRevenueEventsWithShowings(
+      paginationQuery, from, to, search
+    );
 
     const orgMap = new Map<string, OrganizerRevenueData>();
 
@@ -109,6 +113,6 @@ export class GetOrgRevenueService {
       });
     }
 
-    return Ok(Array.from(orgMap.values()));
+    return Ok([Array.from(orgMap.values()), pagination]);
   }
 }

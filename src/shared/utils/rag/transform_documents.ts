@@ -1,6 +1,6 @@
 import { Document } from 'langchain/document';
 import { GetAllEventDetailForRAGResponseDto } from 'src/services/event-svc/modules/event/queries/getAllEventDetailForRAG/getAllEventDetailForRAG-response.dto';
-import { EventDescriptionGenDto } from 'src/services/rag-svc/modules/descriptionGenerate/descriptionGenerate.dto';
+import { EventDescriptionGenDto } from 'src/services/rag-svc/modules/gemini-cohere/descriptionGenerate/descriptionGenerate.dto';
 
 export function transformEventsToDocuments(events: GetAllEventDetailForRAGResponseDto[]): Document[] {
   return events.map((event) => {

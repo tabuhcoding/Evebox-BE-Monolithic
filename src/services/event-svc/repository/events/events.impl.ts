@@ -28,6 +28,8 @@ import { EventOrgFrontDisplayDto } from '../../modules/event/queries/getEventOfO
 import { EventOrgDetailResponseDto } from '../../modules/event/queries/getEventOfOrgDetail/getEventOfOrgDetail-response.dto';
 import { EventSummaryData } from '../../modules/event/queries/getEventSummary/getEventSummary-response.dto';
 import { EventRevenueData, OrganizerRevenueData, ShowingRevenueData } from '../../modules/statistics/queries/getOrgRevenue/getOrgRevenue-response.dto';
+import { PaginationQuery, Pagination } from 'src/shared/constants/pagination';
+import { EventWithShowings } from '../../modules/statistics/queries/getOrgRevenue/getOrgRevenue-response.dto';
 
 @Injectable()
 export class EventsRepositoryImpl
@@ -797,7 +799,7 @@ export class EventsRepositoryImpl
     });
   }
 
-  async getRevenueEventsWithShowings(from?: Date, to?: Date, search?: string) {
+  async getRevenueEventsWithShowings(paginationQuery: PaginationQuery, from?: Date, to?: Date, search?: string): Promise<[EventWithShowings[], Pagination]> {
     const where: any = {
       isApproved: true,
       deleteAt: null,
@@ -810,7 +812,15 @@ export class EventsRepositoryImpl
       };
     }
 
-    return this.prisma.events.findMany({
+    const totalItems = await this.prisma.events.count({ where });
+
+    // Pagination
+    const page = paginationQuery?.page ?? 1;
+    const limit = paginationQuery?.limit ?? 10;
+    const skip = (page - 1) * limit;
+    const totalPages = Math.ceil(totalItems / limit);
+
+    const events = await this.prisma.events.findMany({
       where,
       include: {
         Showing: {
@@ -832,38 +842,46 @@ export class EventsRepositoryImpl
             }
           }
         }
-      }
+      },
+      skip,
+      take: limit,
+      orderBy: { id: 'desc' } // hoặc sort theo nhu cầu
     });
+
+    return [
+      events,
+      { page, limit, totalItems, totalPages }
+    ];
   }
 
   async findEventsByOrgIdWithShowings(orgId: string) {
-  return this.prisma.events.findMany({
-    where: {
-      organizerId: orgId,
-      isApproved: true,
-      deleteAt: null,
-    },
-    select: {
-      id: true,
-      title: true,
-      Showing: {
-        where: { deleteAt: null },
-        select: {
-          id: true,
-          startTime: true,
-          endTime: true,
-          TicketType: {
-            select: {
-              id: true,
-              name: true,
-              price: true,
+    return this.prisma.events.findMany({
+      where: {
+        organizerId: orgId,
+        isApproved: true,
+        deleteAt: null,
+      },
+      select: {
+        id: true,
+        title: true,
+        Showing: {
+          where: { deleteAt: null },
+          select: {
+            id: true,
+            startTime: true,
+            endTime: true,
+            TicketType: {
+              select: {
+                id: true,
+                name: true,
+                price: true,
+              },
             },
           },
         },
       },
-    },
-  });
-}
+    });
+  }
   async findEventById(eventId: number) {
     return this.prisma.events.findUnique({
       where: { id: eventId },
@@ -872,16 +890,16 @@ export class EventsRepositoryImpl
   }
 
   async isEventOwner(email: string, eventId: number): Promise<Result<boolean, Error>> {
-  try {
-    const event = await this.prisma.events.findUnique({
-      where: { id: eventId },
-      select: { organizerId: true },
-    });
+    try {
+      const event = await this.prisma.events.findUnique({
+        where: { id: eventId },
+        select: { organizerId: true },
+      });
 
-    if (!event) return Ok(false);
-    return Ok(event.organizerId === email);
-  } catch {
-    return Err(new Error('Failed to check event author'));
+      if (!event) return Ok(false);
+      return Ok(event.organizerId === email);
+    } catch {
+      return Err(new Error('Failed to check event author'));
+    }
   }
-}
 }

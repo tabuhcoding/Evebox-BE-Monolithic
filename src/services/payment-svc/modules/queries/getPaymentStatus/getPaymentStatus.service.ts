@@ -35,6 +35,7 @@ export class GetPaymentStatusService {
           if (payOSInfo.status === "CANCELED") return "CANCELED";
 
           const payOSStatus = await this.payOSService.getPaymentLinkInformation(payOSInfo.paymentLinkId);
+          await this.slackService.sendNotice(`Payment Svc >>> RecheckOrder at GetPaymentStatusService : PayOS status for orderId ${orderId} is ${JSON.stringify(payOSStatus)}`);
           if (payOSStatus && payOSStatus.status === "PAID") {
             // Update the payment info to reflect the paid status
             await this.payOSInfoRepository.updateOne(
@@ -49,7 +50,7 @@ export class GetPaymentStatusService {
 
             return "PAID";
           } else {
-            if (payOSInfo.expiredAt && new Date(payOSInfo.expiredAt) < new Date()) {
+            if (!payOSInfo.expiredAt || (payOSInfo.expiredAt && new Date(payOSInfo.expiredAt) < new Date())) {
              return "CANCELED"
             }
             return "PENDING";

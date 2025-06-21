@@ -1,7 +1,7 @@
 // vector-store.service.ts
 import { Injectable, Logger } from '@nestjs/common';
 import { Document } from 'langchain/document';
-import { EmbeddingWrapperService } from '../embedding_wrapper/embedding_wrapper.service';
+import { EmbeddingWrapperService } from '../gemini-cohere/embedding_wrapper/embedding_wrapper.service';
 
 @Injectable()
 export class VectorStoreService {

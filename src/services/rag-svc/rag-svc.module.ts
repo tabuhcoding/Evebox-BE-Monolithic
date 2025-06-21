@@ -9,7 +9,7 @@ import { ContentController } from "./modules/content/content.controller";
 import { ContentService } from "./modules/content/content.service";
 import { DescriptionGenerateController } from "./modules/descriptionGenerate/descriptionGenerate.controller";
 import { DescriptionGenerateService } from "./modules/descriptionGenerate/descriptionGenerate.service";
-import { EmbeddingWrapperService } from "./modules/embedding_wrapper/embedding_wrapper.service";
+import { EmbeddingWrapperService } from "./modules/gemini-cohere/embedding_wrapper/embedding_wrapper.service";
 import { VectorStoreCohereService } from "./modules/vector_store/vector_store.cohere";
 import { VectorStoreGeminiService } from "./modules/vector_store/vector_store.gemini";
 import { VectorStoreService } from "./modules/vector_store/vector_store.service";

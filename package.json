@@ -9,7 +9,6 @@
     "prisma:generate:ai": "prisma generate --schema=src/services/rag-svc/database/prisma-ai/schema.prisma",
     "prisma:generate:all": "npx prisma generate && npm run prisma:generate:ai",
     "prestart": "npm run prisma:generate:all",
-    "prestart:dev": "npm run prisma:generate:all && npm run copy-assets",
     "prebuild": "npm run prisma:generate:all",
     "build": "nest build && npm run copy-assets",
     "copy-assets": "copyfiles -u 1 src/assets/**/* dist/assets",
@@ -61,11 +60,15 @@
     "passport-jwt": "^4.0.1",
     "pdfkit": "^0.17.1",
     "pg": "^8.16.0",
+    "proxy-agent": "^6.5.0",
     "qrcode": "^1.5.4",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
+    "tiktoken": "^1.0.21",
     "typeorm": "^0.3.23",
-    "uuid": "^11.1.0"
+    "undici": "^7.10.0",
+    "uuid": "^11.1.0",
+    "zod-to-json-schema": "^3.24.5"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",

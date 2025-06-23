@@ -20,4 +20,18 @@ export class CheckUserExistService {
       return false;
     }
   }
+
+  async checkAdminExist(email: string): Promise<boolean> {
+    try {
+      // Check if the user exists by email and is an admin
+      const userExists = await this.userRepository.isEmailExists(email);
+      if (!userExists) return false;
+
+      const isAdmin = await this.userRepository.isAdmin(email);
+      return isAdmin;
+    } catch (error) {
+      await this.slackService.sendError(`AuthSVC >>> Error checking admin existence: ${error.message}`);
+      return false;
+    }
+  }
 }

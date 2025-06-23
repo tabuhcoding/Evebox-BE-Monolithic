@@ -19,7 +19,7 @@ export function transformEventsToDocuments(events: GetAllEventDetailForRAGRespon
 
         Tổng lượt xem: ${event.totalViews}
         Lượt xem/tuần, có thể dùng để đánh giá độ hot: ${event.viewsPerWeek}
-        Giá vé: ${event.minPrice} ~ ${event.maxPrice} VNĐ
+        Giá vé: ${event.minAvailablePrice} ~ ${event.maxAvailablePrice} VNĐ
         Thể loại: ${event.categories.join(', ')}
 
         Các đêm diễn:
@@ -30,7 +30,7 @@ export function transformEventsToDocuments(events: GetAllEventDetailForRAGRespon
               • Tên vé: ${ticket.name}
                 Mô tả quyền lợi: ${ticket.description}
                 Giá: ${ticket.price} VNĐ
-                Thời gian mở bán: ${ticket.startTime.toISOString()} - ${ticket.endTime.toISOString()}
+                Thời gian mở bán: ${ticket.startSaleTime.toISOString()} - ${ticket.endSaleTime.toISOString()}
             `).join('\n    ')}
         `).join('\n')}
       `.trim();

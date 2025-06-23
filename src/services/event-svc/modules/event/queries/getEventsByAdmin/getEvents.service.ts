@@ -42,11 +42,11 @@ export class GetEventsByAdminService {
         : undefined;
       
       const isApprovedFilter = filters.isApproved !== undefined
-        ? { isApproved: filters.isApproved }
+        ? { isApproved: Boolean(filters.isApproved) }
         : undefined;
 
       const isDeletedFilter = filters.isDeleted !== undefined
-        ? { isDeleted: filters.isDeleted }
+        ? { deleteAt: Boolean(filters.isDeleted) ? { not: null } : null }
         : undefined;
       
       const timeStampFilter = filters.createdFrom || filters.createdTo

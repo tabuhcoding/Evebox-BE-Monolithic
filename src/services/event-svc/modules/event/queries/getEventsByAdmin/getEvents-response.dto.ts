@@ -44,6 +44,9 @@ export class EventAdminDataDto {
   @ApiProperty({ example: 'Nha hat Ben Thanh', description: 'Event venue' })
   venue: string;
 
+  @ApiProperty({ example: 'dattruong01082@gmail.com', description: 'Organizer email' })
+  organizerId: string;
+
   @ApiProperty({ example: true, description: 'Event is approved' })
   isApproved: boolean;
 

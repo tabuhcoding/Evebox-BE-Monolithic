@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { CreateResponseService } from "../../chat-response/create-response.service";
+import { CreateResponseService } from "../../provider/create-response.service";
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 import { OpenAIRouteEnum, RouteDescription } from "../../domain/navigation.enum";
 import { FileCacheService } from "src/infrastructure/cache/fileCache/fileCache.service";
@@ -20,7 +20,6 @@ export class OpenAINavigationService {
   constructor(
     private readonly createResponseService: CreateResponseService,
     private readonly slackService: SlackService,
-    private readonly fileCacheService: FileCacheService,
     private readonly vectorStoreService: OpenAIVectorStoreService,
   ) {}
 

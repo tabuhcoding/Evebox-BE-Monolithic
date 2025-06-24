@@ -126,6 +126,7 @@ export class GetEventsByAdminService {
             title: event.title,
             createdAt: event.createdAt,
             deleteAt: event.deleteAt,
+            organizerId: event.organizerId,
             imgLogoUrl: event.imgLogoUrl,
             imgPosterUrl: event.imgPosterUrl,
             locationString: `${event.locations?.street || ''}, ${event.locations?.ward || ''}, ${event.locations?.districts?.name || ''}, ${event.locations?.districts?.province?.name || ''}`,

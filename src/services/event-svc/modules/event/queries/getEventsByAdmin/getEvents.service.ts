@@ -10,13 +10,13 @@ import { Pagination } from "src/shared/constants/pagination";
 @Injectable()
 export class GetEventsByAdminService {
   constructor(
-    private readonly checkUserExistService: CheckUserExistService,  
+    private readonly checkUserExistService: CheckUserExistService,
     @Inject('EventsRepository') private readonly eventRepository: EventsRepository,
-    private readonly slackService: SlackService,    
-  ) {}
+    private readonly slackService: SlackService,
+  ) { }
 
   async execute(filters: GetEventsAdminDto, email: string): Promise<Result<[EventAdminDataDto[], Pagination], Error>> {
-    try{
+    try {
       const userExists = await this.checkUserExistService.checkAdminExist(email);
       if (!userExists) {
         return Err(new Error('Unauthorized: User does not exist or is not an admin'));
@@ -24,23 +24,34 @@ export class GetEventsByAdminService {
 
       const titleFilter = filters.title
         ? {
-            OR: [
-              {
-                title: {
-                  contains: filters.title,
-                  mode: 'insensitive',
-                },
+          OR: [
+            {
+              title: {
+                contains: filters.title,
+                mode: 'insensitive',
               },
-              {
-                orgName: {
-                  contains: filters.title,
-                  mode: 'insensitive',
-                },
+            },
+            {
+              orgName: {
+                contains: filters.title,
+                mode: 'insensitive',
               },
-            ],
-          }
+            },
+          ],
+        }
         : undefined;
-      
+
+      const categoryFilter =
+        filters.categoryId ? {
+            EventCategories: {
+              some: {
+                categoryId: filters.categoryId >> 0,
+              },
+            },
+          }
+          : undefined;
+
+
       const isApprovedFilter = filters.isApproved !== undefined
         ? { isApproved: Boolean(filters.isApproved) }
         : undefined;
@@ -48,14 +59,14 @@ export class GetEventsByAdminService {
       const isDeletedFilter = filters.isDeleted !== undefined
         ? { deleteAt: Boolean(filters.isDeleted) ? { not: null } : null }
         : undefined;
-      
+
       const timeStampFilter = filters.createdFrom || filters.createdTo
         ? {
-            createdAt: {
-              gte: filters.createdFrom ? new Date(filters.createdFrom) : undefined,
-              lte: filters.createdTo ? new Date(filters.createdTo) : undefined,
-            },
-          }
+          createdAt: {
+            gte: filters.createdFrom ? new Date(filters.createdFrom) : undefined,
+            lte: filters.createdTo ? new Date(filters.createdTo) : undefined,
+          },
+        }
         : undefined;
 
       const payloadFilters = {
@@ -63,6 +74,7 @@ export class GetEventsByAdminService {
         ...isApprovedFilter,
         ...isDeletedFilter,
         ...timeStampFilter,
+        ...categoryFilter,
       };
 
       // Count total events
@@ -71,7 +83,7 @@ export class GetEventsByAdminService {
       );
 
       if (totalEvents === 0) {
-        return Ok([[], {page: 1, limit: filters.limit || 10, totalItems: 0, totalPages: 0}]);
+        return Ok([[], { page: 1, limit: filters.limit || 10, totalItems: 0, totalPages: 0 }]);
       }
 
       // Pagination

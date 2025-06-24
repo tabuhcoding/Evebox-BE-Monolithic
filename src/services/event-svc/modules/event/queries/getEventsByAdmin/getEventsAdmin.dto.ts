@@ -26,6 +26,14 @@ export class GetEventsAdminDto extends PaginationQuery {
   isDeleted?: boolean;
 
   @ApiProperty({
+    example: 1,
+    description: 'Category of event',
+    required: false,
+    type: Number
+  })
+  categoryId: number;
+
+  @ApiProperty({
     example: '2024-12-28T13:00:00.000Z',
     description: 'Filter events created after this date',
     required: false,

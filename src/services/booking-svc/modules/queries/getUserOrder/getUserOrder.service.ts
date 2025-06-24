@@ -61,6 +61,14 @@ export class GetUserOrderService {
       // count
       const totalOrders = await this.orderRepository.count({
         showingId: { in: showingIds },
+        userId: email,
+        status: (
+          status == OrderStatus.PENDING ? BookingTicketStatus.PAID :
+          status == OrderStatus.SUCCESS ? BookingTicketStatus.SUCCESS :
+          status == OrderStatus.CANCELLED ? BookingTicketStatus.CANCEL : {
+            not: BookingTicketStatus.PENDING
+          }
+        )
       });
       // pagination
       const pagination: Pagination = {
@@ -72,6 +80,14 @@ export class GetUserOrderService {
 
       const orders = await this.orderRepository.findMany({
         showingId: { in: showingIds },
+        userId: email,
+        status: (
+          status == OrderStatus.PENDING ? BookingTicketStatus.PAID :
+          status == OrderStatus.SUCCESS ? BookingTicketStatus.SUCCESS :
+          status == OrderStatus.CANCELLED ? BookingTicketStatus.CANCEL : {
+            not: BookingTicketStatus.PENDING
+          }
+        )
       }, {
           Ticket: true,
       }, {

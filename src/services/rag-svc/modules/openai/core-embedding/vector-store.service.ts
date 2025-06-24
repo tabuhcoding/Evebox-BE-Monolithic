@@ -117,6 +117,11 @@ export class OpenAIVectorStoreService {
     return this.embeddingWrapperService.searchByText(prompt, this.FULL_COLLECTION, topK);
   }
 
+  /** Search similar events by text */
+  async searchSimilarEventsByText(text: string, topK = 10) {
+    return this.embeddingWrapperService.searchByText(text, this.SIMILARITY_COLLECTION, topK);
+  }
+
   /** Get vector for an eventId */
   async getVectorByEventId(eventId: string): Promise<number[] | null> {
     const result = await this.prisma.$queryRawUnsafe<any[]>(`

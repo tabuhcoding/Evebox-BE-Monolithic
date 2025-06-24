@@ -1,5 +1,6 @@
 import { Document } from 'langchain/document';
 import { GetAllEventDetailForRAGResponseDto } from 'src/services/event-svc/modules/event/queries/getAllEventDetailForRAG/getAllEventDetailForRAG-response.dto';
+import { EventDescriptionGenDto } from '../api/description-generate/description-generate.dto';
 
 export class EventDocumentBuilder {
   /**
@@ -90,5 +91,20 @@ export class EventDocumentBuilder {
         viewsPerWeek: event.viewsPerWeek,
       },
     });
+  }
+
+  /**
+   * Event Builder to string
+   */
+
+  static eventToString(event: EventDescriptionGenDto, description: string): string {
+    return `
+      Tên sự kiện: ${event.name}
+      Mô tả: ${description}
+      Địa điểm: ${event.venue}, ${event.location}
+      Hình thức: ${event.isOnlineEvent ? 'Trực tuyến' : 'Trực tiếp'}
+      Đơn vị tổ chức: ${event.organizer}
+      Thể loại: ${event.categories.join(', ')}
+    `.trim();
   }
 }

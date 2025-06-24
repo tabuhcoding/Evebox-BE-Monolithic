@@ -3,13 +3,17 @@ import { OpenAIVectorStoreService } from "./core-embedding/vector-store.service"
 import { OpenAINavigationService } from "./api/navigation/navigation.service";
 import { OpenAIEmbeddingWrapperService } from "./core-embedding/embedding-wrapper";
 import { EventDocumentBuilder } from "./core-embedding/event-document.builder";
-import { CreateResponseService } from "./chat-response/create-response.service";
+import { CreateResponseService } from "./provider/create-response.service";
 import { OpenAINavigationController } from "./api/navigation/navigation.controller";
+import { DescriptionGenerateService } from "./api/description-generate/description-generate.service";
+import { DescriptionGenerateController } from "./api/description-generate/description-generate.controller";
+import { AuthSvcModule } from "src/services/auth-svc/auth-svc.module";
 
 @Module({
-  imports: [],
+  imports: [ AuthSvcModule ],
   controllers: [
     OpenAINavigationController,
+    DescriptionGenerateController,
   ],
   providers: [
     OpenAIVectorStoreService,
@@ -18,6 +22,7 @@ import { OpenAINavigationController } from "./api/navigation/navigation.controll
     CreateResponseService,
 
     OpenAINavigationService,
+    DescriptionGenerateService
   ],
   exports: [
     OpenAIVectorStoreService,

@@ -24,10 +24,11 @@ interface ChatResponsesResponse {
   output: {
     id: string;
     type: string;
-    text: string;
+    text?: string;
+    arguments?: string;
     status: string;
     role: string;
-    content: {
+    content?: {
       type: string;
       text: string;
     }[];
@@ -109,17 +110,24 @@ export class CreateResponseService {
       const response = await axios.post<ChatResponsesResponse>(this.baseUrl, payload, { headers });
       const data = response.data;
 
-      if (!data.output?.length || !data.output[0].content?.length) {
+      await this.slackService.sendNotice(`📝 OpenAI content generation successful: ${JSON.stringify(data.output)}`);
+      if (!data.output) {
         throw new Error('Empty content returned from OpenAI');
       }
 
-      const content = data.output[0].content[0].text;
+      const output = data.output[0];
       const responseId = data.id;
 
-      let parsed: any = content;
-      if (schema) {
-        parsed = schema.parse(JSON.parse(content));
+      let parsed: any;
+
+      if (output.type === 'function_call' && output.arguments) {
+        parsed = schema ? schema.parse(JSON.parse(output.arguments)) : JSON.parse(output.arguments);
+      } else {
+        const contentText = output.content?.[0]?.text;
+        if (!contentText) throw new Error('Empty content returned from OpenAI');
+        parsed = schema ? schema.parse(JSON.parse(contentText)) : contentText;
       }
+
 
       return {
         result: parsed,

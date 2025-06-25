@@ -109,6 +109,12 @@ export class EventDetailResponseDto {
   @ApiProperty({ example: '2024-12-27T12:30:00.000Z' })
   startDate: Date;
 
+  @ApiProperty({ example: '2024-12-27T12:30:00.000Z', description: 'Created date of event' })
+  createdAt: Date;
+
+  @ApiProperty({ example: '2024-12-27T12:30:00.000Z', description: 'Deleted date of event' })
+  deleteAt: Date;
+
   @ApiProperty({ example: null, nullable: true })
   organizerId: string | null;
 
@@ -126,6 +132,9 @@ export class EventDetailResponseDto {
 
   @ApiProperty({ example: false })
   isOnline: boolean;
+
+  @ApiProperty({ example: true })
+  isApproved: boolean;
 
   @ApiProperty({ example: '62 Trần Quang Khải, Tan Dinh Ward, 1 District, Ho Chi Minh City' })
   locationsString: string;

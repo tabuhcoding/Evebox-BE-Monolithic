@@ -39,9 +39,9 @@ export class GetEventDetailService {
               },
             },
             where: {
-              endTime: {
-                gte: new Date(new Date().setMonth(new Date().getMonth() - 1)),
-              },
+              // endTime: {
+              //   gte: new Date(new Date().setMonth(new Date().getMonth() - 1)),
+              // },
               deleteAt: null,
             },
           },
@@ -139,7 +139,7 @@ export class GetEventDetailService {
             eventsDto.minPrice = showingMinPrice;
           }
           // Update start date
-          if (new Date(showing.startTime) < eventsDto.startDate && new Date(showing.startTime) > nowDate) {
+          if (new Date(showing.startTime) < eventsDto.startDate && new Date(showing.endTime) > nowDate) {
             eventsDto.startDate = new Date(showing.startTime);
           }
 

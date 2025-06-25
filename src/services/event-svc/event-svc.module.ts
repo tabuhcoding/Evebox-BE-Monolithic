@@ -3,6 +3,8 @@ import { GetTicketDetailOfShowingService } from './modules/showing/queries/getTi
 import { GetShowingsByAdminService } from './modules/showing/queries/getShowingsByAdmin/getShowings.service';
 import { GetShowingAdminDetailService } from './modules/showing/queries/getShowingAdminDetail/getShowingAdminDetail.service';
 import { GetEventsByAdminController } from './modules/event/queries/getEventsByAdmin/getEvents.controller';
+import { GetEventDetailByAdminController } from './modules/event/queries/getEventDetailByAdmin/getEventDetailByAdmin.controller';
+import { GetEventDetailByAdminService } from './modules/event/queries/getEventDetailByAdmin/getEventDetailByAdmin.service';
 // event-svc.module.ts
 import { forwardRef, Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
@@ -195,6 +197,7 @@ import { GetAllFormsController } from './modules/form/queries/getAllForms/getAll
     
     UpdateEventAdminController, 
     GetEventsByAdminController,
+    GetEventDetailByAdminController,
     GetEventSpecialManagementController,
     GetEventMemberController,
     GetEventMemberController,
@@ -273,6 +276,7 @@ import { GetAllFormsController } from './modules/form/queries/getAllForms/getAll
     // Admin event
     UpdateEventAdminService,
     GetEventsByAdminService,
+    GetEventDetailByAdminService,
     GetEventSpecialManagementService,
     GetEventMembersService,
     

@@ -57,6 +57,7 @@ export class GetRecommendEventService {
             }
           },
           deleteAt: null,
+          isApproved: true,
         },
         {
           Showing: {

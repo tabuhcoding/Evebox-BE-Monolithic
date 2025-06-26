@@ -139,12 +139,15 @@ import { SeatRepositoryImpl } from './repository/seatRepository/seatRepository.i
 import { GetAllShowingDetailOfEventController } from './modules/showing/queries/getAllShowingDetailOfEvent/getAllShowingDetailOfEvent.controller';
 import { GetAllFormsService } from './modules/form/queries/getAllForms/getAllForms.service';
 import { GetAllFormsController } from './modules/form/queries/getAllForms/getAllForms.controller';
+import { OpenAIModule } from '../rag-svc/modules/openai/openAI.module';
 
 @Module({
   imports: [ 
     BookingSvcModule, 
     AuthSvcModule, 
-    CqrsModule ],
+    CqrsModule,
+    forwardRef(() => OpenAIModule)
+  ],
   controllers: [
     // Categories
     GetAllCategoriesController,

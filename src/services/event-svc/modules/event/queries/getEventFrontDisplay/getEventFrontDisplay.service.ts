@@ -96,6 +96,7 @@ export class GetEventFrontDisplayService {
       const specialEvents = await this.eventsRepository.findMany({
           isSpecial: true,
           deleteAt: null,
+          isApproved: true,
           Showing: {
             some: {
               startTime: {
@@ -158,6 +159,7 @@ export class GetEventFrontDisplayService {
       const onlyOnEveEvents = await this.eventsRepository.findMany({
         isOnlyOnEve: true,
         deleteAt: null,
+        isApproved: true,
         Showing: {
           some: {
             startTime: {
@@ -224,6 +226,7 @@ export class GetEventFrontDisplayService {
       // Get trending events
       const events = await this.eventsRepository.findMany({
         deleteAt: null,
+        isApproved: true,
         Showing: {
           some: {
             startTime: {
@@ -315,6 +318,7 @@ export class GetEventFrontDisplayService {
             },
           },
           deleteAt: null,
+          isApproved: true,
           Showing: {
             some: {
               endTime: {
@@ -377,10 +381,10 @@ export class GetEventFrontDisplayService {
     }
   }
 
-  async caculateEventStatusAndMinPriceAndStartDate(event: Events): Promise<Result<EventFrontDisplayDto, Error>> {
+  async caculateEventStatusAndMinPriceAndStartDate(event: Events, timeStamp: number = 1): Promise<Result<EventFrontDisplayDto, Error>> {
     try{
       // Calculate event status and min price
-      const [status, minTicketPrice, startTime] = await calculateEventStatusAndMinPriceAndStartDate(event);
+      const [status, minTicketPrice, startTime] = await calculateEventStatusAndMinPriceAndStartDate(event, timeStamp);
 
       // Map to EventFrontDisplayDto
       const eventFrontDisplayDto: EventFrontDisplayDto = {

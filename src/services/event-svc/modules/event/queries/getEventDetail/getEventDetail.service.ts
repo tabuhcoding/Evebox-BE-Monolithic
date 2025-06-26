@@ -121,6 +121,7 @@ export class GetEventDetailService {
         eventsDto.startDate = new Date("9999-12-31T23:59:59.999Z");
       }
       else{
+        var endDate = new Date("1970-12-31T23:59:59.999Z");
         for (const showing of event.Showing) {
           await this.calculateShowingStatusService.reCalculateAllTicketTypesOfShowingStatus(showing);
           var showingStatus: ShowingStatus;
@@ -139,8 +140,16 @@ export class GetEventDetailService {
             eventsDto.minPrice = showingMinPrice;
           }
           // Update start date
-          if (new Date(showing.startTime) < eventsDto.startDate && new Date(showing.endTime) > nowDate) {
-            eventsDto.startDate = new Date(showing.startTime);
+          if (new Date(showing.startTime) < eventsDto.startDate ) {
+            if (new Date(showing.endTime) > nowDate) {
+              eventsDto.startDate = new Date(showing.startTime);
+              endDate = new Date(showing.endTime);
+            } else {
+              if (new Date(showing.endTime) > endDate) {
+                eventsDto.startDate = new Date(showing.startTime);
+                endDate = new Date(showing.endTime);
+              }
+            }
           }
 
           // Add showing to DTO

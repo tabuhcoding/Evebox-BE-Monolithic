@@ -45,26 +45,14 @@ export class GetShowingsByAdminController {
         });
       }
 
-      const data = result.unwrap();
-
-      const totalCount = await this.getShowingsService.count(filters);
-      const totalPages = Math.ceil(totalCount / limit);
-      const currentPage = page;
-
-      const nextPage = currentPage < totalPages ? currentPage + 1 : null;
+      const [data, pagination] = result.unwrap();
 
       return res.status(HttpStatus.OK).json({
         statusCode: HttpStatus.OK,
-        message: 'Showings retrieve successfully',
+        message: 'Showings retrieved successfully',
         data: {
-          data: data,
-          meta: {
-            totalCount,
-            currentPage,
-            nextPage,
-            limit: filters.limit || 10,
-            totalPages,
-          },
+          data,
+          pagination,
         }
       });
     } catch (error) {

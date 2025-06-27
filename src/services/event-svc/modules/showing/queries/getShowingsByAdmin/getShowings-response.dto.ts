@@ -41,10 +41,15 @@ export class ShowingDataDto {
   event: EventData;
 }
 
-export class ShowingByAdminResponseDto extends BaseResponse {
+export class ShowingByAdminResponseData {
   @ApiProperty({ type: [ShowingDataDto], description: 'List of showing' })
   data: ShowingDataDto[];
 
   @ApiProperty({ type: Pagination, description: 'Pagination information' })
   pagination: Pagination;
+}
+
+export class ShowingByAdminResponseDto extends BaseResponse {
+  @ApiProperty({ type: ShowingByAdminResponseData, description: 'Showings by admin response data' })
+  data: ShowingByAdminResponseData;
 }

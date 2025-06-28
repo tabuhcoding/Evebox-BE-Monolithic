@@ -18,7 +18,7 @@ constructor(
     private readonly slackService: SlackService,
   ) {}
   
- async execute(email: string, pagination: PaginationQuery): Promise<Result<[FavoriteEventResponseData[], Pagination], Error>> {
+  async execute(email: string, pagination: PaginationQuery): Promise<Result<[FavoriteEventResponseData[], Pagination], Error>> {
     const emailOrError = Email.create(email);
     if (emailOrError.isErr()) {
       return Err(new Error('Invalid email format'));
@@ -37,6 +37,42 @@ constructor(
       await this.slackService.sendError(` Auth Svc - User >>> GetFavoriteEvent: ${error}`);
       
       return Err(new Error("Failed to retrieve events"));
+    }
+  }
+
+  async getFavoriteEventIDs(email: string): Promise<number[]> {
+    try {
+      const emailOrError = Email.create(email);
+      if (emailOrError.isErr()) {
+        return [];
+      }
+      const emailStr = emailOrError.unwrap();
+      const user = await this.userRepository.findByEmail(emailStr);
+      if (!user) {
+        return [];
+      }
+
+      const eventIds = await this.favoriteRepository.findAll({
+        userId: email,
+        type: 'EVENT',
+      });
+      return eventIds.map(favorite => favorite.eventId);
+    } catch (error) {
+      await this.slackService.sendError(` Auth Svc - User >>> GetFavoriteEventIDs: ${error}`);
+      return [];
+    }
+  }
+
+  async getEventFavoriteUserIds(eventId: number): Promise<string[]> {
+    try {
+      const favoriteUsers = await this.favoriteRepository.findAll({
+        eventId: eventId,
+        type: 'EVENT',
+      });
+      return favoriteUsers.map(favorite => favorite.userId);
+    } catch (error) {
+      await this.slackService.sendError(` Auth Svc - User >>> GetEventFavoriteUserIds: ${error}`);
+      return [];
     }
   }
 }

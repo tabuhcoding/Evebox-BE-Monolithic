@@ -6,6 +6,9 @@ export class GetUsersByAdminDto extends PaginationQuery {
   @ApiProperty({ example: 'Dat Truong', description: 'User name', required: false })
   search?: string;
 
+  @ApiProperty({ example: 1, description: 'Role id', required: false, type: Number })
+  role_id?: number;
+
   @ApiProperty({
     example: '2024-12-28T13:00:00.000Z',
     description: 'Filter users created after this date',

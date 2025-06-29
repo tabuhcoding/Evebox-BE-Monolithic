@@ -82,6 +82,8 @@ import { GetAdminAccessService } from "./modules/user/queries/get-admin-access/g
 import { CheckFavoriteService } from "./modules/user/commands/check-favorite/checkFavorite.service";
 import { GetUsersByAdminService } from "./modules/admin/queries/getUsersByAdmin/getUsersByAdmin.service";
 import { GetUsersByAdminController } from "./modules/admin/queries/getUsersByAdmin/getUsersByAdmin.controller";
+import { GetUserByIdController } from "./modules/user/queries/get-user-by-id/get-user-by-id.controller";
+import { GetUserByIdService } from "./modules/user/queries/get-user-by-id/get-user-by-id.service";
 
 @Module({
   imports: [
@@ -112,6 +114,7 @@ import { GetUsersByAdminController } from "./modules/admin/queries/getUsersByAdm
     ForgotPasswordController,
     GoogleLoginController,
     GetUserController,
+    GetUserByIdController,
     AddToFavoriteController,
     UnfavoriteEventController,
     UnfavoriteOrgController,
@@ -151,6 +154,7 @@ import { GetUsersByAdminController } from "./modules/admin/queries/getUsersByAdm
     ResendOTPService,
     GoogleLoginService,
     GetUserService,
+    GetUserByIdService,
     AddToFavoriteService,
     UnfavoriteEventService,
     UnfavoriteOrgService,

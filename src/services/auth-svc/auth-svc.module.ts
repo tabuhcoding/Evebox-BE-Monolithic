@@ -80,7 +80,8 @@ import { ChangeUserPinController } from "./modules/user/commands/change-pin/chan
 import { ChangeUserPinService } from "./modules/user/commands/change-pin/change-pin.service";
 import { GetAdminAccessService } from "./modules/user/queries/get-admin-access/get-admin-access.service";
 import { CheckFavoriteService } from "./modules/user/commands/check-favorite/checkFavorite.service";
-
+import { GetUsersByAdminService } from "./modules/admin/queries/getUsersByAdmin/getUsersByAdmin.service";
+import { GetUsersByAdminController } from "./modules/admin/queries/getUsersByAdmin/getUsersByAdmin.controller";
 
 @Module({
   imports: [
@@ -131,6 +132,7 @@ import { CheckFavoriteService } from "./modules/user/commands/check-favorite/che
     CreateUserPinController,
     VerifyUserPinController,
     ChangeUserPinController,
+    GetUsersByAdminController,
   ],
   providers: [
     RegisterUserService,
@@ -158,6 +160,7 @@ import { CheckFavoriteService } from "./modules/user/commands/check-favorite/che
     CreateUserPinService,
     VerifyUserPinService,
     ChangeUserPinService,
+    GetUsersByAdminService,
 
     // Repositories
     GetFavoriteEventService,

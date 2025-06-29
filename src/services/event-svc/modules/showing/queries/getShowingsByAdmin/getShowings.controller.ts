@@ -18,6 +18,7 @@ export class GetShowingsByAdminController {
   @ApiQuery({ name: 'limit', required: false, description: 'Number of showings per page', type: Number, default: 10 })
   @ApiQuery({ name: 'startTime', required: false, description: 'Filter showings start time after this date', type: String })
   @ApiQuery({ name: 'endTime', required: false, description: 'Filter showings end time before this date', type: String })
+  @ApiQuery({ name: 'search', required: false, description: 'Search showings by event title or event id', type: String })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Showings retrieved successfully',

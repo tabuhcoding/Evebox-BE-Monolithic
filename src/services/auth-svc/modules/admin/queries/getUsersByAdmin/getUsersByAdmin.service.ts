@@ -64,6 +64,7 @@ export class GetUsersByAdminService {
         limit
       );
 
+      console.log(JSON.stringify(users[0]), users[0]);
 
       const userDtos: UserDto[] = users.map(u => {
         let roleObj: { id: number, role_name: string } | null = null;
@@ -86,10 +87,10 @@ export class GetUsersByAdminService {
             ? String(u.status.getValue())
             : String(u.status),
           role: roleObj,
-          created_at: u.createAt
-            ? new Date(u.createAt).toISOString()
-            : u.createAt
-              ? new Date(u.createAt).toISOString()
+          created_at: u.created_at
+            ? new Date(u.created_at).toISOString()
+            : u.created_at
+              ? new Date(u.created_at).toISOString()
               : "",
         };
       });

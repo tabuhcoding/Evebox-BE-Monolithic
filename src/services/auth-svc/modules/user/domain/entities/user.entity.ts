@@ -23,7 +23,7 @@ interface UserProps {
   role: Role;
   avatar_id?: Avatar;
   status: Status;
-  createAt?: Date;
+  created_at?: Date;
   receiveNoti?: boolean;
 }
 
@@ -83,7 +83,7 @@ export class User extends AggregateRoot<UserId, UserProps> {
     role: Role,
     avatarId?: Avatar,
     status?: Status,
-    createAt?: Date,
+    created_at?: Date,
     receiveNoti?: boolean
   ): Result<User, Error> {
     return Ok(new User(id, {
@@ -95,7 +95,7 @@ export class User extends AggregateRoot<UserId, UserProps> {
       role,
       status,
       avatar_id: avatarId,
-      createAt,
+      created_at: created_at,
       receiveNoti
     }));
   }
@@ -160,8 +160,8 @@ export class User extends AggregateRoot<UserId, UserProps> {
     return this.props.avatar_id.value;
   }
 
-  public get createAt(): Date | undefined {
-    return this.props.createAt;
+  public get created_at(): Date | undefined {
+    return this.props.created_at;
   }
 
   public get receiveNoti(): boolean | undefined {

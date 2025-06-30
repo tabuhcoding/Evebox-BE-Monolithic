@@ -77,7 +77,16 @@ export class CalculateTicketTypeStatusService {
   }
 
   async updateEvents(): Promise<void> {
-    const events = await this.eventsRepository.findAll({},
+    const events = await this.eventsRepository.findAll({
+      Showing: {
+          some: {
+            startTime: {
+              gte: new Date(new Date().setMonth(new Date().getMonth() - 1)),
+            },
+            deleteAt: null,
+          },
+        }
+    },
       {
         Showing: {
           include: {

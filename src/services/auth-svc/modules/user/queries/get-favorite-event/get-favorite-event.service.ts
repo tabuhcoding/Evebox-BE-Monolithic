@@ -54,7 +54,8 @@ constructor(
 
       const eventIds = await this.favoriteRepository.findAll({
         userId: email,
-        type: 'EVENT',
+        isFavorite: true,
+        itemType: 'EVENT',
       });
       return eventIds.map(favorite => favorite.eventId);
     } catch (error) {
@@ -67,7 +68,7 @@ constructor(
     try {
       const favoriteUsers = await this.favoriteRepository.findAll({
         eventId: eventId,
-        type: 'EVENT',
+        itemType: 'EVENT',
       });
       return favoriteUsers.map(favorite => favorite.userId);
     } catch (error) {

@@ -208,6 +208,7 @@ import { CheckFavoriteService } from "./modules/user/commands/check-favorite/che
     GetUserService,
     CheckFavoriteService,
     VerifyUserPinService,
+    GetFavoriteEventService,
   ],
 })
 export class AuthSvcModule { }

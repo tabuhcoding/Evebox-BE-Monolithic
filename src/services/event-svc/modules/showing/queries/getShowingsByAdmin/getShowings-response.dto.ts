@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { BaseResponse } from "src/shared/constants/baseResponse";
+import { Pagination } from "src/shared/constants/pagination";
 
 export class TicketTypeData {
   @ApiProperty({ example: '1001414', description: 'Ticket type ID' })
@@ -37,10 +38,18 @@ export class ShowingDataDto {
   eventTitle: string;
 
   @ApiProperty({ type: EventData, description: 'Event data' })
-  event: EventData
+  event: EventData;
+}
+
+export class ShowingByAdminResponseData {
+  @ApiProperty({ type: [ShowingDataDto], description: 'List of showing' })
+  data: ShowingDataDto[];
+
+  @ApiProperty({ type: Pagination, description: 'Pagination information' })
+  pagination: Pagination;
 }
 
 export class ShowingByAdminResponseDto extends BaseResponse {
-  @ApiProperty({ type: [ShowingDataDto], description: 'List of showing' })
-  data: ShowingDataDto[];
+  @ApiProperty({ type: ShowingByAdminResponseData, description: 'Showings by admin response data' })
+  data: ShowingByAdminResponseData;
 }

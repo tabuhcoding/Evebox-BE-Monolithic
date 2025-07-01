@@ -140,9 +140,11 @@ import { GetAllShowingDetailOfEventController } from './modules/showing/queries/
 import { GetAllFormsService } from './modules/form/queries/getAllForms/getAllForms.service';
 import { GetAllFormsController } from './modules/form/queries/getAllForms/getAllForms.controller';
 import { OpenAIModule } from '../rag-svc/modules/openai/openAI.module';
+import { PrismaEventModule } from './database/prisma-event/prisma.module';
 
 @Module({
   imports: [ 
+    PrismaEventModule,
     BookingSvcModule, 
     AuthSvcModule, 
     CqrsModule,

@@ -1,14 +1,14 @@
-import { FavoriteNotiHistory, ItemType} from '@prisma/client';
-import { BaseRepository } from "src/shared/repo/base.repository";
-import { Prisma } from "@prisma/client";
+import { FavoriteNotiHistory, ItemType} from 'prisma/client-auth';
+import { BaseAuthRepository } from '../base.repository';
+import { Prisma } from "prisma/client-auth";
 import { Pagination, PaginationQuery } from 'src/shared/constants/pagination';
 
 export { FavoriteNotiHistory }
 
-export { ItemType } from '@prisma/client';
+export { ItemType } from 'prisma/client-auth';
 
 export interface FavoriteRepository
-  extends BaseRepository<FavoriteNotiHistory, Prisma.FavoriteNotiHistoryDelegate> {
+  extends BaseAuthRepository<FavoriteNotiHistory, Prisma.FavoriteNotiHistoryDelegate> {
     findFavorite(
     userId: string,
     itemType: ItemType,

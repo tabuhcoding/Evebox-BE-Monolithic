@@ -58,12 +58,12 @@ export function calculateShowingStatusAndMinPrice(ticketTypes: TicketTypeWithout
   return Promise.resolve([showingStatus, minPrice]);
 }
 
-export async function calculateEventStatusAndMinPriceAndStartDate(event: Events): Promise<[EventStatus, number, Date]> {
+export async function calculateEventStatusAndMinPriceAndStartDate(event: Events, timeStamp: number = 1): Promise<[EventStatus, number, Date]> {
   let eventStatus = EventStatus.AVAILABLE;
   let minPrice = Number.MAX_VALUE;
   let showingStatusSet = new Set<ShowingStatus>();
   let startTime = new Date("9999-12-31T23:59:59.999Z");
-  let nowDate = new Date(new Date().setMonth(new Date().getMonth() - 1));
+  let nowDate = new Date(new Date().setMonth(new Date().getMonth() - timeStamp));
 
   if ( !event.Showing || event.Showing?.length === 0) {
 

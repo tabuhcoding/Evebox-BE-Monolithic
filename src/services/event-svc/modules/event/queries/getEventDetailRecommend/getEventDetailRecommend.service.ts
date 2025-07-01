@@ -5,6 +5,7 @@ import { GetEventFrontDisplayService } from "../getEventFrontDisplay/getEventFro
 import { EventFrontDisplayDto } from "../getEventFrontDisplay/getEventFrontDisplay-response.dto";
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 import { CheckFavoriteService } from "src/services/auth-svc/modules/user/commands/check-favorite/checkFavorite.service";
+import { OpenAIVectorStoreService } from "src/services/rag-svc/modules/openai/core-embedding/vector-store.service";
 
 @Injectable()
 export class GetEventDetailRecommendService {
@@ -13,6 +14,7 @@ export class GetEventDetailRecommendService {
     private readonly getEventFrontDisplayService: GetEventFrontDisplayService,
     private readonly slackService: SlackService,
     private readonly checkFavoriteService: CheckFavoriteService,
+    private readonly openAIVectorStoreService: OpenAIVectorStoreService,
   ) {}
 
   async getRecommendedEventsInDetail(eventId: number, limit: string, userId?: string): Promise<Result<EventFrontDisplayDto[], Error>> {
@@ -40,20 +42,19 @@ export class GetEventDetailRecommendService {
 
       const now = new Date();
 
+      const eventSimilarities = await this.openAIVectorStoreService.findSimilarEventsFromEvent(eventId.toString(), 40);
+      if (!eventSimilarities || eventSimilarities.length === 0) {
+        return Ok([]);
+      }
+
+      console.log(`Found ${eventSimilarities.length} similar events for event ID ${eventId}`);
+
+      const eventIds = eventSimilarities.map(similarity => similarity[0].metadata.eventId >> 0);
+
       const recommendedEvents = await this.eventsRepository.findMany(
         {
-          locations: {
-          districts: {
-            provinceId: event.locations.districts.provinceId,
-          },
-          },
-          Showing: {
-            some: {
-              startTime: limit === 'all' ? undefined : { gte: now },
-            },
-          },
-          id: { not: eventId }, 
-          deleteAt: null,
+          id: {
+            in: eventIds,}
         },
         {
           Showing: {
@@ -70,14 +71,12 @@ export class GetEventDetailRecommendService {
             },
             where: {
               startTime: {
-                gte: new Date(),
+                gte: new Date(now.getFullYear(), now.getMonth() - 3, now.getDate()),
               },
             },
           }
         },
-        { lastScore: 'desc' }, 
-        0,
-        limit === 'all' ? undefined : parseInt(limit, 10),
+        { nearlyEndDate: 'desc' }, 
       )
 
       if (!recommendedEvents || recommendedEvents.length === 0) {
@@ -88,7 +87,7 @@ export class GetEventDetailRecommendService {
       var recommendedEventsDto: (EventFrontDisplayDto)[] = [];
 
       for (const event of recommendedEvents) {
-        const result = await this.getEventFrontDisplayService.caculateEventStatusAndMinPriceAndStartDate(event);
+        const result = await this.getEventFrontDisplayService.caculateEventStatusAndMinPriceAndStartDate(event, 3);
         if (result.isErr()) {
           continue; // Skip this event if there's an error
         }
@@ -97,10 +96,11 @@ export class GetEventDetailRecommendService {
 
       // Filter out any null results
       const filteredEventDtos = recommendedEventsDto.filter((event) => event !== null
-        && event.status !== 'EVENT_OVER' 
-        && event.status !== 'SOLD_OUT'
-        && event.status !== 'REGISTER_CLOSE'
-        && event.status !== 'SALE_CLOSE'
+        && event.id !== eventId
+        // && event.status !== 'EVENT_OVER' 
+        // && event.status !== 'SOLD_OUT'
+        // && event.status !== 'REGISTER_CLOSE'
+        // && event.status !== 'SALE_CLOSE'
       ) as EventFrontDisplayDto[];
 
       if (userId) {

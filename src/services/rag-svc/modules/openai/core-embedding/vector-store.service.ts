@@ -125,15 +125,18 @@ export class OpenAIVectorStoreService {
   /** Get vector for an eventId */
   async getVectorByEventId(eventId: string): Promise<number[] | null> {
     const result = await this.prisma.$queryRawUnsafe<any[]>(`
-      SELECT embedding
+      SELECT embedding::text AS embedding
       FROM ${this.SIMILARITY_COLLECTION}
       WHERE metadata->>'eventId' = $1
       LIMIT 1;
     `, eventId);
 
     if (!result?.[0]) return null;
-    return result[0].embedding;
+
+    // Parse the vector string like: "[0.1, 0.2, 0.3]"
+    return JSON.parse(result[0].embedding);
   }
+
 
   /** Find similar events for a given EventId */
   async findSimilarEventsFromEvent(eventId: string, topK = 10) {
@@ -164,7 +167,15 @@ export class OpenAIVectorStoreService {
 
   /** Recommend events based on favorite eventIds */
   async recommendEventsFromFavorites(favoriteIds: string[], topK = 10) {
-    const vectors = await Promise.all(favoriteIds.map(id => this.getVectorByEventId(id)));
+    var vectors: number[][] = [];
+    for (const favoriteId of favoriteIds) {
+      const vector = await this.getVectorByEventId(favoriteId);
+      if (vector) {
+        vectors.push(vector);
+      } else {
+        await this.slackService.sendError(`❌ No vector found for favoriteId: ${favoriteId}`);
+      }
+    }
     const validVectors = vectors.filter(v => Array.isArray(v)) as number[][];
 
     if (validVectors.length === 0) {

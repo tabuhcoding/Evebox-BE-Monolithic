@@ -1,8 +1,8 @@
-import { BaseRepository } from "src/shared/repo/base.repository";
-import { FormInput, Prisma } from "@prisma/client";
+import { BaseEventRepository } from '../base.repository';
+import { FormInput, Prisma } from "prisma/client-event";
 
 export { FormInput }
 
-export interface FormInputRepository extends BaseRepository<FormInput, Prisma.FormInputDelegate> {
+export interface FormInputRepository extends BaseEventRepository<FormInput, Prisma.FormInputDelegate> {
 
 }

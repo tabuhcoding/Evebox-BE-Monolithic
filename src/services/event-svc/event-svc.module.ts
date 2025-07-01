@@ -14,7 +14,6 @@ import { EventCategoriesRepositoryImpl } from './repository/eventCategories/even
 import { EventUserRelationshipRepositoryImpl } from './repository/eventUserRelationship/eventUserRelationship.impl';
 import { EventRoleRepositoryImpl } from './repository/eventRole/eventRole.impl';
 import { LocationsRepositoryImpl } from './repository/locations/location.impl';
-import { AdminRepositoryImpl } from '../auth-svc/repository/admin/admin.repository.impl';
 import { GetAllEventDetailForRAGService } from './modules/event/queries/getAllEventDetailForRAG/getAllEventDetailForRAG.service';
 import { GetAllCategoriesController } from './modules/categories/queries/getAllCategories.controller';
 import { GetAllCategoriesService } from './modules/categories/queries/getAllCategories.service';
@@ -139,12 +138,17 @@ import { SeatRepositoryImpl } from './repository/seatRepository/seatRepository.i
 import { GetAllShowingDetailOfEventController } from './modules/showing/queries/getAllShowingDetailOfEvent/getAllShowingDetailOfEvent.controller';
 import { GetAllFormsService } from './modules/form/queries/getAllForms/getAllForms.service';
 import { GetAllFormsController } from './modules/form/queries/getAllForms/getAllForms.controller';
+import { OpenAIModule } from '../rag-svc/modules/openai/openAI.module';
+import { PrismaEventModule } from './database/prisma-event/prisma.module';
 
 @Module({
   imports: [ 
+    PrismaEventModule,
     BookingSvcModule, 
     AuthSvcModule, 
-    CqrsModule ],
+    CqrsModule,
+    forwardRef(() => OpenAIModule)
+  ],
   controllers: [
     // Categories
     GetAllCategoriesController,
@@ -312,7 +316,6 @@ import { GetAllFormsController } from './modules/form/queries/getAllForms/getAll
     GetAllFormsService,
 
     // Repositories
-    { provide: 'AdminRepository', useClass: AdminRepositoryImpl },
     { provide: 'CategoriesRepository', useClass: CategoriesRepositoryImpl },
     { provide: 'EventsRepository', useClass: EventsRepositoryImpl },
     { provide: 'EventCategoriesRepository', useClass: EventCategoriesRepositoryImpl },

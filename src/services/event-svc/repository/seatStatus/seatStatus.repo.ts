@@ -1,5 +1,5 @@
-import { BaseRepository } from "src/shared/repo/base.repository";
-import { Prisma, SeatStatusEnum } from "@prisma/client";
+import { BaseEventRepository } from '../base.repository';
+import { Prisma, SeatStatusEnum } from "prisma/client-event";
 
 export type SeatStatus = Prisma.SeatStatusGetPayload<{
   include: {
@@ -8,8 +8,8 @@ export type SeatStatus = Prisma.SeatStatusGetPayload<{
   };
 }>;
 
-export { SeatStatusEnum } from "@prisma/client";
+export { SeatStatusEnum } from "prisma/client-event";
 
-export interface SeatStatusRepository extends BaseRepository<SeatStatus, Prisma.SeatStatusDelegate> {
+export interface SeatStatusRepository extends BaseEventRepository<SeatStatus, Prisma.SeatStatusDelegate> {
   
 }

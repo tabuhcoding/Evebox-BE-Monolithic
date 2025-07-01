@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { UserRepository } from './user.repository';
-import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
+import { PrismaAuthService } from '../../database/prisma-auth/prisma.service';
 import { User } from '../../modules/user/domain/entities/user.entity';
 import { Email } from '../../modules/user/domain/value-objects/user/email.vo';
 import { UserId } from '../../modules/user/domain/value-objects/user/user-id.vo';
@@ -9,22 +9,22 @@ import { Role } from '../../modules/user/domain/value-objects/user/role.vo';
 import { Name } from '../../modules/user/domain/value-objects/user/name.vo';
 import { Phone } from '../../modules/user/domain/value-objects/user/phone.vo';
 import { EventBus } from '@nestjs/cqrs';
-import { Prisma, RefreshToken, UserStatus } from '@prisma/client';
+import { Prisma, RefreshToken } from 'prisma/client-auth';
 import { IOTPData } from './user.repository.interface';
 import { OTPType } from '../../modules/user/domain/enums/otp-type.enum';
 import { DomainEvent } from 'src/libs/ddd/domain-event.base';
 import { OTP } from '../../modules/user/domain/entities/otp.entity';
 import { Avatar } from '../../modules/user/domain/value-objects/user/avatar.vo';
 import { Status } from '../../modules/user/domain/value-objects/user/status.vo';
-import { BaseRepository } from 'src/shared/repo/base.repository';
+import { BaseAuthRepository } from '../base.repository';
 import { PinStatus } from './user.repository.interface';
 import { UserPinStatusData } from '../../modules/user/queries/get-pin-status/get-pin-status.response.dto';
 
 @Injectable()
-export class UserRepositoryImpl extends BaseRepository<User, Prisma.UserDelegate>
+export class UserRepositoryImpl extends BaseAuthRepository<User, Prisma.UserDelegate>
   implements UserRepository {
   constructor(
-    protected readonly prisma: PrismaService,
+    protected readonly prisma: PrismaAuthService,
     private readonly eventBus: EventBus,
   ) {
     super(prisma.user, prisma);

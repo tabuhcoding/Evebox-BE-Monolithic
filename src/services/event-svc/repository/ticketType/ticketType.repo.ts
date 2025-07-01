@@ -1,8 +1,8 @@
-export { TicketTypeStatus } from '@prisma/client';
+export { TicketTypeStatus } from 'prisma/client-event';
 import { Result, Ok, Err } from 'oxide.ts';
 
-import { Prisma } from '@prisma/client';
-import { BaseRepository } from 'src/shared/repo/base.repository';
+import { Prisma } from 'prisma/client-event';
+import { BaseEventRepository } from '../base.repository';
 import { CreateTicketTypeDto } from '../../modules/ticketType/commands/createTicketType/createTicketType.dto';
 import { UpdateTicketTypeDto } from '../../modules/ticketType/commands/updateTicketType/updateTicketType.dto';
 
@@ -20,9 +20,9 @@ export type TicketTypeWithoutShowingAndSections = Prisma.TicketTypeGetPayload<{
   }
 }>;
 
-export {TicketDeliveryType} from '@prisma/client'
+export {TicketDeliveryType} from 'prisma/client-event'
 
-export interface TicketTypeRepository extends BaseRepository<TicketType, Prisma.TicketTypeDelegate> {
+export interface TicketTypeRepository extends BaseEventRepository<TicketType, Prisma.TicketTypeDelegate> {
   /* Create Ticket Type */
   createTicketType(dto: CreateTicketTypeDto, showingId: string, userEmail: string): Promise<Result<[string, boolean], Error>>;
 

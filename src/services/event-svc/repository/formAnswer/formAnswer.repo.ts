@@ -1,5 +1,5 @@
-import { BaseRepository } from "src/shared/repo/base.repository";
-import { Prisma } from "@prisma/client";
+import { BaseEventRepository } from '../base.repository';
+import { Prisma } from "prisma/client-event";
 
 export type FormAnswer = Prisma.FormAnswerGetPayload<{
   include: {
@@ -7,6 +7,6 @@ export type FormAnswer = Prisma.FormAnswerGetPayload<{
   };
 }>;
 
-export interface FormAnswerRepository extends BaseRepository<FormAnswer, Prisma.FormAnswerDelegate> {
+export interface FormAnswerRepository extends BaseEventRepository<FormAnswer, Prisma.FormAnswerDelegate> {
 
 }

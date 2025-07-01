@@ -22,4 +22,14 @@ export class GetUsersNotifiedByEventService {
       return Err(new Error('Failed to fetch notified user emails'));
     }
   }
+
+  async getNotifiedUserIds(eventId: number): Promise<string[]> {
+    try {
+      const userIds = await this.favoriteRepository.getUserIdsNotifiedByEvent(eventId);
+      return userIds.map(user => user.userId);
+    } catch (error) {
+      await this.slackService.sendError(` Auth Svc - User >>> GetNotifiedUserIds: ${error}`);
+      return [];
+    }
+  }
 }

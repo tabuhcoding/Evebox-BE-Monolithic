@@ -161,6 +161,13 @@ export class GetUserOrderService {
         });
       }
 
+      // Sort the orders by Showing.startDate in descending order
+      mappedOrders.sort((a, b) => {
+        const dateA = a.Showing.startTime ? new Date(a.Showing.startTime) : new Date("9999-12-31T23:59:59.999Z");
+        const dateB = b.Showing.startTime ? new Date(b.Showing.startTime) : new Date("9999-12-31T23:59:59.999Z");
+        return dateB.getTime() - dateA.getTime();
+      });
+
       return Ok([mappedOrders, pagination]);
     } catch (error) {
       await this.slackService.sendError(`Error in GetUserTicketService: ${error.message}`);

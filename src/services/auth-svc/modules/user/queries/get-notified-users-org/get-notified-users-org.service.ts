@@ -22,4 +22,14 @@ export class GetUsersNotifiedByOrgService {
       return Err(new Error('Failed to fetch notified user emails for organizer'));
     }
   }
+
+  async getNotifiedUserIds(orgId: string): Promise<string[]> {
+    try {
+      const userIds = await this.favoriteRepository.getUserIdsNotifiedByOrganizer(orgId);
+      return userIds.map(user => user.userId);
+    } catch (error) {
+      await this.slackService.sendError(` Auth Svc - User >>> GetNotifiedUserIds: ${error}`);
+      return [];
+    }
+  }
 }

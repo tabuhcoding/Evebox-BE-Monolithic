@@ -29,12 +29,14 @@ export class GetEventsByAdminController {
       const user = req.user;
       const page = filters.page >> 0 || 1;
       const limit = filters.limit >> 0 || 10;
+      const isApproved = filters.isApproved ? filters.isApproved.toString().toLowerCase() === 'true' ? true : false : undefined;
       const isDeleted = filters.isDeleted ? filters.isDeleted.toString().toLowerCase() === 'true' ? true : false : undefined;
       const result = await this.getEventsService.execute({
         ...filters,
         page,
         limit,
-        isDeleted
+        isDeleted,
+        isApproved,
       }, user?.email);
       if (result.isErr()) {
         return res.status(HttpStatus.BAD_REQUEST).json({

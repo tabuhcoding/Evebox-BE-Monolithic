@@ -1,15 +1,15 @@
 import { Injectable } from "@nestjs/common";
-import { PrismaService } from "src/infrastructure/database/prisma/prisma.service";
-import { BaseRepository } from "src/shared/repo/base.repository";
-import { locations, Prisma } from "@prisma/client";
+import { PrismaEventService } from "../../database/prisma-event/prisma.service";
+import { BaseEventRepository } from '../base.repository';
+import { locations, Prisma } from "prisma/client-event";
 import { LocationsRepository } from "./location.repo";
 import { OrganizerLocationDto } from "../../modules/location/queries/getAllLocations/getAllLocation-response.dto";
 
 @Injectable()
 export class LocationsRepositoryImpl
-  extends BaseRepository<locations, Prisma.locationsDelegate>
+  extends BaseEventRepository<locations, Prisma.locationsDelegate>
   implements LocationsRepository {
-  constructor(protected readonly prisma: PrismaService) {
+  constructor(protected readonly prisma: PrismaEventService) {
     super(prisma.locations, prisma);
   }
 

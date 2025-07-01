@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { PaginationQuery } from "src/shared/constants/pagination";
-import { UserStatus } from "@prisma/client";
+import { UserStatus } from "prisma/client-auth";
 
 export class GetUsersByAdminDto extends PaginationQuery {
   @ApiProperty({ example: 'Dat Truong', description: 'User name', required: false })

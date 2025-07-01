@@ -10,7 +10,7 @@ import { Phone } from '../value-objects/user/phone.vo';
 import { ProvinceId } from '../value-objects/user/province-id.vo';
 import { Avatar } from '../value-objects/user/avatar.vo';
 import { Status } from '../value-objects/user/status.vo';
-import { UserStatus } from '@prisma/client';
+import { UserStatus } from 'prisma/client-auth';
 import { Result, Ok, Err } from 'oxide.ts';
 import { UserPasswordResetDomainEvent } from '../events/user/user-reset-password.domain-event';
 

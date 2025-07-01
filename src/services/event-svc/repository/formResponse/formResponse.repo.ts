@@ -1,5 +1,5 @@
-import { BaseRepository } from "src/shared/repo/base.repository";
-import { Prisma } from "@prisma/client";
+import { BaseEventRepository } from '../base.repository';
+import { Prisma } from "prisma/client-event";
 
 import { CreateFormResponseDto } from "../../modules/formResponse/commands/createFormResponse/createFormResponse.dto";
 
@@ -19,7 +19,7 @@ export type FormResponse = Prisma.FormResponseGetPayload<{
   }
 }>;
 
-export interface FormResponseRepository extends BaseRepository<FormResponse, Prisma.FormResponseDelegate> {
+export interface FormResponseRepository extends BaseEventRepository<FormResponse, Prisma.FormResponseDelegate> {
   // /* Create Form Response */
   createFormResponse(dto: CreateFormResponseDto, userId: string): Promise<FormResponse>;
 

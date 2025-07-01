@@ -1,6 +1,6 @@
 import { Prisma, PrismaClient } from 'prisma/client-ai';
 
-export class BaseRepository<
+export class BaseAIRepository<
   TModel,
   TDelegate extends {
     create: Function;

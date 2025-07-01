@@ -1,8 +1,8 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "prisma/client-event";
 
-import { PrismaService } from "src/infrastructure/database/prisma/prisma.service";
-import { BaseRepository } from "src/shared/repo/base.repository";
+import { PrismaEventService } from "../../database/prisma-event/prisma.service";
+import { BaseEventRepository } from '../base.repository';
 import { EventsRepository } from "../events/events.repo";
 import { EVENT_ROLE } from "../../modules/event/domain/eventRole";
 import { Showing, ShowingRepository } from "./showing.repo";
@@ -13,12 +13,12 @@ import { ShowingDataDto } from "../../modules/showing/queries/getShowingsByAdmin
 
 @Injectable()
 export class ShowingRepositoryImpl
-  extends BaseRepository<Showing, Prisma.ShowingDelegate>
+  extends BaseEventRepository<Showing, Prisma.ShowingDelegate>
   implements ShowingRepository
 {
   constructor(
     @Inject('EventsRepository') private readonly eventsRepository: EventsRepository,
-    protected readonly prisma: PrismaService
+    protected readonly prisma: PrismaEventService
   ) {
     super(prisma.showing, prisma);
   }

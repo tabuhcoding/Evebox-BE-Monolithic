@@ -1,5 +1,4 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { Ticket } from "@prisma/client";
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 import { GetTotalTicketOfTicketTypeService } from "src/services/booking-svc/modules/queries/getTotalTicketOfTicketType/getTotalTicketOfTicketType.service";
 import { SeatmapRepository } from "src/services/event-svc/repository/seatmap/seatmap.repo";

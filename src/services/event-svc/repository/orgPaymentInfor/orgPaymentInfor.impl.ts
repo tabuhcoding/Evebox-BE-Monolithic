@@ -1,9 +1,9 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { Prisma, OrgPaymentInfor } from "@prisma/client";
+import { Prisma, OrgPaymentInfor } from "prisma/client-event";
 import { Result, Ok, Err } from "oxide.ts";
 
-import { PrismaService } from "src/infrastructure/database/prisma/prisma.service";
-import { BaseRepository } from "src/shared/repo/base.repository";
+import { PrismaEventService } from "../../database/prisma-event/prisma.service";
+import { BaseEventRepository } from '../base.repository';
 import { OrgPaymentInforRepository } from "./orgPaymentInfor.repo";
 import { UpdateUserRoleService } from "src/services/auth-svc/modules/admin/commands/updateUserRole/updateUserRole.service";
 import { GetUserService } from "src/services/auth-svc/modules/user/queries/get-user/get-user.service";
@@ -12,10 +12,10 @@ import { UpdateOrgPaymentInfoDto } from "../../modules/orgPaymentInfor/commands/
 
 @Injectable()
 export class OrgPaymentInforRepositoryImpl
-  extends BaseRepository<OrgPaymentInfor, Prisma.OrgPaymentInforDelegate>
+  extends BaseEventRepository<OrgPaymentInfor, Prisma.OrgPaymentInforDelegate>
   implements OrgPaymentInforRepository {
   constructor(
-    protected readonly prisma: PrismaService,
+    protected readonly prisma: PrismaEventService,
     private readonly updateUserRoleService: UpdateUserRoleService,
     private readonly getUserService: GetUserService,
   ) {

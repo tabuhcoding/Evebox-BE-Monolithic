@@ -1,24 +1,24 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { PrismaService } from "src/infrastructure/database/prisma/prisma.service";
-import { BaseRepository } from "src/shared/repo/base.repository";
+import { PrismaEventService } from "../../database/prisma-event/prisma.service";
+import { BaseEventRepository } from '../base.repository';
 import { ShowingRepository } from "../showing/showing.repo";
 import { EventsRepository } from "../events/events.repo";
 import { GetUserService } from "src/services/auth-svc/modules/user/queries/get-user/get-user.service";
 import { Email } from "src/services/auth-svc/modules/user/domain/value-objects/user/email.vo";
 import { TicketType, TicketTypeRepository } from "./ticketType.repo";
-import { Prisma, TicketTypeStatus } from "@prisma/client";
+import { Prisma, TicketTypeStatus } from "prisma/client-event";
 import { Result, Ok, Err } from "oxide.ts";
 import { CreateTicketTypeDto } from "../../modules/ticketType/commands/createTicketType/createTicketType.dto";
 import { UpdateTicketTypeDto } from "../../modules/ticketType/commands/updateTicketType/updateTicketType.dto";
 
 @Injectable()
 export class TicketTypeRepositoryImpl
-  extends BaseRepository<TicketType, Prisma.TicketTypeDelegate>
+  extends BaseEventRepository<TicketType, Prisma.TicketTypeDelegate>
   implements TicketTypeRepository {
   constructor(
     @Inject('ShowingRepository') private readonly showingRepository: ShowingRepository,
     @Inject('EventsRepository') private readonly eventsRepository: EventsRepository,
-    protected readonly prisma: PrismaService,
+    protected readonly prisma: PrismaEventService,
     private readonly getUserService: GetUserService,
   ) {
     super(prisma.ticketType, prisma);

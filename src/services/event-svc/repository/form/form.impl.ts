@@ -1,10 +1,10 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { PrismaService } from "src/infrastructure/database/prisma/prisma.service";
-import { BaseRepository } from "src/shared/repo/base.repository";
+import { PrismaEventService } from "../../database/prisma-event/prisma.service";
+import { BaseEventRepository } from '../base.repository';
 import { Form, FormRepository } from "./form.repo";
 import { ShowingRepository } from "../showing/showing.repo";
 import { EventsRepository } from "../events/events.repo";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "prisma/client-event";
 import { Result, Ok, Err } from "oxide.ts";
 import { CreateFormDto } from "../../modules/form/commands/createForm/createForm.dto";
 import { UpdateFormDto, UpdateFormInputDto } from "../../modules/form/commands/updateForm/updateForm.dto";
@@ -14,12 +14,12 @@ import { BasicFormDto } from "../../modules/form/queries/getAllForms/getAllFroms
 
 @Injectable()
 export class FormRepositoryImpl
-  extends BaseRepository<Form, Prisma.FormDelegate>
+  extends BaseEventRepository<Form, Prisma.FormDelegate>
   implements FormRepository {
   constructor(
     @Inject('ShowingRepository') private readonly showingRepository: ShowingRepository,
     @Inject('EventsRepository') private readonly eventsRepository: EventsRepository,
-    protected readonly prisma: PrismaService,
+    protected readonly prisma: PrismaEventService,
   ) {
     super(prisma.form, prisma);
   }

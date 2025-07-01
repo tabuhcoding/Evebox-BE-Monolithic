@@ -1,20 +1,20 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { EventCategories, Prisma } from '@prisma/client';
+import { EventCategories, Prisma } from 'prisma/client-event';
 import { Result, Ok, Err } from 'oxide.ts';
 
-import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
-import { BaseRepository } from 'src/shared/repo/base.repository';
+import { PrismaEventService } from '../../database/prisma-event/prisma.service';
+import { BaseEventRepository } from '../base.repository';
 import { EventCategoriesRepository } from './eventCategories.repo';
 import { CategoriesRepository } from '../categories/categories.repo';
 import { CategoriesResponseDto } from '../../modules/categories/queries/getAllCategories-response.dto';
 
 @Injectable()
 export class EventCategoriesRepositoryImpl
-  extends BaseRepository<EventCategories, Prisma.EventCategoriesDelegate>
+  extends BaseEventRepository<EventCategories, Prisma.EventCategoriesDelegate>
   implements EventCategoriesRepository {
   constructor(
     @Inject('CategoriesRepository') private readonly categoriesRepository: CategoriesRepository,
-    protected readonly prisma: PrismaService
+    protected readonly prisma: PrismaEventService
   ) {
     super(prisma.eventCategories, prisma);
   }

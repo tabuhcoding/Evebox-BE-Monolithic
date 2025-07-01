@@ -1,5 +1,5 @@
-import { Prisma } from "@prisma/client";
-import { BaseRepository } from "src/shared/repo/base.repository";
+import { Prisma } from "prisma/client-event";
+import { BaseEventRepository } from '../base.repository';
 
 export type Seatmap = Prisma.SeatmapGetPayload<{
   include: {
@@ -19,6 +19,6 @@ export type Seatmap = Prisma.SeatmapGetPayload<{
   }
 }>;
 
-export interface SeatmapRepository extends BaseRepository<Seatmap, Prisma.SeatmapDelegate> {
+export interface SeatmapRepository extends BaseEventRepository<Seatmap, Prisma.SeatmapDelegate> {
   getSeatMapById(seatMapId: number): Promise<any>;
 }

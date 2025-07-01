@@ -1,5 +1,5 @@
-import { BaseRepository } from "src/shared/repo/base.repository";
-import { Prisma } from "@prisma/client";
+import { BaseEventRepository } from '../base.repository';
+import { Prisma } from "prisma/client-event";
 import { Result } from "oxide.ts";
 
 import { CreateFormDto } from "../../modules/form/commands/createForm/createForm.dto";
@@ -14,7 +14,7 @@ export type Form = Prisma.FormGetPayload<{
   };
 }>;
 
-export interface FormRepository extends BaseRepository<Form, Prisma.FormDelegate> {
+export interface FormRepository extends BaseEventRepository<Form, Prisma.FormDelegate> {
   checkAuthor(id: number, userId: string): Promise<Result<boolean, Error>>;
 
   /* Create Form */

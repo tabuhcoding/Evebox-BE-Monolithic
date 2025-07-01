@@ -27,8 +27,8 @@ model User {
   created_at            DateTime                @default(now())
   receiveNoti           Boolean                 @default(false)
   avatar_id             Int?   
-  images                Image[]                 @relation("UserUploadedImages") 
-  avatar                Image?                  @relation("UserAvatar", fields: [avatar_id], references: [id])
+  images                Images[]                 @relation("UserUploadedImages") 
+  avatar                Images?                  @relation("UserAvatar", fields: [avatar_id], references: [id])
   refreshTokens         RefreshToken[]
   role                  Role?                   @relation(fields: [role_id], references: [id])
   favoriteNotiHistory   FavoriteNotiHistory[]   @relation("UserFavoriteHistory")

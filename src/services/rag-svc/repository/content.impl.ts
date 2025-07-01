@@ -1,12 +1,12 @@
 import { Injectable } from "@nestjs/common";
 import { Content, Prisma } from "prisma/client-ai";
-import { BaseRepository } from "./base.repository";
+import { BaseAIRepository } from "./base.repository";
 import { ContentRepository } from "./content.repo";
 import { PrismaAIService } from "../database/prisma-ai/prisma.service";
 
 @Injectable()
 export class ContentRepositoryImpl 
-extends BaseRepository<Content, Prisma.ContentDelegate>
+extends BaseAIRepository<Content, Prisma.ContentDelegate>
 implements ContentRepository {
   constructor(protected readonly prisma: PrismaAIService) {
     super(prisma.content, prisma);

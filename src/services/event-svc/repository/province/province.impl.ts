@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from "src/infrastructure/database/prisma/prisma.service";
+import { PrismaEventService } from '../../database/prisma-event/prisma.service';
 import { ProvinceRepository } from './province.repo';
 
 @Injectable()
 export class ProvinceRepositoryImpl implements ProvinceRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaEventService) {}
 
   async getAllWithDistricts() {
     const province = await this.prisma.province.findMany({

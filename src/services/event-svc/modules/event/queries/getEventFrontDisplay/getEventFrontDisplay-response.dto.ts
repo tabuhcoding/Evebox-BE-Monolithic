@@ -67,6 +67,9 @@ export class GetEventFrontDisplayDTO {
 
   @ApiProperty( { type: [EventCategoriesSpectial], description: 'Categories Special events' })
   categorySpecial: EventCategoriesSpectial[];
+
+  @ApiProperty( { type: [EventFrontDisplayDto], description: 'Recommended events for user' })
+  recommendedEvents: EventFrontDisplayDto[];
 }
 
 export class GetEventFrontDisplayResponse {

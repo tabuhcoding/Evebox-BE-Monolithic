@@ -1,6 +1,6 @@
 import { ValueObject } from 'src/libs/ddd/value-object.base';
 import { Result, Ok, Err } from 'oxide.ts';
-import { UserStatus } from '@prisma/client';
+import { UserStatus } from 'prisma/client-auth';
 
 interface StatusProps {
   value: UserStatus;

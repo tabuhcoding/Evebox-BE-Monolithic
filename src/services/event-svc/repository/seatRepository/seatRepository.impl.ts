@@ -1,15 +1,15 @@
 import { Injectable } from "@nestjs/common";
-import { PrismaService } from "src/infrastructure/database/prisma/prisma.service";
-import { BaseRepository } from "src/shared/repo/base.repository";
+import { PrismaEventService } from "../../database/prisma-event/prisma.service";
+import { BaseEventRepository } from '../base.repository';
 import { SeatRepository, SeatWithDetails } from "./seatRepository.repo";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "prisma/client-event";
 
 @Injectable()
 export class SeatRepositoryImpl
-  extends BaseRepository<SeatWithDetails, Prisma.SeatDelegate>
+  extends BaseEventRepository<SeatWithDetails, Prisma.SeatDelegate>
   implements SeatRepository
 {
-  constructor(protected readonly prisma: PrismaService) {
+  constructor(protected readonly prisma: PrismaEventService) {
     super(prisma.seat, prisma);
   }
 

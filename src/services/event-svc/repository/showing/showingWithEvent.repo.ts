@@ -1,6 +1,6 @@
-import { Prisma } from "@prisma/client";
+import { Prisma } from "prisma/client-event";
 import { Result } from "oxide.ts";
-import { BaseRepository } from "src/shared/repo/base.repository";
+import { BaseEventRepository } from '../base.repository';
 import { CreateShowingDto } from "../../modules/showing/command/createShowing/createShowing.dto";
 import { UpdateShowingDto } from "../../modules/showing/command/updateShowing/updateShowing.dto";
 import { ShowingDataDto } from "../../modules/showing/queries/getShowingsByAdmin/getShowings-response.dto";
@@ -28,6 +28,6 @@ export type ShowingWithEvent = Prisma.ShowingGetPayload<{
   }
 }>
 
-export interface ShowingWithEventRepository extends BaseRepository<ShowingWithEvent, Prisma.ShowingDelegate> {
+export interface ShowingWithEventRepository extends BaseEventRepository<ShowingWithEvent, Prisma.ShowingDelegate> {
   
 }

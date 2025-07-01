@@ -1,5 +1,5 @@
-import { BaseRepository } from "src/shared/repo/base.repository";
-import { Prisma } from "@prisma/client";
+import { BaseEventRepository } from '../base.repository';
+import { Prisma } from "prisma/client-event";
 
 export type TicketTypeSection = Prisma.TicketTypeSectionGetPayload<{
   include: {
@@ -8,7 +8,7 @@ export type TicketTypeSection = Prisma.TicketTypeSectionGetPayload<{
   };
 }>;
 
-export interface TicketTypeSectionRepository extends BaseRepository<TicketTypeSection, Prisma.TicketTypeSectionDelegate> {
+export interface TicketTypeSectionRepository extends BaseEventRepository<TicketTypeSection, Prisma.TicketTypeSectionDelegate> {
   // Add any specific methods for TicketTypeSection if needed, for example:
   // findByTicketTypeId(ticketTypeId: string): Promise<TicketTypeSection[]>;
   // findBySectionId(sectionId: string): Promise<TicketTypeSection[]>;

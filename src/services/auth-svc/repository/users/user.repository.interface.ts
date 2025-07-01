@@ -1,4 +1,4 @@
-import { OTPType } from "@prisma/client";
+import { OTPType } from "prisma/client-auth";
 
 export interface IOTPData {
   id: string;

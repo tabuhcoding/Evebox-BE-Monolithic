@@ -28,6 +28,7 @@ import { GetUserOrderService } from "./modules/queries/getUserOrder/getUserOrder
 import { GetTicketQrCodeController } from "./modules/queries/getTicketQrCode/getTicketQrCode.controller";
 import { GetTicketQrCodeService } from "./modules/queries/getTicketQrCode/getTicketQrCode.service";
 import { EmailModule } from "src/infrastructure/adapters/email/email.module";
+import { PrismaBookingModule } from "./database/prisma-booking/prisma.module";
 
 @Module({
   imports: [ 
@@ -35,6 +36,7 @@ import { EmailModule } from "src/infrastructure/adapters/email/email.module";
      forwardRef(() => EventSvcModule),
      forwardRef(() => PaymentSvcModule),
      EmailModule,
+     PrismaBookingModule,
   ],
   controllers: [
     SelectSeatController,

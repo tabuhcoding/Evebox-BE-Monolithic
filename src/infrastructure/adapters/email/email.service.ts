@@ -4,6 +4,7 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 import { UserOrderDto } from 'src/services/booking-svc/modules/queries/getUserOrder/getUserOrder-response.dto';
+import { EventFrontDisplayDto } from 'src/services/event-svc/modules/event/queries/getEventFrontDisplay/getEventFrontDisplay-response.dto';
 
 @Injectable()
 export class EmailService implements OnModuleInit {
@@ -228,5 +229,9 @@ export class EmailService implements OnModuleInit {
       console.error('Failed to send ticket email:', error);
       throw new Error('Failed to send ticket email');
     }
+  }
+
+  async sendNewEventNotification(email: string[], eventInfo: EventFrontDisplayDto): Promise<void> {
+  
   }
 }

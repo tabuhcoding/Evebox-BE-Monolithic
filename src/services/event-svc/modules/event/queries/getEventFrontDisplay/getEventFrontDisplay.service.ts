@@ -7,7 +7,13 @@ import { CategoriesRepository } from 'src/services/event-svc/repository/categori
 import { SlackService } from 'src/infrastructure/adapters/slack/slack.service';
 import { FileCacheService } from 'src/infrastructure/cache/fileCache/fileCache.service';
 import { CheckFavoriteService } from 'src/services/auth-svc/modules/user/commands/check-favorite/checkFavorite.service';
+import { GetFavoriteEventService } from 'src/services/auth-svc/modules/user/queries/get-favorite-event/get-favorite-event.service';
+import { OpenAIVectorStoreService } from 'src/services/rag-svc/modules/openai/core-embedding/vector-store.service';
 
+interface eventScore {
+    id: number;
+    score: number;
+}
 @Injectable()
 export class GetEventFrontDisplayService {
   constructor(
@@ -16,15 +22,20 @@ export class GetEventFrontDisplayService {
     private readonly slackService: SlackService,
     private readonly fileCacheService: FileCacheService,
     private readonly checkFavoriteService: CheckFavoriteService,
+    private readonly getFavoriteEventService: GetFavoriteEventService,
+    private readonly vectorStoreService: OpenAIVectorStoreService,
   ) {}
 
   async execute(userId?: string): Promise<Result<GetEventFrontDisplayDTO, Error>> {
-    try {
+    try {      
       // Check if data is cached
       const cachedData = await this.fileCacheService.getCache('getEventFrontDisplay', {}) as GetEventFrontDisplayDTO;
       if (cachedData) {
         // Attach favorite status to cached data
         if (userId) {
+          const favoriteEvents = await this.getEventRecommentForUser(userId);
+
+          await this.checkFavoriteService.attachFavorite(userId, favoriteEvents);
           await this.checkFavoriteService.attachFavorite(userId, cachedData.specialEvents);
           await this.checkFavoriteService.attachFavorite(userId, cachedData.trendingEvents);
           await this.checkFavoriteService.attachFavorite(userId, cachedData.onlyOnEve);
@@ -60,12 +71,12 @@ export class GetEventFrontDisplayService {
       }
       const categorySpecialData = categorySpecial.unwrap();
 
-      const result: GetEventFrontDisplayDTO = {
+      var result: GetEventFrontDisplayDTO = {
         specialEvents: specialEventsData,
         trendingEvents: trendingEventsData,
         onlyOnEve: onlyOnEveData,
         categorySpecial: categorySpecialData,
-
+        recommendedEvents: []
       };
 
       // Cache the result without await
@@ -73,6 +84,9 @@ export class GetEventFrontDisplayService {
 
       // Attach favorite status if userId is provided
       if (userId) {
+        const recommendedEvents = await this.getEventRecommentForUser(userId);
+        result.recommendedEvents = recommendedEvents;
+        await this.checkFavoriteService.attachFavorite(userId, result.recommendedEvents);
         await this.checkFavoriteService.attachFavorite(userId, result.specialEvents);
         await this.checkFavoriteService.attachFavorite(userId, result.trendingEvents);
         await this.checkFavoriteService.attachFavorite(userId, result.onlyOnEve);
@@ -405,6 +419,126 @@ export class GetEventFrontDisplayService {
     catch (error) {
       console.error(error);
       return Err(new Error('Failed to calculate event status and min price.'));
+    }
+  }
+  
+  async getEventRecommentForUser(email: string): Promise<EventFrontDisplayDto[]> {
+    if (!email) {
+      return [];
+    }
+    try {
+      const eventRecommentForUserCache = await this.fileCacheService.getCache('getEventRecommentForUser', {userId: email}) as EventFrontDisplayDto[];
+      if (eventRecommentForUserCache) {
+        return eventRecommentForUserCache;
+      }
+      var eventScoresMap: Map<number, number> = new Map();
+
+      const cacheScore = await this.fileCacheService.getCache('eventScoresMap', {userId: email}) as { eventScoreMap: eventScore[] } | null;
+      console.log(`Cache score map for user ${email}:`, cacheScore);
+      if (cacheScore) {
+        eventScoresMap = new Map(cacheScore.eventScoreMap.map(item => [item.id, item.score]));
+      } else {
+        const favoriteEvents = await this.getFavoriteEventService.getFavoriteEventIDs(email);
+        const favoriteEventsToString = favoriteEvents.map(eventId => eventId.toString());
+        
+        const userEventsSimilar = await this.vectorStoreService.recommendEventsFromFavorites(favoriteEventsToString, 1000);
+
+        if (userEventsSimilar.length === 0) {
+          return [];
+        }
+        // Create a map of score and event ID
+        
+        for (const event of userEventsSimilar) {
+          eventScoresMap.set(event[0].metadata.eventId, event[1]);
+        }
+
+        // Convert Map to array of eventScore
+        const eventScoresArray: eventScore[] = Array.from(eventScoresMap, ([id, score]) => ({ id, score }));
+
+        this.fileCacheService.cacheEndpoint('similar_events', 60*24, {
+          userId: email,
+        }, { eventScoreMap: eventScoresArray }); // Cache for 24 hours
+      }
+
+      const events = await this.eventsRepository.findMany({
+        id: {
+          in: Array.from(eventScoresMap.keys()),
+        },
+        deleteAt: null,
+        isApproved: true,
+        Showing: {
+          some: {
+            startTime: {
+              gte: new Date(),
+            },
+            deleteAt: null,
+          },
+        }
+      }, {
+        Showing: {
+          select: {
+            id: true,
+            startTime: true,
+            TicketType: {
+              select: {
+                id: true,
+                price: true,
+                status: true,
+              },
+            },
+          },
+          where: {
+            startTime: {
+              gte: new Date(),
+            },
+            deleteAt: null,
+          },
+        }
+      });
+
+      console.log(`Events found for user ${email}:`, events.length);
+
+      // Map to EventFrontDisplayDto
+      const eventFrontDisplayDtos = await Promise.all(events.map(async (event) => {
+        const result = await this.caculateEventStatusAndMinPriceAndStartDate(event);
+        if (result.isErr()) {
+          return null;
+        }
+        return result.unwrap();
+      }));
+
+      // Filter out null values and status is not SoldOut Or EventOver
+      const filteredEvents = eventFrontDisplayDtos.filter((event) => event !== null) as EventFrontDisplayDto[];
+      
+      // Sort by map score of vector store and then by status
+      filteredEvents.sort((a, b) => {
+        const scoreA = eventScoresMap.get(a.id) || 0;
+        const scoreB = eventScoresMap.get(b.id) || 0;
+
+        // Sort by status first
+        if (a.status === EventStatus.AVAILABLE && b.status !== EventStatus.AVAILABLE) {
+          return -1; // a is available, b is not
+        } else if (b.status === EventStatus.AVAILABLE && a.status !== EventStatus.AVAILABLE) {
+          return 1; // b is available, a is not
+        }
+
+        // Sort by score first
+        if (scoreB !== scoreA) {
+          return scoreB - scoreA;
+        }
+
+        // If scores are equal, sort by status
+        return 0;
+      });
+
+      await this.fileCacheService.cacheEndpoint('getEventRecommentForUser', 360, {userId: email}, filteredEvents.slice(0, 10)); // Cache for 24 hours
+
+      return filteredEvents;
+    }
+    catch (error) {
+      // console.error(error);
+      await this.slackService.sendError(`EventSvc - Event >>> GetEventRecommentForUser: ${error.message}`);
+      return [];
     }
   }
 }

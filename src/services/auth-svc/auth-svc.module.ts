@@ -82,6 +82,7 @@ import { GetAdminAccessService } from "./modules/user/queries/get-admin-access/g
 import { CheckFavoriteService } from "./modules/user/commands/check-favorite/checkFavorite.service";
 import { GetUsersByAdminService } from "./modules/admin/queries/getUsersByAdmin/getUsersByAdmin.service";
 import { GetUsersByAdminController } from "./modules/admin/queries/getUsersByAdmin/getUsersByAdmin.controller";
+import { PrismaAuthModule } from "./database/prisma-auth/prisma.module";
 
 @Module({
   imports: [
@@ -95,6 +96,7 @@ import { GetUsersByAdminController } from "./modules/admin/queries/getUsersByAdm
       }),
       inject: [ConfigService],
     }),
+    PrismaAuthModule,
     EmailModule,
     LocalStorageModule,
     OtpUtilsModule,
@@ -186,10 +188,6 @@ import { GetUsersByAdminController } from "./modules/admin/queries/getUsersByAdm
       useClass: AdminRepositoryImpl
     },
     UpdateUserRoleService,
-    {
-      provide: 'AdminRepository',
-      useClass: AdminRepositoryImpl
-    },
     SetReceiveNotiService,
     TurnOnNotificationService,
     GetUsersNotifiedByEventService,
@@ -200,17 +198,13 @@ import { GetUsersByAdminController } from "./modules/admin/queries/getUsersByAdm
     CheckFavoriteService,
   ],
   exports: [
-    UserRepositoryImpl,
-    {
-      provide: 'UserRepository',
-      useClass: UserRepositoryImpl,
-    },
     CheckUserExistService,
     GetAdminAccessService,
     UpdateUserRoleService,
     GetUserService,
     CheckFavoriteService,
     VerifyUserPinService,
+    GetFavoriteEventService,
   ],
 })
 export class AuthSvcModule { }

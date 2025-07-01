@@ -17,7 +17,7 @@ COPY . .
 COPY .env .env
 
 # Generate Prisma Client for Linux
-RUN npx prisma generate
+# RUN npx prisma generate
 
 # Build the application (if necessary for a NestJS app)
 RUN npm run build

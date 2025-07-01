@@ -167,7 +167,15 @@ export class OpenAIVectorStoreService {
 
   /** Recommend events based on favorite eventIds */
   async recommendEventsFromFavorites(favoriteIds: string[], topK = 10) {
-    const vectors = await Promise.all(favoriteIds.map(id => this.getVectorByEventId(id)));
+    var vectors: number[][] = [];
+    for (const favoriteId of favoriteIds) {
+      const vector = await this.getVectorByEventId(favoriteId);
+      if (vector) {
+        vectors.push(vector);
+      } else {
+        await this.slackService.sendError(`❌ No vector found for favoriteId: ${favoriteId}`);
+      }
+    }
     const validVectors = vectors.filter(v => Array.isArray(v)) as number[][];
 
     if (validVectors.length === 0) {

@@ -1,4 +1,4 @@
-import { UserStatus } from "@prisma/client";
+import { UserStatus } from "prisma/client-auth";
 import { UserRole } from "../../modules/user/domain/enums/user-role.enum";
 
 export interface AdminRepository {

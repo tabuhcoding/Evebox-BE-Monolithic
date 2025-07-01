@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { AdminRepository } from "./admin.repository";
-import { PrismaService } from "src/infrastructure/database/prisma/prisma.service";
-import { Prisma, UserStatus } from "@prisma/client";
+import { PrismaAuthService } from "../../database/prisma-auth/prisma.service";
+import { Prisma, UserStatus } from "prisma/client-auth";
 import { User } from "../../modules/user/domain/entities/user.entity";
 import { UserId } from "../../modules/user/domain/value-objects/user/user-id.vo";
 import { EventBus } from "@nestjs/cqrs";
@@ -17,7 +17,7 @@ import { UserRole } from "../../modules/user/domain/enums/user-role.enum";
 @Injectable()
 export class AdminRepositoryImpl implements AdminRepository {
   constructor(
-    private readonly prisma: PrismaService,
+    private readonly prisma: PrismaAuthService,
     protected readonly eventBus: EventBus
   ) { }
 

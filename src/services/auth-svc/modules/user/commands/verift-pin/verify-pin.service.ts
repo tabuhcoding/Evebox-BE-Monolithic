@@ -6,14 +6,14 @@ import { addMinutes } from "date-fns";
 import { VerifyUserPinCommand } from "./verify-pin.command";
 import { UserRepository } from "src/services/auth-svc/repository/users/user.repository";
 import { Email } from "../../domain/value-objects/user/email.vo";
-import { PrismaService } from "src/infrastructure/database/prisma/prisma.service";
+import { PrismaAuthService } from "src/services/auth-svc/database/prisma-auth/prisma.service";
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 
 @Injectable()
 export class VerifyUserPinService {
   constructor(
     @Inject('UserRepository') private readonly userRepository: UserRepository,
-    private readonly prisma: PrismaService,
+    private readonly prisma: PrismaAuthService,
     private readonly slackService: SlackService,
   ) { }
 

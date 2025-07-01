@@ -1,7 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { BaseResponse } from "src/shared/constants/baseResponse";
 import { Pagination } from "src/shared/constants/pagination";
-import { UserStatus } from "@prisma/client";
+import { UserStatus } from "prisma/client-auth";
 
 class UserRole {
   @ApiProperty({ example: 1, description: 'User role id' })

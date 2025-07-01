@@ -3,14 +3,14 @@ import { isEmail } from 'class-validator';
 import { User } from '../../modules/user/domain/entities/user.entity';
 import { Email } from '../../modules/user/domain/value-objects/user/email.vo';
 import { UserId } from '../../modules/user/domain/value-objects/user/user-id.vo';
-import { Prisma, RefreshToken } from '@prisma/client';
+import { Prisma, RefreshToken } from 'prisma/client-auth';
 import { OTP } from '../../modules/user/domain/entities/otp.entity';
 import { OTPType } from '../../modules/user/domain/enums/otp-type.enum';
 import { IOTPData } from './user.repository.interface';
-import { BaseRepository } from 'src/shared/repo/base.repository';
+import { BaseAuthRepository } from '../base.repository';
 import { PinStatus } from './user.repository.interface';
 
-export interface UserRepository extends BaseRepository<User, Prisma.UserDelegate> {
+export interface UserRepository extends BaseAuthRepository<User, Prisma.UserDelegate> {
   findByEmail(email: Email): Promise<User | null>;
   save(user: User): Promise<void>;
   updateUserInfo(user: User): Promise<void>;

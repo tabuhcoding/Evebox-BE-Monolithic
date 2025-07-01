@@ -1,8 +1,8 @@
-import { Images, Prisma } from "@prisma/client"
-import { BaseRepository } from "src/shared/repo/base.repository"
+import { Images, Prisma } from "prisma/client-auth";
+import { BaseAuthRepository } from "../base.repository";
 
 export interface ImagesRepository
-  extends BaseRepository<Images, Prisma.ImagesDelegate> {
+  extends BaseAuthRepository<Images, Prisma.ImagesDelegate> {
     create(imageUrl: string, userEmail: string): Promise<Images>;
     findAll(userEmail: string): Promise<Images[]>;
     findOne(id: number): Promise<Images | null>;

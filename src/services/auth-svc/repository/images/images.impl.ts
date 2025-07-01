@@ -1,14 +1,14 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
-import { PrismaService } from "src/infrastructure/database/prisma/prisma.service";
-import { BaseRepository } from "src/shared/repo/base.repository";
-import { Images, Prisma } from "@prisma/client";
+import { PrismaAuthService } from "../../database/prisma-auth/prisma.service";
+import { BaseAuthRepository } from "../base.repository";
+import { Images, Prisma } from "prisma/client-auth";
 import { ImagesRepository } from "./images.repo";
 
 @Injectable()
 export class ImagesRepositoryImpl
-  extends BaseRepository<Images, Prisma.ImagesDelegate>
+  extends BaseAuthRepository<Images, Prisma.ImagesDelegate>
   implements ImagesRepository {
-  constructor(protected readonly prisma: PrismaService) {
+  constructor(protected readonly prisma: PrismaAuthService) {
     super(prisma.images, prisma);
   }
 

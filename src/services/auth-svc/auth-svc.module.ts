@@ -188,10 +188,6 @@ import { PrismaAuthModule } from "./database/prisma-auth/prisma.module";
       useClass: AdminRepositoryImpl
     },
     UpdateUserRoleService,
-    {
-      provide: 'AdminRepository',
-      useClass: AdminRepositoryImpl
-    },
     SetReceiveNotiService,
     TurnOnNotificationService,
     GetUsersNotifiedByEventService,
@@ -202,11 +198,6 @@ import { PrismaAuthModule } from "./database/prisma-auth/prisma.module";
     CheckFavoriteService,
   ],
   exports: [
-    UserRepositoryImpl,
-    {
-      provide: 'UserRepository',
-      useClass: UserRepositoryImpl,
-    },
     CheckUserExistService,
     GetAdminAccessService,
     UpdateUserRoleService,

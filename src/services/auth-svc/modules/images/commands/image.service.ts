@@ -2,7 +2,7 @@ import { Inject, Injectable } from "@nestjs/common";
 import { Result, Ok, Err } from "oxide.ts";
 import { CloudinaryService } from "src/infrastructure/adapters/cloudinary/cloudinary.service";
 import { ImagesRepository } from "src/services/auth-svc/repository/images/images.repo";
-import { Images } from "@prisma/client";
+import { Images } from "prisma/client-auth";
 
 @Injectable()
 export class ImagesService {

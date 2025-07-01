@@ -27,12 +27,13 @@ model User {
   created_at            DateTime                @default(now())
   receiveNoti           Boolean                 @default(false)
   avatar_id             Int?   
+  status                UserStatus     @default(ACTIVE)
   images                Images[]                 @relation("UserUploadedImages") 
   avatar                Images?                  @relation("UserAvatar", fields: [avatar_id], references: [id])
   refreshTokens         RefreshToken[]
   role                  Role?                   @relation(fields: [role_id], references: [id])
   favoriteNotiHistory   FavoriteNotiHistory[]   @relation("UserFavoriteHistory")
-
+  userPin             UserPin?
   @@map("users")
 }
 
@@ -45,6 +46,17 @@ model RefreshToken {
   user      User     @relation(fields: [email], references: [email], onDelete: Cascade)
 
   @@map("refresh_tokens")
+}
+
+model UserPin {
+  id         Int      @id @default(autoincrement())
+  userEmail     String      @unique @db.VarChar(255)
+  user       User     @relation(fields: [userEmail], references: [email])
+  hashedPin  String
+  attempts   Int      @default(0)
+  lockedUntil DateTime?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
 model Otp {
@@ -92,4 +104,10 @@ enum OTPType {
 enum ItemType {
   EVENT
   ORG
+}
+
+
+enum UserStatus {
+ACTIVE
+BLOCKED
 }

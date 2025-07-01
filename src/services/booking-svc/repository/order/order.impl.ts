@@ -1,8 +1,8 @@
 import { Injectable, Inject } from "@nestjs/common"
 import { Order, OrderRepository } from './order.repo'
-import { PrismaService } from "src/infrastructure/database/prisma/prisma.service"
-import { BaseRepository } from "src/shared/repo/base.repository"
-import { Prisma } from "@prisma/client"
+import { PrismaBookingService } from "../../database/prisma-booking/prisma.service"
+import { BaseBookingRepository } from "../base.repository"
+import { Prisma } from "prisma/client-booking"
 import { Result, Ok, Err } from "oxide.ts"
 import { OrderData, TicketGroupedByTicketTypeID } from "../../modules/queries/getOrdersByShowingId/getOrdersByShowingId-response.dto"
 import { GetPaymentInfoService } from "src/services/payment-svc/modules/queries/getPaymentInfo/getPaymentInfo.service"
@@ -11,11 +11,11 @@ import { Pagination, PaginationQuery } from "src/shared/constants/pagination"
 
 @Injectable()
 export class OrderRepositoryImpl
-  extends BaseRepository<Order, Prisma.OrderDelegate>
+  extends BaseBookingRepository<Order, Prisma.OrderDelegate>
   implements OrderRepository
   {
     constructor(
-      protected readonly prisma: PrismaService,
+      protected readonly prisma: PrismaBookingService,
       private readonly getPaymentInfoService: GetPaymentInfoService,
       private readonly getFormResponseByIdService: GetFormResponseByIdService,
     ) {

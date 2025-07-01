@@ -113,7 +113,8 @@ export class GetRecommendEventService {
     } catch (error) {
       await this.slackService.sendError(`Event Service - Event >>> getRecommendedEvents: ${error.message}`);
       
-      return Err(new Error('Failed to fetch recommended events.'));
+      return Ok([]); 
+      // return Err(new Error('Failed to fetch recommended events.'));
     }
   }
 }

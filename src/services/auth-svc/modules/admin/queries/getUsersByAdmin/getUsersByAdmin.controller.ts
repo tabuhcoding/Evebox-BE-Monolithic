@@ -6,7 +6,7 @@ import { GetUsersByAdminService } from "./getUsersByAdmin.service";
 import { UserDataResponse } from "./getUsersByAdmin-response.dto";
 import { GetUsersByAdminDto } from "./getUsersByAdmin.dto";
 
-@ApiTags('Auth Service - User')
+@ApiTags('Authentication Service - Admin')
 @Controller('api/admin/user')
 export class GetUsersByAdminController {
   constructor(

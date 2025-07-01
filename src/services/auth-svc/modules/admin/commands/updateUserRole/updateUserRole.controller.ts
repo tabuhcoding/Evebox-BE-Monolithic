@@ -7,7 +7,7 @@ import { UpdateUserRoleDto } from "./updateUserRole.dto";
 import { UpdateUserRoleService } from "./updateUserRole.service";
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 
-@Controller('api/admin')
+@Controller('api/admin/user')
 @ApiTags('Authentication Service - Admin')
 export class UpdateUserRoleController {
   constructor(

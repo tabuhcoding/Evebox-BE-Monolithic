@@ -423,6 +423,7 @@ export class GetEventFrontDisplayService {
   }
   
   async getEventRecommentForUser(email: string): Promise<EventFrontDisplayDto[]> {
+    return [];
     if (!email) {
       return [];
     }

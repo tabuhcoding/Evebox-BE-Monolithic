@@ -18,6 +18,7 @@ export class GetEventDetailRecommendService {
   ) {}
 
   async getRecommendedEventsInDetail(eventId: number, limit: string, userId?: string): Promise<Result<EventFrontDisplayDto[], Error>> {
+    return Ok([]);
     if (!eventId) {
       return Err(new Error("Event ID is required."));
     }
@@ -46,8 +47,6 @@ export class GetEventDetailRecommendService {
       if (!eventSimilarities || eventSimilarities.length === 0) {
         return Ok([]);
       }
-
-      console.log(`Found ${eventSimilarities.length} similar events for event ID ${eventId}`);
 
       const eventIds = eventSimilarities.map(similarity => similarity[0].metadata.eventId >> 0);
 

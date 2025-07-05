@@ -137,6 +137,12 @@ import { SeatRepositoryImpl } from './repository/seatRepository/seatRepository.i
 import { GetAllShowingDetailOfEventController } from './modules/showing/queries/getAllShowingDetailOfEvent/getAllShowingDetailOfEvent.controller';
 import { GetAllFormsService } from './modules/form/queries/getAllForms/getAllForms.service';
 import { GetAllFormsController } from './modules/form/queries/getAllForms/getAllForms.controller';
+import { AddEventMemberController } from './modules/event/commands/AddEventMember/addEventMember.controller';
+import { UpdateEventMemberController } from './modules/event/commands/UpdateEventMember/updateEventMember.controller';
+import { DeleteEventMemberController } from './modules/event/commands/DeleteEventMember/deleteEventMember.controller';
+import { AddEventMemberService } from './modules/event/commands/AddEventMember/addEventMember.service';
+import { UpdateEventMemberService } from './modules/event/commands/UpdateEventMember/updateEventMember.service';
+import { DeleteEventMemberService } from './modules/event/commands/DeleteEventMember/deleteEventMember.service';
 
 @Module({
   imports: [ 
@@ -209,7 +215,11 @@ import { GetAllFormsController } from './modules/form/queries/getAllForms/getAll
     GetEventRevenueDetailController,
     GetSummaryTicketRevenueController,
     GetAllShowingDetailOfEventController,
-    GetAllFormsController
+    GetAllFormsController,
+
+    AddEventMemberController,
+    UpdateEventMemberController,
+    DeleteEventMemberController
   ],
   providers: [
     // Adapters
@@ -306,6 +316,10 @@ import { GetAllFormsController } from './modules/form/queries/getAllForms/getAll
     GetAllShowingDetailOfEventService,
 
     GetAllFormsService,
+
+    AddEventMemberService,
+    UpdateEventMemberService,
+    DeleteEventMemberService,
 
     // Repositories
     { provide: 'AdminRepository', useClass: AdminRepositoryImpl },

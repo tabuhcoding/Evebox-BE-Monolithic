@@ -80,6 +80,7 @@ import { ChangeUserPinController } from "./modules/user/commands/change-pin/chan
 import { ChangeUserPinService } from "./modules/user/commands/change-pin/change-pin.service";
 import { GetAdminAccessService } from "./modules/user/queries/get-admin-access/get-admin-access.service";
 import { CheckFavoriteService } from "./modules/user/commands/check-favorite/checkFavorite.service";
+import { FindUserByEmailService } from "./modules/user/commands/find-user-by-email/findUserByEmail.service";
 
 
 @Module({
@@ -195,6 +196,7 @@ import { CheckFavoriteService } from "./modules/user/commands/check-favorite/che
     TurnOffNotificationServiceForOrg,
     GetAdminAccessService,
     CheckFavoriteService,
+    FindUserByEmailService
   ],
   exports: [
     UserRepositoryImpl,
@@ -208,6 +210,7 @@ import { CheckFavoriteService } from "./modules/user/commands/check-favorite/che
     GetUserService,
     CheckFavoriteService,
     VerifyUserPinService,
+    FindUserByEmailService
   ],
 })
 export class AuthSvcModule { }

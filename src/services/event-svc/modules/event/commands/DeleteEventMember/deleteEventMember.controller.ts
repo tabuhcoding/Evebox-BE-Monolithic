@@ -3,13 +3,12 @@ import {
   Delete,
   Param,
   Query,
-  Req,
+  Request,
   Res,
   HttpStatus,
-  BadRequestException,
   UseGuards,
 } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { JwtAuthGuard } from 'src/shared/guard/jwt-auth.guard';
 import { DeleteEventMemberService } from './deleteEventMember.service';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
@@ -29,7 +28,7 @@ export class DeleteEventMemberController {
   async deleteMember(
     @Param('eventId') eventIdRaw: string,
     @Query('email') email: string,
-    @Req() req: Request,
+    @Request() req: any,
     @Res() res: Response,
   ) {
     try {

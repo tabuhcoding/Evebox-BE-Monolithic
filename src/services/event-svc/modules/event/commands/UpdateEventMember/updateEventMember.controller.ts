@@ -7,9 +7,9 @@ import {
   Res,
   UseGuards,
   HttpStatus,
-  BadRequestException,
+  Request,
 } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { JwtAuthGuard } from 'src/shared/guard/jwt-auth.guard';
 import { UpdateEventMemberService } from './updateEventMember.service';
 import { UpdateEventMemberDto } from './updateEventMember.dto';
@@ -35,7 +35,7 @@ export class UpdateEventMemberController {
   async updateMember(
     @Query('eventId') eventIdRaw: string,
     @Body() dto: UpdateEventMemberDto,
-    @Req() req: Request,
+    @Request() req: any,
     @Res() res: Response,
   ) {
     try {

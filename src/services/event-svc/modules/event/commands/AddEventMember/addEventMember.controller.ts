@@ -1,8 +1,7 @@
-import { Controller, Post, Query, Body, Req, ForbiddenException, UseGuards, BadRequestException, HttpStatus, Res } from '@nestjs/common';
+import { Controller, Post, Query, Body, Request, UseGuards, HttpStatus, Res } from '@nestjs/common';
 import { AddEventMemberService } from './addEventMember.service';
 import { AddEventMemberDto } from './addEventMember.dto';
 import { JwtAuthGuard } from 'src/shared/guard/jwt-auth.guard';
-import { Request } from 'express';
 import { Response } from 'express';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AddEventMemberResponseDto } from './addEventMember-response.dto';
@@ -22,7 +21,7 @@ export class AddEventMemberController {
   async addMember(
     @Query('eventId') eventIdRaw: string,
     @Body() dto: AddEventMemberDto,
-    @Req() req: Request,
+    @Request() req: any,
     @Res() res: Response, 
   ) {
     try {

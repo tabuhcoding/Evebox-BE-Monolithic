@@ -1,15 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
-import { BaseRepository } from 'src/shared/repo/base.repository';
-import { FavoriteNotiHistory, ItemType, Prisma } from '@prisma/client';
+import { PrismaAuthService } from '../../database/prisma-auth/prisma.service';
+import { BaseAuthRepository } from '../base.repository';
+import { FavoriteNotiHistory, ItemType, Prisma } from 'prisma/client-auth';
 import { FavoriteRepository } from './favorite.repo';
 import { Pagination, PaginationQuery } from 'src/shared/constants/pagination';
 
 @Injectable()
 export class FavoriteRepositoryImpl 
-extends BaseRepository<FavoriteNotiHistory, Prisma.FavoriteNotiHistoryDelegate>
+extends BaseAuthRepository<FavoriteNotiHistory, Prisma.FavoriteNotiHistoryDelegate>
 implements FavoriteRepository {
-  constructor(protected readonly prisma: PrismaService) {
+  constructor(protected readonly prisma: PrismaAuthService) {
     super(prisma.favoriteNotiHistory, prisma);
   }
 

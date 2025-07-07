@@ -23,7 +23,7 @@ export class SlackService {
 
   async sendNotice(message: string) {
     if (this.isDevelopment) {
-      console.log('Console error:', message);
+      console.log('Console notice:', message);
       
       return;
     }

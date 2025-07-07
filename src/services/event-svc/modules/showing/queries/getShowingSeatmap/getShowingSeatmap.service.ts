@@ -6,7 +6,7 @@ import { ShowingRepository } from 'src/services/event-svc/repository/showing/sho
 import { getSeatmapType, SeatmapType } from 'src/shared/utils/status/seatmap';
 import { CalculateSectionStatusService } from '../../command/calculateSectionStatus/calculateSectionStatus.service';
 import { GetTotalTicketOfTicketTypeService } from 'src/services/booking-svc/modules/queries/getTotalTicketOfTicketType/getTotalTicketOfTicketType.service';
-import { SeatStatusEnum } from '@prisma/client';
+import { SeatStatusEnum } from 'prisma/client-event';
 import { ShowingSeatMapResponseDto } from './getShowingSeatmap-response.dto';
 import { TicketTypeSectionRepository } from 'src/services/event-svc/repository/ticketTypeSection/ticketTypeSection.repo';
 

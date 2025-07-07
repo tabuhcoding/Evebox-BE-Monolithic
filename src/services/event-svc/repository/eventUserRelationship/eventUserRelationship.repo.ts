@@ -1,6 +1,6 @@
-import { BaseRepository } from "src/shared/repo/base.repository";
-import { EventUserRelationship } from "@prisma/client";
-import { Prisma } from "@prisma/client";
+import { BaseEventRepository } from '../base.repository';
+import { EventUserRelationship } from "prisma/client-event";
+import { Prisma } from "prisma/client-event";
 import { Result } from "oxide.ts";
 import { AddEventMemberDto } from "../../modules/event/commands/AddEventMember/addEventMember.dto";
 import { UpdateEventMemberDto } from "../../modules/event/commands/UpdateEventMember/updateEventMember.dto";
@@ -8,7 +8,7 @@ import { UpdateEventMemberDto } from "../../modules/event/commands/UpdateEventMe
 export { EventUserRelationship }
 
 export interface EventUserRelationshipRepository 
-  extends BaseRepository<EventUserRelationship, Prisma.EventUserRelationshipDelegate> {
+  extends BaseEventRepository<EventUserRelationship, Prisma.EventUserRelationshipDelegate> {
   // Thêm các method riêng cho EventUserRelationship nếu cần, ví dụ:
    hasPermissionToManageMembers(eventId: number, userId: string, email: string): Promise<boolean>;
    addMember(eventId: number, dto: AddEventMemberDto): Promise<EventUserRelationship>;

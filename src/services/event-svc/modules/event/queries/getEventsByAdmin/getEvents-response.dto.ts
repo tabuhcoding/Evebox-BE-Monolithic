@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { BaseResponse } from "src/shared/constants/baseResponse";
+import { Pagination } from "src/shared/constants/pagination";
 
 class CategoriesResponseDto {
   @ApiProperty( { example: 1 , description: 'The ID of the category' })
@@ -9,7 +10,7 @@ class CategoriesResponseDto {
   name: string;
 }
 
-export class EventDataDto {
+export class EventAdminDataDto {
   @ApiProperty({ example: 22911, description: 'Event ID' })
   id: number;
 
@@ -43,6 +44,9 @@ export class EventDataDto {
   @ApiProperty({ example: 'Nha hat Ben Thanh', description: 'Event venue' })
   venue: string;
 
+  @ApiProperty({ example: 'dattruong01082@gmail.com', description: 'Organizer email' })
+  organizerId: string;
+
   @ApiProperty({ example: true, description: 'Event is approved' })
   isApproved: boolean;
 
@@ -60,6 +64,9 @@ export class EventDataDto {
 }
 
 export class EventDataResponse extends BaseResponse {
-  @ApiProperty({ type: [EventDataDto], description: 'List of events' })
-  data: EventDataDto[];
+  @ApiProperty({ type: [EventAdminDataDto], description: 'List of events' })
+  data: EventAdminDataDto[];
+
+  @ApiProperty({ type: Pagination, description: 'Pagination information' })
+  pagination: Pagination;
 }

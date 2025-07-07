@@ -3,12 +3,12 @@ import { ContentDto } from "./content.dto";
 import { ContentService } from "./content.service";
 import { ApiTags } from "@nestjs/swagger";
 
-@ApiTags('RAG Service')
-@Controller('rag/content')
+@ApiTags('RAG Service - OpenAI')
+@Controller('api/rag/agent')
 export class ContentController {
   constructor( private readonly contentService: ContentService) {}
 
-  @Post('/')
+  @Post('/content')
   // @ApiQuery({ type: ContentDto })
   async createContent(
     @Body() dto:  ContentDto,
@@ -22,7 +22,7 @@ export class ContentController {
     }
   }
 
-  @Get('/')
+  @Get('/content')
   async getAllContent() {
     try {
       const content = await this.contentService.getAllContent();

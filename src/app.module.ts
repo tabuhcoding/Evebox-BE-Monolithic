@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { CqrsModule } from '@nestjs/cqrs';
-import { PrismaModule } from './infrastructure/database/prisma/prisma.module';
+// import { PrismaModule } from './infrastructure/database/prisma/prisma.module';
 import { EventSvcModule } from './services/event-svc/event-svc.module';
 import { RagSvcModule } from './services/rag-svc/rag-svc.module';
 import { AuthSvcModule } from './services/auth-svc/auth-svc.module';
@@ -22,7 +22,6 @@ import { CronjobModule } from './services/cronjob/cronjob.module';
       envFilePath: '.env', // Path to .env file
     }),
     ScheduleModule.forRoot(),
-    PrismaModule,
     CqrsModule,
     FileCacheModule,
     SlackModule,

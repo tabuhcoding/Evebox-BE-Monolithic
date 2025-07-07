@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { BaseResponse } from "src/shared/constants/baseResponse";
+import { Pagination } from "src/shared/constants/pagination";
 
 class CategoryDto {
   @ApiProperty({ example: 5 })
@@ -32,4 +33,7 @@ export class EventSpecialData {
 export class EventSpecialRepsonseDto extends BaseResponse {
   @ApiProperty({ type: [EventSpecialData], description: 'Special events data' })
   data: EventSpecialData[]
+
+  @ApiProperty({ type: Pagination, description: 'Pagination information' })
+  pagination: Pagination;
 }

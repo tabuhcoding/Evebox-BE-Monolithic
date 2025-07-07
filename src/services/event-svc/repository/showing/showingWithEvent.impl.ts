@@ -1,17 +1,17 @@
 import { Injectable } from "@nestjs/common";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "prisma/client-event";
 
-import { PrismaService } from "src/infrastructure/database/prisma/prisma.service";
-import { BaseRepository } from "src/shared/repo/base.repository";
+import { PrismaEventService } from "../../database/prisma-event/prisma.service";
+import { BaseEventRepository } from '../base.repository';
 import { ShowingWithEvent, ShowingWithEventRepository } from "./showingWithEvent.repo";
 
 @Injectable()
 export class ShowingWithEventRepositoryImpl
-  extends BaseRepository<ShowingWithEvent, Prisma.ShowingDelegate>
+  extends BaseEventRepository<ShowingWithEvent, Prisma.ShowingDelegate>
   implements ShowingWithEventRepository
 {
   constructor(
-    protected readonly prisma: PrismaService
+    protected readonly prisma: PrismaEventService
   ) {
     super(prisma.showing, prisma);
   }

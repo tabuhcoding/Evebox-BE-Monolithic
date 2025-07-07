@@ -17,9 +17,11 @@ import { PayOSWebhookController } from "./modules/webhooks/payos/payosWebhook.co
 import { CheckoutResultService } from "./modules/commands/checkoutResult/checkoutResult.service";
 import { PayOSWebhookService } from "./modules/webhooks/payos/payosWebhook.service";
 import { GetPaymentStatusService } from "./modules/queries/getPaymentStatus/getPaymentStatus.service";
+import { PrismaPaymentModule } from "./database/prisma-payment/prisma.module";
 
 @Module({
   imports: [
+    PrismaPaymentModule,
     forwardRef(() => BookingSvcModule),
     forwardRef(() => EventSvcModule),
   ],

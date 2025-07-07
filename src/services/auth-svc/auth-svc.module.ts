@@ -80,7 +80,9 @@ import { ChangeUserPinController } from "./modules/user/commands/change-pin/chan
 import { ChangeUserPinService } from "./modules/user/commands/change-pin/change-pin.service";
 import { GetAdminAccessService } from "./modules/user/queries/get-admin-access/get-admin-access.service";
 import { CheckFavoriteService } from "./modules/user/commands/check-favorite/checkFavorite.service";
-import { FindUserByEmailService } from "./modules/user/commands/find-user-by-email/findUserByEmail.service";
+import { GetUsersByAdminService } from "./modules/admin/queries/getUsersByAdmin/getUsersByAdmin.service";
+import { GetUsersByAdminController } from "./modules/admin/queries/getUsersByAdmin/getUsersByAdmin.controller";
+import { PrismaAuthModule } from "./database/prisma-auth/prisma.module";import { FindUserByEmailService } from "./modules/user/commands/find-user-by-email/findUserByEmail.service";
 
 
 @Module({
@@ -95,6 +97,7 @@ import { FindUserByEmailService } from "./modules/user/commands/find-user-by-ema
       }),
       inject: [ConfigService],
     }),
+    PrismaAuthModule,
     EmailModule,
     LocalStorageModule,
     OtpUtilsModule,
@@ -132,6 +135,7 @@ import { FindUserByEmailService } from "./modules/user/commands/find-user-by-ema
     CreateUserPinController,
     VerifyUserPinController,
     ChangeUserPinController,
+    GetUsersByAdminController,
   ],
   providers: [
     RegisterUserService,
@@ -159,6 +163,7 @@ import { FindUserByEmailService } from "./modules/user/commands/find-user-by-ema
     CreateUserPinService,
     VerifyUserPinService,
     ChangeUserPinService,
+    GetUsersByAdminService,
 
     // Repositories
     GetFavoriteEventService,
@@ -184,10 +189,6 @@ import { FindUserByEmailService } from "./modules/user/commands/find-user-by-ema
       useClass: AdminRepositoryImpl
     },
     UpdateUserRoleService,
-    {
-      provide: 'AdminRepository',
-      useClass: AdminRepositoryImpl
-    },
     SetReceiveNotiService,
     TurnOnNotificationService,
     GetUsersNotifiedByEventService,
@@ -199,17 +200,13 @@ import { FindUserByEmailService } from "./modules/user/commands/find-user-by-ema
     FindUserByEmailService
   ],
   exports: [
-    UserRepositoryImpl,
-    {
-      provide: 'UserRepository',
-      useClass: UserRepositoryImpl,
-    },
     CheckUserExistService,
     GetAdminAccessService,
     UpdateUserRoleService,
     GetUserService,
     CheckFavoriteService,
     VerifyUserPinService,
+    GetFavoriteEventService,
     FindUserByEmailService
   ],
 })

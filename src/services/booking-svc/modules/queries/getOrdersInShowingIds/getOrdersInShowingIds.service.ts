@@ -1,6 +1,6 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { Result, Ok, Err } from "oxide.ts";
-import { Order } from "@prisma/client";
+import { Order } from "prisma/client-booking";
 
 import { OrderRepository } from "src/services/booking-svc/repository/order/order.repo";
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";

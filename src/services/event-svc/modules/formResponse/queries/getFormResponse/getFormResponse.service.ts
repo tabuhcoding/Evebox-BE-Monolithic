@@ -1,6 +1,6 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { Result, Ok, Err } from "oxide.ts";
-import { FormResponse } from "@prisma/client";
+import { FormResponse } from "prisma/client-event";
 
 import { FormResponseRepository } from "src/services/event-svc/repository/formResponse/formResponse.repo";
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";

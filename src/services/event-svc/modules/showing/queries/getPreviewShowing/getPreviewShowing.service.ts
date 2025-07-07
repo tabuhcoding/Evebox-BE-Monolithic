@@ -55,4 +55,39 @@ export class GetPreviewShowingService {
       return null;
     }
   }
+
+  async truncateListShowingIdMeetFilter(
+    ids: string[],
+    startTime: Date,
+    endTime: Date,
+    title?: string,
+  ) : Promise<void> {
+    try {
+      const showings = await this.showingRepository.findMany({
+        id: {
+          in: ids
+        },
+        endTime: {
+          gte: startTime,
+          lte: endTime,
+        },
+        ...(title && {
+          Events: {
+            is: {
+              OR: [
+                { title: { contains: title, mode: 'insensitive' } },
+                { orgName: { contains: title, mode: 'insensitive' } },
+              ]
+            }
+          }
+        })
+      });
+
+      ids.length = 0;
+      ids.push(...showings.map(showing => showing.id));
+      return;
+    } catch (error) {
+      await this.slackService.sendError(`Event Svc >>> TruncateListShowingIdMeetTimeStamp : ${error.message}`);
+    }
+  }
 }

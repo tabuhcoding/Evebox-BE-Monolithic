@@ -1,11 +1,11 @@
-import { BaseRepository } from "src/shared/repo/base.repository";
-import { EventRole } from "@prisma/client";
-import { Prisma } from "@prisma/client";
+import { BaseEventRepository } from '../base.repository';
+import { EventRole } from "prisma/client-event";
+import { Prisma } from "prisma/client-event";
 
 export { EventRole }
 
 export interface EventRoleRepository 
-  extends BaseRepository<EventRole, Prisma.EventRoleDelegate> {
+  extends BaseEventRepository<EventRole, Prisma.EventRoleDelegate> {
   // Thêm các method riêng cho EventUserRelationship nếu cần, ví dụ:
 
 }

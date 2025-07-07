@@ -1,13 +1,12 @@
 /* Package System */
-import { Ticket } from '@prisma/client';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Prisma } from 'prisma/client-event';
 import { Result, Ok, Err } from 'oxide.ts';
 import { subMonths, startOfMonth } from 'date-fns';
 
 /* Package Application */
 // Repositories
-import { BaseRepository } from 'src/shared/repo/base.repository';
+import { BaseEventRepository } from '../base.repository';
 import { Events, EventsRepository } from './events.repo';
 import { ShowingRepository } from '../showing/showing.repo';
 import { ShowingWithEventRepository } from '../showing/showingWithEvent.repo';
@@ -15,7 +14,7 @@ import { EventUserRelationshipRepository } from '../eventUserRelationship/eventU
 import { UserClickHistoryRepository } from '../userClickHistory/userClickHistory.repo';
 
 // Services
-import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
+import { PrismaEventService } from '../../database/prisma-event/prisma.service';
 import { GetUserService } from 'src/services/auth-svc/modules/user/queries/get-user/get-user.service';
 import { GetPaidOrdersByShowingIdService } from 'src/services/booking-svc/modules/queries/getPaidOrdersByShowingId/getPaidOrdersByShowingId.service';
 import { GetOrdersInShowingIdsService } from 'src/services/booking-svc/modules/queries/getOrdersInShowingIds/getOrdersInShowingIds.service';
@@ -33,7 +32,7 @@ import { EventWithShowings } from '../../modules/statistics/queries/getOrgRevenu
 
 @Injectable()
 export class EventsRepositoryImpl
-  extends BaseRepository<Events, Prisma.EventsDelegate>
+  extends BaseEventRepository<Events, Prisma.EventsDelegate>
   implements EventsRepository {
   constructor(
     @Inject(forwardRef(() => 'EventUserRelationshipRepository'))
@@ -41,7 +40,7 @@ export class EventsRepositoryImpl
     @Inject('ShowingRepository') private readonly showingRepository: ShowingRepository,
     @Inject('ShowingWithEventRepository') private readonly showingWithEventRepository: ShowingWithEventRepository,
     @Inject('UserClickHistoryRepository') private readonly userClickHistoryRepository: UserClickHistoryRepository,
-    protected readonly prisma: PrismaService,
+    protected readonly prisma: PrismaEventService,
     private readonly getUserService: GetUserService,
     private readonly getPaidOrdersByShowingIdService: GetPaidOrdersByShowingIdService,
     private readonly getOrdersInShowingIdsService: GetOrdersInShowingIdsService

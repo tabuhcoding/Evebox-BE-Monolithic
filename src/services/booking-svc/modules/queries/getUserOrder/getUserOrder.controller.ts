@@ -14,7 +14,6 @@ import { VerifyUserPinCommand } from 'src/services/auth-svc/modules/user/command
 export class GetUserOrderController {
   constructor(
     private readonly getUserOrderService: GetUserOrderService,
-    private readonly verifyUserPinService: VerifyUserPinService,
   ) {}
 
   @UseGuards(JwtAuthGuard)
@@ -40,10 +39,12 @@ export class GetUserOrderController {
     const result = await this.getUserOrderService.execute( 
       email,
       body.status || null,
+      body.timeStamp || OrderTimeStamp.UPCOMING,
       {
         limit: body?.limit >> 0 || 10,
         page: body?.page >> 0 || 1
-      }
+      },
+      body.title || null
     );
     if (result.isErr()) {
       return res

@@ -19,6 +19,7 @@ export class GetRecommendEventService {
   ) {}
 
   async getRecommendedEvents(timeWindow: "week" | "month", userId?: string): Promise<Result<EventFrontDisplayDto[], Error>> {
+    return Ok([])
     try {
       // Check cache first
       const cacheData = await this.fileCacheService.getCache('getRecommendedEvents', { timeWindow })  as EventFrontDisplayDto[];
@@ -57,6 +58,7 @@ export class GetRecommendEventService {
             }
           },
           deleteAt: null,
+          isApproved: true,
         },
         {
           Showing: {
@@ -112,7 +114,8 @@ export class GetRecommendEventService {
     } catch (error) {
       await this.slackService.sendError(`Event Service - Event >>> getRecommendedEvents: ${error.message}`);
       
-      return Err(new Error('Failed to fetch recommended events.'));
+      return Ok([]); 
+      // return Err(new Error('Failed to fetch recommended events.'));
     }
   }
 }

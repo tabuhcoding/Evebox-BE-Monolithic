@@ -3,6 +3,8 @@ import { GetTicketDetailOfShowingService } from './modules/showing/queries/getTi
 import { GetShowingsByAdminService } from './modules/showing/queries/getShowingsByAdmin/getShowings.service';
 import { GetShowingAdminDetailService } from './modules/showing/queries/getShowingAdminDetail/getShowingAdminDetail.service';
 import { GetEventsByAdminController } from './modules/event/queries/getEventsByAdmin/getEvents.controller';
+import { GetEventDetailByAdminController } from './modules/event/queries/getEventDetailByAdmin/getEventDetailByAdmin.controller';
+import { GetEventDetailByAdminService } from './modules/event/queries/getEventDetailByAdmin/getEventDetailByAdmin.service';
 // event-svc.module.ts
 import { forwardRef, Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
@@ -12,7 +14,6 @@ import { EventCategoriesRepositoryImpl } from './repository/eventCategories/even
 import { EventUserRelationshipRepositoryImpl } from './repository/eventUserRelationship/eventUserRelationship.impl';
 import { EventRoleRepositoryImpl } from './repository/eventRole/eventRole.impl';
 import { LocationsRepositoryImpl } from './repository/locations/location.impl';
-import { AdminRepositoryImpl } from '../auth-svc/repository/admin/admin.repository.impl';
 import { GetAllEventDetailForRAGService } from './modules/event/queries/getAllEventDetailForRAG/getAllEventDetailForRAG.service';
 import { GetAllCategoriesController } from './modules/categories/queries/getAllCategories.controller';
 import { GetAllCategoriesService } from './modules/categories/queries/getAllCategories.service';
@@ -137,6 +138,8 @@ import { SeatRepositoryImpl } from './repository/seatRepository/seatRepository.i
 import { GetAllShowingDetailOfEventController } from './modules/showing/queries/getAllShowingDetailOfEvent/getAllShowingDetailOfEvent.controller';
 import { GetAllFormsService } from './modules/form/queries/getAllForms/getAllForms.service';
 import { GetAllFormsController } from './modules/form/queries/getAllForms/getAllForms.controller';
+import { OpenAIModule } from '../rag-svc/modules/openai/openAI.module';
+import { PrismaEventModule } from './database/prisma-event/prisma.module';
 import { AddEventMemberController } from './modules/event/commands/AddEventMember/addEventMember.controller';
 import { UpdateEventMemberController } from './modules/event/commands/UpdateEventMember/updateEventMember.controller';
 import { DeleteEventMemberController } from './modules/event/commands/DeleteEventMember/deleteEventMember.controller';
@@ -146,9 +149,12 @@ import { DeleteEventMemberService } from './modules/event/commands/DeleteEventMe
 
 @Module({
   imports: [ 
+    PrismaEventModule,
     BookingSvcModule, 
     AuthSvcModule, 
-    CqrsModule ],
+    CqrsModule,
+    forwardRef(() => OpenAIModule)
+  ],
   controllers: [
     // Categories
     GetAllCategoriesController,
@@ -201,6 +207,7 @@ import { DeleteEventMemberService } from './modules/event/commands/DeleteEventMe
     
     UpdateEventAdminController, 
     GetEventsByAdminController,
+    GetEventDetailByAdminController,
     GetEventSpecialManagementController,
     GetEventMemberController,
     GetEventMemberController,
@@ -283,6 +290,7 @@ import { DeleteEventMemberService } from './modules/event/commands/DeleteEventMe
     // Admin event
     UpdateEventAdminService,
     GetEventsByAdminService,
+    GetEventDetailByAdminService,
     GetEventSpecialManagementService,
     GetEventMembersService,
     
@@ -322,7 +330,6 @@ import { DeleteEventMemberService } from './modules/event/commands/DeleteEventMe
     DeleteEventMemberService,
 
     // Repositories
-    { provide: 'AdminRepository', useClass: AdminRepositoryImpl },
     { provide: 'CategoriesRepository', useClass: CategoriesRepositoryImpl },
     { provide: 'EventsRepository', useClass: EventsRepositoryImpl },
     { provide: 'EventCategoriesRepository', useClass: EventCategoriesRepositoryImpl },

@@ -1,17 +1,16 @@
 import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
-import { PrismaService } from "src/infrastructure/database/prisma/prisma.service";
-import { BaseRepository } from "src/shared/repo/base.repository";
-import { EventUserRelationship, Prisma } from "@prisma/client";
+import { PrismaEventService } from "../../database/prisma-event/prisma.service";
+import { BaseEventRepository } from '../base.repository';
+import { EventUserRelationship, Prisma } from "prisma/client-event";
 import { EventUserRelationshipRepository } from "./eventUserRelationship.repo";
-import { Result } from "oxide.ts";
 import { AddEventMemberDto } from "../../modules/event/commands/AddEventMember/addEventMember.dto";
 import { UpdateEventMemberDto } from "../../modules/event/commands/UpdateEventMember/updateEventMember.dto";
 
 @Injectable()
 export class EventUserRelationshipRepositoryImpl
-  extends BaseRepository<EventUserRelationship, Prisma.EventUserRelationshipDelegate>
+  extends BaseEventRepository<EventUserRelationship, Prisma.EventUserRelationshipDelegate>
   implements EventUserRelationshipRepository {
-  constructor(protected readonly prisma: PrismaService) {
+  constructor(protected readonly prisma: PrismaEventService) {
     super(prisma.eventUserRelationship, prisma);
   }
 

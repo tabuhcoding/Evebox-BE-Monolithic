@@ -23,6 +23,8 @@ export class DailyStatusService {
       // Call the service to recalculate ticket type status
       await this.calculateTicketTypeStatusService.execute();
       await this.slackService.sendNotice('Daily status update completed successfully.');
+      await this.calculateTicketTypeStatusService.updateEvents();
+      await this.slackService.sendNotice('Events updated successfully after daily status update.');
     }
     catch (error) {
       await this.slackService.sendError(`Daily status update failed: ${error.message}`);

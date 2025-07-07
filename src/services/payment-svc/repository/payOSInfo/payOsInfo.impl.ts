@@ -1,14 +1,14 @@
 import { Injectable } from "@nestjs/common";
 import { PayOSInfo, PayOSInfoRepository } from "./payOsInfo.repo";
-import { PrismaService } from "src/infrastructure/database/prisma/prisma.service";
-import { BaseRepository } from "src/shared/repo/base.repository";
-import { Prisma } from "@prisma/client";
+import { PrismaPaymentService } from "../../database/prisma-payment/prisma.service";
+import { BasePaymentRepository } from "../base.repository";
+import { Prisma } from "prisma/client-payment";
 
 @Injectable()
 export class PayOSInfoRepositoryImpl
-  extends BaseRepository<PayOSInfo, Prisma.PayOSInfoDelegate>
+  extends BasePaymentRepository<PayOSInfo, Prisma.PayOSInfoDelegate>
   implements PayOSInfoRepository {
-  constructor(protected readonly prisma: PrismaService) {
+  constructor(protected readonly prisma: PrismaPaymentService) {
     super(prisma.payOSInfo, prisma);
   }
 

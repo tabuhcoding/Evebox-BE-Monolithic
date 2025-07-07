@@ -1,8 +1,8 @@
-import { BaseRepository } from 'src/shared/repo/base.repository';
+import { BaseEventRepository } from '../base.repository';
 import { Result } from 'oxide.ts';
 import { CreateEventDto } from '../../modules/event/commands/createEvent/createEvent.dto';
 import { UpdateEventDto } from '../../modules/event/commands/updateEvent/updateEvent.dto';
-import { Prisma } from '@prisma/client';
+import { Prisma } from 'prisma/client-event';
 import { UpdateEventAdminDto } from '../../modules/event/commands/UpdateEventAdmin/updateEventAdmin.dto';
 import { EventOrgFrontDisplayDto } from '../../modules/event/queries/getEventOfOrg/getEventOfOrg-response.dto';
 import { EventOrgDetailResponseDto } from '../../modules/event/queries/getEventOfOrgDetail/getEventOfOrgDetail-response.dto';
@@ -77,7 +77,7 @@ export type EventWithShowingsAndTicketTypes = Prisma.EventsGetPayload<{
 
 
 
-export interface EventsRepository extends BaseRepository<Events, Prisma.EventsDelegate> {
+export interface EventsRepository extends BaseEventRepository<Events, Prisma.EventsDelegate> {
   // Thêm các method riêng cho Events nếu cần, ví dụ:
   findManyByIdsWithDetails(ids: number[]): Promise<Events[]>;
   updateEventFields(dto: UpdateEventAdminDto, eventId: number): Promise<any | null>;

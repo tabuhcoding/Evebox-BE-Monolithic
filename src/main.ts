@@ -1,3 +1,4 @@
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -8,7 +9,7 @@ async function bootstrap() {
   const options = new DocumentBuilder()
     .setTitle('Evebox API')
     .setDescription('The Evebox API description')
-    .setVersion('2.2')
+    .setVersion('2.7')
     .addBearerAuth(
       {
          type: 'http',
@@ -35,7 +36,7 @@ async function bootstrap() {
     optionsSuccessStatus: 204,
   });
 
-  await app.listen(process.env.PORT);
+  await app.listen(process.env.PORT || 8005);
 }
 
 bootstrap();

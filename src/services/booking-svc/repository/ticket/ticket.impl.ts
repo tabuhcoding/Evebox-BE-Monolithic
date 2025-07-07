@@ -1,16 +1,16 @@
 import { Injectable } from "@nestjs/common";
-import { PrismaService } from "src/infrastructure/database/prisma/prisma.service";
-import { BaseRepository } from "src/shared/repo/base.repository";
+import { PrismaBookingService } from "../../database/prisma-booking/prisma.service";
+import { BaseBookingRepository } from "../base.repository";
 import { Ticket, TicketRepository } from "./ticket.repo";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "prisma/client-booking";
 
 @Injectable()
 export class TicketRepositoryImpl
-  extends BaseRepository<Ticket, Prisma.TicketDelegate>
+  extends BaseBookingRepository<Ticket, Prisma.TicketDelegate>
   implements TicketRepository
 {
   constructor(
-    protected readonly prisma: PrismaService,
+    protected readonly prisma: PrismaBookingService,
   ) {
     super(prisma.ticket, prisma);
   }

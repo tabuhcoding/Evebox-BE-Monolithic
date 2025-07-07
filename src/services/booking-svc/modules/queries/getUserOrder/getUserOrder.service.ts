@@ -28,11 +28,39 @@ export class GetUserOrderService {
   async execute(
     email: string,
     status: OrderStatus,
-    paginationQuery: PaginationQuery
+    timeStamp: OrderTimeStamp | null,
+    paginationQuery: PaginationQuery,
+    title?: string,
   ): Promise<Result<[UserOrderDto[], Pagination], Error>> {
     try {
+      // Get set showing ID of user order 
+      const orderShowingIds = await this.orderRepository.findMany({
+        userId: email,
+        status: (
+          status == OrderStatus.PENDING ? BookingTicketStatus.PAID :
+          status == OrderStatus.SUCCESS ? BookingTicketStatus.SUCCESS :
+          status == OrderStatus.CANCELLED ? BookingTicketStatus.CANCEL : {
+            not: BookingTicketStatus.PENDING
+          }
+        )
+      });
+
+      var showingIds: string[] = [];
+      if (orderShowingIds && orderShowingIds.length > 0) {
+        showingIds = orderShowingIds.map(order => order.showingId);
+      }
+
+      await this.getPreviewShowingService.truncateListShowingIdMeetFilter(
+        showingIds,
+        timeStamp === OrderTimeStamp.UPCOMING ? new Date() : new Date("1970-01-01T00:00:00Z"), 
+        timeStamp === OrderTimeStamp.PAST ? new Date() : new Date("9999-12-31T23:59:59Z"),
+        title || undefined,
+      );
+
+      // Get showing IDs that match the timeStamp criteria
       // count
       const totalOrders = await this.orderRepository.count({
+        showingId: { in: showingIds },
         userId: email,
         status: (
           status == OrderStatus.PENDING ? BookingTicketStatus.PAID :
@@ -51,6 +79,7 @@ export class GetUserOrderService {
       };
 
       const orders = await this.orderRepository.findMany({
+        showingId: { in: showingIds },
         userId: email,
         status: (
           status == OrderStatus.PENDING ? BookingTicketStatus.PAID :
@@ -61,7 +90,7 @@ export class GetUserOrderService {
         )
       }, {
           Ticket: true,
-      },{
+      }, {
         createdAt: 'desc',
       }, (paginationQuery.page - 1) * paginationQuery.limit,
         paginationQuery.limit
@@ -131,6 +160,13 @@ export class GetUserOrderService {
           count: order.Ticket.length,
         });
       }
+
+      // Sort the orders by Showing.startDate in descending order
+      mappedOrders.sort((a, b) => {
+        const dateA = a.Showing.startTime ? new Date(a.Showing.startTime) : new Date("9999-12-31T23:59:59.999Z");
+        const dateB = b.Showing.startTime ? new Date(b.Showing.startTime) : new Date("9999-12-31T23:59:59.999Z");
+        return dateB.getTime() - dateA.getTime();
+      });
 
       return Ok([mappedOrders, pagination]);
     } catch (error) {

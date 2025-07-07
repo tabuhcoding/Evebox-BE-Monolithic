@@ -13,11 +13,11 @@ export class GetEventSpecialManagementController {
   @UseGuards(JwtAuthGuard)
   @Get('/')
   @ApiBearerAuth('access-token')
-  @ApiOperation({ summary: 'Get special event in management page' })
+  @ApiOperation({ summary: 'Get special event in management page with pagination' })
   @ApiQuery({ name: 'page', required: false, description: 'Page number for pagination', type: Number, default: 1 })
   @ApiQuery({ name: 'limit', required: false, description: 'Number of events per page', type: Number, default: 10 })
-  @ApiQuery({ name: 'isSpecial', required: false, description: 'Is event special?', type: Boolean})
-  @ApiQuery({ name: 'isOnlyOnEve', required: false, description: 'Is event only on Eve?', type: Boolean})
+  @ApiQuery({ name: 'isSpecial', required: false, description: 'Is event special?', type: Boolean })
+  @ApiQuery({ name: 'isOnlyOnEve', required: false, description: 'Is event only on Eve?', type: Boolean })
   @ApiQuery({ name: 'categoryId', required: false, description: 'Category ID for filtering events', type: Number })
   @ApiQuery({ name: 'search', required: false, description: 'Search events by title or ID', type: String })
   @ApiResponse({
@@ -59,26 +59,14 @@ export class GetEventSpecialManagementController {
         });
       }
 
-      const data = result.unwrap();
-
-      const totalCount = await this.getEventSpecialManagementService.count(filters);
-      const totalPages = Math.ceil(totalCount / limit);
-      const currentPage = page;
-
-      const nextPage = currentPage < totalPages ? currentPage + 1 : null;
+      const [data, pagination] = result.unwrap();
 
       return res.status(HttpStatus.OK).json({
         statusCode: HttpStatus.OK,
-        message: 'Organizer revenue retrieved successfully',
+        message: 'Special events retrieved successfully',
         data: {
-          data: data,
-          meta: {
-            totalCount,
-            currentPage,
-            nextPage,
-            limit: filters.limit || 10,
-            totalPages,
-          },
+          data,
+          pagination,
         }
       });
     } catch (error) {

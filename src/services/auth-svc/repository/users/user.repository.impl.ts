@@ -46,6 +46,23 @@ export class UserRepositoryImpl extends BaseAuthRepository<User, Prisma.UserDele
     return this.mapToDomain(userRecord);
   }
 
+  async findUserByEmail(email: string): Promise<User | null> {
+    const userRecord = await this.prisma.user.findUnique({
+      where: { email: email },
+      include: {
+        role: true,
+        avatar: true,
+      },
+    });
+
+    if (!userRecord) {
+      return null;
+    }
+
+    return this.mapToDomain(userRecord);
+  }
+
+
   async findById(id: UserId): Promise<User | null> {
     const userRecord = await this.prisma.user.findUnique({
       where: { id: id.value },

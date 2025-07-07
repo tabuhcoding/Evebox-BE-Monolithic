@@ -27,11 +27,12 @@ export interface UserRepository extends BaseAuthRepository<User, Prisma.UserDele
   markOTPAsUsed(requestToken: string): Promise<void>
   removeAllRefreshTokens(email: string): Promise<void>
   isEmailExists(email: string): Promise<boolean>;
-  setReceiveNoti(userId: string, receive: boolean): Promise<void>;
+  setReceiveNoti(userId: string, recseive: boolean): Promise<void>;
   getReceiveNotiByUserId(userId: string): Promise<boolean>;
   getEmailsByIds(userIds: string[]): Promise<string[]>;
   isAdmin(email: string): Promise<boolean>;
   findPinStatusByEmail(email: Email): Promise<PinStatus | null>;
   createPinUser(email: Email, pin: string): Promise<void>;
   updatePinUser(email: Email, pin: string): Promise<void>;
+  findUserByEmail(email: string): Promise<User | null>
 }

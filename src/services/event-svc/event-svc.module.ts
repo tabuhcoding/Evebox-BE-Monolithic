@@ -140,6 +140,12 @@ import { GetAllFormsService } from './modules/form/queries/getAllForms/getAllFor
 import { GetAllFormsController } from './modules/form/queries/getAllForms/getAllForms.controller';
 import { OpenAIModule } from '../rag-svc/modules/openai/openAI.module';
 import { PrismaEventModule } from './database/prisma-event/prisma.module';
+import { AddEventMemberController } from './modules/event/commands/AddEventMember/addEventMember.controller';
+import { UpdateEventMemberController } from './modules/event/commands/UpdateEventMember/updateEventMember.controller';
+import { DeleteEventMemberController } from './modules/event/commands/DeleteEventMember/deleteEventMember.controller';
+import { AddEventMemberService } from './modules/event/commands/AddEventMember/addEventMember.service';
+import { UpdateEventMemberService } from './modules/event/commands/UpdateEventMember/updateEventMember.service';
+import { DeleteEventMemberService } from './modules/event/commands/DeleteEventMember/deleteEventMember.service';
 
 @Module({
   imports: [ 
@@ -216,7 +222,11 @@ import { PrismaEventModule } from './database/prisma-event/prisma.module';
     GetEventRevenueDetailController,
     GetSummaryTicketRevenueController,
     GetAllShowingDetailOfEventController,
-    GetAllFormsController
+    GetAllFormsController,
+
+    AddEventMemberController,
+    UpdateEventMemberController,
+    DeleteEventMemberController
   ],
   providers: [
     // Adapters
@@ -314,6 +324,10 @@ import { PrismaEventModule } from './database/prisma-event/prisma.module';
     GetAllShowingDetailOfEventService,
 
     GetAllFormsService,
+
+    AddEventMemberService,
+    UpdateEventMemberService,
+    DeleteEventMemberService,
 
     // Repositories
     { provide: 'CategoriesRepository', useClass: CategoriesRepositoryImpl },

@@ -11,8 +11,8 @@ export interface EventUserRelationshipRepository
   extends BaseEventRepository<EventUserRelationship, Prisma.EventUserRelationshipDelegate> {
   // Thêm các method riêng cho EventUserRelationship nếu cần, ví dụ:
    hasPermissionToManageMembers(eventId: number, userId: string, email: string): Promise<boolean>;
-   addMember(eventId: number, dto: AddEventMemberDto): Promise<EventUserRelationship>;
-   updateMember(eventId: number, dto: UpdateEventMemberDto): Promise<EventUserRelationship | null>;
+   addMember(eventId: number,userId: string, email: string, dto: AddEventMemberDto): Promise<EventUserRelationship>;
+   updateMember(eventId: number, userId: string, dto: UpdateEventMemberDto): Promise<EventUserRelationship | null>;
    getMember(eventId: number, userId: string): Promise<any>;
    softDeleteMember(eventId: number, userId: string): Promise<any>;
 }

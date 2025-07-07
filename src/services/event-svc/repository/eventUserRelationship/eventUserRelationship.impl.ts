@@ -49,13 +49,7 @@ export class EventUserRelationshipRepositoryImpl
     return !!role?.viewMember;
   }
 
-  async addMember(eventId: number, dto: AddEventMemberDto): Promise<EventUserRelationship> {
-    const user = await this.prisma.user.findUnique({
-      where: { email: dto.email },
-    });
-
-    if (!user) throw new NotFoundException(`User with email ${dto.email} not found`);
-
+  async addMember(eventId: number,userId: string, email: string, dto: AddEventMemberDto): Promise<EventUserRelationship> {
     const role_desc = this.roleMap[dto.role];
     if (!role_desc) throw new BadRequestException('Invalid role number');
 
@@ -63,7 +57,7 @@ export class EventUserRelationshipRepositoryImpl
       where: {
         eventId_userId: {
           eventId,
-          userId: user.id,
+          userId: userId,
         },
       },
     });
@@ -71,7 +65,7 @@ export class EventUserRelationshipRepositoryImpl
     if (existing) {
       if (existing.isDeleted) {
         return this.prisma.eventUserRelationship.update({
-          where: { eventId_userId: { eventId, userId: user.id } },
+          where: { eventId_userId: { eventId, userId: userId} },
           data: { isDeleted: false, role: dto.role, role_desc },
         });
       } else {
@@ -82,17 +76,14 @@ export class EventUserRelationshipRepositoryImpl
     return this.prisma.eventUserRelationship.create({
       data: {
         eventId,
-        userId: user.id,
-        email: user.email,
+        userId: userId,
+        email: email,
         role: dto.role,
         role_desc,
       },
     });
   }
-async updateMember(eventId: number, dto: UpdateEventMemberDto): Promise<EventUserRelationship | null> {
-    const user = await this.prisma.user.findUnique({ where: { email: dto.email } });
-    if (!user) throw new NotFoundException(`User with email ${dto.email} not found`);
-
+async updateMember(eventId: number, userId: string, dto: UpdateEventMemberDto): Promise<EventUserRelationship | null> {
     const role_desc = this.roleMap[dto.role];
     if (!role_desc) throw new BadRequestException('Invalid role number');
 
@@ -100,7 +91,7 @@ async updateMember(eventId: number, dto: UpdateEventMemberDto): Promise<EventUse
       where: {
         eventId_userId: {
           eventId,
-          userId: user.id,
+          userId: userId,
         },
       },
     });
@@ -111,7 +102,7 @@ async updateMember(eventId: number, dto: UpdateEventMemberDto): Promise<EventUse
       where: {
         eventId_userId: {
           eventId,
-          userId: user.id,
+          userId: userId,
         },
       },
       data: {

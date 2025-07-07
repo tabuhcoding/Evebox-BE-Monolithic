@@ -26,10 +26,13 @@ export class UpdateEventMemberService {
       const user = await this.findUserByEmail.execute(currentEmail);
       if (!user) return Err(new Error('User not found'));
 
+      const addedUser = await this.findUserByEmail.execute(dto.email);
+      if (!addedUser) return Err(new Error('User not found'));
+
       const canManage = await this.eventUserRepo.hasPermissionToManageMembers(eventId, user.id.value, currentEmail);
       if (!canManage) return Err(new Error('You do not have permission to manage members.'));
 
-      const updated = await this.eventUserRepo.updateMember(eventId, dto);
+      const updated = await this.eventUserRepo.updateMember(eventId, addedUser.id.value, dto);
       if (!updated) return Err(new Error('Failed to update member'));
 
       return Ok({

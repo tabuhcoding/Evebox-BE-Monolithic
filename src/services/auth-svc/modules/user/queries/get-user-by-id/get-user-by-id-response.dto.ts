@@ -43,7 +43,7 @@ export class UserData {
   created_at: Date;
 }
 
-export class UserResponse extends BaseResponse {
+export class UserResponseById extends BaseResponse {
   @ApiProperty({ type: UserData, description: 'User data' })
   data: UserData;
 }

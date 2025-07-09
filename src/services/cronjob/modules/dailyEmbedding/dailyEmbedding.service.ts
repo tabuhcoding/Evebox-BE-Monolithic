@@ -12,7 +12,7 @@ export class DailyEmbeddingService {
     private readonly openAIVectorStoreService: OpenAIVectorStoreService,
   ) {  }
 
-  // @Cron('0 27 00 * * 1')
+  // @Cron('0 36 17 * * 3')
   async runDailyEmbedding() {
     try {
       const events = await this.getAllEventsForRagService.getAllEvents();
@@ -22,7 +22,7 @@ export class DailyEmbeddingService {
       }
 
       const batchSize = 100;
-      for (let i = 0; i < events.length; i += batchSize) {
+      for (let i = 2000; i < events.length; i += batchSize) {
         const batch = events.slice(i, i + batchSize);
         await this.openAIVectorStoreService.embedFullEventDocuments(batch);
         await this.slackService.sendNotice(`Embedded batch ${Math.floor(i / batchSize) + 1} of ${Math.ceil(events.length / batchSize)}.`);
@@ -30,7 +30,7 @@ export class DailyEmbeddingService {
 
       await this.slackService.sendNotice("Daily embedding completed successfully.");
 
-      for (let i = 0; i < events.length; i += batchSize) {
+      for (let i = 800; i < events.length; i += batchSize) {
         const batch = events.slice(i, i + batchSize);
         await this.openAIVectorStoreService.embedSimilarityEventDocuments(batch);
         await this.slackService.sendNotice(`Embedded similar batch ${Math.floor(i / batchSize) + 1} of ${Math.ceil(events.length / batchSize)}.`);

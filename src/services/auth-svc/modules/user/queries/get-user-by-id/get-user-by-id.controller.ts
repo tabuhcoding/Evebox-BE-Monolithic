@@ -2,7 +2,7 @@ import { Controller, Get, HttpStatus, Res, Param } from "@nestjs/common";
 import { Response } from "express";
 import { ApiTags, ApiOperation, ApiNotFoundResponse, ApiOkResponse } from "@nestjs/swagger";
 import { ErrorHandler } from "src/shared/exceptions/error.handler";
-import { UserResponse } from "./get-user-by-id-response.dto";
+import { UserResponseById } from "./get-user-by-id-response.dto";
 import { GetUserByIdService } from "./get-user-by-id.service";
 
 @ApiTags('Auth Service - User')
@@ -19,7 +19,7 @@ export class GetUserByIdController {
   })
   @ApiOkResponse({
     description: 'User details fetched successfully',
-    type: UserResponse
+    type: UserResponseById
   })
   @ApiNotFoundResponse({
     description: 'User not found'

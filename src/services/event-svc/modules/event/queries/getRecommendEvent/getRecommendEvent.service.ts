@@ -19,7 +19,6 @@ export class GetRecommendEventService {
   ) {}
 
   async getRecommendedEvents(timeWindow: "week" | "month", userId?: string): Promise<Result<EventFrontDisplayDto[], Error>> {
-    return Ok([])
     try {
       // Check cache first
       const cacheData = await this.fileCacheService.getCache('getRecommendedEvents', { timeWindow })  as EventFrontDisplayDto[];

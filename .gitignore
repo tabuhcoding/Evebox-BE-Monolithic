@@ -4,6 +4,7 @@
 /build
 /prisma
 /cache
+.vscode/
 
 # Logs
 logs

@@ -14,4 +14,5 @@ export interface TicketRepository extends BaseBookingRepository<Ticket, Prisma.T
   // Thêm các method riêng cho Order nếu cần
   countCheckedInTickets(ticketTypeIds: string[]): Promise<number>;
   countTicketsByTicketTypeIds(ticketTypeIds: string[]): Promise<Record<string, number>>;
+  getCheckedInTicketsByShowingId(showingId: string);
 }

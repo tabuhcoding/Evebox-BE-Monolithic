@@ -365,7 +365,7 @@ import { DeleteEventMemberService } from './modules/event/commands/DeleteEventMe
     GetPreviewShowingService,
     GetFormAnswerWithQuestionService,
     CalculateTicketTypeStatusService,
-    SubmitFormResponseService,
+    SubmitFormResponseService
   ],
 })
 export class EventSvcModule {}

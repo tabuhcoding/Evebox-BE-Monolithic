@@ -36,6 +36,7 @@ export class GetEventFrontDisplayService {
           const favoriteEvents = await this.getEventRecommentForUser(userId);
 
           await this.checkFavoriteService.attachFavorite(userId, favoriteEvents);
+          cachedData.recommendedEvents = favoriteEvents;
           await this.checkFavoriteService.attachFavorite(userId, cachedData.specialEvents);
           await this.checkFavoriteService.attachFavorite(userId, cachedData.trendingEvents);
           await this.checkFavoriteService.attachFavorite(userId, cachedData.onlyOnEve);
@@ -423,7 +424,6 @@ export class GetEventFrontDisplayService {
   }
   
   async getEventRecommentForUser(email: string): Promise<EventFrontDisplayDto[]> {
-    return [];
     if (!email) {
       return [];
     }
@@ -434,15 +434,14 @@ export class GetEventFrontDisplayService {
       }
       var eventScoresMap: Map<number, number> = new Map();
 
-      const cacheScore = await this.fileCacheService.getCache('eventScoresMap', {userId: email}) as { eventScoreMap: eventScore[] } | null;
-      console.log(`Cache score map for user ${email}:`, cacheScore);
+      const cacheScore = await this.fileCacheService.getCache('similar_events', {userId: email}) as { eventScoreMap: eventScore[] } | null;
       if (cacheScore) {
         eventScoresMap = new Map(cacheScore.eventScoreMap.map(item => [item.id, item.score]));
       } else {
         const favoriteEvents = await this.getFavoriteEventService.getFavoriteEventIDs(email);
         const favoriteEventsToString = favoriteEvents.map(eventId => eventId.toString());
         
-        const userEventsSimilar = await this.vectorStoreService.recommendEventsFromFavorites(favoriteEventsToString, 1000);
+        const userEventsSimilar = await this.vectorStoreService.recommendEventsFromFavorites(favoriteEventsToString, 200);
 
         if (userEventsSimilar.length === 0) {
           return [];
@@ -470,7 +469,7 @@ export class GetEventFrontDisplayService {
         Showing: {
           some: {
             startTime: {
-              gte: new Date(),
+              gte: new Date(new Date().setMonth(new Date().getMonth() - 1)),
             },
             deleteAt: null,
           },
@@ -490,14 +489,12 @@ export class GetEventFrontDisplayService {
           },
           where: {
             startTime: {
-              gte: new Date(),
+              gte: new Date(new Date().setMonth(new Date().getMonth() - 1)),
             },
             deleteAt: null,
           },
         }
-      });
-
-      console.log(`Events found for user ${email}:`, events.length);
+      }, {}, 0, 20);
 
       // Map to EventFrontDisplayDto
       const eventFrontDisplayDtos = await Promise.all(events.map(async (event) => {

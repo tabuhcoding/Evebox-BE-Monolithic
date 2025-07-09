@@ -5,7 +5,7 @@ import { GetCheckedInTicketsService } from './getCheckedInTickets.service';
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 import { GetCheckedInTicketsResponseDto } from './getCheckedInTickets-response.dto';
 
-@ApiTags('Org - Checkin')
+@ApiTags('Booking Service - Org - Checkin')
 @Controller('api/org/checkin')
 export class GetCheckedInTicketsController {
   constructor(private readonly service: GetCheckedInTicketsService) {}

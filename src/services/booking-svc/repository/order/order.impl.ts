@@ -33,7 +33,9 @@ export class OrderRepositoryImpl
 
         const orders = await this.findMany({
           showingId
-        }, {}, {
+        }, {
+          Ticket: true,
+        }, {
           createdAt: 'desc',
         }, (paginationQuery.page - 1) * paginationQuery.limit, paginationQuery.limit);
 
@@ -106,6 +108,7 @@ export class OrderRepositoryImpl
           totalPages: totalPages,
         }]);
       } catch (error) {
+        console.error(`Error in OrderRepositoryImpl.getOrders: ${error.message}`);
         return Err(new Error('Failed to get orders of showing'));
       }
     }

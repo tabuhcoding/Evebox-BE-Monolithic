@@ -31,6 +31,10 @@ export class GetUsersByAdminService {
         ];
       }
 
+      if (filters.role_id !== undefined && filters.role_id !== null) {
+        payloadFilters.role_id = Number(filters.role_id);
+      }
+
       if (filters.status) {
         payloadFilters.status = filters.status;
       }
@@ -63,8 +67,6 @@ export class GetUsersByAdminService {
         skip,
         limit
       );
-
-      console.log(JSON.stringify(users[0]), users[0]);
 
       const userDtos: UserDto[] = users.map(u => {
         let roleObj: { id: number, role_name: string } | null = null;

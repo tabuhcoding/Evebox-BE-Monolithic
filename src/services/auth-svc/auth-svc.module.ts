@@ -82,8 +82,10 @@ import { GetAdminAccessService } from "./modules/user/queries/get-admin-access/g
 import { CheckFavoriteService } from "./modules/user/commands/check-favorite/checkFavorite.service";
 import { GetUsersByAdminService } from "./modules/admin/queries/getUsersByAdmin/getUsersByAdmin.service";
 import { GetUsersByAdminController } from "./modules/admin/queries/getUsersByAdmin/getUsersByAdmin.controller";
-import { PrismaAuthModule } from "./database/prisma-auth/prisma.module";import { FindUserByEmailService } from "./modules/user/commands/find-user-by-email/findUserByEmail.service";
-
+import { FindUserByEmailService } from "./modules/user/commands/find-user-by-email/findUserByEmail.service";
+import { GetUserByIdController } from "./modules/user/queries/get-user-by-id/get-user-by-id.controller";
+import { GetUserByIdService } from "./modules/user/queries/get-user-by-id/get-user-by-id.service";
+import { PrismaAuthModule } from "./database/prisma-auth/prisma.module";
 
 @Module({
   imports: [
@@ -115,6 +117,7 @@ import { PrismaAuthModule } from "./database/prisma-auth/prisma.module";import {
     ForgotPasswordController,
     GoogleLoginController,
     GetUserController,
+    GetUserByIdController,
     AddToFavoriteController,
     UnfavoriteEventController,
     UnfavoriteOrgController,
@@ -154,6 +157,7 @@ import { PrismaAuthModule } from "./database/prisma-auth/prisma.module";import {
     ResendOTPService,
     GoogleLoginService,
     GetUserService,
+    GetUserByIdService,
     AddToFavoriteService,
     UnfavoriteEventService,
     UnfavoriteOrgService,

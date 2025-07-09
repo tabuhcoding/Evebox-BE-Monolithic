@@ -18,7 +18,7 @@ export class GetEventDetailRecommendService {
   ) {}
 
   async getRecommendedEventsInDetail(eventId: number, limit: string, userId?: string): Promise<Result<EventFrontDisplayDto[], Error>> {
-    return Ok([]);
+    // return Ok([]);
     if (!eventId) {
       return Err(new Error("Event ID is required."));
     }
@@ -49,11 +49,11 @@ export class GetEventDetailRecommendService {
       }
 
       const eventIds = eventSimilarities.map(similarity => similarity[0].metadata.eventId >> 0);
-
       const recommendedEvents = await this.eventsRepository.findMany(
         {
           id: {
-            in: eventIds,}
+            in: eventIds,
+          }
         },
         {
           Showing: {
@@ -90,23 +90,31 @@ export class GetEventDetailRecommendService {
         if (result.isErr()) {
           continue; // Skip this event if there's an error
         }
-        recommendedEventsDto.push(result.unwrap());
+        const eventDto = result.unwrap();
+        if (!eventDto || eventDto.id === eventId) {
+          continue; // Skip if eventDto is null
+        }
+        // if available, push to the first position, else push to the end
+        if (eventDto.status === 'AVAILABLE')
+          recommendedEventsDto.unshift(eventDto);
+        else
+          recommendedEventsDto.push(eventDto);
       }
 
       // Filter out any null results
-      const filteredEventDtos = recommendedEventsDto.filter((event) => event !== null
-        && event.id !== eventId
-        // && event.status !== 'EVENT_OVER' 
-        // && event.status !== 'SOLD_OUT'
-        // && event.status !== 'REGISTER_CLOSE'
-        // && event.status !== 'SALE_CLOSE'
-      ) as EventFrontDisplayDto[];
+      // const filteredEventDtos = recommendedEventsDto.filter((event) => event !== null
+      //   && event.id !== eventId
+      //   // && event.status !== 'EVENT_OVER' 
+      //   // && event.status !== 'SOLD_OUT'
+      //   // && event.status !== 'REGISTER_CLOSE'
+      //   // && event.status !== 'SALE_CLOSE'
+      // ) as EventFrontDisplayDto[];
 
       if (userId) {
-        await this.checkFavoriteService.attachFavorite(userId, filteredEventDtos);
+        await this.checkFavoriteService.attachFavorite(userId, recommendedEventsDto);
       }
 
-      return Ok(filteredEventDtos);
+      return Ok(recommendedEventsDto);
     } catch (error) {
       await this.slackService.sendError(`Event Service - Event >>> getRecommendedEventsInDetail: ${error.message}`);
 

@@ -26,6 +26,15 @@ export class GetEventDetailByAdminService {
     if (!eventId) {
       return Err(new Error("Event ID is required."));
     }
+
+    if (!userId){
+      return Err(new Error("User ID is required."));
+    }
+
+    const userExists = await this.checkUserExistService.checkAdminExist(userId);
+    if (!userExists) {
+      return Err(new Error("User does not Admin."));
+    }
     try {
       // find event by ID
       const event = await this.eventsRepository.findOneById(eventId,
@@ -39,9 +48,9 @@ export class GetEventDetailByAdminService {
               },
             },
             where: {
-              endTime: {
-                gte: new Date(new Date().setMonth(new Date().getMonth() - 1)),
-              },
+              // endTime: {
+              //   gte: new Date(new Date().setMonth(new Date().getMonth() - 1)),
+              // },
               deleteAt: null,
             },
           },
@@ -66,11 +75,11 @@ export class GetEventDetailByAdminService {
         return Err(new Error("Event not found."));
       }
 
-      var [isFavoriteEvent, isNotifiedEvent, isFavoriteOrg, isNotifiedOrg] = [false, false, false, false];
-      // Check if user exists
-      if (userId) {
-        [isFavoriteEvent, isNotifiedEvent, isFavoriteOrg, isNotifiedOrg] = await this.checkFavoriteService.execute(userId, event.organizerId, event.id);
-      }
+      // var [isFavoriteEvent, isNotifiedEvent, isFavoriteOrg, isNotifiedOrg] = [false, false, false, false];
+      // // Check if user exists
+      // if (userId) {
+      //   [isFavoriteEvent, isNotifiedEvent, isFavoriteOrg, isNotifiedOrg] = await this.checkFavoriteService.execute(userId, event.organizerId, event.id);
+      // }
 
 
       let eventsDto: EventDetailResponseDto = {
@@ -103,10 +112,10 @@ export class GetEventDetailByAdminService {
         showing: [],
         locationsString: "",
         minPrice: Number.MAX_VALUE,
-        isUserFavorite: isFavoriteEvent,
-        isUserNotice: isNotifiedEvent,
-        isUserFavoriteOrganizer: isFavoriteOrg,
-        isUserNoticeOrganizer: isNotifiedOrg,
+        // isUserFavorite: isFavoriteEvent,
+        // isUserNotice: isNotifiedEvent,
+        // isUserFavoriteOrganizer: isFavoriteOrg,
+        // isUserNoticeOrganizer: isNotifiedOrg,
       }
 
       // Location string

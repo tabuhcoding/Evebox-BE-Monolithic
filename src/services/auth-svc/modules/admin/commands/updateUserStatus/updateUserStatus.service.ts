@@ -48,7 +48,7 @@ export class UpdateUserStatusService {
         return Err(statusOrError.unwrapErr());
       }
 
-      await this.adminRepository.updateUserStatus(email, dto.status);
+      await this.adminRepository.updateUserStatus(userId, dto.status);
 
       return Ok(void 0);
     } catch (error) {

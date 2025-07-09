@@ -39,21 +39,20 @@ export class CheckFavoriteService {
   }
 
   async attachFavorite( userId: string, events: EventFrontDisplayDto[]): Promise<void> {
-    for (const event of events) {
-      try {
-        const isFavoriteEvent = await this.favoriteRepository.findOne({
-          userId,
-          itemType: ItemType.EVENT,
-          eventId: event.id,
-        });
-
-        event.isUserFavorite = isFavoriteEvent ? isFavoriteEvent.isFavorite : false;
-        event.isUserNotice = isFavoriteEvent ? isFavoriteEvent.isNotified : false;
-      } catch (error) {
-        await this.slackService.sendError(`Auth Service - Attach Favorite >>> ${error.message}`);
-        event.isUserFavorite = false;
-        event.isUserNotice = false;
-      }
+    const eventIds = events.map(event => event.id);
+    if (eventIds.length === 0) {
+      return;
     }
+    const isFavoriteEvents = await this.favoriteRepository.findMany({
+      userId,
+      itemType: ItemType.EVENT,
+      eventId: { in: eventIds },
+    });
+    
+    await Promise.all(events.map(event => {
+      const isFavoriteEvent = isFavoriteEvents.find(fav => fav.eventId === event.id);
+      event.isUserFavorite = isFavoriteEvent ? isFavoriteEvent.isFavorite : false;
+      event.isUserNotice = isFavoriteEvent ? isFavoriteEvent.isNotified : false;
+    }));
   }
 }

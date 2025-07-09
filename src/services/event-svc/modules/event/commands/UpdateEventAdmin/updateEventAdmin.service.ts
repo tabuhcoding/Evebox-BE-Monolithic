@@ -18,20 +18,10 @@ export class UpdateEventAdminService {
   ) {}
 
   async execute(dto: UpdateEventAdminDto, eventId: number, emailStr: string): Promise<Result<EventDto, Error>> {
-    const userExists = await this.checkUserExistService.execute(emailStr);
+    const userExists = await this.checkUserExistService.checkAdminExist(emailStr);
       if (!userExists) {
-        return Err(new Error('User does not exist'));
+        return Err(new Error('User does not exist or is not an admin'));
       }
-
-      const hasPermisison = await this.eventRepository.hasPermissionToManageEvent(eventId, emailStr, EVENT_ROLE.IS_EDITED);
-      if (hasPermisison.isErr()) {
-        return Err(new Error('Failed to check permission'));
-      }
-
-      if (!hasPermisison.unwrap()) {
-        return Err(new Error('Unauthorized'));
-      }
-
 
     try {
       const event = await this.eventRepository.updateEventFields(dto, eventId);

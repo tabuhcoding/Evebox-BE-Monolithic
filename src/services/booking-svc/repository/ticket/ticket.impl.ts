@@ -43,4 +43,26 @@ export class TicketRepositoryImpl
 
     return result;
   }
+
+  async getCheckedInTicketsByShowingId(showingId: string) {
+    return this.prisma.ticket.findMany({
+      where: {
+        isCheckedIn: true,
+        Order: {
+          showingId,
+          status: 'SUCCESS',
+        },
+      },
+      select: {
+        id: true,
+        orderId: true,
+        ticketTypeId: true,
+        Order: {
+          select: {
+            type: true, // PHYSICAL_TICKET or E_TICKET
+          },
+        },
+      },
+    });
+  }
 }

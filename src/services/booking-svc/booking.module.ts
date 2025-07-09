@@ -1,3 +1,4 @@
+import { GetCheckedInTicketsService } from './modules/queries/getCheckedInTickets/getCheckedInTickets.service';
 import { forwardRef, Module } from "@nestjs/common";
 import { OrderRepositoryImpl } from "./repository/order/order.impl";
 import { TicketRepositoryImpl } from "./repository/ticket/ticket.impl";
@@ -29,6 +30,7 @@ import { GetTicketQrCodeController } from "./modules/queries/getTicketQrCode/get
 import { GetTicketQrCodeService } from "./modules/queries/getTicketQrCode/getTicketQrCode.service";
 import { EmailModule } from "src/infrastructure/adapters/email/email.module";
 import { PrismaBookingModule } from "./database/prisma-booking/prisma.module";
+import { GetCheckedInTicketsController } from './modules/queries/getCheckedInTickets/getCheckedInTickets.controller';
 
 @Module({
   imports: [ 
@@ -46,6 +48,7 @@ import { PrismaBookingModule } from "./database/prisma-booking/prisma.module";
     SubmitFormController,
     GetUserOrderController,
     GetTicketQrCodeController,
+    GetCheckedInTicketsController
   ],
   providers: [
     // Services
@@ -69,6 +72,8 @@ import { PrismaBookingModule } from "./database/prisma-booking/prisma.module";
     GetTicketQrCodeService,
 
     SubmitFormService,
+
+    GetCheckedInTicketsService,
 
     // Repositories
     { provide: 'OrderRepository', useClass: OrderRepositoryImpl },

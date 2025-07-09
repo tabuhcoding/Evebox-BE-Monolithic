@@ -39,9 +39,9 @@ export class GetEventDetailService {
               },
             },
             where: {
-              // endTime: {
-              //   gte: new Date(new Date().setMonth(new Date().getMonth() - 1)),
-              // },
+              endTime: {
+                gte: new Date(new Date().setMonth(new Date().getMonth() - 2)),
+              },
               deleteAt: null,
             },
           },
@@ -136,7 +136,7 @@ export class GetEventDetailService {
           showingStatusSet.add(showingStatus);
 
           // Update min price
-          if (showingMinPrice < eventsDto.minPrice) {
+          if (showingMinPrice < eventsDto.minPrice && showingStatus !== ShowingStatus.SHOWING_OVER) {
             eventsDto.minPrice = showingMinPrice;
           }
           // Update start date

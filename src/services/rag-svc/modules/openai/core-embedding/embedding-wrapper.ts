@@ -66,7 +66,7 @@ export class OpenAIEmbeddingWrapperService {
   async searchByText(query: string, collectionName: string, k = 5) {
     try {
       const store = await this.initStore(collectionName);
-      return await store.similaritySearch(query, k);
+      return await store.similaritySearch(`${query}, ưu tiên sự kiện có đêm diễn sắp diễn ra`, k);
     } catch (err) {
       await this.slackService.sendError(`❌ Text search error: ${err.message}`);
       throw err;

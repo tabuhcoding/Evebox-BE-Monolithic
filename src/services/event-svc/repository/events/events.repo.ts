@@ -85,7 +85,7 @@ export interface EventsRepository extends BaseEventRepository<Events, Prisma.Eve
   createEvent(data: CreateEventDto, email: string, locationId?: number): Promise<number>;
 
   /* Update Event */
-  updateEvent(dto: UpdateEventDto, eventId: number, locationId?: number): Promise<[number, boolean]> ;
+  updateEvent(dto: UpdateEventDto, eventId: number, isValid: boolean, locationId?: number): Promise<[number, boolean]> ;
   getEventOrganizer(eventId: number): Promise<string | null>;
   getMember(eventId: number, userEmail: string): Promise<any | null>;
   hasPermissionToManageEvent(eventId: number, userEmail: string, permission: string): Promise<Result<boolean, Error>>;

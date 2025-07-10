@@ -129,7 +129,7 @@ export class EventsRepositoryImpl
   }
 
   /* Update Event */
-  async updateEvent(dto: UpdateEventDto, eventId: number, locationId?: number): Promise<[number, boolean]> {
+  async updateEvent(dto: UpdateEventDto, eventId: number, isValid: boolean, locationId?: number): Promise<[number, boolean]> {
     try {
       const event = await this.findOneById(eventId);
       if (!event) {
@@ -137,6 +137,7 @@ export class EventsRepositoryImpl
       }
 
       const updateData: any = {};
+      updateData.isApproved = isValid
       if (dto.title) updateData.title = dto.title;
       if (dto.description) updateData.description = dto.description;
       if (dto.imgLogoUrl) updateData.imgLogoUrl = dto.imgLogoUrl;

@@ -297,7 +297,7 @@ export class EmailService implements OnModuleInit {
     }
   }
 
-  async sendNewEventToUsers(email: string[], eventInfo: CreateEventDto, eventId: string): Promise<void> {
+  async sendNewEventToUsers(email: string[], eventInfo: CreateEventDto, eventId: number): Promise<void> {
     const subject = `New Event: ${eventInfo.title} From your favorite Organizer`;
     const content = `
       <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 8px; padding: 20px;">

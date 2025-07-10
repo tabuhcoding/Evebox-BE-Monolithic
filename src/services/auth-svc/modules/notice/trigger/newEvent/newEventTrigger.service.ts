@@ -21,16 +21,14 @@ export class NewEventTriggerService {
             New event created: ${dto.title} by ${orgId} with Info ${dto.orgName}. Description: ${dto.description}`);
     }
 
-    async sendEmailToUsers(dto: CreateEventDto, orgId: string): Promise<void> {
+    async sendEmailToUsers(dto: CreateEventDto, orgId: string, eventId: number): Promise<void> {
         const userIds = await this.favoriteRepository.getUserIdsNotifiedByOrganizer(orgId);
         if (userIds.length === 0) return;
 
         // Extract user IDs from the result
         const emails = userIds.map(user => user.userId);
 
-        await this.emailService.sendNewEventToUsers(emails, dto, orgId);
-        await this.slackService.sendNotice(`
-            New event created: ${dto.title} by ${orgId} with Info ${dto.orgName}. Description: ${dto.description}`);
+        await this.emailService.sendNewEventToUsers(emails, dto, eventId);
     }
 
 }

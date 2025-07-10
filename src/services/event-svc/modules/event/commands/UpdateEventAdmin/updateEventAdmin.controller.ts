@@ -1,6 +1,6 @@
 import { Controller, Request, Res, HttpStatus, Body, UseGuards, Put } from '@nestjs/common';
 import { Response } from 'express';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UpdateEventAdminService } from './updateEventAdmin.service';
 import { UpdateEventAdminDto } from './updateEventAdmin.dto';
 import { JwtAuthGuard } from 'src/shared/guard/jwt-auth.guard';
@@ -15,6 +15,7 @@ export class UpdateEventAdminController {
   @Put('/:id')
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Update an existing event' })
+  @ApiParam({ name: 'id', description: 'ID of the event to update', type: Number })
   @ApiResponse({ status: HttpStatus.OK, description: 'Event updated successfully', type: EventResponse })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid input' })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Internal server error' })

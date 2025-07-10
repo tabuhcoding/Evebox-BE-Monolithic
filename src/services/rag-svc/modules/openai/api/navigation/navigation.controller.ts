@@ -33,15 +33,15 @@ export class OpenAINavigationController {
   async navigation(
     @Res() res: Response,
     @Body('query') query: string, 
-    @Body('privateKey') privateKey: string,
+    @Body('privateKey') privateKey?: string,
     @Body('previousID') previousID?: string,
   ) {
-    if(!privateKey || privateKey !== process.env.OPENAI_USAGE_PRIVATE_KEY) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        statusCode: HttpStatus.BAD_REQUEST,
-        message: 'Private key is required',
-      });
-    }
+    // if(!privateKey || privateKey !== process.env.OPENAI_USAGE_PRIVATE_KEY) {
+    //   return res.status(HttpStatus.BAD_REQUEST).json({
+    //     statusCode: HttpStatus.BAD_REQUEST,
+    //     message: 'Private key is required',
+    //   });
+    // }
     // This method will handle the navigation logic using OpenAINavigationService.
     try{
       const answer = await this.openAINavigationService.selectRoute(query, previousID);

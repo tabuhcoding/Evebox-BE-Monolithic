@@ -23,7 +23,7 @@ export class GoogleLoginService {
 
   async execute(
     command: GoogleLoginCommand,
-  ): Promise<Result<{ access_token: string; refresh_token: string }, Error>> {
+  ): Promise<Result<{ access_token: string; refresh_token: string; id: string }, Error>> {
     const emailOrError = Email.create(command.email);
     if (emailOrError.isErr()) {
       return Err(emailOrError.unwrapErr());
@@ -93,6 +93,10 @@ export class GoogleLoginService {
       expiresAt, 
     );
 
-    return Ok({ access_token: accessToken, refresh_token: refreshToken });
+    return Ok({ 
+      access_token: accessToken, 
+      refresh_token: refreshToken,
+      id: user.id.value
+    });
   }
 }

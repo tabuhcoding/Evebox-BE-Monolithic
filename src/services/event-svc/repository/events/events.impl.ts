@@ -156,9 +156,6 @@ export class EventsRepositoryImpl
 
       updateData.updatedAt = new Date();
 
-      // updateData.isApproved = false
-      // TODO: handle after update
-
       const updatedEvent = await this.updateAndFindOneById(eventId, updateData);
       if (!updatedEvent) {
         throw new Error('Failed to update event');

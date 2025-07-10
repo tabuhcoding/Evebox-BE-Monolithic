@@ -7,6 +7,8 @@ import { EventsRepository } from 'src/services/event-svc/repository/events/event
 import { EventCategoriesRepository } from 'src/services/event-svc/repository/eventCategories/eventCategories.repo';
 import { SlackService } from 'src/infrastructure/adapters/slack/slack.service';
 import { CheckUserExistService } from 'src/services/auth-svc/modules/user/commands/checkuserExist/checkuserExist.service';
+import { NewEventTriggerService } from 'src/services/auth-svc/modules/notice/trigger/newEvent/newEventTrigger.service';
+import { CreateEventDto } from '../createEvent/createEvent.dto';
 
 @Injectable()
 export class UpdateEventAdminService {
@@ -15,6 +17,7 @@ export class UpdateEventAdminService {
     @Inject('EventsRepository') private readonly eventRepository: EventsRepository,
     private readonly slackService: SlackService,
     private readonly checkUserExistService: CheckUserExistService,  
+    private readonly newEventTriggerService: NewEventTriggerService,
   ) {}
 
   async execute(dto: UpdateEventAdminDto, eventId: number, emailStr: string): Promise<Result<EventDto, Error>> {
@@ -63,6 +66,23 @@ export class UpdateEventAdminService {
         categories,
       };
 
+      if (dto.isApproved) {
+        const createEventDto: CreateEventDto = {
+          title: eventDto.title,
+          description: eventDto.description,
+          venue: eventDto.venue,
+          orgName: eventDto.orgName,
+          orgDescription: eventDto.orgDescription,
+          isOnline: eventDto.isOnline,
+          imgLogoUrl: "",
+          imgPosterUrl: "",
+          categoryIds: eventDto.categories.map(category => category.id),
+        };
+
+        this.newEventTriggerService.sendEmailToUsers(createEventDto, eventDto.organizerId, eventId);
+      }
+
+      
       return Ok(eventDto);
     } catch (error) {
       console.error(error);

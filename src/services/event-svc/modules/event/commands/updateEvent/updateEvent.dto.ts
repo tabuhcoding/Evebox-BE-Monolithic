@@ -60,4 +60,7 @@ export class UpdateEventDto {
   @IsOptional()
   @IsString()
   imgPosterUrl?: string;
+
+  @ApiProperty({ example: "ABCSDNA", description: 'Signmessage to confirm the update' })
+  signMessage?: string;
 }

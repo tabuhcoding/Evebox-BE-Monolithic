@@ -41,12 +41,12 @@ export class DescriptionGenerateController {
     @Body() dto: DescriptionGenerateDTO,
     @Request() req: any,
   ) {
-    if (dto.privatekey !== process.env.OPENAI_USAGE_PRIVATE_KEY) {
-      return res.status(403).json({
-        statusCode: 403,
-        message: 'Forbidden: Invalid private key',
-      });
-    }
+    // if (dto.privatekey !== process.env.OPENAI_USAGE_PRIVATE_KEY) {
+    //   return res.status(403).json({
+    //     statusCode: 403,
+    //     message: 'Forbidden: Invalid private key',
+    //   });
+    // }
 
     try{
       const result = await this.descriptionGenerateService.generateDescription(dto, req.user.email);

@@ -8,6 +8,7 @@ import { CreateEventDto } from "./createEvent.dto";
 import { CreateEventResponseData } from "./createEvent-response.dto";
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 import { CheckUserExistService } from "src/services/auth-svc/modules/user/commands/checkuserExist/checkuserExist.service";
+import { NewEventTriggerService } from "src/services/auth-svc/modules/notice/trigger/newEvent/newEventTrigger.service";
 
 @Injectable()
 export class CreateEventService {
@@ -17,6 +18,7 @@ export class CreateEventService {
     @Inject('LocationsRepository') private readonly locationsRepository: LocationsRepository,
     private readonly slackService: SlackService,
     private readonly checkUserExistService: CheckUserExistService, 
+    private readonly newEventTriggerService: NewEventTriggerService,
   ) {}
 
   async execute(dto: CreateEventDto, email: string): Promise<Result<CreateEventResponseData, Error>> {
@@ -63,6 +65,8 @@ export class CreateEventService {
         await this.eventsRepository.deleteHardOne(eventId);
         return Err(categoryResult.unwrapErr());
       }
+
+      this.newEventTriggerService.sendEmailToAdmin(dto, email);
 
       return Ok({ id: eventId });
     } catch (error) {

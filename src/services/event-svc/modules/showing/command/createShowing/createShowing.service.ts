@@ -1,3 +1,5 @@
+import { NewEventTriggerService } from 'src/services/auth-svc/modules/notice/trigger/newEvent/newEventTrigger.service';
+import { GetPreviewShowingService } from 'src/services/event-svc/modules/showing/queries/getPreviewShowing/getPreviewShowing.service';
 import { Inject, Injectable } from "@nestjs/common";
 import { Result, Ok, Err } from "oxide.ts";
 
@@ -13,7 +15,9 @@ export class CreateShowingService {
     @Inject('EventsRepository') private readonly eventsRepository: EventsRepository,
     @Inject('ShowingRepository') private readonly showingRepository: ShowingRepository,
     private readonly slackService: SlackService,
-    private readonly checkUserExistService: CheckUserExistService
+    private readonly checkUserExistService: CheckUserExistService,
+    private readonly getPreviewShowingService: GetPreviewShowingService,
+    private readonly newEventTriggerService: NewEventTriggerService
   ) {}
 
   async execute(dto: CreateShowingDto, eventId: number, userEmail: string): Promise<Result<string, Error>> {
@@ -41,7 +45,11 @@ export class CreateShowingService {
 
       const [showingId, isApproved] = result.unwrap();
       if (isApproved) {
-        await this.slackService.sendNotice(`Event Service - Showing >>> CreateShowingService: Event with ID ${eventId} has been created showing.`);
+        const previewShowing = await this.getPreviewShowingService.execute(showingId);
+        if (previewShowing){
+          this.newEventTriggerService.sendNewShowingToUsers(previewShowing, eventId);
+        }
+        this.slackService.sendNotice(`Event Service - Showing >>> CreateShowingService: Event with ID ${eventId} has been created showing.`);
       }
 
       return Ok(showingId);

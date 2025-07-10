@@ -461,4 +461,12 @@ export class UserRepositoryImpl extends BaseAuthRepository<User, Prisma.UserDele
 
     return pinStatusRecord;
   }
+
+  async findAllAdminEmails(): Promise<string[]> {
+    const admins = await this.prisma.user.findMany({
+      where: { role_id: 1 }, // Assuming role_id 1 is for admin
+      select: { email: true },
+    });
+    return admins.map((admin) => admin.email);
+  }
 }

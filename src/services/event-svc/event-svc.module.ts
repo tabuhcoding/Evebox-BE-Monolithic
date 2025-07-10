@@ -146,6 +146,7 @@ import { DeleteEventMemberController } from './modules/event/commands/DeleteEven
 import { AddEventMemberService } from './modules/event/commands/AddEventMember/addEventMember.service';
 import { UpdateEventMemberService } from './modules/event/commands/UpdateEventMember/updateEventMember.service';
 import { DeleteEventMemberService } from './modules/event/commands/DeleteEventMember/deleteEventMember.service';
+import { DistrictsRepositoryImpl } from './repository/districts/districts.impl';
 
 @Module({
   imports: [ 
@@ -350,6 +351,7 @@ import { DeleteEventMemberService } from './modules/event/commands/DeleteEventMe
     { provide: 'FormInputRepository', useClass: FormInputRepositoryImpl },
     { provide: 'ProvinceRepository', useClass: ProvinceRepositoryImpl },
     { provide: 'SeatRepository', useClass: SeatRepositoryImpl },
+    { provide: 'DistrictsRepository', useClass: DistrictsRepositoryImpl }, // Assuming DistrictRepository is similar to ProvinceRepository
   ],
   exports: [
     GetAllEventDetailForRAGService, 

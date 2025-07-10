@@ -8,6 +8,7 @@ import { OpenAINavigationController } from "./api/navigation/navigation.controll
 import { DescriptionGenerateService } from "./api/description-generate/description-generate.service";
 import { DescriptionGenerateController } from "./api/description-generate/description-generate.controller";
 import { AuthSvcModule } from "src/services/auth-svc/auth-svc.module";
+import { CheckUpdateEventService } from "./api/checkUpdateEvent/checkUpdateEvent.service";
 
 @Module({
   imports: [ AuthSvcModule ],
@@ -22,10 +23,12 @@ import { AuthSvcModule } from "src/services/auth-svc/auth-svc.module";
     CreateResponseService,
 
     OpenAINavigationService,
-    DescriptionGenerateService
+    DescriptionGenerateService,
+    CheckUpdateEventService
   ],
   exports: [
     OpenAIVectorStoreService,
+    CheckUpdateEventService
   ]
 })
 export class OpenAIModule {

@@ -35,7 +35,7 @@ export class EventDescriptionGenDto {
 
 export class DescriptionGenerateDTO {
   @ApiProperty({ example: 'evebox-private-key', description: 'Private key for authentication', required: true })
-  privatekey: string
+  privatekey?: string
 
   @ApiProperty({ description: 'Event details for description generation', type: EventDescriptionGenDto, required: true })
   Event: EventDescriptionGenDto;

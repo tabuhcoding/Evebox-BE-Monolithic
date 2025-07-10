@@ -86,6 +86,7 @@ import { FindUserByEmailService } from "./modules/user/commands/find-user-by-ema
 import { GetUserByIdController } from "./modules/user/queries/get-user-by-id/get-user-by-id.controller";
 import { GetUserByIdService } from "./modules/user/queries/get-user-by-id/get-user-by-id.service";
 import { PrismaAuthModule } from "./database/prisma-auth/prisma.module";
+import { NewEventTriggerService } from "./modules/notice/trigger/newEvent/newEventTrigger.service";
 
 @Module({
   imports: [
@@ -201,7 +202,8 @@ import { PrismaAuthModule } from "./database/prisma-auth/prisma.module";
     TurnOffNotificationServiceForOrg,
     GetAdminAccessService,
     CheckFavoriteService,
-    FindUserByEmailService
+    FindUserByEmailService,
+    NewEventTriggerService,
   ],
   exports: [
     CheckUserExistService,
@@ -211,7 +213,8 @@ import { PrismaAuthModule } from "./database/prisma-auth/prisma.module";
     CheckFavoriteService,
     VerifyUserPinService,
     GetFavoriteEventService,
-    FindUserByEmailService
+    FindUserByEmailService,
+    NewEventTriggerService
   ],
 })
 export class AuthSvcModule { }

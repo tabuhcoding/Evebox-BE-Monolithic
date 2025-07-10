@@ -4,6 +4,7 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 import { UserOrderDto } from 'src/services/booking-svc/modules/queries/getUserOrder/getUserOrder-response.dto';
+import { CreateEventDto } from 'src/services/event-svc/modules/event/commands/createEvent/createEvent.dto';
 import { EventFrontDisplayDto } from 'src/services/event-svc/modules/event/queries/getEventFrontDisplay/getEventFrontDisplay-response.dto';
 
 @Injectable()
@@ -231,7 +232,127 @@ export class EmailService implements OnModuleInit {
     }
   }
 
-  async sendNewEventNotification(email: string[], eventInfo: EventFrontDisplayDto): Promise<void> {
-  
+  async sendNewEventToAdmins(email: string[], eventInfo: CreateEventDto, orgId: string): Promise<void> {
+    const subject = `New Event Created: ${eventInfo.title} by ${orgId}`;
+    const content = `
+      <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 8px; padding: 20px;">
+        <h2 style="color: #4CAF50; border-bottom: 1px solid #ddd; padding-bottom: 10px;">🎉 New Event Created</h2>
+
+        <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+          <tr>
+            <td style="font-weight: bold; padding: 8px; width: 150px;">Event Title:</td>
+            <td style="padding: 8px;">${eventInfo.title}</td>
+          </tr>
+          <tr>
+            <td style="font-weight: bold; padding: 8px;">Organizer:</td>
+            <td style="padding: 8px;">${eventInfo.orgName}</td>
+          </tr>
+          <tr>
+            <td style="font-weight: bold; padding: 8px;">Venue:</td>
+            <td style="padding: 8px;">${eventInfo.venue}</td>
+          </tr>
+          <tr>
+            <td style="font-weight: bold; padding: 8px;">Categories:</td>
+            <td style="padding: 8px;">${eventInfo.categoryIds.join(', ')}</td>
+          </tr>
+          <tr>
+            <td style="font-weight: bold; padding: 8px;">User ID:</td>
+            <td style="padding: 8px;">${orgId}</td>
+          </tr>
+        </table>
+
+        <div style="margin-top: 30px;">
+          <h3 style="margin-bottom: 10px;">📋 Event Description</h3>
+          <p style="line-height: 1.6;">${eventInfo.description}</p>
+        </div>
+
+        <div style="margin-top: 20px;">
+          <h3 style="margin-bottom: 10px;">🏢 Organization Description</h3>
+          <p style="line-height: 1.6;">${eventInfo.orgDescription}</p>
+        </div>
+
+        <p style="margin-top: 30px; font-size: 12px; color: #999;">
+          This is an automated message from EveBox.
+        </p>
+      </div>
+      <div style="text-align: center; margin: 40px 0;">
+          <a href="https://evebox.azurewebsites.net/admin/event-management" 
+            style="display: inline-block; background-color: #4CAF50; color: white; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: bold; font-size: 14px;">
+            🔍 View in Dashboard
+          </a>
+        </div>
+    `;
+
+
+    try {
+      await this.transporter.sendMail({
+        from: `EveBox <${this.configService.get<string>('EMAIL_USER', 'sp.bs.evebox@gmail.com')}>`,
+        to: email,
+        subject: subject,
+        html: content,
+      });
+    } catch (error) {
+      console.error('Failed to send email:', error);
+      throw new Error('Failed to send email');
+    }
+  }
+
+  async sendNewEventToUsers(email: string[], eventInfo: CreateEventDto, eventId: string): Promise<void> {
+    const subject = `New Event: ${eventInfo.title} From your favorite Organizer`;
+    const content = `
+      <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 8px; padding: 20px;">
+        <h2 style="color: #4CAF50; border-bottom: 1px solid #ddd; padding-bottom: 10px;">🎉 New Event Alert</h2>
+
+        <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+          <tr>
+            <td style="font-weight: bold; padding: 8px; width: 150px;">Event Title:</td>
+            <td style="padding: 8px;">${eventInfo.title}</td>
+          </tr>
+          <tr>
+            <td style="font-weight: bold; padding: 8px;">Organizer:</td>
+            <td style="padding: 8px;">${eventInfo.orgName}</td>
+          </tr>
+          <tr>
+            <td style="font-weight: bold; padding: 8px;">Venue:</td>
+            <td style="padding: 8px;">${eventInfo.venue}</td>
+          </tr>
+          <tr>
+            <td style="font-weight: bold; padding: 8px;">Categories:</td>
+            <td style="padding: 8px;">${eventInfo.categoryIds.join(', ')}</td>
+          </tr>
+        </table>
+
+        <div style="margin-top: 30px;">
+          <h3 style="margin-bottom: 10px;">📋 Event Description</h3>
+          <p style="line-height: 1.6;">${eventInfo.description}</p>
+        </div>
+
+        <div style="margin-top: 20px;">
+          <h3 style="margin-bottom: 10px;">🏢 Organization Description</h3>
+          <p style="line-height: 1.6;">${eventInfo.orgDescription}</p>
+        </div>
+
+        <p style="margin-top: 30px; font-size: 12px; color: #999;">
+          This is an automated message from EveBox.
+        </p>
+      </div>
+      <div style="text-align: center; margin: 40px 0;">
+          <a href="https://evebox.azurewebsites.net/event/${eventId}" 
+            style="display: inline-block; background-color: #4CAF50; color: white; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: bold; font-size: 14px;">
+            🔍 View Event
+          </a>
+      </div>
+    `;
+    try {
+      await this.transporter.sendMail({
+        from: `EveBox <${this.configService.get<string>('EMAIL_USER', 'sp.bs.evebox@gmail.com')}>`,
+        to: email,
+        subject: subject,
+        html: content,
+      });
+    } catch (error) {
+      console.error('Failed to send email:', error);
+      throw new Error('Failed to send email');
+    }
   }
 }

@@ -3,7 +3,7 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
-import { UserOrderDto } from 'src/services/booking-svc/modules/queries/getUserOrder/getUserOrder-response.dto';
+import { PreviewShowingDto, UserOrderDto } from 'src/services/booking-svc/modules/queries/getUserOrder/getUserOrder-response.dto';
 import { CreateEventDto } from 'src/services/event-svc/modules/event/commands/createEvent/createEvent.dto';
 import { EventFrontDisplayDto } from 'src/services/event-svc/modules/event/queries/getEventFrontDisplay/getEventFrontDisplay-response.dto';
 
@@ -346,6 +346,61 @@ export class EmailService implements OnModuleInit {
     try {
       await this.transporter.sendMail({
         from: `EveBox <${this.configService.get<string>('EMAIL_USER', 'sp.bs.evebox@gmail.com')}>`,
+        to: email,
+        subject: subject,
+        html: content,
+      });
+    } catch (error) {
+      console.error('Failed to send email:', error);
+      throw new Error('Failed to send email');
+    }
+  }
+
+  async sendNewShowingToUsers(email: string[], showing: PreviewShowingDto, eventId: number): Promise<void> {
+    const subject = `New Showing: ${showing.title} at ${showing.venue}`;
+    const content = `
+      <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 8px; padding: 20px;">
+        <h2 style="color: #4CAF50; border-bottom: 1px solid #ddd; padding-bottom: 10px;">🎉 Your Favorite Event Has New Showing</h2>
+
+        <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+          <tr>
+            <td style="font-weight: bold; padding: 8px; width: 150px;">Event Title:</td>
+            <td style="padding: 8px;">${showing.title}</td>
+          </tr>
+          <tr>
+            <td style="font-weight: bold; padding: 8px;">Venue:</td>
+            <td style="padding: 8px;">${showing.venue}</td>
+          </tr>
+          <tr>
+            <td style="font-weight: bold; padding: 8px;">Location:</td>
+            <td style="padding: 8px;">${showing.locationsString}</td>
+          </tr>
+          <tr>
+            <td style="font-weight: bold; padding: 8px;">Start Time:</td>
+            <td style="padding: 8px;">${new Date(showing.startTime).toLocaleString()}</td>
+          </tr>
+          <tr>
+            <td style="font-weight: bold; padding: 8px;">End Time:</td>
+            <td style="padding: 8px;">${new Date(showing.endTime).toLocaleString()}</td>
+          </tr>
+        </table>
+
+        ${showing.imageUrl ? `<img src="${showing.imageUrl}" alt="${showing.title}" style="width:100%; height:auto; margin-top:20px;" />` : ''}
+
+        <p style="margin-top: 30px; font-size: 12px; color: #999;">
+          This is an automated message from EveBox.
+        </p>
+      </div>
+      <div style="text-align: center; margin: 40px 0;">
+          <a href="https://evebox.azurewebsites.net/event/${eventId}" 
+            style="display: inline-block; background-color: #4CAF50; color: white; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: bold; font-size: 14px;">
+            🔍 View Showing
+          </a>
+      </div>
+    `;
+    try {
+      await this.transporter.sendMail({
+        from: `EveBox <${this.configService.get<string>('EMAIL_USER', 'sp.sp.bs.evebox@gmail.com')}>`,
         to: email,
         subject: subject,
         html: content,

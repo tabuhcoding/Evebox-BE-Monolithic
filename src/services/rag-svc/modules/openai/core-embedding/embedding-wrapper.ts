@@ -16,16 +16,16 @@ export class OpenAIEmbeddingWrapperService {
   private readonly model = 'text-embedding-3-small';
   private storeMap = new Map<string, PGVectorStore>();
 
-  private async initStore(collectionName: string): Promise<PGVectorStore> {
-    const embeddings = new TrackedOpenAIEmbeddings(this.apiKey, this.model,this.slackService);
+  // private async initStore(collectionName: string): Promise<PGVectorStore> {
+  //   const embeddings = new TrackedOpenAIEmbeddings(this.apiKey, this.model,this.slackService);
 
-    return await PGVectorStore.initialize(embeddings, {
-      postgresConnectionOptions: {
-        connectionString: this.collectionUrl,
-      },
-      tableName: collectionName,
-    });
-  }
+  //   return await PGVectorStore.initialize(embeddings, {
+  //     postgresConnectionOptions: {
+  //       connectionString: this.collectionUrl,
+  //     },
+  //     tableName: collectionName,
+  //   });
+  // }
 
   private async getOrCreateStore(collectionName: string): Promise<PGVectorStore> {
     if (this.storeMap.has(collectionName)) {
@@ -39,6 +39,11 @@ export class OpenAIEmbeddingWrapperService {
 
     this.storeMap.set(collectionName, store);
     await this.slackService.sendNotice(`Initialized store for collection: ${collectionName}`);
+
+    setTimeout(() => {
+      this.storeMap.delete(collectionName);
+      this.slackService.sendNotice(`🧹 Store for collection "${collectionName}" has been deleted from memory after timeout`);
+    }, 10 * 60 * 1000);
     return store;
   }
     
@@ -47,7 +52,7 @@ export class OpenAIEmbeddingWrapperService {
     const DELAY_MS = 500;
 
     try {
-      const store = await this.initStore(collectionName);
+      const store = await this.getOrCreateStore(collectionName);
 
       for (let i = 0; i < documents.length; i += BATCH_SIZE) {
         const batch = documents.slice(i, i + BATCH_SIZE);
@@ -65,7 +70,7 @@ export class OpenAIEmbeddingWrapperService {
 
   async searchByText(query: string, collectionName: string, k = 5) {
     try {
-      const store = await this.initStore(collectionName);
+      const store = await this.getOrCreateStore(collectionName);
       return await store.similaritySearch(`${query}, ưu tiên sự kiện có đêm diễn sắp diễn ra`, k);
     } catch (err) {
       await this.slackService.sendError(`❌ Text search error: ${err.message}`);
@@ -75,7 +80,7 @@ export class OpenAIEmbeddingWrapperService {
 
   async searchByVector(vector: number[], collectionName: string, k = 10) {
     try {
-      const store = await this.initStore(collectionName);
+      const store = await this.getOrCreateStore(collectionName);
       return await store.similaritySearchVectorWithScore(vector, k);
     } catch (err) {
       await this.slackService.sendError(`❌ Vector search error: ${err.message}`);

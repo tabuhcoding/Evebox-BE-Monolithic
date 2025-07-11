@@ -22,7 +22,7 @@ export class GetOrdersByShowingIdService {
     private readonly checkUserPermissionService: CheckUserPermissionService,
   ) {}
 
-  async execute(showingId: string, organizerId: string, paginationQuery: PaginationQuery): Promise<Result<[OrderData[], Pagination], Error>> {
+  async execute(showingId: string, organizerId: string, paginationQuery: PaginationQuery, userEmail?: string): Promise<Result<[OrderData[], Pagination], Error>> {
     try {
       const showing = await this.getShowingDetailService.executeSimple(showingId);
       if (showing.isErr()) {

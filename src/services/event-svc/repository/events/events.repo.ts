@@ -10,6 +10,7 @@ import { EventSummaryData } from '../../modules/event/queries/getEventSummary/ge
 import { EventRevenueData, OrganizerRevenueData } from '../../modules/statistics/queries/getOrgRevenue/getOrgRevenue-response.dto';
 import { Pagination, PaginationQuery } from 'src/shared/constants/pagination';
 import { EventWithShowings } from '../../modules/statistics/queries/getOrgRevenue/getOrgRevenue-response.dto';
+import { RevenueSummaryItem } from '../../modules/statistics/queries/getOrgRevenueChart/getOrgRevenueChart-response.dto';
 
 export type Events = Prisma.EventsGetPayload<{
   include: {
@@ -118,6 +119,7 @@ export interface EventsRepository extends BaseEventRepository<Events, Prisma.Eve
   ): Promise<[EventWithShowings[], Pagination]>;
 
   findEventsByOrgIdWithShowings(orgId: string): Promise<EventWithShowingsAndTicketTypes[]>;
+  findRevenueSummary(groupByFormat: string, feePercent: number, fromDate?: Date, toDate?: Date): Promise<Result<RevenueSummaryItem[], Error>>;
   findEventById(eventId: number): Promise<{ id: number; title: string } | null>;
   isEventOwner(email: string, eventId: number): Promise<Result<boolean, Error>>;
 }

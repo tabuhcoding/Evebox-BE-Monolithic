@@ -29,6 +29,7 @@ import { EventSummaryData } from '../../modules/event/queries/getEventSummary/ge
 import { EventRevenueData, OrganizerRevenueData, ShowingRevenueData } from '../../modules/statistics/queries/getOrgRevenue/getOrgRevenue-response.dto';
 import { PaginationQuery, Pagination } from 'src/shared/constants/pagination';
 import { EventWithShowings } from '../../modules/statistics/queries/getOrgRevenue/getOrgRevenue-response.dto';
+import { RevenueSummaryItem } from '../../modules/statistics/queries/getOrgRevenueChart/getOrgRevenueChart-response.dto';
 
 @Injectable()
 export class EventsRepositoryImpl
@@ -898,5 +899,35 @@ export class EventsRepositoryImpl
     } catch {
       return Err(new Error('Failed to check event author'));
     }
+  }
+
+  async findRevenueSummary(groupByFormat: string, feePercent: number, fromDate?: Date, toDate?: Date): Promise<Result<RevenueSummaryItem[], Error>> {
+    const rawQuery = `
+      SELECT
+        to_char(s."startTime", '${groupByFormat}') AS period,
+        SUM(t.price) AS "totalRevenue"
+      FROM "Showing" s
+      JOIN "Ticket" t ON t."showingId" = s.id
+      WHERE t."paymentId" IS NOT NULL
+        AND s."deleteAt" IS NULL
+        ${fromDate ? `AND s."startTime" >= '${fromDate.toISOString()}'` : ""}
+        ${toDate ? `AND s."startTime" <= '${toDate.toISOString()}'` : ""}
+      GROUP BY period
+      ORDER BY period
+    `;
+
+    const result = await this.prisma.$queryRawUnsafe<RevenueSummaryItem[]>(rawQuery);
+
+    if (!result || result.length === 0) {
+      return Ok([]);
+    }
+
+    const mappedResult = result.map((row: any) => ({
+      period: row.period,
+      totalRevenue: Number(row.totalRevenue),
+      actualRevenue: Number(row.totalRevenue) * (1 - feePercent / 100),
+    }));
+
+    return Ok(mappedResult);
   }
 }

@@ -73,9 +73,9 @@ export class GetAnalyticsService {
         eventTitle: event.title,
         totalClicks: event.totalClicks,
         weekClicks: event.weekClicks,
-        totalUsers,
+        totalUsers: totalUsers + totalBuyers,
         totalBuyers,
-        transferRating: (totalBuyers / totalUsers),
+        transferRating: (totalBuyers / (totalUsers + totalBuyers)),
         totalOrders,
         statistic
       };

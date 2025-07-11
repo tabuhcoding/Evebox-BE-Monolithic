@@ -2,7 +2,8 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { Prisma } from 'prisma/client-event';
 import { Result, Ok, Err } from 'oxide.ts';
-import { subMonths, startOfMonth } from 'date-fns';
+import { startOfWeek, endOfWeek, addWeeks, differenceInCalendarWeeks, startOfMonth, subMonths } from 'date-fns';
+
 
 /* Package Application */
 // Repositories
@@ -771,42 +772,52 @@ export class EventsRepositoryImpl
     }
   }
 
+
   async getStatistics(eventId: number): Promise<Result<any, Error>> {
     try {
       const now = new Date();
-      const sixMonthsAgo = subMonths(now, 5);
+      const threeMonthsAgo = subMonths(now, 2); // start from 2 months ago (covers 3 months total)
+      const from = startOfMonth(threeMonthsAgo);
+      const to = now;
+
       const clicks = await this.userClickHistoryRepository.findMany({
         eventId,
         date: {
-          gte: startOfMonth(sixMonthsAgo), // from start of 6 months ago
-          lte: now,
+          gte: from,
+          lte: to,
         },
       });
 
+      // Calculate number of weeks between `from` and `to`
+      const totalWeeks = differenceInCalendarWeeks(to, from) + 1;
       const statisticsMap = new Map<string, number>();
 
-      for (let i = 0; i < 6; i++) {
-        const month = subMonths(now, i);
-        const monthKey = `${month.getFullYear()}-${String(month.getMonth() + 1).padStart(2, '0')}`;
-        statisticsMap.set(monthKey, 0);
+      // Initialize all weeks to 0
+      for (let i = 0; i < totalWeeks; i++) {
+        const weekStart = startOfWeek(addWeeks(from, i), { weekStartsOn: 1 }); // Week starts on Monday
+        const key = weekStart.toISOString().split('T')[0]; // e.g., "2025-06-03"
+        statisticsMap.set(key, 0);
       }
 
+      // Aggregate clicks into weekly buckets
       for (const click of clicks) {
-        const monthKey = `${click.date.getFullYear()}-${String(click.date.getMonth() + 1).padStart(2, '0')}`;
-        if (statisticsMap.has(monthKey)) {
-          statisticsMap.set(monthKey, (statisticsMap.get(monthKey) || 0) + 1);
+        const weekStart = startOfWeek(click.date, { weekStartsOn: 1 });
+        const key = weekStart.toISOString().split('T')[0];
+        if (statisticsMap.has(key)) {
+          statisticsMap.set(key, (statisticsMap.get(key) || 0) + 1);
         }
       }
 
       const statistic = Array.from(statisticsMap.entries())
-        .map(([month, visits]) => ({ month, visits }))
-        .sort((a, b) => a.month.localeCompare(b.month));
+        .map(([weekStart, visits]) => ({ weekStart, visits }))
+        .sort((a, b) => a.weekStart.localeCompare(b.weekStart));
 
       return Ok(statistic);
     } catch (error) {
       return Err(new Error('Failed to get statistics of event'));
     }
   }
+
 
   async findEventsByOrganizerEmail(email: string) {
     return this.prisma.events.findMany({

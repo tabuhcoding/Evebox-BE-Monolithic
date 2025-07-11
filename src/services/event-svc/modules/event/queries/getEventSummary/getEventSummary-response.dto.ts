@@ -8,11 +8,17 @@ export class TicketTypeSummary {
   @ApiProperty({ example: 250000, description: 'Ticket price' })
   price: number;
 
+  @ApiProperty({ example: 300, description: 'Ticket original price' })
+  originalPrice: number;
+
   @ApiProperty({ example: 120, description: 'Sold amount' })
   sold: number;
 
   @ApiProperty({ example: 0.8, description: 'Sold ratio' })
   ratio: number;
+
+  @ApiProperty({ example: 150, description: 'Quantity' })
+  quantity: number;
 }
 
 export class EventSummaryData {

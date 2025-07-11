@@ -130,6 +130,8 @@ import { GetOrgRevenueController } from './modules/statistics/queries/getOrgReve
 import { GetOrgRevenueService } from './modules/statistics/queries/getOrgRevenue/getOrgRevenue.service';
 import { GetOrgRevenueByIdService } from './modules/statistics/queries/getOrgRevenueById/getOrgRevenueById.service';
 import { GetOrgRevenueByIdController } from './modules/statistics/queries/getOrgRevenueById/getOrgRevenueById.controller';
+import { GetOrgRevenueChartService } from './modules/statistics/queries/getOrgRevenueChart/getOrgRevenueChart.service';
+import { GetOrgRevenueChartController } from './modules/statistics/queries/getOrgRevenueChart/getOrgRevenueChart.controller';
 import { GetEventRevenueDetailController } from './modules/statistics/queries/getEventRevenueDetail/getEventRevenueDetail.controller';
 import { GetEventRevenueDetailService } from './modules/statistics/queries/getEventRevenueDetail/getEventRevenueDetail.service';
 import { GetSummaryTicketRevenueController } from './modules/statistics/queries/getSummaryTicketRevenue/getSummaryTicketRevenue.controller';
@@ -220,6 +222,7 @@ import { DistrictsRepositoryImpl } from './repository/districts/districts.impl';
     GetOrgLocationsController,
     GetOrgRevenueController,
     GetOrgRevenueByIdController,
+    GetOrgRevenueChartController,
     GetEventRevenueDetailController,
     GetSummaryTicketRevenueController,
     GetAllShowingDetailOfEventController,
@@ -320,6 +323,7 @@ import { DistrictsRepositoryImpl } from './repository/districts/districts.impl';
 
     GetOrgRevenueService,
     GetOrgRevenueByIdService,
+    GetOrgRevenueChartService,
     GetEventRevenueDetailService,
     GetSummaryTicketRevenueService,
     GetAllShowingDetailOfEventService,

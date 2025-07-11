@@ -31,6 +31,7 @@ import { PaginationQuery, Pagination } from 'src/shared/constants/pagination';
 import { EventWithShowings } from '../../modules/statistics/queries/getOrgRevenue/getOrgRevenue-response.dto';
 import { RevenueSummaryItem } from '../../modules/statistics/queries/getOrgRevenueChart/getOrgRevenueChart-response.dto';
 import { ProvinceRevenueData } from '../../modules/statistics/queries/getOrgRevenueByProvince/getOrgRevenueByProvince-response.dto';
+import { TicketTypesData } from './events.repo';
 
 @Injectable()
 export class EventsRepositoryImpl
@@ -1003,6 +1004,26 @@ export class EventsRepositoryImpl
       return Ok(result);
     } catch (error) {
       return Err(new Error('Failed to find events with showing IDs'));
+    }
+  }
+
+  async getAllTicketTypes(): Promise<TicketTypesData[]> {
+    try {
+      const ticketTypes = await this.prisma.ticketType.findMany({
+        select: {
+          id: true,
+          price: true,
+          quantity: true,
+        },
+      });
+
+      return ticketTypes.map(tt => ({
+        id: tt.id,
+        price: tt.price,
+        quantity: tt.quantity || 0,
+      }));
+    } catch (error) {
+      throw new Error(`Failed to get all ticket types: ${error.message}`);
     }
   }
 }

@@ -105,6 +105,14 @@ export type EventWithShowingsData = Prisma.EventsGetPayload<{
   }
 }>;
 
+export type TicketTypesData = Prisma.TicketTypeGetPayload<{
+  select: {
+    id: true;
+    price: true;
+    quantity: true;
+  }
+}>;
+
 export interface EventsRepository extends BaseEventRepository<Events, Prisma.EventsDelegate> {
   // Thêm các method riêng cho Events nếu cần, ví dụ:
   findManyByIdsWithDetails(ids: number[]): Promise<Events[]>;
@@ -150,4 +158,5 @@ export interface EventsRepository extends BaseEventRepository<Events, Prisma.Eve
   findEventById(eventId: number): Promise<{ id: number; title: string } | null>;
   isEventOwner(email: string, eventId: number): Promise<Result<boolean, Error>>;
   getOrgRevenueByProvince(): Promise<Result<ProvinceRevenueData[], Error>>;
+  getAllTicketTypes(): Promise<TicketTypesData[]>;
 }

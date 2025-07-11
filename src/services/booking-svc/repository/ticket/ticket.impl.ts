@@ -15,7 +15,7 @@ export class TicketRepositoryImpl
     super(prisma.ticket, prisma);
   }
 
-  countCheckedInTickets(ticketTypeIds: string[]): Promise<number> {
+  async countCheckedInTickets(ticketTypeIds: string[]): Promise<number> {
     return this.prisma.ticket.count({
       where: {
         ticketTypeId: { in: ticketTypeIds },

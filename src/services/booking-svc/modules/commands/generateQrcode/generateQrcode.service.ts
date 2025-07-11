@@ -15,6 +15,7 @@ import * as path from 'path';
 import { format } from 'date-fns';
 import axios from 'axios';
 import { GetUserOrderService } from "../../queries/getUserOrder/getUserOrder.service";
+import { OrderStatus } from "../../queries/getUserOrder/getUserOrder.dto";
 
 interface Attachments {
   name: string;
@@ -212,7 +213,7 @@ export class GenerateQrcodeService {
   }
 
 
-  async sendTicketEmail(order: UserOrderDto, email: string[]): Promise<void> {
+  async sendTicketEmail(order: UserOrderDto, email: string[], orderId: number): Promise<void> {
     try{
       var attachments : Attachments[] = [];
       const fontPath = path.resolve(__dirname, '../../../../../../src/assets/fonts/Roboto.ttf');
@@ -431,6 +432,10 @@ export class GenerateQrcodeService {
       await new Promise(resolve => setTimeout(resolve, 5000));
       // Send the generated PDFs via email
       await this.emailService.sendTicketEmail(order, attachments, email);
+
+      await this.orderRepository.updateOneById(orderId, {
+        mailSent: true,
+      });
     } catch (error) {
       await this.slackService.sendError(`Booking Svc >>> generatePDF : Error generating PDF for orderCode: ${order.id}, Error: ${error.message}`);
     }
@@ -496,18 +501,23 @@ export class GenerateQrcodeService {
         }
       }
 
-      await this.sendTicketEmail(sampleOrder, [email, userId]);
+      // await this.sendTicketEmail(sampleOrder, [email, userId]);
     } catch (error) {
       await this.slackService.sendError(`Booking Svc >>> testGenerateTicketEmail : Error generating test ticket email, Error: ${error.message}`);
     }
   }
 
-  async sendTicketEmailToUser(orderId: number) : Promise<void> {
+  async sendTicketEmailToUser(orderId: number) : Promise<boolean> {
     try {
       const [sampleOrder, userId] = await this.getUserOrderService.executeByOriginalOrderIdWithoutCheck(orderId);
       if (!sampleOrder) {
         await this.slackService.sendError(`Booking Svc >>> sendTicketEmailToUser : Sample order not found`);
         return;
+      }
+
+      if (sampleOrder.status !== OrderStatus.SUCCESS) {
+        await this.slackService.sendError(`Booking Svc >>> sendTicketEmailToUser : Sample order is not in a valid state to send email`);
+        return false;
       }
 
       var email = ""
@@ -519,9 +529,11 @@ export class GenerateQrcodeService {
         }
       }
 
-      await this.sendTicketEmail(sampleOrder, [email, userId]);
+      await this.sendTicketEmail(sampleOrder, [email, userId], orderId);
+      return true;
     } catch (error) {
       await this.slackService.sendError(`Booking Svc >>> sendTicketEmailToUser : Error generating ticket email, Error: ${error.message}`);
+      return false;
     }
   }
 }

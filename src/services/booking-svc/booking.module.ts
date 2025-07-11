@@ -31,6 +31,7 @@ import { GetTicketQrCodeService } from "./modules/queries/getTicketQrCode/getTic
 import { EmailModule } from "src/infrastructure/adapters/email/email.module";
 import { PrismaBookingModule } from "./database/prisma-booking/prisma.module";
 import { GetCheckedInTicketsController } from './modules/queries/getCheckedInTickets/getCheckedInTickets.controller';
+import { SendEmailController } from './modules/commands/sendEmail/sendEmail.controller';
 
 @Module({
   imports: [ 
@@ -48,7 +49,8 @@ import { GetCheckedInTicketsController } from './modules/queries/getCheckedInTic
     SubmitFormController,
     GetUserOrderController,
     GetTicketQrCodeController,
-    GetCheckedInTicketsController
+    GetCheckedInTicketsController,
+    SendEmailController,
   ],
   providers: [
     // Services

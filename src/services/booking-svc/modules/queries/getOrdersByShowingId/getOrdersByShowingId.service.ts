@@ -43,7 +43,7 @@ export class GetOrdersByShowingIdService {
         return Err(new Error('You do not have permisison to get orders of showing'));
       }
 
-      const result = await this.orderRepository.getOrders(showingId, paginationQuery);
+      const result = await this.orderRepository.getOrders(showingId, paginationQuery, userEmail);
       if (result.isErr()) {
         return Err(new Error(result.unwrapErr().message));
       }

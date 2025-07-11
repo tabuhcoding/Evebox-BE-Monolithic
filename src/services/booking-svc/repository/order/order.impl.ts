@@ -21,24 +21,25 @@ export class OrderRepositoryImpl
     super(prisma.order, prisma)
   }
 
-  async getOrders(showingId: string, paginationQuery: PaginationQuery, userEmail?: string): Promise<Result<[OrderData[], Pagination], Error>> {
-    try {
-      var filterQuery: any = {
-        showingId,
-      }
-      if (userEmail) {
-        filterQuery.userId = userEmail;
-      }
-      // count the total number of orders for pagination
-      const totalOrders = await this.count(filterQuery);
+    async getOrders(showingId: string, paginationQuery: PaginationQuery, userEmail?: string): Promise<Result<[OrderData[], Pagination], Error>> {
+      try {
+        var filterQuery: any = {
+          showingId,
+        }
+        if (userEmail) {
+          filterQuery.userId = userEmail;
+        }
+        // count the total number of orders for pagination
+        const totalOrders = await this.count(filterQuery);
+        
+        const totalPages = Math.ceil(totalOrders / paginationQuery.limit);
 
-      const totalPages = Math.ceil(totalOrders / paginationQuery.limit);
+        const orders = await this.findMany(filterQuery, {
+          Ticket: true,
+        }, {
+          createdAt: 'desc',
+        }, (paginationQuery.page - 1) * paginationQuery.limit, paginationQuery.limit);
 
-      const orders = await this.findMany(filterQuery, {
-        Ticket: true,
-      }, {
-        createdAt: 'desc',
-      }, (paginationQuery.page - 1) * paginationQuery.limit, paginationQuery.limit);
 
       if (!orders) {
         return Ok([[], null]);

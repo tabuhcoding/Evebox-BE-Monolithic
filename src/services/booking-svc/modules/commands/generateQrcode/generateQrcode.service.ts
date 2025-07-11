@@ -507,29 +507,49 @@ export class GenerateQrcodeService {
     }
   }
 
-  async sendTicketEmailToUser(orderId: number) : Promise<boolean> {
+  async sendTicketEmailToUser(orderIds: number[]) : Promise<boolean> {
     try {
-      const [sampleOrder, userId] = await this.getUserOrderService.executeByOriginalOrderIdWithoutCheck(orderId);
-      if (!sampleOrder) {
-        await this.slackService.sendError(`Booking Svc >>> sendTicketEmailToUser : Sample order not found`);
-        return;
+      var sampleOrderMapping = new Map<number, UserOrderDto>();
+      var userIdMapping = new Map<number, string[]>();
+      for (const orderId of orderIds) {
+        const [sampleOrder, userId] = await this.getUserOrderService.executeByOriginalOrderIdWithoutCheck(orderId);
+        if (!sampleOrder) {
+          await this.slackService.sendError(`Booking Svc >>> sendTicketEmailToUser : Sample order not found`);
+          return false;
+        }
+
+        if (sampleOrder.status !== OrderStatus.SUCCESS) {
+          await this.slackService.sendError(`Booking Svc >>> sendTicketEmailToUser : Sample order is not in a valid state to send email`);
+          return false;
+        }
+
+        var email = ""
+
+        for ( const formrespon of sampleOrder.formResponse){
+          if (formrespon.fieldName.includes("email") || formrespon.fieldName.includes("Email")) {
+            email = formrespon.value;
+            break;
+          }
+        }
+
+        sampleOrderMapping.set(orderId, sampleOrder);
+        userIdMapping.set(orderId, [userId, email]);
       }
 
-      if (sampleOrder.status !== OrderStatus.SUCCESS) {
-        await this.slackService.sendError(`Booking Svc >>> sendTicketEmailToUser : Sample order is not in a valid state to send email`);
+      if (sampleOrderMapping.size === 0) {
+        await this.slackService.sendError(`Booking Svc >>> sendTicketEmailToUser : No valid orders found to send email`);
         return false;
       }
 
-      var email = ""
-
-      for ( const formrespon of sampleOrder.formResponse){
-        if (formrespon.fieldName.includes("email") || formrespon.fieldName.includes("Email")) {
-          email = formrespon.value;
-          break;
+      for (const [orderId, sampleOrder] of sampleOrderMapping.entries()) {
+        const [email, userId] = userIdMapping.get(orderId) || [];
+        if (!email || !userId) {
+          await this.slackService.sendError(`Booking Svc >>> sendTicketEmailToUser : Email or User ID not found for orderId: ${orderId}`);
+          continue;
         }
+        await this.sendTicketEmail(sampleOrder, [email, userId], orderId);
       }
 
-      await this.sendTicketEmail(sampleOrder, [email, userId], orderId);
       return true;
     } catch (error) {
       await this.slackService.sendError(`Booking Svc >>> sendTicketEmailToUser : Error generating ticket email, Error: ${error.message}`);

@@ -1,7 +1,7 @@
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 import { GenerateQrcodeService } from "../generateQrcode/generateQrcode.service";
-import { Controller, HttpStatus, Param, Post, Res, UseGuards, Request } from "@nestjs/common";
+import { Controller, HttpStatus, Param, Post, Res, UseGuards, Request, Query } from "@nestjs/common";
 import { JwtAuthGuard } from "src/shared/guard/jwt-auth.guard";
 import { Response } from "express";
 import { CheckUserExistService } from "src/services/auth-svc/modules/user/commands/checkuserExist/checkuserExist.service";
@@ -16,9 +16,10 @@ export class SendEmailController {
     ) {}
 
     @UseGuards(JwtAuthGuard)
-    @Post('/sendEmail/:orderId')
+    @Post('/sendEmail')
     @ApiBearerAuth('access-token')
     @ApiOperation({ summary: 'Send ticket email to user' })
+    @ApiQuery({ name: 'orderId', required: true, type: [Number], description: 'Order IDs to send email' })
     @ApiResponse({
         status: HttpStatus.OK,
         description: 'Email sent successfully',
@@ -41,7 +42,7 @@ export class SendEmailController {
     })
     async sendEmail(
         @Request() req,
-        @Param('orderId') orderId: number,
+        @Query('orderId') orderIds: number[],
         @Res() res: Response,
     ) {
         try {
@@ -53,7 +54,9 @@ export class SendEmailController {
             //         message: 'Forbidden: You do not have permission to perform this action',
             //     });
             // }
-            const result = await this.sendEmailService.sendTicketEmailToUser(orderId>>0);
+            const result = await this.sendEmailService.sendTicketEmailToUser(
+                orderIds.map(id => id >> 0),
+            );
             if (!result) {
                 return res.status(HttpStatus.BAD_REQUEST).json({
                     statusCode: HttpStatus.BAD_REQUEST,
@@ -67,7 +70,7 @@ export class SendEmailController {
                 data: result
             });
         } catch (error) {
-            await this.slackService.sendError(`Booking Svc >>> sendEmail : Error sending email for orderId: ${orderId}, Error: ${error.message}`);
+            await this.slackService.sendError(`Booking Svc >>> sendEmail : Error sending email for orderId: ${orderIds.join(', ')}, Error: ${error.message}`);
             return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
                 statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
                 message: 'Internal server error',

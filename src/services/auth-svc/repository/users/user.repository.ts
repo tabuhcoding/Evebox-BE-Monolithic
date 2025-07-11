@@ -36,4 +36,5 @@ export interface UserRepository extends BaseAuthRepository<User, Prisma.UserDele
   updatePinUser(email: Email, pin: string): Promise<void>;
   findUserByEmail(email: string): Promise<User | null>
   findAllAdminEmails(): Promise<string[]>;
+  updateUserRoleToOrganizer(email: string): Promise<boolean>;
 }

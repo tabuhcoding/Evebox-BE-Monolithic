@@ -469,4 +469,12 @@ export class UserRepositoryImpl extends BaseAuthRepository<User, Prisma.UserDele
     });
     return admins.map((admin) => admin.email);
   }
+
+  async updateUserRoleToOrganizer(email: string): Promise<boolean> {
+    const updated = await this.prisma.user.updateMany({
+      where: { email: email },
+      data: { role_id: 2 }, // Organizer role
+    });
+    return updated.count > 0;
+  }
 }

@@ -22,7 +22,7 @@ export class GetOrdersByShowingIdService {
     private readonly checkUserPermissionService: CheckUserPermissionService,
   ) {}
 
-  async execute(showingId: string, organizerId: string, paginationQuery: PaginationQuery): Promise<Result<[OrderData[], Pagination], Error>> {
+  async execute(showingId: string, organizerId: string, paginationQuery: PaginationQuery, userEmail?: string): Promise<Result<[OrderData[], Pagination], Error>> {
     try {
       const showing = await this.getShowingDetailService.executeSimple(showingId);
       if (showing.isErr()) {
@@ -43,7 +43,7 @@ export class GetOrdersByShowingIdService {
         return Err(new Error('You do not have permisison to get orders of showing'));
       }
 
-      const result = await this.orderRepository.getOrders(showingId, paginationQuery);
+      const result = await this.orderRepository.getOrders(showingId, paginationQuery, userEmail);
       if (result.isErr()) {
         return Err(new Error(result.unwrapErr().message));
       }

@@ -228,11 +228,11 @@ export class ShowingRepositoryImpl
     if (filters.search) {
       const keyword = filters.search.trim();
       const isId = !isNaN(Number(keyword));
-      where.Events = {
-        ...(isId
-          ? { id: Number(keyword) }
-          : { title: { contains: keyword, mode: 'insensitive' } }),
-      };
+      where.OR = [
+        { Events: { title: { contains: keyword, mode: 'insensitive' } } },
+        { id: (keyword) },
+        { Events: { id: isId ? Number(keyword) : undefined } }
+      ];
     }
 
     return where;

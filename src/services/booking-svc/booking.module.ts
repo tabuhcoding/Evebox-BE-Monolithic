@@ -31,6 +31,8 @@ import { GetTicketQrCodeService } from "./modules/queries/getTicketQrCode/getTic
 import { EmailModule } from "src/infrastructure/adapters/email/email.module";
 import { PrismaBookingModule } from "./database/prisma-booking/prisma.module";
 import { GetCheckedInTicketsController } from './modules/queries/getCheckedInTickets/getCheckedInTickets.controller';
+import { GetOrdersWithTypeService } from './modules/queries/getOrdersWithType/getOrdersWithType.service';
+import { SendEmailController } from './modules/commands/sendEmail/sendEmail.controller';
 
 @Module({
   imports: [ 
@@ -48,7 +50,8 @@ import { GetCheckedInTicketsController } from './modules/queries/getCheckedInTic
     SubmitFormController,
     GetUserOrderController,
     GetTicketQrCodeController,
-    GetCheckedInTicketsController
+    GetCheckedInTicketsController,
+    SendEmailController,
   ],
   providers: [
     // Services
@@ -74,6 +77,7 @@ import { GetCheckedInTicketsController } from './modules/queries/getCheckedInTic
     SubmitFormService,
 
     GetCheckedInTicketsService,
+    GetOrdersWithTypeService,
 
     // Repositories
     { provide: 'OrderRepository', useClass: OrderRepositoryImpl },
@@ -89,7 +93,8 @@ import { GetCheckedInTicketsController } from './modules/queries/getCheckedInTic
     GenerateTicketService,
     GenerateQrcodeService,
     RecheckOrderMissedService,
-    TicketQueryService
+    TicketQueryService,
+    GetOrdersWithTypeService,
   ],
 })
 export class BookingSvcModule {}

@@ -5,6 +5,7 @@ import { BookingTicketStatus, BookingTicketType } from 'src/services/booking-svc
 import { PaymentMethod } from 'src/services/payment-svc/repository/paymentMethodStatus/paymentMethodStatus.repo';
 import { TicketWithTicketTypeDto } from '../getUserOrder/getUserOrder-response.dto';
 import { Pagination } from 'src/shared/constants/pagination';
+import { Ticket } from 'src/services/booking-svc/repository/ticket/ticket.repo';
 
 
 class FormInput {
@@ -64,6 +65,9 @@ export class TicketGroupedByTicketTypeID {
 
   @ApiProperty( {type: [TicketDto], description: 'The tickets of the ticket type' })
   tickets: TicketDto[];
+
+  @ApiProperty( { example: 30, description: 'The total ticket sale of the ticket type' })
+  totalSales?: number;
 }
 
 export class OrderData {
@@ -94,13 +98,27 @@ export class OrderData {
   @ApiProperty({ type: PaymentInfo, description: 'Payment information associated with the order', required: false })
   paymentInfo?: PaymentInfo;
 
-  @ApiProperty( {type: [TicketGroupedByTicketTypeID], description: 'The tickets of the order' })
-  Ticket?: TicketGroupedByTicketTypeID[];
+  // @ApiProperty( {type: [TicketGroupedByTicketTypeID], description: 'The tickets of the order' })
+  // Ticket?: TicketGroupedByTicketTypeID[];
+
+  @ApiProperty({ example: '2023-10-01T12:00:00Z', description: 'The time when the order was created' })
+  createdAt: Date;
+
+  @ApiProperty({ example: 2, description: 'Total number of tickets in the order' })
+  totalTicket: number;
 }
 
 export class GetOrdersResponse extends BaseResponse {
   @ApiProperty({ type: [OrderData], description: 'List of all tickets/orders of the showing' })
   data: OrderData[];
+
+  @ApiProperty({ type: Pagination, description: 'Pagination information' })
+  pagination?: Pagination;
+}
+
+export class GetTicketsResponse extends BaseResponse {
+  @ApiProperty({ description: 'List of all tickets of the showing' })
+  data: Ticket[];
 
   @ApiProperty({ type: Pagination, description: 'Pagination information' })
   pagination?: Pagination;

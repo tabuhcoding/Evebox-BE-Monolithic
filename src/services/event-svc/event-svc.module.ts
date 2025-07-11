@@ -132,6 +132,10 @@ import { GetOrgRevenueByIdService } from './modules/statistics/queries/getOrgRev
 import { GetOrgRevenueByIdController } from './modules/statistics/queries/getOrgRevenueById/getOrgRevenueById.controller';
 import { GetOrgRevenueChartService } from './modules/statistics/queries/getOrgRevenueChart/getOrgRevenueChart.service';
 import { GetOrgRevenueChartController } from './modules/statistics/queries/getOrgRevenueChart/getOrgRevenueChart.controller';
+import { GetOrgRevenueByProvinceService } from './modules/statistics/queries/getOrgRevenueByProvince/getOrgRevenueByProvince.service';
+import { GetOrgRevenueByProvinceController } from './modules/statistics/queries/getOrgRevenueByProvince/getOrgRevenueByProvince.controller';
+import { GetRevenueByTicketPriceService } from './modules/statistics/queries/getRevenueByTicketPrice/getRevenueByTicketPrice.service';
+import { GetRevenueByTicketPriceController } from './modules/statistics/queries/getRevenueByTicketPrice/getRevenueByTicketPrice.controller';
 import { GetEventRevenueDetailController } from './modules/statistics/queries/getEventRevenueDetail/getEventRevenueDetail.controller';
 import { GetEventRevenueDetailService } from './modules/statistics/queries/getEventRevenueDetail/getEventRevenueDetail.service';
 import { GetSummaryTicketRevenueController } from './modules/statistics/queries/getSummaryTicketRevenue/getSummaryTicketRevenue.controller';
@@ -223,6 +227,8 @@ import { DistrictsRepositoryImpl } from './repository/districts/districts.impl';
     GetOrgRevenueController,
     GetOrgRevenueByIdController,
     GetOrgRevenueChartController,
+    GetOrgRevenueByProvinceController,
+    GetRevenueByTicketPriceController,
     GetEventRevenueDetailController,
     GetSummaryTicketRevenueController,
     GetAllShowingDetailOfEventController,
@@ -324,6 +330,8 @@ import { DistrictsRepositoryImpl } from './repository/districts/districts.impl';
     GetOrgRevenueService,
     GetOrgRevenueByIdService,
     GetOrgRevenueChartService,
+    GetOrgRevenueByProvinceService,
+    GetRevenueByTicketPriceService,
     GetEventRevenueDetailService,
     GetSummaryTicketRevenueService,
     GetAllShowingDetailOfEventService,

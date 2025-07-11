@@ -11,6 +11,7 @@ import { EventRevenueData, OrganizerRevenueData } from '../../modules/statistics
 import { Pagination, PaginationQuery } from 'src/shared/constants/pagination';
 import { EventWithShowings } from '../../modules/statistics/queries/getOrgRevenue/getOrgRevenue-response.dto';
 import { RevenueSummaryItem } from '../../modules/statistics/queries/getOrgRevenueChart/getOrgRevenueChart-response.dto';
+import { ProvinceRevenueData } from '../../modules/statistics/queries/getOrgRevenueByProvince/getOrgRevenueByProvince-response.dto';
 
 export type Events = Prisma.EventsGetPayload<{
   include: {
@@ -76,7 +77,47 @@ export type EventWithShowingsAndTicketTypes = Prisma.EventsGetPayload<{
   };
 }>;
 
+export type EventWithShowingsData = Prisma.EventsGetPayload<{
+  select: {
+    id: true,
+    locations: {
+      select: {
+        districts: {
+          select: {
+            province: {
+              select: {
+                id: true,
+                name: true
+              },
+            },
+          },
+        },
+      },
+    },
+    Showing: {
+      where: {
+        deleteAt: null,
+      },
+      select: {
+        id: true,
+      }
+    };
+  }
+}>;
 
+export type TicketTypesData = Prisma.TicketTypeGetPayload<{
+  select: {
+    id: true;
+    price: true;
+    quantity: true;
+  }
+}>;
+
+export type TicketTypePriceRange = {
+  minPrice: number;
+  maxPrice: number;
+  ticketTypes: TicketTypesData[];
+}
 
 export interface EventsRepository extends BaseEventRepository<Events, Prisma.EventsDelegate> {
   // Thêm các method riêng cho Events nếu cần, ví dụ:
@@ -86,7 +127,7 @@ export interface EventsRepository extends BaseEventRepository<Events, Prisma.Eve
   createEvent(data: CreateEventDto, email: string, locationId?: number): Promise<number>;
 
   /* Update Event */
-  updateEvent(dto: UpdateEventDto, eventId: number, isValid: boolean, locationId?: number): Promise<[number, boolean]> ;
+  updateEvent(dto: UpdateEventDto, eventId: number, isValid: boolean, locationId?: number): Promise<[number, boolean]>;
   getEventOrganizer(eventId: number): Promise<string | null>;
   getMember(eventId: number, userEmail: string): Promise<any | null>;
   hasPermissionToManageEvent(eventId: number, userEmail: string, permission: string): Promise<Result<boolean, Error>>;
@@ -122,4 +163,7 @@ export interface EventsRepository extends BaseEventRepository<Events, Prisma.Eve
   findRevenueSummary(groupByFormat: string, feePercent: number, fromDate?: Date, toDate?: Date): Promise<Result<RevenueSummaryItem[], Error>>;
   findEventById(eventId: number): Promise<{ id: number; title: string } | null>;
   isEventOwner(email: string, eventId: number): Promise<Result<boolean, Error>>;
+  getOrgRevenueByProvince(): Promise<Result<ProvinceRevenueData[], Error>>;
+  getAllTicketTypes(): Promise<TicketTypesData[]>;
+  getTicketTypePriceRange(): Promise<TicketTypePriceRange[]>;
 }

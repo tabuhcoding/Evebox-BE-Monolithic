@@ -7,7 +7,7 @@ import { subMonths, startOfMonth } from 'date-fns';
 /* Package Application */
 // Repositories
 import { BaseEventRepository } from '../base.repository';
-import { Events, EventsRepository } from './events.repo';
+import { Events, EventsRepository, TicketTypePriceRange } from './events.repo';
 import { ShowingRepository } from '../showing/showing.repo';
 import { ShowingWithEventRepository } from '../showing/showingWithEvent.repo';
 import { EventUserRelationshipRepository } from '../eventUserRelationship/eventUserRelationship.repo';
@@ -30,6 +30,8 @@ import { EventRevenueData, OrganizerRevenueData, ShowingRevenueData } from '../.
 import { PaginationQuery, Pagination } from 'src/shared/constants/pagination';
 import { EventWithShowings } from '../../modules/statistics/queries/getOrgRevenue/getOrgRevenue-response.dto';
 import { RevenueSummaryItem } from '../../modules/statistics/queries/getOrgRevenueChart/getOrgRevenueChart-response.dto';
+import { ProvinceRevenueData } from '../../modules/statistics/queries/getOrgRevenueByProvince/getOrgRevenueByProvince-response.dto';
+import { TicketTypesData } from './events.repo';
 import { Ticket } from 'src/services/booking-svc/repository/ticket/ticket.repo';
 
 @Injectable()
@@ -948,5 +950,167 @@ export class EventsRepositoryImpl
     }));
 
     return Ok(mappedResult);
+  }
+
+  async getOrgRevenueByProvince(): Promise<Result<ProvinceRevenueData[], Error>> {
+    try {
+      const events = await this.prisma.events.findMany({
+        where: {
+          isApproved: true,
+          deleteAt: null,
+        },
+        select: {
+          id: true,
+          locations: {
+            select: {
+              districts: {
+                select: {
+                  province: {
+                    select: {
+                      id: true,
+                      name: true
+                    },
+                  },
+                },
+              },
+            },
+          },
+          Showing: {
+            where: { deleteAt: null },
+            select: {
+              id: true,
+            },
+          },
+        },
+      });
+
+      if (!events || events.length === 0) {
+        return Ok([]); // No events found
+      }
+
+      const provinceMap = new Map<string, { eventCount: number, showingCount: number, totalRevenue: number }>();
+
+      for (const event of events) {
+        const provinceName = event.locations?.districts?.province?.name?.replace(/^"|"$/g, '') || "Khác";
+
+        const prev = provinceMap.get(provinceName) || { eventCount: 0, showingCount: 0, totalRevenue: 0 };
+
+        const showingCount = event.Showing.length;
+        const showingIds = event.Showing.map(showing => showing.id);
+
+        const ordersResult = await this.getOrdersInShowingIdsService.execute(showingIds);
+        if (ordersResult.isErr()) {
+          return Err(new Error(ordersResult.unwrapErr().message));
+        }
+
+        const totalRevenue = ordersResult.unwrap().reduce((sum, order) => {
+          return sum + (order.price || 0);
+        }, 0);
+
+        provinceMap.set(provinceName, {
+          eventCount: prev.eventCount + 1,
+          showingCount: prev.showingCount + showingCount,
+          totalRevenue: prev.totalRevenue + totalRevenue,
+        });
+      }
+
+      const result: ProvinceRevenueData[] = Array.from(provinceMap.entries()).map(([provinceName, data]) => ({
+        provinceName,
+        eventCount: data.eventCount,
+        showingCount: data.showingCount,
+        totalRevenue: data.totalRevenue,
+      }));
+      return Ok(result);
+    } catch (error) {
+      return Err(new Error('Failed to find events with showing IDs'));
+    }
+  }
+
+  async getAllTicketTypes(): Promise<TicketTypesData[]> {
+    try {
+      const ticketTypes = await this.prisma.ticketType.findMany({
+        select: {
+          id: true,
+          price: true,
+          quantity: true,
+        },
+      });
+
+      return ticketTypes.map(tt => ({
+        id: tt.id,
+        price: tt.price,
+        quantity: tt.quantity || 0,
+      }));
+    } catch (error) {
+      throw new Error(`Failed to get all ticket types: ${error.message}`);
+    }
+  }
+
+  async getTicketTypePriceRange(): Promise<TicketTypePriceRange[]>{
+    try {
+      const ticketTypes = await this.prisma.ticketType.findMany({
+        select: {
+          id: true,
+          price: true,
+          quantity: true,
+        },
+      });
+
+      const priceRanges: TicketTypePriceRange[] = [
+        {
+          minPrice: 0,
+          maxPrice: 300000,
+          ticketTypes: [],
+        },
+        {
+          minPrice: 300001,
+          maxPrice: 500000,
+          ticketTypes: [],
+        },
+        {
+          minPrice: 500001,
+          maxPrice: 800000,
+          ticketTypes: [],
+        },
+        {
+          minPrice: 800001,
+          maxPrice: 1500000,
+          ticketTypes: [],
+        },
+        {
+          minPrice: 1500001,
+          maxPrice: 2000000,
+          ticketTypes: [],
+        },
+        {
+          minPrice: 2000001,
+          maxPrice: 5000000,
+          ticketTypes: [],
+        },
+        {
+          minPrice: 5000001,
+          maxPrice: Number.MAX_SAFE_INTEGER,
+          ticketTypes: [],
+        },
+      ];
+      
+      await Promise.all(ticketTypes.map(async (ticketType) => {
+        const price = ticketType.price || 0;
+        for (const range of priceRanges) {
+          if (price >= range.minPrice && price <= range.maxPrice) {
+            range.ticketTypes.push({
+              id: ticketType.id,
+              price: ticketType.price,
+              quantity: ticketType.quantity || 0,
+            });
+            break;
+          }
+        }
+      }));
+
+      return priceRanges;
+    } catch (error) {
+      throw new Error(`Failed to get ticket type price range: ${error.message}`);
+    }
   }
 }

@@ -285,6 +285,7 @@ export class GetUserOrderService {
           status: {
             not: BookingTicketStatus.PENDING
           },
+          mailSent: false,
         }, {
         Ticket: true,
         });

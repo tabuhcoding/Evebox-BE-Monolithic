@@ -1,6 +1,6 @@
 import { Controller, Get, Res, HttpStatus, UseGuards, Param, Request, Query } from "@nestjs/common";
 import { Response } from "express";
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from "src/shared/guard/jwt-auth.guard";
 import { GetOrdersByShowingIdService } from "./getOrdersByShowingId.service";
 import { GetOrdersResponse } from "./getOrdersByShowingId-response.dto";
@@ -18,6 +18,9 @@ export class GetOrdersByShowingIdController {
   @UseGuards(JwtAuthGuard)
   @Get('orders/:showingId')
   @ApiBearerAuth('access-token')
+  @ApiQuery({ name: 'userEmail', required: false, type: String, description: 'User email to filter orders' })
+  @ApiQuery({ name: 'page', required: false, type: Number, description: 'Page number for pagination' })
+  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Number of orders per page' })
   @ApiOperation({ summary: 'Get orders of a showing by showing id' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Orders retrieved successfully', type: GetOrdersResponse })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
@@ -27,6 +30,7 @@ export class GetOrdersByShowingIdController {
     @Param('showingId') showingId: string,
     @Query() pagination: PaginationQuery,
     @Request() req,
+    @Query('userEmail') userEmail?: string,
   ){
     try {
       const email = req.user?.email;
@@ -50,7 +54,8 @@ export class GetOrdersByShowingIdController {
         {
           page: pagination.page >> 0 || 1,
           limit: pagination.limit >> 0 || 10,
-        }
+        },
+        userEmail,
       );
 
       if (result.isErr()) {
@@ -68,6 +73,69 @@ export class GetOrdersByShowingIdController {
       });
     } catch (error) {
       await this.slackService.sendError(`Error in GetOrdersByShowingIdController: ${error.message}`);
+
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: 'Internal server error',
+      });
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('tickets/:showingId')
+  @ApiBearerAuth('access-token')
+  @ApiQuery({ name: 'orderId', required: false, type: Number, description: 'Order ID to filter tickets' })
+  @ApiQuery({ name: 'page', required: false, type: Number, description: 'Page number for pagination' })
+  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Number of tickets per page' })
+  @ApiOperation({ summary: 'Get all tickets of a showing by showing id' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Tickets retrieved successfully', type: GetOrdersResponse })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad request' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Internal server error' })
+  async getAllTickets(@Res() res: Response,
+    @Param('showingId') showingId: string,
+    @Query() pagination: PaginationQuery,
+    @Request() req,
+    @Query('orderId') orderId?: number,
+  ){
+    try {
+      const email = req.user?.email;
+      if (!email) {
+        return res.status(HttpStatus.UNAUTHORIZED).json({
+          statusCode: HttpStatus.UNAUTHORIZED,
+          message: 'Unauthorized',
+        });
+      }
+
+      if (!showingId) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+          statusCode: HttpStatus.BAD_REQUEST,
+          message: 'Showing ID is required',
+        });
+      }
+
+      const result = await this.getOrdersByShowingIdService.getAllTicketsByShowingId(showingId, req.user.email,
+        {
+          page: pagination.page >> 0 || 1,
+          limit: pagination.limit >> 0 || 10,
+        },
+        orderId >> 0
+      );
+
+      if (result.isErr()) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+          statusCode: HttpStatus.BAD_REQUEST,
+          message: result.unwrapErr().message,
+        });
+      }
+
+      return res.status(HttpStatus.OK).json({
+        statusCode: HttpStatus.OK,
+        message: 'Tickets retrieved successfully',
+        data: result.unwrap(),
+      });
+    } catch (error) {
+      await this.slackService.sendError(`Error in GetOrdersByShowingIdController.getAllTickets: ${error.message}`);
 
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,

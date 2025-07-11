@@ -15,6 +15,7 @@ export class GetOrdersInShowingIdsService {
   async execute(showingIds: string[]): Promise<Result<Order[], Error>> {
     try {
       const totalOrders = await this.orderRepository.findMany({
+        paymentId: { not: null },
         showingId: {
           in: showingIds
         }

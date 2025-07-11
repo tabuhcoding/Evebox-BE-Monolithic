@@ -87,6 +87,7 @@ import { GetUserByIdController } from "./modules/user/queries/get-user-by-id/get
 import { GetUserByIdService } from "./modules/user/queries/get-user-by-id/get-user-by-id.service";
 import { PrismaAuthModule } from "./database/prisma-auth/prisma.module";
 import { NewEventTriggerService } from "./modules/notice/trigger/newEvent/newEventTrigger.service";
+import { UpdateUserToOrgService } from "./modules/user/commands/update-user-to-org/updateUserToOrg.service";
 
 @Module({
   imports: [
@@ -173,6 +174,8 @@ import { NewEventTriggerService } from "./modules/notice/trigger/newEvent/newEve
     // Repositories
     GetFavoriteEventService,
     GetFavoriteOrgService,
+
+    UpdateUserToOrgService,
     {
       provide: 'FavoriteRepository',
       useClass: FavoriteRepositoryImpl,
@@ -214,7 +217,8 @@ import { NewEventTriggerService } from "./modules/notice/trigger/newEvent/newEve
     VerifyUserPinService,
     GetFavoriteEventService,
     FindUserByEmailService,
-    NewEventTriggerService
+    NewEventTriggerService,
+    UpdateUserToOrgService
   ],
 })
 export class AuthSvcModule { }

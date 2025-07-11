@@ -56,7 +56,7 @@ export class GetOrdersByShowingIdService {
     }
   }
 
-  async getAllTicketsByShowingId(showingId: string, email: string): Promise<Result<Ticket[], Error>> {
+  async getAllTicketsByShowingId(showingId: string, email: string, pagination: PaginationQuery, orderId?: number): Promise<Result<[Ticket[], Pagination], Error>> {
     try {
       const showing = await this.getShowingDetailService.executeSimple(showingId);
       if (showing.isErr()) {
@@ -77,19 +77,45 @@ export class GetOrdersByShowingIdService {
         return Err(new Error('You do not have permisison to get orders of showing'));
       }
 
+      var querySearch: any = {
+        showingId: showingId,
+        status: {
+          in: [BookingTicketStatus.SUCCESS, BookingTicketStatus.PAID, BookingTicketStatus.CANCEL]
+        }
+      }
+
+      if (orderId) {
+        querySearch = {
+            id: orderId,
+            showingId: showingId,
+        };
+      }
+
+      const totalTickets = await this.ticketRepository.count({
+        Order: {
+          is: querySearch
+        }
+      });
+
+      const totalPages = Math.ceil(totalTickets / pagination.limit);
+
+      const paginationResult: Pagination = {
+        page: pagination.page,
+        limit: pagination.limit,
+        totalItems: totalTickets,
+        totalPages: totalPages,
+      };
+
       const tickets = await this.ticketRepository.findMany({ 
         Order: {
-          some: {
-            showingId: showingId,
-            OR: [
-              { status: BookingTicketStatus.SUCCESS },
-              { status: BookingTicketStatus.PAID },
-              { status: BookingTicketStatus.CANCEL },
-            ]
-          }
-        },
-       });
-      return Ok(tickets);
+          is: querySearch
+        }
+      }, {
+        qrCode: false,
+        Order: true,
+      }, {}, (pagination.page - 1) * pagination.limit, pagination.limit);
+
+      return Ok([tickets, paginationResult]);
     } catch (error) {
       await this.slackService.sendError(`Event Service - Tickets of showing >>> GetAllTicketsByShowingIdService: ${error.message}`);
       return Err(new Error('Failed to get tickets of showing'));

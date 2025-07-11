@@ -1,6 +1,6 @@
 import { Controller, Get, Res, HttpStatus, UseGuards, Param, Request, Query } from "@nestjs/common";
 import { Response } from "express";
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from "src/shared/guard/jwt-auth.guard";
 import { GetOrdersByShowingIdService } from "./getOrdersByShowingId.service";
 import { GetOrdersResponse } from "./getOrdersByShowingId-response.dto";
@@ -79,6 +79,9 @@ export class GetOrdersByShowingIdController {
   @UseGuards(JwtAuthGuard)
   @Get('tickets/:showingId')
   @ApiBearerAuth('access-token')
+  @ApiQuery({ name: 'orderId', required: false, type: Number, description: 'Order ID to filter tickets' })
+  @ApiQuery({ name: 'page', required: false, type: Number, description: 'Page number for pagination' })
+  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Number of tickets per page' })
   @ApiOperation({ summary: 'Get all tickets of a showing by showing id' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Tickets retrieved successfully', type: GetOrdersResponse })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
@@ -86,7 +89,9 @@ export class GetOrdersByShowingIdController {
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Internal server error' })
   async getAllTickets(@Res() res: Response,
     @Param('showingId') showingId: string,
+    @Query() pagination: PaginationQuery,
     @Request() req,
+    @Query('orderId') orderId?: number,
   ){
     try {
       const email = req.user?.email;
@@ -104,7 +109,14 @@ export class GetOrdersByShowingIdController {
         });
       }
 
-      const result = await this.getOrdersByShowingIdService.getAllTicketsByShowingId(showingId, req.user.email);
+      const result = await this.getOrdersByShowingIdService.getAllTicketsByShowingId(showingId, req.user.email,
+        {
+          page: pagination.page >> 0 || 1,
+          limit: pagination.limit >> 0 || 10,
+        },
+        orderId >> 0
+      );
+
       if (result.isErr()) {
         return res.status(HttpStatus.BAD_REQUEST).json({
           statusCode: HttpStatus.BAD_REQUEST,

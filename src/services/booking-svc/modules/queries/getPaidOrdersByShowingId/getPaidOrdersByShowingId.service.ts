@@ -53,4 +53,25 @@ export class GetPaidOrdersByShowingIdService {
       return null;
     }
   }
+
+  async executeAll(fromDate?: Date, toDate?: Date): Promise<Order[] | null> {
+    try {
+      const orders = await this.orderRepository.findMany({
+        OR: [
+          { status: BookingTicketStatus.PAID },
+          { status: BookingTicketStatus.SUCCESS },
+        ],
+        ...(fromDate && { createdAt: { gte: fromDate } }),
+        ...(toDate && { createdAt: { lte: toDate } }),
+      }, {
+        Ticket: true,
+      });
+
+      return (orders);
+    } catch (error) {
+      await this.slackService.sendError(` Booking Svc >>> GetOrdersByShowingIdService : ${error.message}`)
+
+      return null;
+    }
+  }
 }

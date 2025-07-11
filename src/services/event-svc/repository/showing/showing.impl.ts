@@ -296,13 +296,6 @@ async findShowingsByOrgAndEvent(orgId: string, eventId: number) {
   return this.prisma.showing.findFirst({
     where: {
       id: showingId,
-      eventId,
-      deleteAt: null,
-      Events: {
-        organizerId,
-        deleteAt: null,
-        isApproved: true,
-      }
     },
     select: {
       id: true,

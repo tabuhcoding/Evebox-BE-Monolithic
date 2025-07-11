@@ -2,7 +2,8 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { Prisma } from 'prisma/client-event';
 import { Result, Ok, Err } from 'oxide.ts';
-import { subMonths, startOfMonth } from 'date-fns';
+import { startOfWeek, endOfWeek, addWeeks, differenceInCalendarWeeks, startOfMonth, subMonths } from 'date-fns';
+
 
 /* Package Application */
 // Repositories
@@ -610,6 +611,24 @@ export class EventsRepositoryImpl
         return Err(new Error('Showing has no ticket type data'));
       }
 
+      const endDate = new Date(showing.endTime);
+      var startDate = endDate;
+      for (const tt of showing.TicketType) {
+        if (new Date(tt.startTime) < startDate) {
+          startDate = new Date(tt.startTime);
+        }
+      }
+
+      const totalWeeks = differenceInCalendarWeeks(endDate, startDate) + 1;
+      const statisticsMap = new Map<string, [number, number]>();
+
+      // Initialize all weeks to 0
+      for (let i = 0; i < totalWeeks; i++) {
+        const weekStart = startOfWeek(addWeeks(startDate, i), { weekStartsOn: 1 }); // Week starts on Monday
+        const key = weekStart.toISOString().split('T')[0]; // e.g., "2025-06-03"
+        statisticsMap.set(key, [0, 0]);
+      }
+
       const orders = await this.getPaidOrdersByShowingIdService.execute(showingId);
 
       if (orders.isErr()) {
@@ -622,6 +641,13 @@ export class EventsRepositoryImpl
       await Promise.all(
         paidOrders.map(async (order) => {
           const tickets = order.Ticket || [];
+          const weekStart = startOfWeek(new Date(order.createdAt), { weekStartsOn: 1 });
+          const key = weekStart.toISOString().split('T')[0]; // e.g., "2025-06-03"
+          if (!statisticsMap.has(key)) {
+            statisticsMap.set(key, [0, 0]);
+          }
+          const [revenue, ticketsSold] = statisticsMap.get(key) || [0, 0];
+          statisticsMap.set(key, [revenue + order.totalPrice, ticketsSold + tickets.length]);
           await Promise.all(
             tickets.map(async (ticket) => {
               if (!ticketMapByTicketType.has(ticket.ticketTypeId)) {
@@ -667,7 +693,12 @@ export class EventsRepositoryImpl
         ticketsSold,
         totalTickets,
         percentageSold: totalTickets ? ticketsSold / totalTickets : 0,
-        byTicketType: summary.map(({ revenue, ...rest }) => rest)
+        byTicketType: summary.map(({ revenue, ...rest }) => rest),
+        revenueChart: Array.from(statisticsMap.entries()).map(([weekStart, [revenue, ticketsSold]]) => ({
+          date: weekStart,
+          revenue,
+          ticketsSold,
+        })),
       });
     } catch (error) {
       return Err(new Error('Failed to get summary of event'));
@@ -771,42 +802,52 @@ export class EventsRepositoryImpl
     }
   }
 
+
   async getStatistics(eventId: number): Promise<Result<any, Error>> {
     try {
       const now = new Date();
-      const sixMonthsAgo = subMonths(now, 5);
+      const threeMonthsAgo = subMonths(now, 2); // start from 2 months ago (covers 3 months total)
+      const from = startOfMonth(threeMonthsAgo);
+      const to = now;
+
       const clicks = await this.userClickHistoryRepository.findMany({
         eventId,
         date: {
-          gte: startOfMonth(sixMonthsAgo), // from start of 6 months ago
-          lte: now,
+          gte: from,
+          lte: to,
         },
       });
 
+      // Calculate number of weeks between `from` and `to`
+      const totalWeeks = differenceInCalendarWeeks(to, from) + 1;
       const statisticsMap = new Map<string, number>();
 
-      for (let i = 0; i < 6; i++) {
-        const month = subMonths(now, i);
-        const monthKey = `${month.getFullYear()}-${String(month.getMonth() + 1).padStart(2, '0')}`;
-        statisticsMap.set(monthKey, 0);
+      // Initialize all weeks to 0
+      for (let i = 0; i < totalWeeks; i++) {
+        const weekStart = startOfWeek(addWeeks(from, i), { weekStartsOn: 1 }); // Week starts on Monday
+        const key = weekStart.toISOString().split('T')[0]; // e.g., "2025-06-03"
+        statisticsMap.set(key, 0);
       }
 
+      // Aggregate clicks into weekly buckets
       for (const click of clicks) {
-        const monthKey = `${click.date.getFullYear()}-${String(click.date.getMonth() + 1).padStart(2, '0')}`;
-        if (statisticsMap.has(monthKey)) {
-          statisticsMap.set(monthKey, (statisticsMap.get(monthKey) || 0) + 1);
+        const weekStart = startOfWeek(click.date, { weekStartsOn: 1 });
+        const key = weekStart.toISOString().split('T')[0];
+        if (statisticsMap.has(key)) {
+          statisticsMap.set(key, (statisticsMap.get(key) || 0) + 1);
         }
       }
 
       const statistic = Array.from(statisticsMap.entries())
-        .map(([month, visits]) => ({ month, visits }))
-        .sort((a, b) => a.month.localeCompare(b.month));
+        .map(([weekStart, visits]) => ({ weekStart, visits }))
+        .sort((a, b) => a.weekStart.localeCompare(b.weekStart));
 
       return Ok(statistic);
     } catch (error) {
       return Err(new Error('Failed to get statistics of event'));
     }
   }
+
 
   async findEventsByOrganizerEmail(email: string) {
     return this.prisma.events.findMany({
@@ -818,34 +859,16 @@ export class EventsRepositoryImpl
     });
   }
 
-  async getRevenueEventsWithShowings(paginationQuery: PaginationQuery, from?: Date, to?: Date, search?: string): Promise<[EventWithShowings[], Pagination]> {
-    const where: any = {
-      isApproved: true,
-      deleteAt: null,
-    };
-
-    if (search) {
-      where.orgName = {
-        contains: search,
-        mode: 'insensitive',
-      };
-    }
-
-    const totalItems = await this.prisma.events.count({ where });
-
-    // Pagination
-    const page = paginationQuery?.page ?? 1;
-    const limit = paginationQuery?.limit ?? 10;
-    const skip = (page - 1) * limit;
-    const totalPages = Math.ceil(totalItems / limit);
-
+  async getRevenueEventsWithShowings(userIds: string[]): Promise<EventWithShowings[]> {
     const events = await this.prisma.events.findMany({
-      where,
+      where: {
+        isApproved: true,
+        deleteAt: null,
+        organizerId: { in: userIds },
+      },
       include: {
         Showing: {
           where: {
-            ...(from && { startTime: { gte: from } }),
-            ...(to && { startTime: { lte: to } }),
             deleteAt: null,
           },
           select: {
@@ -862,15 +885,10 @@ export class EventsRepositoryImpl
           }
         }
       },
-      skip,
-      take: limit,
       orderBy: { id: 'desc' } // hoặc sort theo nhu cầu
     });
 
-    return [
-      events,
-      { page, limit, totalItems, totalPages }
-    ];
+    return events; 
   }
 
   async findEventsByOrgIdWithShowings(orgId: string) {
@@ -883,6 +901,8 @@ export class EventsRepositoryImpl
       select: {
         id: true,
         title: true,
+        organizerId: true,
+        orgName: true,
         Showing: {
           where: { deleteAt: null },
           select: {

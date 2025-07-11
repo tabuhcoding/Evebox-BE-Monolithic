@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { UserRepositoryImpl } from 'src/services/auth-svc/repository/users/user.repository.impl';
 import { Email } from '../../domain/value-objects/user/email.vo';
 import { Err, Ok, Result } from 'oxide.ts';
+import { Pagination, PaginationQuery } from 'src/shared/constants/pagination';
 
 @Injectable()
 export class GetUserService {
@@ -33,6 +34,34 @@ export class GetUserService {
     }
     } catch (error) {
       return Err(new Error('Failed to get user'));
+    }
+  }
+
+  async getUserWithSearch(search: string, paginationQuery: PaginationQuery): Promise<[string[], Pagination]> {
+    try {
+      const pagination: PaginationQuery = {
+        page: paginationQuery.page >> 0 || 1,
+        limit: paginationQuery.limit >> 0 || 10,
+      };
+
+      const totalItems = await this.userRepository.countWithSearch(search);
+      const totalPages = Math.ceil(totalItems / pagination.limit);
+
+      const paginationResult: Pagination = {
+        page: pagination.page,
+        limit: pagination.limit,
+        totalItems: totalItems,
+        totalPages: totalPages,
+      };
+
+      const userIds = await this.userRepository.getUsersWithSearch(search, pagination);
+      if (!userIds || userIds.length === 0) {
+        return [[], paginationResult];
+      }
+
+      return [userIds, paginationResult];
+    } catch (error) {
+      throw new Error('Failed to get users with search');
     }
   }
 }

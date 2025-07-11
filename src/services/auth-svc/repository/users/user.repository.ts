@@ -9,6 +9,7 @@ import { OTPType } from '../../modules/user/domain/enums/otp-type.enum';
 import { IOTPData } from './user.repository.interface';
 import { BaseAuthRepository } from '../base.repository';
 import { PinStatus } from './user.repository.interface';
+import { Pagination, PaginationQuery } from 'src/shared/constants/pagination';
 
 export interface UserRepository extends BaseAuthRepository<User, Prisma.UserDelegate> {
   findByEmail(email: Email): Promise<User | null>;
@@ -37,4 +38,6 @@ export interface UserRepository extends BaseAuthRepository<User, Prisma.UserDele
   findUserByEmail(email: string): Promise<User | null>
   findAllAdminEmails(): Promise<string[]>;
   updateUserRoleToOrganizer(email: string): Promise<boolean>;
+  countWithSearch(search: string): Promise<number>;
+  getUsersWithSearch(search: string, pagination: PaginationQuery): Promise<string[]>;
 }

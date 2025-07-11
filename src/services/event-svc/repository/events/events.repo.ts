@@ -60,6 +60,8 @@ export type EventWithShowingsAndTicketTypes = Prisma.EventsGetPayload<{
   select: {
     id: true;
     title: true;
+    organizerId: true;
+    orgName: true;
     Showing: {
       select: {
         id: true;
@@ -153,11 +155,8 @@ export interface EventsRepository extends BaseEventRepository<Events, Prisma.Eve
   getStatistics(eventId: number): Promise<Result<any, Error>>;
   findEventsByOrganizerEmail(email: string): Promise<Pick<Events, 'locationId' | 'venue'>[]>;
   getRevenueEventsWithShowings(
-    paginationQuery: PaginationQuery,
-    from?: Date,
-    to?: Date,
-    search?: string
-  ): Promise<[EventWithShowings[], Pagination]>;
+    userIds: string[]
+  ): Promise<EventWithShowings[]>;
 
   findEventsByOrgIdWithShowings(orgId: string): Promise<EventWithShowingsAndTicketTypes[]>;
   findRevenueSummary(groupByFormat: string, feePercent: number, fromDate?: Date, toDate?: Date): Promise<Result<RevenueSummaryItem[], Error>>;

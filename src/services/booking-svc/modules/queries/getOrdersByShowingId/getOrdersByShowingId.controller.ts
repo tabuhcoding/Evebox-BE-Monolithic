@@ -75,4 +75,55 @@ export class GetOrdersByShowingIdController {
       });
     }
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('tickets/:showingId')
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Get all tickets of a showing by showing id' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Tickets retrieved successfully', type: GetOrdersResponse })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad request' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Internal server error' })
+  async getAllTickets(@Res() res: Response,
+    @Param('showingId') showingId: string,
+    @Request() req,
+  ){
+    try {
+      const email = req.user?.email;
+      if (!email) {
+        return res.status(HttpStatus.UNAUTHORIZED).json({
+          statusCode: HttpStatus.UNAUTHORIZED,
+          message: 'Unauthorized',
+        });
+      }
+
+      if (!showingId) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+          statusCode: HttpStatus.BAD_REQUEST,
+          message: 'Showing ID is required',
+        });
+      }
+
+      const result = await this.getOrdersByShowingIdService.getAllTicketsByShowingId(showingId, req.user.email);
+      if (result.isErr()) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+          statusCode: HttpStatus.BAD_REQUEST,
+          message: result.unwrapErr().message,
+        });
+      }
+
+      return res.status(HttpStatus.OK).json({
+        statusCode: HttpStatus.OK,
+        message: 'Tickets retrieved successfully',
+        data: result.unwrap(),
+      });
+    } catch (error) {
+      await this.slackService.sendError(`Error in GetOrdersByShowingIdController.getAllTickets: ${error.message}`);
+
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: 'Internal server error',
+      });
+    }
+  }
 }

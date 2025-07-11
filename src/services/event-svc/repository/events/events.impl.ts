@@ -859,20 +859,16 @@ export class EventsRepositoryImpl
     });
   }
 
-  async getRevenueEventsWithShowings(userIds: string[], from?: Date, to?: Date): Promise<EventWithShowings[]> {
-    const where: any = {
-      isApproved: true,
-      deleteAt: null,
-      organizerId: { in: userIds },
-    };
-
+  async getRevenueEventsWithShowings(userIds: string[]): Promise<EventWithShowings[]> {
     const events = await this.prisma.events.findMany({
-      where,
+      where: {
+        isApproved: true,
+        deleteAt: null,
+        organizerId: { in: userIds },
+      },
       include: {
         Showing: {
           where: {
-            ...(from && { startTime: { gte: from } }),
-            ...(to && { startTime: { lte: to } }),
             deleteAt: null,
           },
           select: {

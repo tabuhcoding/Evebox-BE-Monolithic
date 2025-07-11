@@ -31,4 +31,26 @@ export class GetPaidOrdersByShowingIdService {
       return null;
     }
   }
+
+  async executeWithMultipleShowings(showingIds: string[], fromDate?: Date, toDate?: Date): Promise<Order[] | null> {
+    try {
+      const orders = await this.orderRepository.findMany({
+        OR: [
+          { status: BookingTicketStatus.PAID },
+          { status: BookingTicketStatus.SUCCESS },
+        ],
+        showingId: { in: showingIds },
+        ...(fromDate && { createdAt: { gte: fromDate } }),
+        ...(toDate && { createdAt: { lte: toDate } }),
+      }, {
+        Ticket: true,
+      });
+
+      return (orders);
+    } catch (error) {
+      await this.slackService.sendError(` Booking Svc >>> GetOrdersByShowingIdService : ${error.message}`)
+
+      return null;
+    }
+  }
 }

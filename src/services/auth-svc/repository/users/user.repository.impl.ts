@@ -521,12 +521,12 @@ export class UserRepositoryImpl extends BaseAuthRepository<User, Prisma.UserDele
           }
         ],
       },
-      select: { id: true },
+      select: { id: true, email: true },
       skip,
       take: limit,
     });
 
-    const userIds = users.map(user => user.id);
+    const userIds = users.map(user => user.email);
 
     return userIds;
   }

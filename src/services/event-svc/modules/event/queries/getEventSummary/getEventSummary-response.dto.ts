@@ -1,6 +1,17 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { BaseResponse } from 'src/shared/constants/baseResponse';
 
+export class RevenueChart {
+  @ApiProperty({ example: '2024-04-01', description: 'Date (format YYYY-MM-DD)' })
+  date: string;
+
+  @ApiProperty({ example: 123, description: 'Revenue generated on this date' })
+  revenue: number;
+
+  @ApiProperty({ example: 50, description: 'Number of tickets sold on this date' })
+  ticketsSold: number;
+}
+
 export class TicketTypeSummary {
   @ApiProperty({ example: 'Vé thường', description: 'Name of ticket type' })
   typeName: string;
@@ -51,6 +62,9 @@ export class EventSummaryData {
 
   @ApiProperty({ type: [TicketTypeSummary], description: 'Each ticket type detail' })
   byTicketType: TicketTypeSummary[];
+
+  @ApiProperty({ type: [RevenueChart], description: 'Revenue chart data' })
+  revenueChart: RevenueChart[];
 }
 
 export class EventSummaryResponse extends BaseResponse {

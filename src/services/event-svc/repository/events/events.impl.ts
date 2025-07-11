@@ -611,6 +611,24 @@ export class EventsRepositoryImpl
         return Err(new Error('Showing has no ticket type data'));
       }
 
+      const endDate = new Date(showing.endTime);
+      var startDate = endDate;
+      for (const tt of showing.TicketType) {
+        if (new Date(tt.startTime) < startDate) {
+          startDate = new Date(tt.startTime);
+        }
+      }
+
+      const totalWeeks = differenceInCalendarWeeks(endDate, startDate) + 1;
+      const statisticsMap = new Map<string, [number, number]>();
+
+      // Initialize all weeks to 0
+      for (let i = 0; i < totalWeeks; i++) {
+        const weekStart = startOfWeek(addWeeks(startDate, i), { weekStartsOn: 1 }); // Week starts on Monday
+        const key = weekStart.toISOString().split('T')[0]; // e.g., "2025-06-03"
+        statisticsMap.set(key, [0, 0]);
+      }
+
       const orders = await this.getPaidOrdersByShowingIdService.execute(showingId);
 
       if (orders.isErr()) {
@@ -623,6 +641,13 @@ export class EventsRepositoryImpl
       await Promise.all(
         paidOrders.map(async (order) => {
           const tickets = order.Ticket || [];
+          const weekStart = startOfWeek(new Date(order.createdAt), { weekStartsOn: 1 });
+          const key = weekStart.toISOString().split('T')[0]; // e.g., "2025-06-03"
+          if (!statisticsMap.has(key)) {
+            statisticsMap.set(key, [0, 0]);
+          }
+          const [revenue, ticketsSold] = statisticsMap.get(key) || [0, 0];
+          statisticsMap.set(key, [revenue + order.totalPrice, ticketsSold + tickets.length]);
           await Promise.all(
             tickets.map(async (ticket) => {
               if (!ticketMapByTicketType.has(ticket.ticketTypeId)) {
@@ -668,7 +693,12 @@ export class EventsRepositoryImpl
         ticketsSold,
         totalTickets,
         percentageSold: totalTickets ? ticketsSold / totalTickets : 0,
-        byTicketType: summary.map(({ revenue, ...rest }) => rest)
+        byTicketType: summary.map(({ revenue, ...rest }) => rest),
+        revenueChart: Array.from(statisticsMap.entries()).map(([weekStart, [revenue, ticketsSold]]) => ({
+          date: weekStart,
+          revenue,
+          ticketsSold,
+        })),
       });
     } catch (error) {
       return Err(new Error('Failed to get summary of event'));

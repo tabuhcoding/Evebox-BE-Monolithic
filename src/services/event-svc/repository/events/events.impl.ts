@@ -30,6 +30,7 @@ import { EventRevenueData, OrganizerRevenueData, ShowingRevenueData } from '../.
 import { PaginationQuery, Pagination } from 'src/shared/constants/pagination';
 import { EventWithShowings } from '../../modules/statistics/queries/getOrgRevenue/getOrgRevenue-response.dto';
 import { RevenueSummaryItem } from '../../modules/statistics/queries/getOrgRevenueChart/getOrgRevenueChart-response.dto';
+import { ProvinceRevenueData } from '../../modules/statistics/queries/getOrgRevenueByProvince/getOrgRevenueByProvince-response.dto';
 
 @Injectable()
 export class EventsRepositoryImpl
@@ -929,5 +930,79 @@ export class EventsRepositoryImpl
     }));
 
     return Ok(mappedResult);
+  }
+
+  async getOrgRevenueByProvince(): Promise<Result<ProvinceRevenueData[], Error>> {
+    try {
+      const events = await this.prisma.events.findMany({
+        where: {
+          isApproved: true,
+          deleteAt: null,
+        },
+        select: {
+          id: true,
+          locations: {
+            select: {
+              districts: {
+                select: {
+                  province: {
+                    select: {
+                      id: true,
+                      name: true
+                    },
+                  },
+                },
+              },
+            },
+          },
+          Showing: {
+            where: { deleteAt: null },
+            select: {
+              id: true,
+            },
+          },
+        },
+      });
+
+      if (!events || events.length === 0) {
+        return Ok([]); // No events found
+      }
+
+      const provinceMap = new Map<string, { eventCount: number, showingCount: number, totalRevenue: number }>();
+
+      for (const event of events) {
+        const provinceName = event.locations?.districts?.province?.name?.replace(/^"|"$/g, '') || "Khác";
+
+        const prev = provinceMap.get(provinceName) || { eventCount: 0, showingCount: 0, totalRevenue: 0 };
+
+        const showingCount = event.Showing.length;
+        const showingIds = event.Showing.map(showing => showing.id);
+
+        const ordersResult = await this.getOrdersInShowingIdsService.execute(showingIds);
+        if (ordersResult.isErr()) {
+          return Err(new Error(ordersResult.unwrapErr().message));
+        }
+
+        const totalRevenue = ordersResult.unwrap().reduce((sum, order) => {
+          return sum + (order.price || 0);
+        }, 0);
+
+        provinceMap.set(provinceName, {
+          eventCount: prev.eventCount + 1,
+          showingCount: prev.showingCount + showingCount,
+          totalRevenue: prev.totalRevenue + totalRevenue,
+        });
+      }
+
+      const result: ProvinceRevenueData[] = Array.from(provinceMap.entries()).map(([provinceName, data]) => ({
+        provinceName,
+        eventCount: data.eventCount,
+        showingCount: data.showingCount,
+        totalRevenue: data.totalRevenue,
+      }));
+      return Ok(result);
+    } catch (error) {
+      return Err(new Error('Failed to find events with showing IDs'));
+    }
   }
 }

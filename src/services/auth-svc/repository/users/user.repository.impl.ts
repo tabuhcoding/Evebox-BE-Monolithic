@@ -19,6 +19,7 @@ import { Status } from '../../modules/user/domain/value-objects/user/status.vo';
 import { BaseAuthRepository } from '../base.repository';
 import { PinStatus } from './user.repository.interface';
 import { UserPinStatusData } from '../../modules/user/queries/get-pin-status/get-pin-status.response.dto';
+import { Pagination, PaginationQuery } from 'src/shared/constants/pagination';
 
 @Injectable()
 export class UserRepositoryImpl extends BaseAuthRepository<User, Prisma.UserDelegate>
@@ -476,5 +477,57 @@ export class UserRepositoryImpl extends BaseAuthRepository<User, Prisma.UserDele
       data: { role_id: 2 }, // Organizer role
     });
     return updated.count > 0;
+  }
+
+  async countWithSearch(search: string): Promise<number>{
+    const count = await this.prisma.user.count({
+      where: {
+        AND: [
+          {
+            OR: [
+              { email: { contains: search, mode: 'insensitive' } },
+              { name: { contains: search, mode: 'insensitive' } },
+            ],
+          },
+          {
+            OR: [
+              { role_id: 1 }, // Admin
+              { role_id: 2 }, // Organizer
+            ],
+          }
+        ],
+      },
+    });
+    return count;
+  }
+  async getUsersWithSearch(search: string, pagination: PaginationQuery): Promise<string[]>{
+    const { page, limit } = pagination;
+    const skip = (page - 1) * limit;
+
+    const users = await this.prisma.user.findMany({
+      where: {
+        AND: [
+          {
+            OR: [
+              { email: { contains: search, mode: 'insensitive' } },
+              { name: { contains: search, mode: 'insensitive' } },
+            ],
+          },
+          {
+            OR: [
+              { role_id: 1 }, // Admin
+              { role_id: 2 }, // Organizer
+            ],
+          }
+        ],
+      },
+      select: { id: true },
+      skip,
+      take: limit,
+    });
+
+    const userIds = users.map(user => user.id);
+
+    return userIds;
   }
 }

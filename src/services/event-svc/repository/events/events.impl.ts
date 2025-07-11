@@ -859,26 +859,12 @@ export class EventsRepositoryImpl
     });
   }
 
-  async getRevenueEventsWithShowings(paginationQuery: PaginationQuery, from?: Date, to?: Date, search?: string): Promise<[EventWithShowings[], Pagination]> {
+  async getRevenueEventsWithShowings(userIds: string[], from?: Date, to?: Date): Promise<EventWithShowings[]> {
     const where: any = {
       isApproved: true,
       deleteAt: null,
+      organizerId: { in: userIds },
     };
-
-    if (search) {
-      where.orgName = {
-        contains: search,
-        mode: 'insensitive',
-      };
-    }
-
-    const totalItems = await this.prisma.events.count({ where });
-
-    // Pagination
-    const page = paginationQuery?.page ?? 1;
-    const limit = paginationQuery?.limit ?? 10;
-    const skip = (page - 1) * limit;
-    const totalPages = Math.ceil(totalItems / limit);
 
     const events = await this.prisma.events.findMany({
       where,
@@ -903,15 +889,10 @@ export class EventsRepositoryImpl
           }
         }
       },
-      skip,
-      take: limit,
       orderBy: { id: 'desc' } // hoặc sort theo nhu cầu
     });
 
-    return [
-      events,
-      { page, limit, totalItems, totalPages }
-    ];
+    return events; 
   }
 
   async findEventsByOrgIdWithShowings(orgId: string) {

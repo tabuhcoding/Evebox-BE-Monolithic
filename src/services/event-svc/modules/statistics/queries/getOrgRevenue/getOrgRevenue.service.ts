@@ -4,6 +4,7 @@ import { OrganizerRevenueData, ShowingRevenueData, TicketTypeRevenueData, EventW
 import { GetAdminAccessService } from "src/services/auth-svc/modules/user/queries/get-admin-access/get-admin-access.service";
 import { EventsRepository } from "src/services/event-svc/repository/events/events.repo";
 import { Pagination, PaginationQuery } from "src/shared/constants/pagination";
+import { GetUserService } from "src/services/auth-svc/modules/user/queries/get-user/get-user.service";
 
 const FEE_PERCENT = 10; // default, or can be got from OrgPaymentInfo table
 
@@ -12,6 +13,7 @@ export class GetOrgRevenueService {
   constructor(
     private readonly getAdminAccessService: GetAdminAccessService,
     @Inject('EventsRepository') private readonly eventsRepo: EventsRepository,
+    private readonly getUserService: GetUserService
   ) {}
 
    async execute(
@@ -31,8 +33,10 @@ export class GetOrgRevenueService {
       return Err(new Error("fromDate must be earlier than or equal to toDate"));
     }
 
-    const [events, pagination] = await this.eventsRepo.getRevenueEventsWithShowings(
-      paginationQuery, from, to, search
+    const [users, paginationResult] = await this.getUserService.getUserWithSearch(search, paginationQuery);
+
+    const events = await this.eventsRepo.getRevenueEventsWithShowings(
+      users, from, to
     );
 
     const orgMap = new Map<string, OrganizerRevenueData>();
@@ -113,6 +117,6 @@ export class GetOrgRevenueService {
       });
     }
 
-    return Ok([Array.from(orgMap.values()), pagination]);
+    return Ok([Array.from(orgMap.values()), paginationResult]);
   }
 }

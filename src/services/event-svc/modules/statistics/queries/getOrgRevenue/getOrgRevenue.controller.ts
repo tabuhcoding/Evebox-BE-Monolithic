@@ -22,7 +22,6 @@ export class GetOrgRevenueController {
   @ApiQuery({ name: 'fromDate', required: false, type: String })
   @ApiQuery({ name: 'toDate', required: false, type: String })
   @ApiQuery({ name: 'search', required: false, type: String })
-  @ApiQuery({ name: 'search', required: false, type: String })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
   @ApiResponse({ status: HttpStatus.OK, description: 'Organizer revenue retrieved successfully', type: OrganizerRevenueResponseDto })

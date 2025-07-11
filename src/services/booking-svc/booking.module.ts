@@ -32,6 +32,7 @@ import { EmailModule } from "src/infrastructure/adapters/email/email.module";
 import { PrismaBookingModule } from "./database/prisma-booking/prisma.module";
 import { GetCheckedInTicketsController } from './modules/queries/getCheckedInTickets/getCheckedInTickets.controller';
 import { GetOrdersWithTypeService } from './modules/queries/getOrdersWithType/getOrdersWithType.service';
+import { SendEmailController } from './modules/commands/sendEmail/sendEmail.controller';
 
 @Module({
   imports: [ 
@@ -49,7 +50,8 @@ import { GetOrdersWithTypeService } from './modules/queries/getOrdersWithType/ge
     SubmitFormController,
     GetUserOrderController,
     GetTicketQrCodeController,
-    GetCheckedInTicketsController
+    GetCheckedInTicketsController,
+    SendEmailController,
   ],
   providers: [
     // Services

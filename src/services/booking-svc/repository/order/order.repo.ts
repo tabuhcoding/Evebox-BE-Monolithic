@@ -15,6 +15,6 @@ export { BookingTicketStatus, BookingTicketType } from "prisma/client-booking"
 
 export interface OrderRepository extends BaseBookingRepository<Order, Prisma.OrderDelegate> {
   // Thêm các method riêng cho Order nếu cần
-  getOrders(showingId: string, paginationQuery: PaginationQuery): Promise<Result<[OrderData[], Pagination], Error>>;
+  getOrders(showingId: string, paginationQuery: PaginationQuery, userEmail?: string): Promise<Result<[OrderData[], Pagination], Error>>;
   getAllSuccessOrders(): Promise<Order[]>;
 }

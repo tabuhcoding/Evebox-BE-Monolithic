@@ -21,18 +21,20 @@ export class OrderRepositoryImpl
     super(prisma.order, prisma)
   }
 
-  async getOrders(showingId: string, paginationQuery: PaginationQuery): Promise<Result<[OrderData[], Pagination], Error>> {
+  async getOrders(showingId: string, paginationQuery: PaginationQuery, userEmail?: string): Promise<Result<[OrderData[], Pagination], Error>> {
     try {
+      var filterQuery: any = {
+        showingId,
+      }
+      if (userEmail) {
+        filterQuery.userId = userEmail;
+      }
       // count the total number of orders for pagination
-      const totalOrders = await this.count({
-        showingId
-      });
+      const totalOrders = await this.count(filterQuery);
 
       const totalPages = Math.ceil(totalOrders / paginationQuery.limit);
 
-      const orders = await this.findMany({
-        showingId
-      }, {
+      const orders = await this.findMany(filterQuery, {
         Ticket: true,
       }, {
         createdAt: 'desc',
@@ -61,27 +63,27 @@ export class OrderRepositoryImpl
 
         // Struct the ticket data group by ticket type
         // Re structure the tickets
-        const ticketsMapByTicketTypeId = new Map<string, TicketGroupedByTicketTypeID>();
+        // const ticketsMapByTicketTypeId = new Map<string, TicketGroupedByTicketTypeID>();
 
         // count
-        for (const ticket of order.Ticket) {
-          // Check if the ticket type already exists in the map
-          // If not, fetch the ticket type details and add it to the map
-          if (!ticketsMapByTicketTypeId.has(ticket.ticketTypeId)) {
-            ticketsMapByTicketTypeId.set(ticket.ticketTypeId, {
-              id: ticket.ticketTypeId,
-              tickets: []
-            });
-          }
+        // for (const ticket of order.Ticket) {
+        //   // Check if the ticket type already exists in the map
+        //   // If not, fetch the ticket type details and add it to the map
+        //   if (!ticketsMapByTicketTypeId.has(ticket.ticketTypeId)) {
+        //     ticketsMapByTicketTypeId.set(ticket.ticketTypeId, {
+        //       id: ticket.ticketTypeId,
+        //       tickets: []
+        //     });
+        //   }
 
-          ticketsMapByTicketTypeId.get(ticket.ticketTypeId)!.tickets.push({
-            id: ticket.id,
-            seatID: ticket.seatId,
-            sectionID: ticket.sectionId,
-            qrCode: ticket.qrCode,
-            description: ticket.description,
-          });
-        }
+        //   ticketsMapByTicketTypeId.get(ticket.ticketTypeId)!.tickets.push({
+        //     id: ticket.id,
+        //     seatID: ticket.seatId,
+        //     sectionID: ticket.sectionId,
+        //     qrCode: ticket.qrCode,
+        //     description: ticket.description,
+        //   });
+        // }
         orderData.push({
           id: order.id,
           status: order.status,
@@ -96,7 +98,9 @@ export class OrderRepositoryImpl
             method: paymentInfoData.method,
             paidAt: paymentInfoData.paidAt,
           },
-          Ticket: Array.from(ticketsMapByTicketTypeId.values()),
+          createdAt: order.createdAt,
+          totalTicket: order.Ticket.length,
+          // Ticket: Array.from(ticketsMapByTicketTypeId.values()),         
         });
       }
 

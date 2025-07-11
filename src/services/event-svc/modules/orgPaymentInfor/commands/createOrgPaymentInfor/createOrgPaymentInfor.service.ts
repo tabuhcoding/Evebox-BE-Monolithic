@@ -5,13 +5,15 @@ import { OrgPaymentInforRepository } from "src/services/event-svc/repository/org
 import { CreateOrgPaymentInfoDto } from "./createOrgPaymentInfor.dto";
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 import { CheckUserExistService } from "src/services/auth-svc/modules/user/commands/checkuserExist/checkuserExist.service";
+import { UpdateUserToOrgService } from "src/services/auth-svc/modules/user/commands/update-user-to-org/updateUserToOrg.service";
 
 @Injectable()
 export class CreateOrgPaymentInfoService {
   constructor(
     @Inject('OrgPaymentInforRepository') private readonly orgPaymentInforRepository: OrgPaymentInforRepository,
     private readonly slackService: SlackService,
-    private readonly checkUserExistService: CheckUserExistService
+    private readonly checkUserExistService: CheckUserExistService,
+    private readonly updateUserToOrgService: UpdateUserToOrgService
   ) {}
 
   async execute (dto: CreateOrgPaymentInfoDto, organizerId: string): Promise<Result<string, Error>> {
@@ -36,6 +38,11 @@ export class CreateOrgPaymentInfoService {
       const result = await this.orgPaymentInforRepository.createOrgPaymentInfo(dto, organizerId);
       if (result.isErr()) {
         return Err(new Error(result.unwrapErr().message));
+      }
+
+      const updateResult = await this.updateUserToOrgService.execute(organizerId);
+      if (updateResult.isErr()) {
+        await this.slackService.sendError(`EventSvc - OrgPaymentInfo >>> Failed to upgrade user to organizer: ${updateResult.unwrapErr().message}`);
       }
 
       return result;

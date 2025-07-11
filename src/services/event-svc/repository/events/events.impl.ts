@@ -901,6 +901,8 @@ export class EventsRepositoryImpl
       select: {
         id: true,
         title: true,
+        organizerId: true,
+        orgName: true,
         Showing: {
           where: { deleteAt: null },
           select: {

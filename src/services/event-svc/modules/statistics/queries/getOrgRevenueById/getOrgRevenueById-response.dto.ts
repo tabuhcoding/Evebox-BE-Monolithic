@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { BaseResponse } from "src/shared/constants/baseResponse";
+import { OrganizerRevenueData } from "../getOrgRevenue/getOrgRevenue-response.dto";
 
 export class TicketTypeRevenueData {
   @ApiProperty()
@@ -56,6 +57,6 @@ export class EventRevenueData {
 }
 
 export class RevenueByIdDto extends BaseResponse {
-  @ApiProperty({ type: [EventRevenueData], description: "Revenue of org" })
-    data: EventRevenueData[];
+  @ApiProperty({ type: [OrganizerRevenueData], description: "Revenue of org" })
+    data: OrganizerRevenueData[];
 }

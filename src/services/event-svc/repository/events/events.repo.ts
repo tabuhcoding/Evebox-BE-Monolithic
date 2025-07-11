@@ -60,6 +60,8 @@ export type EventWithShowingsAndTicketTypes = Prisma.EventsGetPayload<{
   select: {
     id: true;
     title: true;
+    organizerId: true;
+    orgName: true;
     Showing: {
       select: {
         id: true;

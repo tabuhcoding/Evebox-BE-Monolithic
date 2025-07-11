@@ -1,6 +1,6 @@
-import { Controller, Get, Param, Res, HttpStatus, UseGuards, Request } from "@nestjs/common";
+import { Controller, Get, Param, Res, HttpStatus, UseGuards, Request, Query } from "@nestjs/common";
 import { Response } from "express";
-import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { GetOrgRevenueByIdService } from "./getOrgRevenueById.service";
 import { RevenueByIdDto } from "./getOrgRevenueById-response.dto";
 import { JwtAuthGuard } from "src/shared/guard/jwt-auth.guard";
@@ -14,6 +14,8 @@ export class GetOrgRevenueByIdController {
   @Get('/revenue/:orgId')
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Get revenue of an org' })
+  @ApiQuery({ name: 'fromDate', required: false, type: String })
+  @ApiQuery({ name: 'toDate', required: false, type: String })
   @ApiParam({ name: 'orgId', example: "The gmail stands for ID of the organizer", description: "The ID of the organization" })
   @ApiResponse({ status: HttpStatus.OK, description: 'Organizer revenue retrieved successfully', type: RevenueByIdDto })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid input' })
@@ -22,12 +24,14 @@ export class GetOrgRevenueByIdController {
   async execute(
     @Param('orgId') orgId: string,
     @Request() req,
-    @Res() res: Response
+    @Res() res: Response,
+    @Query('fromDate') fromDate: string,
+    @Query('toDate') toDate: string,
   ) {
     try {
       const email = req.user?.email;
 
-      const result = await this.getOrgRevenueByIdService.execute(orgId, email);
+      const result = await this.getOrgRevenueByIdService.execute(orgId, email, fromDate, toDate);
 
       if (result.isErr()) {
         return res.status(HttpStatus.BAD_REQUEST).json({

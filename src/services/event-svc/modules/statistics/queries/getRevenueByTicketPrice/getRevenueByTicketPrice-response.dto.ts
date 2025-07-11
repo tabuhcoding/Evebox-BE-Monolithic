@@ -3,7 +3,10 @@ import { BaseResponse } from 'src/shared/constants/baseResponse';
 
 export class RevenueByTicketPriceData {
   @ApiProperty({ example: 100000 })
-  price: number;
+  minPrice: number;
+
+  @ApiProperty({ example: 200000 })
+  maxPrice: number;
 
   @ApiProperty({ example: 300 })
   total: number;

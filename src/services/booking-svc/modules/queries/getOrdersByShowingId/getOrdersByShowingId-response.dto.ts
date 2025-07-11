@@ -65,6 +65,9 @@ export class TicketGroupedByTicketTypeID {
 
   @ApiProperty( {type: [TicketDto], description: 'The tickets of the ticket type' })
   tickets: TicketDto[];
+
+  @ApiProperty( { example: 30, description: 'The total ticket sale of the ticket type' })
+  totalSales?: number;
 }
 
 export class OrderData {

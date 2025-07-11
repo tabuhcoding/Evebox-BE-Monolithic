@@ -30,6 +30,7 @@ import { EventRevenueData, OrganizerRevenueData, ShowingRevenueData } from '../.
 import { PaginationQuery, Pagination } from 'src/shared/constants/pagination';
 import { EventWithShowings } from '../../modules/statistics/queries/getOrgRevenue/getOrgRevenue-response.dto';
 import { RevenueSummaryItem } from '../../modules/statistics/queries/getOrgRevenueChart/getOrgRevenueChart-response.dto';
+import { Ticket } from 'src/services/booking-svc/repository/ticket/ticket.repo';
 
 @Injectable()
 export class EventsRepositoryImpl
@@ -598,6 +599,7 @@ export class EventsRepositoryImpl
         ticketTypeId: tt.id,
         typeName: tt.name,
         price: tt.price,
+        originalPrice: tt.originalPrice,
         showingId: tt.showingId,
         quantity: tt.quantity || 0,
       }));
@@ -614,21 +616,38 @@ export class EventsRepositoryImpl
 
       const paidOrders = orders.unwrap();
 
+      const ticketMapByTicketType = new Map<string, Ticket[]>();
+      await Promise.all(
+        paidOrders.map(async (order) => {
+          const tickets = order.Ticket || [];
+          await Promise.all(
+            tickets.map(async (ticket) => {
+              if (!ticketMapByTicketType.has(ticket.ticketTypeId)) {
+                ticketMapByTicketType.set(ticket.ticketTypeId, []);
+              }
+              ticketMapByTicketType.get(ticket.ticketTypeId)?.push({
+                ...ticket,
+                Order: null,
+              });
+            })
+          );
+        })
+      );
+
       const summary = ticketTypeData.map(tt => {
-        const matchedTickets = paidOrders.filter(
-          t => t.type === tt.typeName && t.showingId === tt.showingId
-        );
+        const matchedTickets = ticketMapByTicketType.get(tt.ticketTypeId) || [];
 
-        const sold = matchedTickets.reduce((sum, t) => sum + t.Ticket.length, 0);
+        const sold = matchedTickets.length;
 
-        const revenue = matchedTickets.reduce((sum, t) => sum + t.price, 0);
-
+        const revenue = matchedTickets.length * tt.price;
         return {
           typeName: tt.typeName,
           price: tt.price,
+          originalPrice: tt.originalPrice,
           sold,
           ratio: tt.quantity ? sold / tt.quantity : 0,
-          revenue
+          revenue,
+          quantity: tt.quantity,
         };
       });
 

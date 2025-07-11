@@ -15,8 +15,13 @@ export class GetPaidOrdersByShowingIdService {
   async execute(showingId: string): Promise<Result<Order[], Error>> {
     try {
       const orders = await this.orderRepository.findMany({
-        status: BookingTicketStatus.PAID || BookingTicketStatus.SUCCESS,
+        OR: [
+          { status: BookingTicketStatus.PAID },
+          { status: BookingTicketStatus.SUCCESS },
+        ],
         showingId
+      }, {
+        Ticket: true,
       });
 
       return Ok(orders);

@@ -1,3 +1,4 @@
+import { OrganizerRevenueRepository } from './repository/organizer-revenue/organizer-revenue.repo';
 import { forwardRef, Module } from "@nestjs/common";
 import { JwtModule } from "@nestjs/jwt";
 import { ConfigService, ConfigModule } from "@nestjs/config";
@@ -88,6 +89,11 @@ import { GetUserByIdService } from "./modules/user/queries/get-user-by-id/get-us
 import { PrismaAuthModule } from "./database/prisma-auth/prisma.module";
 import { NewEventTriggerService } from "./modules/notice/trigger/newEvent/newEventTrigger.service";
 import { UpdateUserToOrgService } from "./modules/user/commands/update-user-to-org/updateUserToOrg.service";
+import { RevenueRepositoryImpl } from "./repository/revenue/revenue.impl";
+import { TicketTypeRevenueRepositoryImpl } from "./repository/tickettype-revenue/tickettype-revenue.impl";
+import { ShowingRevenueRepositoryImpl } from "./repository/showing-revenue/showing-revenue.impl";
+import { EventRevenueRepositoryImpl } from "./repository/event-revenue/event-revenue.impl";
+import { OrganizerRevenueRepositoryImpl } from './repository/organizer-revenue/organizer-revenue.impl';
 
 @Module({
   imports: [
@@ -195,6 +201,26 @@ import { UpdateUserToOrgService } from "./modules/user/commands/update-user-to-o
     {
       provide: 'AdminRepository',
       useClass: AdminRepositoryImpl
+    },
+    {
+      provide: 'RevenueRepository',
+      useClass: RevenueRepositoryImpl,
+    },
+    {
+      provide: 'TicketTypeRevenueRepository',
+      useClass: TicketTypeRevenueRepositoryImpl,
+    },
+    {
+      provide: 'ShowingRevenueRepository',
+      useClass: ShowingRevenueRepositoryImpl,
+    },
+    {
+      provide: 'EventRevenueRepository',
+      useClass: EventRevenueRepositoryImpl,
+    },
+    {
+      provide: 'OrganizerRevenueRepository',
+      useClass: OrganizerRevenueRepositoryImpl,
     },
     UpdateUserRoleService,
     SetReceiveNotiService,

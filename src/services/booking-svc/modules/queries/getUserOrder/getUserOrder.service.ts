@@ -160,6 +160,11 @@ export class GetUserOrderService {
             order.status === BookingTicketStatus.CANCEL ? OrderStatus.CANCELLED :
             OrderStatus.PENDING
           ),
+          canGiveAway: (
+            order.status === BookingTicketStatus.SUCCESS 
+            && order.ownerId && order.ownerId !== email
+            && showing.startTime > new Date()
+          ) ? true : false,
           createdAt: order.createdAt,
           PaymentInfo: paymentInfo ? {
             method: paymentInfo.method,
@@ -207,7 +212,7 @@ export class GetUserOrderService {
         return Err(new Error('Order not found'));
       }
 
-      if (order.userId !== email || (order.ownerId && order.ownerId !== email)) {
+      if (order.userId !== email && (order.ownerId && order.ownerId !== email)) {
         return Err(new Error('Unauthorized access to this order'));
       }
 
@@ -266,6 +271,98 @@ export class GetUserOrderService {
           order.status === BookingTicketStatus.SUCCESS 
           && order.ownerId && order.ownerId !== email
           && showing.startTime > new Date()
+        ) ? true : false,
+        ownerId: order.ownerId || order.userId, // If ownerId is not set, use userId
+        type: order.type,
+        price: order.totalPrice,
+        createdAt: order.createdAt,
+        PaymentInfo: paymentInfo ? {
+          method: paymentInfo.method,
+          paidAt: paymentInfo.paidAt,
+        } : undefined,
+        Showing: showing,
+        Ticket: Array.from(ticketsMapByTicketTypeId.values()),
+        count: order.Ticket.length,
+        formResponse: formResponses,
+      };
+
+      return Ok(userOrder);
+    }
+    catch (error) {
+      await this.slackService.sendError(`Error in GetUserOrderByIdService: ${error.message}`);
+      
+      return Err(new Error('Failed to select seat'));
+    }
+  }
+
+  async executeByOrderIdAdmin(id: number): Promise<Result<UserOrderDto, Error>> {
+    try {
+      if(!id) {
+        return Err(new Error('Invalid order ID'));
+      }
+
+      const order = await this.orderRepository.findOne({
+        id: id,
+        status: {
+          not: BookingTicketStatus.PENDING
+        }
+      }, {
+        Ticket: true,
+      });
+
+      if (!order || order.status === BookingTicketStatus.PENDING) {
+        return Err(new Error('Order not found'));
+      }
+
+      // Get payment info for the order
+      const paymentInfo = await this.paymentInfoService.getPaymentInfoByOrderId(order.id);
+      // Get showing details for the order
+      const showing = await this.getPreviewShowingService.execute(order.showingId);
+      // Re structure the tickets
+      const ticketsMapByTicketTypeId = new Map<string, TicketWithTicketTypeDto>();
+      // Get form response for order
+      var formResponses : UserFormAnserDto[] = [];
+      if (order.formResponseId) {
+        formResponses = await this.getFormAnswerWithQuestionService.execute(order.formResponseId);
+      }
+      // count
+      for (const ticket of order.Ticket) {
+        if (!ticketsMapByTicketTypeId.has(ticket.ticketTypeId)) {
+          const ticketTypeDetail = await this.getTicketTypeDetailService.getTicketTypeDetail(ticket.ticketTypeId);
+          ticketsMapByTicketTypeId.set(ticket.ticketTypeId, {
+            id: ticketTypeDetail.id,
+            name: ticketTypeDetail.name,
+            description: ticketTypeDetail.description,
+            price: ticketTypeDetail.price,
+            tickets: []
+          });
+        }
+
+        let seatname: string | null = null;
+        let sectionname: string | null = null;
+
+        if (ticket.seatId) {
+          [seatname, sectionname] = await this.getTicketTypeDetailService.getSeatSectionName(ticket.ticketTypeId, ticket.seatId);
+        } else if (ticket.sectionId) {
+          sectionname = await this.getTicketTypeDetailService.getTicketTypeSectionname(ticket.ticketTypeId, ticket.sectionId);
+        }
+
+        ticketsMapByTicketTypeId.get(ticket.ticketTypeId)!.tickets.push({
+          id: ticket.id,
+          seatname,
+          sectionname,
+          description: ticket.description,
+        });
+      }
+
+      const userOrder: UserOrderDto = {
+        id: this.hashids.encode(order.id),
+        showingId: order.showingId,
+        status: (
+          order.status === BookingTicketStatus.PAID ? OrderStatus.PENDING :
+          order.status === BookingTicketStatus.SUCCESS ? OrderStatus.SUCCESS :
+          order.status === BookingTicketStatus.CANCEL ? OrderStatus.CANCELLED :
+          OrderStatus.PENDING
         ),
         ownerId: order.ownerId || order.userId, // If ownerId is not set, use userId
         type: order.type,

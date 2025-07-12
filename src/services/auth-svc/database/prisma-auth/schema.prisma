@@ -98,8 +98,10 @@ model FavoriteNotiHistory {
 
 model Revenue {
   id Int @id @default(autoincrement())
-  date Datetime
+  date DateTime
   total_revenue Int @default(0)
+
+  OrganizeRevenue OrganizeRevenue[]
 }
 
 model OrganizeRevenue {
@@ -110,6 +112,7 @@ model OrganizeRevenue {
   total_revenue Int @default(0)
 
   Revenue Revenue @relation(fields: [revenue_id], references: [id])
+  EventRevenue EventRevenue[]
 }
 
 model EventRevenue {
@@ -120,17 +123,19 @@ model EventRevenue {
   total_revenue Int
 
   OrganizerRevenue OrganizeRevenue @relation(fields: [org_id], references: [id])
+  ShowingRevenue ShowingRevenue[]
 }
 
 model ShowingRevenue{
   id Int @id @default(autoincrement())
   event_id Int
   showing_id String
-  start_date Datetime
-  end_date Datetime
+  start_date DateTime
+  end_date DateTime
   total_revenue Int
 
   EventRevenue EventRevenue @relation(fields: [event_id], references: [id])
+  TicketTypeRevenue TicketTypeRevenue[]
 }
 
 model TicketTypeRevenue{

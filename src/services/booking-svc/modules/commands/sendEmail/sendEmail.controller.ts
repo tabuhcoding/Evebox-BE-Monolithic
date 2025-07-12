@@ -46,14 +46,13 @@ export class SendEmailController {
         @Res() res: Response,
     ) {
         try {
-            // Check if the user is an admin
-            // const isAdmin = await this.checkAdminExist.checkAdminExist(req.user.email);
-            // if (!isAdmin) {
-            //     return res.status(HttpStatus.FORBIDDEN).json({
-            //         statusCode: HttpStatus.FORBIDDEN,
-            //         message: 'Forbidden: You do not have permission to perform this action',
-            //     });
-            // }
+            orderIds = Array.isArray(orderIds) ? orderIds : [orderIds];
+            if (!Array.isArray(orderIds) || orderIds.length === 0) {
+                return res.status(HttpStatus.BAD_REQUEST).json({
+                    statusCode: HttpStatus.BAD_REQUEST,
+                    message: 'Invalid order ID',
+                });
+            }
             const result = await this.sendEmailService.sendTicketEmailToUser(
                 orderIds.map(id => id >> 0),
             );
@@ -70,7 +69,7 @@ export class SendEmailController {
                 data: result
             });
         } catch (error) {
-            await this.slackService.sendError(`Booking Svc >>> sendEmail : Error sending email for orderId: ${orderIds.join(', ')}, Error: ${error.message}`);
+            await this.slackService.sendError(`Booking Svc >>> sendEmail : Error sending email for orderId: ${orderIds}, Error: ${error.message}`);
             return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
                 statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
                 message: 'Internal server error',

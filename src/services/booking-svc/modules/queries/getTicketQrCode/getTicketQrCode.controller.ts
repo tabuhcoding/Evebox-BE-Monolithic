@@ -71,7 +71,7 @@ export class GetTicketQrCodeController {
       }
     }
     
-    const result = await this.getTicketQrCodeService.getTicketQrCode(ticketId);
+    const result = await this.getTicketQrCodeService.getTicketQrCode(ticketId, email);
     if (result.isErr()) {
       return res
         .status(HttpStatus.BAD_REQUEST)

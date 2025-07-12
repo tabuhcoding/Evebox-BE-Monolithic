@@ -5,6 +5,7 @@ export enum OrderStatus{
   PENDING = 'PENDING',
   SUCCESS = 'SUCCESS',
   CANCELLED = 'CANCELLED',
+  GIVEAWAY = 'GIVEAWAY',
 }
 
 export enum OrderTimeStamp {

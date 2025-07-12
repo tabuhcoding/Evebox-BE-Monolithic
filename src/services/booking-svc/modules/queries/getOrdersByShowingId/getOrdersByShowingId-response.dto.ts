@@ -89,8 +89,11 @@ export class OrderData {
   @ApiProperty({ example: true, description: 'Whether the order confirmation mail was sent' })
   mailSent: boolean;
 
-  @ApiProperty({ example: 'dattruong01082@gmail.com', description: 'User email associated with the order' })
+  @ApiProperty({ example: 'dattruong01082@gmail.com', description: 'User email buy the order' })
   userId: string;
+
+  @ApiProperty({ example: 'dattruong01082@gmail.com', description: 'User email now owns the order' })
+  ownerId: string;
 
   @ApiProperty({ type: FormResponse, description: 'Form responses attached to the order', required: false })
   formResponse?: FormResponse;

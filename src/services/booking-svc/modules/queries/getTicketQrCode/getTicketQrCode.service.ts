@@ -10,11 +10,19 @@ export class GetTicketQrCodeService {
     @Inject('TicketRepository') private readonly ticketRepository: TicketRepository,
   ) {}
 
-  async getTicketQrCode(ticketId: string): Promise<Result<string, Error>>{
+  async getTicketQrCode(ticketId: string, email: string): Promise<Result<string, Error>>{
     try {
       const ticket = await this.ticketRepository.findOneById(ticketId);
       if (!ticket) {
         return Err(new Error('Ticket not found'));
+      }
+
+      if (ticket.Order.ownerId && ticket.Order.ownerId !== email) {
+        return Err(new Error('Unauthorized access to this ticket'));
+      }
+
+      if (!ticket.Order.ownerId && ticket.Order.userId !== email) {
+        return Err(new Error('Unauthorized access to this ticket'));
       }
 
       if (!ticket.qrCode) {

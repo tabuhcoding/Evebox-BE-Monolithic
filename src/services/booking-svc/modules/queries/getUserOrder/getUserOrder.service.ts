@@ -35,8 +35,12 @@ export class GetUserOrderService {
     try {
       // Get set showing ID of user order 
       const orderShowingIds = await this.orderRepository.findMany({
-        userId: email,
+        OR: [
+          { userId: email },
+          { ownerId: email }
+        ],
         status: (
+          status == OrderStatus.GIVEAWAY ? BookingTicketStatus.SUCCESS :
           status == OrderStatus.PENDING ? BookingTicketStatus.PAID :
           status == OrderStatus.SUCCESS ? BookingTicketStatus.SUCCESS :
           status == OrderStatus.CANCELLED ? BookingTicketStatus.CANCEL : {
@@ -61,8 +65,12 @@ export class GetUserOrderService {
       // count
       const totalOrders = await this.orderRepository.count({
         showingId: { in: showingIds },
-        userId: email,
+        OR: [
+          { userId: email },
+          { ownerId: email }
+        ],
         status: (
+          status == OrderStatus.GIVEAWAY ? BookingTicketStatus.SUCCESS :
           status == OrderStatus.PENDING ? BookingTicketStatus.PAID :
           status == OrderStatus.SUCCESS ? BookingTicketStatus.SUCCESS :
           status == OrderStatus.CANCELLED ? BookingTicketStatus.CANCEL : {
@@ -145,6 +153,7 @@ export class GetUserOrderService {
           type: order.type,
           price: order.totalPrice,
           status: (
+            (order.status === BookingTicketStatus.SUCCESS && order.ownerId && order.ownerId !== email) ? OrderStatus.GIVEAWAY :
             order.status === BookingTicketStatus.PAID ? OrderStatus.PENDING :
             order.status === BookingTicketStatus.SUCCESS ? OrderStatus.SUCCESS :
             order.status === BookingTicketStatus.CANCEL ? OrderStatus.CANCELLED :
@@ -197,7 +206,7 @@ export class GetUserOrderService {
         return Err(new Error('Order not found'));
       }
 
-      if (order.userId !== email) {
+      if (order.userId !== email || (order.ownerId && order.ownerId !== email)) {
         return Err(new Error('Unauthorized access to this order'));
       }
 
@@ -246,6 +255,7 @@ export class GetUserOrderService {
         id: this.hashids.encode(order.id),
         showingId: order.showingId,
         status: (
+          (order.status === BookingTicketStatus.SUCCESS && order.ownerId && order.ownerId !== email) ? OrderStatus.GIVEAWAY :
           order.status === BookingTicketStatus.PAID ? OrderStatus.PENDING :
           order.status === BookingTicketStatus.SUCCESS ? OrderStatus.SUCCESS :
           order.status === BookingTicketStatus.CANCEL ? OrderStatus.CANCELLED :
@@ -383,7 +393,7 @@ export class GetUserOrderService {
         formResponse: formResponses,
       };
 
-      return ([userOrder, order.userId]);
+      return ([userOrder, order.ownerId || order.userId]);
     }
     catch (error) {
       await this.slackService.sendError(`Error in GetUserTicketByOriginalService: ${error.message}`);

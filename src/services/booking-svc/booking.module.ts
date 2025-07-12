@@ -33,6 +33,8 @@ import { PrismaBookingModule } from "./database/prisma-booking/prisma.module";
 import { GetCheckedInTicketsController } from './modules/queries/getCheckedInTickets/getCheckedInTickets.controller';
 import { GetOrdersWithTypeService } from './modules/queries/getOrdersWithType/getOrdersWithType.service';
 import { SendEmailController } from './modules/commands/sendEmail/sendEmail.controller';
+import { GiveTicketController } from './modules/commands/giveTicket/giveTicket.controller';
+import { GiveTicketService } from './modules/commands/giveTicket/giveTicket.service';
 
 @Module({
   imports: [ 
@@ -52,6 +54,7 @@ import { SendEmailController } from './modules/commands/sendEmail/sendEmail.cont
     GetTicketQrCodeController,
     GetCheckedInTicketsController,
     SendEmailController,
+    GiveTicketController,
   ],
   providers: [
     // Services
@@ -78,6 +81,7 @@ import { SendEmailController } from './modules/commands/sendEmail/sendEmail.cont
 
     GetCheckedInTicketsService,
     GetOrdersWithTypeService,
+    GiveTicketService,
 
     // Repositories
     { provide: 'OrderRepository', useClass: OrderRepositoryImpl },

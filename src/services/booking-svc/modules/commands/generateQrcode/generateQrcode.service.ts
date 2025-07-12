@@ -544,7 +544,11 @@ export class GenerateQrcodeService {
         }
 
         sampleOrderMapping.set(orderId, sampleOrder);
-        userIdMapping.set(orderId, [userId, email]);
+        if (sampleOrder.ownerId)
+          userIdMapping.set(orderId, [sampleOrder.ownerId]);
+        else {
+          userIdMapping.set(orderId, [userId, email]);
+        }
       }
 
       if (sampleOrderMapping.size === 0) {
@@ -553,12 +557,12 @@ export class GenerateQrcodeService {
       }
 
       for (const [orderId, sampleOrder] of sampleOrderMapping.entries()) {
-        const [email, userId] = userIdMapping.get(orderId) || [];
-        if (!email || !userId) {
-          await this.slackService.sendError(`Booking Svc >>> sendTicketEmailToUser : Email or User ID not found for orderId: ${orderId}`);
+        const email = userIdMapping.get(orderId) || [];
+        if (!email) {
+          await this.slackService.sendError(`Booking Svc >>> sendTicketEmailToUser : Email not found for orderId: ${orderId}`);
           continue;
         }
-        await this.sendTicketEmail(sampleOrder, [email, userId], orderId);
+        await this.sendTicketEmail(sampleOrder, email, orderId);
       }
 
       return true;

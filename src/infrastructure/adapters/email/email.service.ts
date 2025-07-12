@@ -410,4 +410,65 @@ export class EmailService implements OnModuleInit {
       throw new Error('Failed to send email');
     }
   }
+
+  async sendGiveAwayEmail(email: string[], fromEmail: string, sendKey: string): Promise<void> {
+    const subject = `You have received a ticket from ${fromEmail}`;
+    const content = `
+      <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 8px; padding: 20px;">
+        <h2 style="color: #4CAF50; border-bottom: 1px solid #ddd; padding-bottom: 10px;">🎉 You have received a ticket!</h2>
+
+        <p>Dear User,</p>
+        <p>You have received a ticket from <strong>${fromEmail}</strong>. Please use the following step to claim your ticket:</p>
+        
+        <div style="text-align: center; margin: 40px 0;">
+            <a href="https://evebox.azurewebsites.net/order/receive?sendKey=${sendKey}" 
+              style="display: inline-block; background-color: #4CAF50; color: white; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: bold; font-size: 14px;">
+              🔍 Click here to confirm receive it
+            </a>
+        </div>
+
+        <p style="margin-top: 30px; font-size: 12px; color: #999;">
+          This is an automated message from EveBox.
+        </p>
+      </div>
+    `;
+    try {
+      await this.transporter.sendMail({
+        from: `EveBox <${this.configService.get<string>('EMAIL_USER', 'sp.sp.bs.evebox@gmail.com')}>`,
+        to: email,
+        subject: subject,
+        html: content,
+      });
+    } catch (error) {
+      console.error('Failed to send email:', error);
+      throw new Error('Failed to send email');
+    }
+  }
+
+  async sendConfirmMessageWhenReceived(email:string, orderId: number, receiver: string): Promise<void> {
+    const subject = `Ticket Received Confirmation`;
+    const content = `
+      <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 8px; padding: 20px;">
+        <h2 style="color: #4CAF50; border-bottom: 1px solid #ddd; padding-bottom: 10px;">🎉 Ticket Received Successfully</h2>
+
+        <p>Dear User,</p>
+        <p>Your sending ticket request for order ID <strong>${orderId}</strong> has been successfully received by <strong>${receiver}</strong>.</p>
+
+        <p style="margin-top: 30px; font-size: 12px; color: #999;">
+          This is an automated message from EveBox.
+        </p>
+      </div>
+    `;
+    try {
+      await this.transporter.sendMail({
+        from: `EveBox <${this.configService.get<string>('EMAIL_USER', 'sp.sp.bs.evebox@gmail.com')}>`,
+        to: email,
+        subject: subject,
+        html: content,
+      });
+    } catch (error) {
+      console.error('Failed to send email:', error);
+      throw new Error('Failed to send email');
+    }
+  }
 }

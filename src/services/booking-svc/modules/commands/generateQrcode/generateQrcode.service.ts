@@ -525,7 +525,7 @@ export class GenerateQrcodeService {
       for (const orderId of orderIds) {
         const [sampleOrder, userId] = await this.getUserOrderService.executeByOriginalOrderIdWithoutCheck(orderId);
         if (!sampleOrder) {
-          await this.slackService.sendError(`Booking Svc >>> sendTicketEmailToUser : Sample order not found`);
+          await this.slackService.sendError(`Booking Svc >>> sendTicketEmailToUser : Sample order not found or the order has been send email already`);
           return false;
         }
 

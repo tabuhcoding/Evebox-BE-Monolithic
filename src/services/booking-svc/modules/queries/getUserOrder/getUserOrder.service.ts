@@ -160,6 +160,11 @@ export class GetUserOrderService {
             order.status === BookingTicketStatus.CANCEL ? OrderStatus.CANCELLED :
             OrderStatus.PENDING
           ),
+          canGiveAway: (
+            order.status === BookingTicketStatus.SUCCESS 
+            && order.ownerId && order.ownerId !== email
+            && showing.startTime > new Date()
+          ) ? true : false,
           createdAt: order.createdAt,
           PaymentInfo: paymentInfo ? {
             method: paymentInfo.method,
@@ -207,7 +212,7 @@ export class GetUserOrderService {
         return Err(new Error('Order not found'));
       }
 
-      if (order.userId !== email || (order.ownerId && order.ownerId !== email)) {
+      if (order.userId !== email && (order.ownerId && order.ownerId !== email)) {
         return Err(new Error('Unauthorized access to this order'));
       }
 
@@ -266,7 +271,7 @@ export class GetUserOrderService {
           order.status === BookingTicketStatus.SUCCESS 
           && order.ownerId && order.ownerId !== email
           && showing.startTime > new Date()
-        ),
+        ) ? true : false,
         ownerId: order.ownerId || order.userId, // If ownerId is not set, use userId
         type: order.type,
         price: order.totalPrice,

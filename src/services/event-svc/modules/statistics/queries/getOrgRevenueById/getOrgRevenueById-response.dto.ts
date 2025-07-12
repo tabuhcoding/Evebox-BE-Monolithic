@@ -57,6 +57,6 @@ export class EventRevenueData {
 }
 
 export class RevenueByIdDto extends BaseResponse {
-  @ApiProperty({ type: [OrganizerRevenueData], description: "Revenue of org" })
-    data: OrganizerRevenueData[];
+  @ApiProperty({ type: OrganizerRevenueData, description: "Revenue of org" })
+    data: OrganizerRevenueData;
 }

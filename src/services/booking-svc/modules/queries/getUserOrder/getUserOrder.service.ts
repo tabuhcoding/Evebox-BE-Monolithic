@@ -152,6 +152,7 @@ export class GetUserOrderService {
           showingId: order.showingId,
           type: order.type,
           price: order.totalPrice,
+          ownerId: order.ownerId || order.userId, // If ownerId is not set, use userId
           status: (
             (order.status === BookingTicketStatus.SUCCESS && order.ownerId && order.ownerId !== email) ? OrderStatus.GIVEAWAY :
             order.status === BookingTicketStatus.PAID ? OrderStatus.PENDING :
@@ -261,6 +262,7 @@ export class GetUserOrderService {
           order.status === BookingTicketStatus.CANCEL ? OrderStatus.CANCELLED :
           OrderStatus.PENDING
         ),
+        ownerId: order.ownerId || order.userId, // If ownerId is not set, use userId
         type: order.type,
         price: order.totalPrice,
         createdAt: order.createdAt,
@@ -312,12 +314,14 @@ export class GetUserOrderService {
             id: this.hashids.encode(order.id),
             showingId: order.showingId,
             status: OrderStatus.PENDING,
+            ownerId: order.ownerId || order.userId, // If ownerId is not set, use userId
             type: order.type,
             price: order.totalPrice,
             createdAt: order.createdAt,
             PaymentInfo: undefined,
             Ticket: [],
             Showing: showing,
+
           }, order.userId]);
         }
 
@@ -381,6 +385,7 @@ export class GetUserOrderService {
           order.status === BookingTicketStatus.CANCEL ? OrderStatus.CANCELLED :
           OrderStatus.PENDING
         ),
+        ownerId: order.ownerId || order.userId, // If ownerId is not set, use userId
         type: order.type,
         price: order.totalPrice,
         PaymentInfo: paymentInfo ? {
@@ -438,6 +443,7 @@ export class GetUserOrderService {
             id: this.hashids.encode(order.id),
             showingId: order.showingId,
             status: OrderStatus.PENDING,
+            ownerId: order.ownerId || order.userId, // If ownerId is not set, use userId
             type: order.type,
             price: order.totalPrice,
             createdAt: order.createdAt,
@@ -506,6 +512,7 @@ export class GetUserOrderService {
           order.status === BookingTicketStatus.CANCEL ? OrderStatus.CANCELLED :
           OrderStatus.PENDING
         ),
+        ownerId: order.ownerId || order.userId, // If ownerId is not set, use userId
         type: order.type,
         price: order.totalPrice,
         PaymentInfo: paymentInfo ? {

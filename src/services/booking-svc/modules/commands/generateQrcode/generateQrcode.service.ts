@@ -16,6 +16,7 @@ import { format } from 'date-fns';
 import axios from 'axios';
 import { GetUserOrderService } from "../../queries/getUserOrder/getUserOrder.service";
 import { OrderStatus } from "../../queries/getUserOrder/getUserOrder.dto";
+import { v4 } from 'uuid';
 
 interface Attachments {
   name: string;
@@ -183,17 +184,19 @@ export class GenerateQrcodeService {
       for (const ticket of order.Ticket) {
         if (!ticket.qrCode) {
           // Generate a new QR code for the ticket
-          const qrData = {
-            showingId: order.showingId,
-            ticketTypeId: ticket.ticketTypeId,
-            seatId: ticket.seatId,
-            userId: order.userId,
-            ticketId: ticket.id,
-          }
-          const qrContent = JSON.stringify(qrData);
-          const encryptedQrContent = encrypt(qrContent);
-          const qrCode = await generateQRCode(encryptedQrContent);
-          const qrCodeContent = qrCode || "Unknow";
+          // const qrData = {
+          //   showingId: order.showingId,
+          //   ticketTypeId: ticket.ticketTypeId,
+          //   seatId: ticket.seatId,
+          //   userId: order.userId,
+          //   ticketId: ticket.id,
+          // }
+          // const qrContent = JSON.stringify(qrData);
+          // const encryptedQrContent = encrypt(qrContent);
+          // const qrCode = await generateQRCode(encryptedQrContent);
+          // const qrCodeContent = qrCode || "Unknow";
+
+          const qrCodeContent = `${ticket.id}-${v4()}`;
 
           // Update the ticket with the new QR code
           await this.ticketRepository.updateOneById(ticket.id, { qrCode: qrCodeContent });
@@ -308,8 +311,16 @@ export class GenerateQrcodeService {
             doc.roundedRect(margin, imageY, contentWidth, imageHeight, 10).fill('#007074');
           }
       
-        
+          
           // Check if QR code is valid (not "Unknown")
+          const qrData = {
+            key: ticket.qrcode,
+            ticketId: ticket.id,
+          }
+          const qrContent = JSON.stringify(qrData);
+          const encryptedQrContent = encrypt(qrContent);
+          const qrCode = await generateQRCode(encryptedQrContent);
+          ticket.qrcode = qrCode || "Unknow";
           const hasValidQRCode = ticket.qrcode && ticket.qrcode !== "Unknow";
       
           // QR Code and ticket info section - with margins

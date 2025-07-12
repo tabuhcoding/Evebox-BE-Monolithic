@@ -96,6 +96,54 @@ model FavoriteNotiHistory {
   user        User       @relation("UserFavoriteHistory", fields: [userId], references: [email])
 }
 
+model Revenue {
+  id Int @id @default(autoincrement())
+  date Datetime
+  total_revenue Int @default(0)
+}
+
+model OrganizeRevenue {
+  id Int @id @default(autoincrement())
+  revenue_id Int
+  org_id String
+  org_name String?
+  total_revenue Int @default(0)
+
+  Revenue Revenue @relation(fields: [revenue_id], references: [id])
+}
+
+model EventRevenue {
+  id Int @id @default(autoincrement())
+  org_id Int
+  event_id Int
+  event_name String?
+  total_revenue Int
+
+  OrganizerRevenue OrganizeRevenue @relation(fields: [org_id], references: [id])
+}
+
+model ShowingRevenue{
+  id Int @id @default(autoincrement())
+  event_id Int
+  showing_id String
+  start_date Datetime
+  end_date Datetime
+  total_revenue Int
+
+  EventRevenue EventRevenue @relation(fields: [event_id], references: [id])
+}
+
+model TicketTypeRevenue{
+  id Int @id @default(autoincrement())
+  showing_id Int
+  name String?
+  price Int
+  sold Int @default(0)
+  total_revenue Int
+
+  ShowingRevenue ShowingRevenue @relation(fields: [showing_id], references: [id])
+}
+
 enum OTPType {
   FORGOT_PASSWORD
   REGISTER
@@ -111,3 +159,4 @@ enum UserStatus {
 ACTIVE
 BLOCKED
 }
+

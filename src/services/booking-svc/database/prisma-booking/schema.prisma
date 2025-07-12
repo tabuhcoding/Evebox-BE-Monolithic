@@ -19,6 +19,8 @@ model Order {
   price          Int
   totalPrice     Int
   userId         String
+  ownerId        String?
+  sendKey        String?
   status         BookingTicketStatus
   mailSent       Boolean        @default(false)
   paymentId      Int?

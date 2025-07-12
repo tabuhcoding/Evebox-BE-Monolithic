@@ -262,6 +262,10 @@ export class GetUserOrderService {
           order.status === BookingTicketStatus.CANCEL ? OrderStatus.CANCELLED :
           OrderStatus.PENDING
         ),
+        canGiveAway: (
+          order.status === BookingTicketStatus.SUCCESS 
+          && order.ownerId && order.ownerId !== email
+        ),
         ownerId: order.ownerId || order.userId, // If ownerId is not set, use userId
         type: order.type,
         price: order.totalPrice,

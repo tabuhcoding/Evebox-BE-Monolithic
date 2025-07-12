@@ -90,6 +90,12 @@ export class UserOrderDto {
   @ApiProperty( {example: OrderStatus.SUCCESS, description: 'The status of the order' })
   status: OrderStatus;
 
+  @ApiProperty({ example: 'dattruong01082@gmail.com', description: 'User email now owns the order' })
+  ownerId: string;
+
+  @ApiProperty( {example: true, description: 'Has able to give away'})
+  canGiveAway?: boolean;
+
   @ApiProperty( {example: BookingTicketType.E_TICKET, description: 'Type of order' })
   type: BookingTicketType;
 

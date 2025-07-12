@@ -93,6 +93,7 @@ export class OrderRepositoryImpl
           mailSent: order.mailSent,
           showingId: order.showingId,
           userId: order.userId,
+          ownerId: order.ownerId || order.userId, // If ownerId is not set, use userId
           formResponse: formResponse.unwrap(),
           paymentInfo: {
             id: paymentInfoData.id,

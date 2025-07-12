@@ -5,6 +5,7 @@ import { CheckUserPermissionService } from "src/services/event-svc/modules/event
 import { TicketRepository } from "src/services/booking-svc/repository/ticket/ticket.repo";
 import { decrypt } from "src/shared/utils/qrcode/utils";
 import { GetTicketTypeDetailService } from "src/services/event-svc/modules/ticketType/queries/getTicketTypeDetail/getTicketTypeDetail.service";
+import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 
 @Injectable()
 export class CheckInTicketByQrService {
@@ -12,6 +13,7 @@ export class CheckInTicketByQrService {
     @Inject('TicketRepository') private readonly ticketRepository: TicketRepository,
     private readonly checkUserPermissionService: CheckUserPermissionService,
     private readonly ticketTypeDetailService: GetTicketTypeDetailService,
+    private readonly slackService: SlackService,
   ) {}
 
   async execute(encryptedQrData: string, email: string): Promise<Result<CheckInTicketByQrResponse, Error>> {
@@ -74,7 +76,7 @@ export class CheckInTicketByQrService {
       });
 
     } catch (error) {
-      console.error(error);
+      await this.slackService.sendError(`CheckInTicketByQrService >>> Error checking in ticket by QR: ${error.message}`);
       return Err(new Error('Failed to check in ticket by QR'));
     }
   }

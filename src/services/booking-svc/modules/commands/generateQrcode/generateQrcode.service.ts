@@ -567,7 +567,7 @@ export class GenerateQrcodeService {
 
       return true;
     } catch (error) {
-      await this.slackService.sendError(`Booking Svc >>> sendTicketEmailToUser : Error generating ticket email, Error: ${error.message}`);
+      await this.slackService.sendError(`Booking Svc >>> sendTicketEmailToUser : Error generating ticket email, Error: ${error.message}, OrderIds: ${orderIds}`);
       return false;
     }
   }

@@ -62,6 +62,39 @@ export class GetUserOrderController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get('org/getOrderById')
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Get order by orderId' })
+  @ApiQuery({ name: 'orderId', required: true, type: Number, description: 'The ID of the order to retrieve' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Order data retrieved successfully',
+    type: GetUserTicketResponseDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Internal server error',
+  })
+  async getOrderByIdAdmin(
+    @Query('orderId') orderId: number,
+    @Res() res: Response,
+  ) {    
+    const result = await this.getUserOrderService.executeByOrderIdAdmin(orderId>>0);
+    if (result.isErr()) {
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json(ErrorHandler.internalServerError(result.unwrapErr().message));
+    }
+
+    const data = result.unwrap();
+    return res.status(HttpStatus.OK).json({
+      statusCode: HttpStatus.OK,
+      message: 'Order data retrieved successfully',
+      data
+    });
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get('/getOrderById')
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Get order by orderId' })

@@ -51,15 +51,15 @@ export class DailyStatusService {
       //   }
       // }
       // Calculate revenue for the previous day
-      // const yesterday = new Date();
-      // yesterday.setDate(yesterday.getDate() - 1);
-      // const revenueData = await this.calculateRevenueService.getRevenueByDate(yesterday.toISOString().split('T')[0]);
-      // if (revenueData.total_revenue > 0) {
-      //   // Save the revenue data
-      //   await this.saveRevenueDataService.saveRevenueData(revenueData);
-      // } else {
-      //   await this.slackService.sendNotice(`No revenue data for ${yesterday.toISOString().split('T')[0]}.`);
-      // }
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const revenueData = await this.calculateRevenueService.getRevenueByDate(yesterday.toISOString().split('T')[0]);
+      if (revenueData.total_revenue > 0) {
+        // Save the revenue data
+        await this.saveRevenueDataService.saveRevenueData(revenueData);
+      } else {
+        await this.slackService.sendNotice(`No revenue data for ${yesterday.toISOString().split('T')[0]}.`);
+      }
     } catch (error) {
       await this.slackService.sendError(`Daily revenue calculation failed: ${error.message}`);
     }

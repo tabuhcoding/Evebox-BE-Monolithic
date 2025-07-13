@@ -18,11 +18,17 @@ export class CalculateRevenueService {
   ) {}
 
   async getAllDatesInOrder(): Promise<string[]> {
-    const orders = await this.orderRepository.findAll({});
+    const orders = await this.orderRepository.findAll({
+      createdAt: {
+        gte: new Date('2025-01-01T00:00:00Z'),
+      },
+    });
     
-    const uniqueDays = Array.from(
+    var uniqueDays = Array.from(
       new Set(orders.map((item) => format(item.createdAt, 'yyyy-MM-dd')))
     );
+
+    uniqueDays.sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
 
     return uniqueDays;  
   }
@@ -41,6 +47,8 @@ export class CalculateRevenueService {
         }
       );
 
+      this.slackService.sendNotice(`Calculating revenue for date: ${date}, found ${orders.length} orders.`);
+
       // var orderMappingShowingId = new Map<string, Order[]>();
       // var ticketMappingTicketTypeId = new Map<string, number>();
 
@@ -58,13 +66,14 @@ export class CalculateRevenueService {
             showing_id: order.showingId,
             start_date: new Date(),
             end_date: new Date(),
-            total_revenue: 0,
+            total_revenue: order.totalPrice/1000,
             ticket_types: new Map<string, TicketTypeRevenueData>()
           });
         }
         // ticket types
+        const showing_revenue = showingMapping.get(order.showingId);
+        showing_revenue.total_revenue += order.totalPrice/1000;
         order.Ticket.forEach((ticket) => {
-          const showing_revenue = showingMapping.get(order.showingId);
           if (showing_revenue.ticket_types.has(ticket.ticketTypeId)) {
             const ticketTypeRevenue = showing_revenue.ticket_types.get(ticket.ticketTypeId);
             ticketTypeRevenue.sold += 1;
@@ -78,6 +87,7 @@ export class CalculateRevenueService {
             });
           }
         });
+        showingMapping.set(order.showingId, showing_revenue);
       });
 
       for (const [showingId, showingData] of showingMapping.entries()) {
@@ -94,7 +104,7 @@ export class CalculateRevenueService {
           if (ticketTypeRevenue) {
             ticketTypeRevenue.name = ticketType.name;
             ticketTypeRevenue.price = ticketType.price;
-            ticketTypeRevenue.total_revenue = ticketType.price * ticketTypeRevenue.sold;
+            ticketTypeRevenue.total_revenue = ticketType.price/1000 * ticketTypeRevenue.sold;
             showingData.ticket_types.set(ticketType.id, ticketTypeRevenue);
           }
         });

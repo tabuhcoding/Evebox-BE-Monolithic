@@ -77,7 +77,6 @@ export class GiveTicketController {
                 data: true,
             });
         } catch (error) {
-            console.error(error);
             await this.slackService.sendError(`Booking Svc >>> GiveTicketController : ${error.message}`);
             return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
                 statusCode: HttpStatus.INTERNAL_SERVER_ERROR,

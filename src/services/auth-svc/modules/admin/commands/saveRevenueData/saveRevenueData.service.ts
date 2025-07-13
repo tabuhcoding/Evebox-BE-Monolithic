@@ -77,4 +77,11 @@ export class SaveRevenueDataService {
       return;
     }
   }
+
+  async checkDateHasData(date: string): Promise<boolean> {
+    const revenue = await this.revenueRepository.findOne({
+      date: new Date(date),
+    });
+    return !!revenue;
+  }
 }

@@ -185,7 +185,7 @@ export class SaveRevenueDataService {
     return [organizerRevenues, paginationResult];
   }
 
-  async getEventRevenueByDateAndEventId(pagination: PaginationQuery, from?: string, to?: string, eventId?: number, search?: string): Promise<EventRevenue[]> {
+  async getEventRevenueByDateAndEventId(from?: string, to?: string, eventId?: number, search?: string): Promise<EventRevenue[]> {
     var query = {}
     if (from) {
       query['date'] = {

@@ -369,7 +369,7 @@ export function convertToOrganizerRevenueDataFoeach(revenueData: OrganizerRevenu
 }
 
 
-function convertToEventRevenueData(eventData: EventRevenue[]): EventRevenueData[] {
+export function convertToEventRevenueData(eventData: EventRevenue[]): EventRevenueData[] {
   const eventMap = new Map<number, EventRevenueData>();
 
   eventData.forEach((ev) => {

@@ -39,9 +39,15 @@ export class DailyStatusService {
   async executeDailyRevenueCalculation() {
     await this.slackService.sendNotice('Daily revenue calculation started.');
     try {
-      // // Get all unique dates in orders
+      // Get all unique dates in orders
       // const uniqueDates = await this.calculateRevenueService.getAllDatesInOrder();
       // for (const date of uniqueDates) {
+      //   const checkDateExist = await this.saveRevenueDataService.checkDateHasData(date);
+      //   if (checkDateExist) {
+      //     await this.slackService.sendNotice(`Revenue data for ${date} already exists. Skipping.`);
+      //     continue;
+      //   }
+      //   await this.slackService.sendNotice(`Calculating revenue for date: ${date}`);
       //   // Calculate revenue for each date
       //   const revenueData = await this.calculateRevenueService.getRevenueByDate(date);
       //   if (revenueData.total_revenue > 0) {

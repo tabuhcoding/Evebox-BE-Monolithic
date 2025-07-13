@@ -36,11 +36,19 @@ export class CalculateRevenueService {
   async getRevenueByDate(date: string): Promise<RevenueData> {
     try {
       const orders = await this.orderRepository.findAll({
-          createdAt: {
-            gte: new Date(`${date}T00:00:00Z`),
-            lt: new Date(`${date}T23:59:59Z`),
-          },
-          status: BookingTicketStatus.SUCCESS,
+          OR: [
+            { createdAt: {
+              gte: new Date(`${date}T00:00:00Z`),
+              lt: new Date(`${date}T23:59:59Z`),
+              },
+            },
+            { updatedAt: {
+              gte: new Date(`${date}T00:00:00Z`),
+              lt: new Date(`${date}T23:59:59Z`),
+              },
+            },
+          ],
+          status: { in: [BookingTicketStatus.SUCCESS, BookingTicketStatus.CANCEL] },
         },
         {
           Ticket: true
@@ -66,13 +74,13 @@ export class CalculateRevenueService {
             showing_id: order.showingId,
             start_date: new Date(),
             end_date: new Date(),
-            total_revenue: order.totalPrice/1000,
+            total_revenue: order.status === BookingTicketStatus.SUCCESS ? order.totalPrice/1000 : - order.totalPrice/1000,
             ticket_types: new Map<string, TicketTypeRevenueData>()
           });
         }
         // ticket types
         const showing_revenue = showingMapping.get(order.showingId);
-        showing_revenue.total_revenue += order.totalPrice/1000;
+        showing_revenue.total_revenue += order.status === BookingTicketStatus.SUCCESS ? order.totalPrice/1000 : - order.totalPrice/1000;
         order.Ticket.forEach((ticket) => {
           if (showing_revenue.ticket_types.has(ticket.ticketTypeId)) {
             const ticketTypeRevenue = showing_revenue.ticket_types.get(ticket.ticketTypeId);

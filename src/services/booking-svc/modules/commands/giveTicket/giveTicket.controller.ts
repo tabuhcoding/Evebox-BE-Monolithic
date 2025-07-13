@@ -1,7 +1,7 @@
-import { ApiBearerAuth, ApiBody, ApiOperation, ApiProperty, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiBody, ApiHeader, ApiOperation, ApiProperty, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 import { GenerateQrcodeService } from "../generateQrcode/generateQrcode.service";
-import { Controller, HttpStatus, Param, Post, Res, UseGuards, Request, Query, Body } from "@nestjs/common";
+import { Controller,Headers, HttpStatus, Param, Post, Res, UseGuards, Request, Query, Body } from "@nestjs/common";
 import { JwtAuthGuard } from "src/shared/guard/jwt-auth.guard";
 import { Response } from "express";
 import { GiveTicketService } from "./giveTicket.service";
@@ -86,9 +86,8 @@ export class GiveTicketController {
         }
     }
 
-    @UseGuards(JwtAuthGuard)
-    @Post('/receive-ticket/:sendKey')
-    @ApiBearerAuth('access-token')
+    @Post('/receive-ticket')
+    @ApiHeader({ name: 'x-send-key', description: 'The send key for ticket receiving' })
     @ApiOperation({ summary: 'Receive ticket using send key' })
     @ApiResponse({
         status: HttpStatus.OK,
@@ -104,10 +103,15 @@ export class GiveTicketController {
         description: 'Internal server error',
     })
     async receiveTicket(
-        @Param('sendKey') sendKey: string,
-        @Request() req,
+        @Headers('x-send-key') sendKey: string,
         @Res() res: Response
     ) {
+        if (!sendKey) {
+            return res.status(HttpStatus.UNAUTHORIZED).json({
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: 'Send key is required',
+            });
+        }
         try {
             const result = await this.giveTicketService.receiveTicket(sendKey);
 

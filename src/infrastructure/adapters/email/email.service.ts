@@ -412,6 +412,7 @@ export class EmailService implements OnModuleInit {
   }
 
   async sendGiveAwayEmail(email: string[], fromEmail: string, sendKey: string): Promise<void> {
+    const encodedKey = encodeURIComponent(sendKey);
     const subject = `You have received a ticket from ${fromEmail}`;
     const content = `
       <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 8px; padding: 20px;">
@@ -421,7 +422,7 @@ export class EmailService implements OnModuleInit {
         <p>You have received a ticket from <strong>${fromEmail}</strong>. Please use the following step to claim your ticket:</p>
         
         <div style="text-align: center; margin: 40px 0;">
-            <a href="https://evebox.azurewebsites.net/order/receive?sendKey=${sendKey}" 
+            <a href="https://evebox.azurewebsites.net/order/receive?sendKey=${encodedKey}" 
               style="display: inline-block; background-color: #4CAF50; color: white; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: bold; font-size: 14px;">
               🔍 Click here to confirm receive it
             </a>

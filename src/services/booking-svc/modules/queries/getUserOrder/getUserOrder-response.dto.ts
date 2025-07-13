@@ -5,6 +5,7 @@ import { OrderStatus } from './getUserOrder.dto';
 import { Pagination } from 'src/shared/constants/pagination';
 import { VerifyPinData } from 'src/services/auth-svc/modules/user/commands/verift-pin/verify-pin.dto';
 import { BaseResponse } from 'src/shared/constants/baseResponse';
+import { TicketTypeWithoutShowingAndSections } from 'src/services/event-svc/repository/ticketType/ticketType.repo';
 
 export class PreviewShowingDto {
   @ApiProperty( {example: 'The Batman', description: 'The title of the event' })
@@ -26,6 +27,10 @@ export class PreviewShowingDto {
   
   @ApiProperty({ description: 'Image URL', example: 'https://example.com/image.jpg', })
   imageUrl?: string;
+
+  eventId?: number;
+  orgId?: string;
+  TicketType?: TicketTypeWithoutShowingAndSections[];
 }
 
 export class UserFormAnserDto {

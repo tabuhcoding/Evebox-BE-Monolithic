@@ -141,6 +141,7 @@ model ShowingRevenue{
 model TicketTypeRevenue{
   id Int @id @default(autoincrement())
   showing_id Int
+  ticket_type_id String
   name String?
   price Int
   sold Int @default(0)

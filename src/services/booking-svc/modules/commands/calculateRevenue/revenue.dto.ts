@@ -10,26 +10,26 @@ export class ShowingRevenueData {
   start_date: Date;
   end_date: Date;
   total_revenue: number;
-  ticket_types: TicketTypeRevenueData[];
+  ticket_types: Map<string,TicketTypeRevenueData>;
 }
 
 export class EventRevenueData {
   event_id: number;
   event_name: string;
   total_revenue: number;
-  showings: ShowingRevenueData[];
+  showings: Map<string,ShowingRevenueData>;
 }
 
 export class OrganizerRevenueData {
   org_id: string;
   org_name: string;
   total_revenue: number;
-  events: EventRevenueData[];
+  events: Map<number,EventRevenueData>;
 }
 
 export class RevenueData {
   date: Date;
   total_revenue: number;
 
-  organizers: OrganizerRevenueData[];
+  organizers: Map<string, OrganizerRevenueData>;
 }

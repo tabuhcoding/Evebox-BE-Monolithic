@@ -112,6 +112,7 @@ export class GiveTicketController {
                 message: 'Send key is required',
             });
         }
+        this.slackService.sendNotice(`Booking Svc >>> GiveTicketController : Receive ticket with sendKey ${sendKey}`);
         try {
             const result = await this.giveTicketService.receiveTicket(sendKey);
 

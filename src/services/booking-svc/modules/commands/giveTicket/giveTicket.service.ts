@@ -80,6 +80,9 @@ export class GiveTicketService {
         try {
             const order = await this.orderRepository.findOne({
                 sendKey: sendKey,
+            },
+            {
+                Ticket: true,
             })
 
             if (!order) {

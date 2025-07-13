@@ -269,7 +269,7 @@ export class GetUserOrderService {
         ),
         canGiveAway: (
           order.status === BookingTicketStatus.SUCCESS 
-          && order.ownerId && order.ownerId !== email
+          && ( ( order.ownerId && order.ownerId !== email) || !order.ownerId)
           && showing.startTime > new Date()
         ) ? true : false,
         ownerId: order.ownerId || order.userId, // If ownerId is not set, use userId

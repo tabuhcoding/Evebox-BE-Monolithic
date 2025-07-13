@@ -1,12 +1,13 @@
+import { Pagination, PaginationQuery } from 'src/shared/constants/pagination';
 import { Inject, Injectable } from "@nestjs/common";
 import { TicketTypeRevenue } from "prisma/client-auth";
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
-import { EventRevenueRepository } from "src/services/auth-svc/repository/event-revenue/event-revenue.repo";
-import { OrganizerRevenueRepository } from "src/services/auth-svc/repository/organizer-revenue/organizer-revenue.repo";
-import { RevenueRepository } from "src/services/auth-svc/repository/revenue/revenue.repo";
-import { ShowingRevenueRepository } from "src/services/auth-svc/repository/showing-revenue/showing-revenue.repo";
+import { EventRevenue, EventRevenueRepository } from "src/services/auth-svc/repository/event-revenue/event-revenue.repo";
+import { OrganizerRevenue, OrganizerRevenueRepository } from "src/services/auth-svc/repository/organizer-revenue/organizer-revenue.repo";
+import { Revenue, RevenueRepository } from "src/services/auth-svc/repository/revenue/revenue.repo";
+import { ShowingRevenue, ShowingRevenueRepository } from "src/services/auth-svc/repository/showing-revenue/showing-revenue.repo";
 import { TicketTypeRevenueRepository } from "src/services/auth-svc/repository/tickettype-revenue/tickettype-revenue.repo";
-import { RevenueData } from "src/services/booking-svc/modules/commands/calculateRevenue/revenue.dto";
+import { RevenueDataDTO } from "src/services/booking-svc/modules/commands/calculateRevenue/revenue.dto";
 
 @Injectable()
 export class SaveRevenueDataService {
@@ -19,7 +20,7 @@ export class SaveRevenueDataService {
     private readonly slackService: SlackService,
   ){}
 
-  async saveRevenueData(data: RevenueData): Promise<void> {
+  async saveRevenueData(data: RevenueDataDTO): Promise<void> {
     try{
       // revenue
       const revenue = await this.revenueRepository.insertOneWithNumberId({
@@ -83,5 +84,187 @@ export class SaveRevenueDataService {
       date: new Date(date),
     });
     return !!revenue;
+  }
+
+  async getRevenueByDate(from?: string, to?: string): Promise<Revenue[]> {
+    var query = {}
+    if (from) {
+      query['date'] = {
+        gte: new Date(from),
+      };
+    }
+    if (to) {
+      query['date'] = {
+        ...query['date'],
+        lte: new Date(to),
+      };
+    }
+
+    const revenues = await this.revenueRepository.findMany(query, {
+      OrganizeRevenue: {
+        include: {
+          EventRevenue: {
+            include: {
+              ShowingRevenue: {
+                include: {
+                  TicketTypeRevenue: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+    if (!revenues || revenues.length === 0) {
+      throw new Error(`No revenue data found for date: ${from} to ${to}`);
+    }
+    return revenues;
+  }
+
+  async getOrganizerRevenueByDateAndOrgId(pagination: PaginationQuery, from?: string, to?: string, search?: string, org_id?: string[]): Promise<[OrganizerRevenue[], Pagination]> {
+    var query = {}
+    if (from) {
+      query['date'] = {
+        gte: new Date(from),
+      };
+    }
+    if (to) {
+      query['date'] = {
+        ...query['date'],
+        lte: new Date(to),
+      };
+    }
+    if (search) {
+      query['org_id'] = {
+        contains: search,
+        mode: 'insensitive',
+      };
+    }
+    if (org_id && org_id.length > 0) {
+      query['org_id'] = {
+        in: org_id,
+      };
+    }
+    const count = await this.organizerRevenueRepository.countDistinct('org_id', query);
+    const paginationResult: Pagination = {
+      totalItems: count,
+      page: pagination.page,
+      limit: pagination.limit,
+      totalPages: Math.ceil(count / pagination.limit),
+    };
+
+    const distinctOrgIds = await this.organizerRevenueRepository.getDistinct(
+      'org_id',
+      query,
+      { org_id: 'asc' },
+      (pagination.page - 1) * pagination.limit,
+      pagination.limit
+    );
+
+    if (!distinctOrgIds || distinctOrgIds.length === 0) {
+      return [[], paginationResult];
+    }
+    query['org_id'] = {
+      in: distinctOrgIds.map(org => org.org_id),
+    };
+      
+    const organizerRevenues = await this.organizerRevenueRepository.findMany(query, {
+      EventRevenue: {
+        include: {
+          ShowingRevenue: {
+            include: {
+              TicketTypeRevenue: true,
+            },
+          },
+        },
+      }
+    }, { org_id: "asc"});
+    if (!organizerRevenues || organizerRevenues.length === 0) {
+      throw new Error(`No organizer revenue data found for orgId: ${search} from date: ${from} to ${to}`);
+    }
+    return [organizerRevenues, paginationResult];
+  }
+
+  async getEventRevenueByDateAndEventId(pagination: PaginationQuery, from?: string, to?: string, eventId?: number, search?: string): Promise<EventRevenue[]> {
+    var query = {}
+    if (from) {
+      query['date'] = {
+        gte: new Date(from),
+      };
+    }
+    if (to) {
+      query['date'] = {
+        ...query['date'],
+        lte: new Date(to),
+      };
+    }
+    if (eventId) {
+      query['event_id'] = eventId;
+    }
+    if (search) {
+      query['event_name'] = {
+        contains: search,
+        mode: 'insensitive',
+      };
+    }
+    const eventRevenues = await this.eventRevenueRepository.findMany(query, {
+      ShowingRevenue: {
+        include: {
+          TicketTypeRevenue: true,
+        },
+      },
+    });
+    if (!eventRevenues || eventRevenues.length === 0) {
+      throw new Error(`No event revenue data found for eventId: ${eventId} from date: ${from} to ${to}`);
+    }
+    return eventRevenues;
+  }
+
+  async getShowingRevenueByDateAndShowingId(pagination: PaginationQuery, from?: string, to?: string, showingId?: string): Promise<ShowingRevenue[]> {
+    var query = {}
+    if (from) {
+      query['date'] = {
+        gte: new Date(from),
+      };
+    }
+    if (to) {
+      query['date'] = {
+        ...query['date'],
+        lte: new Date(to),
+      };
+    }
+    if (showingId) {
+      query['showing_id'] = showingId;
+    }
+    const showingRevenues = await this.showingRevenueRepository.findMany(query, {
+      TicketTypeRevenue: true,
+    });
+    if (!showingRevenues || showingRevenues.length === 0) {
+      throw new Error(`No showing revenue data found for showingId: ${showingId} from date: ${from} to ${to}`);
+    }
+    return showingRevenues;
+  }
+
+  async getTicketTypeRevenueByDateAndTicketTypeId(pagination: PaginationQuery, from?: string, to?: string, ticketTypeId?: string): Promise<TicketTypeRevenue[]> {
+    var query = {}
+    if (from) {
+      query['date'] = {
+        gte: new Date(from),
+      };
+    }
+    if (to) {
+      query['date'] = {
+        ...query['date'],
+        lte: new Date(to),
+      };
+    }
+    if (ticketTypeId) {
+      query['ticket_type_id'] = ticketTypeId;
+    }
+    const ticketTypeRevenues = await this.ticketTypeRevenueRepository.findMany(query);
+    if (!ticketTypeRevenues || ticketTypeRevenues.length === 0) {
+      throw new Error(`No ticket type revenue data found for ticketTypeId: ${ticketTypeId} from date: ${from} to ${to}`);
+    }
+    return ticketTypeRevenues;
   }
 }

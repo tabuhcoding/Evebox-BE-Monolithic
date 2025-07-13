@@ -5,7 +5,7 @@ import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 import { BookingTicketStatus, Order, OrderRepository } from "src/services/booking-svc/repository/order/order.repo";
 import { Ticket, TicketRepository } from "src/services/booking-svc/repository/ticket/ticket.repo";
 import { format } from 'date-fns';
-import { EventRevenueData, OrganizerRevenueData, RevenueData, ShowingRevenueData, TicketTypeRevenueData } from "./revenue.dto";
+import { EventRevenueDataDTO, OrganizerRevenueDataDTO, RevenueDataDTO, ShowingRevenueDataDTO, TicketTypeRevenueDataDTO } from "./revenue.dto";
 
 @Injectable()
 export class CalculateRevenueService {
@@ -33,7 +33,7 @@ export class CalculateRevenueService {
     return uniqueDays;  
   }
 
-  async getRevenueByDate(date: string): Promise<RevenueData> {
+  async getRevenueByDate(date: string): Promise<RevenueDataDTO> {
     try {
       const orders = await this.orderRepository.findAll({
           OR: [
@@ -60,13 +60,13 @@ export class CalculateRevenueService {
       // var orderMappingShowingId = new Map<string, Order[]>();
       // var ticketMappingTicketTypeId = new Map<string, number>();
 
-      var revenueData: RevenueData = {
+      var revenueData: RevenueDataDTO = {
         date: new Date(date),
         total_revenue: 0,
-        organizers: new Map<string, OrganizerRevenueData>()
+        organizers: new Map<string, OrganizerRevenueDataDTO>()
       };
 
-      var showingMapping = new Map<string, ShowingRevenueData>();
+      var showingMapping = new Map<string, ShowingRevenueDataDTO>();
       orders.forEach((order) => {
         // showing
         if (!showingMapping.has(order.showingId)) {
@@ -75,7 +75,7 @@ export class CalculateRevenueService {
             start_date: new Date(),
             end_date: new Date(),
             total_revenue: order.status === BookingTicketStatus.SUCCESS ? order.totalPrice/1000 : - order.totalPrice/1000,
-            ticket_types: new Map<string, TicketTypeRevenueData>()
+            ticket_types: new Map<string, TicketTypeRevenueDataDTO>()
           });
         }
         // ticket types
@@ -123,7 +123,7 @@ export class CalculateRevenueService {
             org_id: showingDetail.orgId,
             org_name: showingDetail.orgId,
             total_revenue: showingData.total_revenue,
-            events: new Map<number, EventRevenueData>()
+            events: new Map<number, EventRevenueDataDTO>()
           });
         }
 
@@ -135,7 +135,7 @@ export class CalculateRevenueService {
             event_id: showingDetail.eventId,
             event_name: showingDetail.title,
             total_revenue: showingData.total_revenue,
-            showings: new Map<string, ShowingRevenueData>()
+            showings: new Map<string, ShowingRevenueDataDTO>()
           });
         }
 

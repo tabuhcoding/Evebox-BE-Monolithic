@@ -1,7 +1,7 @@
 import { BaseAuthRepository } from "../base.repository";
 import { Prisma } from "prisma/client-auth";
 
-export type TicketTypeRevenue = Prisma.RevenueGetPayload<{
+export type TicketTypeRevenue = Prisma.TicketTypeRevenueGetPayload<{
 }>;
 
 export interface TicketTypeRevenueRepository extends BaseAuthRepository<TicketTypeRevenue, Prisma.TicketTypeRevenueDelegate> {

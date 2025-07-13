@@ -55,7 +55,7 @@ export class CheckoutService {
         return Err(new Error('Failed to create order.'));
       }
 
-      if (redisSeat.totalAmount = 0){
+      if (redisSeat.totalAmount == 0){
         const seatmapType = await this.generateTicketService.execute(orderCode, redisSeat.ticketTypeSelection);
         await this.generateQrcodeService.execute(orderCode, seatmapType);
         return Ok({

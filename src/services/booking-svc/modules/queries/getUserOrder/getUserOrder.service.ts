@@ -88,7 +88,10 @@ export class GetUserOrderService {
 
       const orders = await this.orderRepository.findMany({
         showingId: { in: showingIds },
-        userId: email,
+        OR: [
+          { userId: email },
+          { ownerId: email }
+        ],
         status: (
           status == OrderStatus.PENDING ? BookingTicketStatus.PAID :
           status == OrderStatus.SUCCESS ? BookingTicketStatus.SUCCESS :

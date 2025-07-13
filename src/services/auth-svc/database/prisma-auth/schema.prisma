@@ -106,6 +106,7 @@ model Revenue {
 
 model OrganizeRevenue {
   id Int @id @default(autoincrement())
+  date DateTime?
   revenue_id Int
   org_id String
   org_name String?
@@ -117,6 +118,7 @@ model OrganizeRevenue {
 
 model EventRevenue {
   id Int @id @default(autoincrement())
+  date DateTime?
   org_id Int
   event_id Int
   event_name String?
@@ -128,6 +130,7 @@ model EventRevenue {
 
 model ShowingRevenue{
   id Int @id @default(autoincrement())
+  date DateTime?
   event_id Int
   showing_id String
   start_date DateTime
@@ -140,6 +143,7 @@ model ShowingRevenue{
 
 model TicketTypeRevenue{
   id Int @id @default(autoincrement())
+  date DateTime?
   showing_id Int
   ticket_type_id String
   name String?

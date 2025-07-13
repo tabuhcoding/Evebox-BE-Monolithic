@@ -28,7 +28,7 @@ export class CreateOrderService {
         formResponseId: formResponseId,
         type: BookingTicketType.E_TICKET,
         userId: userID,
-        status: BookingTicketStatus.PENDING,
+        status: totalPrice > 0 ? BookingTicketStatus.PENDING : BookingTicketStatus.SUCCESS,
       });
 
       if (!order) {

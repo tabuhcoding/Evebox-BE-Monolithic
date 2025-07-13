@@ -1,3 +1,4 @@
+import { GenerateTicketService } from 'src/services/booking-svc/modules/commands/generateTicket/generateTicket.service';
 import { Inject, Injectable } from '@nestjs/common';
 import { Result, Ok, Err } from 'oxide.ts';
 import { CheckoutDto } from './checkout.dto';
@@ -9,17 +10,24 @@ import { PaymentMethod } from 'src/services/payment-svc/repository/paymentMethod
 import { PayOSCheckoutService } from '../payOSCheckout/payOSCheckout.service';
 import { FileCacheService } from 'src/infrastructure/cache/fileCache/fileCache.service';
 import { PaymentInfoRepository } from 'src/services/payment-svc/repository/paymentInfo/paymentInfo.repo';
+import Hashids from 'hashids';
+import { GenerateQrcodeService } from 'src/services/booking-svc/modules/commands/generateQrcode/generateQrcode.service';
 
 @Injectable()
 export class CheckoutService {
+  private hashids: Hashids;
   constructor(
     private readonly slackService: SlackService, 
     private readonly getRedisSeat: GetRedisSeatService,  
     private readonly createOrderService: CreateOrderService,
     private readonly payOSCheckoutService: PayOSCheckoutService,
     private readonly fileCacheService: FileCacheService,
+    private readonly generateTicketService: GenerateTicketService,
+    private readonly generateQrcodeService: GenerateQrcodeService,
     @Inject('PaymentInfoRepository') private readonly paymentInfoRepository: PaymentInfoRepository
-  ) {}
+  ) {
+    this.hashids = new Hashids('evebox-salt', 12);
+  }
 
   async execute(checkoutDto: CheckoutDto, userId: string): Promise<Result<CheckoutResponseData, Error>> {
     try {
@@ -45,6 +53,15 @@ export class CheckoutService {
         await this.slackService.sendError(`Failed to create order for user ${userId} in showing ${checkoutDto.showingID}`);
         
         return Err(new Error('Failed to create order.'));
+      }
+
+      if (redisSeat.totalAmount == 0){
+        const seatmapType = await this.generateTicketService.execute(orderCode, redisSeat.ticketTypeSelection);
+        await this.generateQrcodeService.execute(orderCode, seatmapType);
+        return Ok({
+          orderCode: this.hashids.encode(orderCode),
+          checkoutType: 'REGISTER'
+        });
       }
 
       // Create the payment link
@@ -90,6 +107,7 @@ export class CheckoutService {
 
           return Ok({
             paymentLink: checkoutResult.checkoutUrl,
+            checkoutType: 'BOOKING'
           })
         default:
           await this.slackService.sendError(`Payment method ${checkoutDto.paymentMethod} not available for user ${userId} in showing ${checkoutDto.showingID}`);

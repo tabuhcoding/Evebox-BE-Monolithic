@@ -6,6 +6,8 @@ import { EventsRepository } from "src/services/event-svc/repository/events/event
 import { OrganizerRevenueData } from "../getOrgRevenue/getOrgRevenue-response.dto";
 import { GetPaidOrdersByShowingIdService } from "src/services/booking-svc/modules/queries/getPaidOrdersByShowingId/getPaidOrdersByShowingId.service";
 import { Order } from "src/services/booking-svc/repository/order/order.repo";
+import { SaveRevenueDataService } from "src/services/auth-svc/modules/admin/commands/saveRevenueData/saveRevenueData.service";
+import { convertToOrganizerRevenueDataFoeach } from "../getOrgRevenue/getOrgRevenue.service";
 
 const FEE_PERCENT = 10; // default, or can be got from OrgPaymentInfo table
 
@@ -15,6 +17,7 @@ export class GetOrgRevenueByIdService {
     @Inject('EventsRepository') private readonly eventsRepo: EventsRepository,
     private readonly getAdminAccessService: GetAdminAccessService,
     private readonly getPaidOrdersByShowingIdService: GetPaidOrdersByShowingIdService,
+    private readonly saveRevenueDataService: SaveRevenueDataService,
   ) {}
 
   async execute(orgId: string, email: string,
@@ -117,5 +120,39 @@ export class GetOrgRevenueByIdService {
     }));
 
     return Ok(result);
+  }
+
+  async executeV2(orgId: string, email: string,
+    fromDate?: string,
+    toDate?: string,
+  ): Promise<Result<OrganizerRevenueData, Error>> {
+    const isAdmin = await this.getAdminAccessService.execute(email);
+    if (!isAdmin) return Err(new Error('Unauthorized'));
+
+    const from = fromDate ? new Date(fromDate) : undefined;
+    const to = toDate ? new Date(toDate) : undefined;
+
+    if (from && to && from > to) {
+      return Err(new Error("fromDate must be earlier than or equal to toDate"));
+    }
+
+    const [revenue,_] = await this.saveRevenueDataService.getOrganizerRevenueByDateAndOrgId(
+      {
+        page: 1,
+        limit: 1,
+      },
+      fromDate?.split('T')[0], 
+      toDate?.split('T')[0],
+      null,
+      [orgId]
+    );
+
+    if (!revenue || revenue.length === 0) {
+      return Err(new Error('No revenue data found for the specified organization and date range'));
+    }
+
+    const result = convertToOrganizerRevenueDataFoeach(revenue);
+
+    return Ok(result[0]);
   }
 }

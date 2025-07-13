@@ -52,4 +52,47 @@ export class GetOrgRevenueByIdController {
       });
     }
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/revenue-V2/:orgId')
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Get revenue of an org' })
+  @ApiQuery({ name: 'fromDate', required: false, type: String })
+  @ApiQuery({ name: 'toDate', required: false, type: String })
+  @ApiParam({ name: 'orgId', example: "The gmail stands for ID of the organizer", description: "The ID of the organization" })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Organizer revenue retrieved successfully', type: RevenueByIdDto })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid input' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Internal server error' })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'You do not have permission to get org revenue' })
+  async executeV2(
+    @Param('orgId') orgId: string,
+    @Request() req,
+    @Res() res: Response,
+    @Query('fromDate') fromDate: string,
+    @Query('toDate') toDate: string,
+  ) {
+    try {
+      const email = req.user?.email;
+
+      const result = await this.getOrgRevenueByIdService.executeV2(orgId, email, fromDate, toDate);
+
+      if (result.isErr()) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+          statusCode: HttpStatus.BAD_REQUEST,
+          message: result.unwrapErr().message,
+        });
+      }
+
+      return res.status(HttpStatus.OK).json({
+        statusCode: HttpStatus.OK,
+        message: 'Organizer revenue retrieved successfully',
+        data: result.unwrap(),
+      });
+    } catch (error) {
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: 'Internal server error',
+      });
+    }
+  }
 }

@@ -5,6 +5,8 @@ import { GetAdminAccessService } from "src/services/auth-svc/modules/user/querie
 import { EventsRepository } from "src/services/event-svc/repository/events/events.repo";
 import { TicketQueryService } from "src/services/booking-svc/modules/queries/getTicketQuery/ticket-query.service";
 import { ShowingRepository } from "src/services/event-svc/repository/showing/showing.repo";
+import { SaveRevenueDataService } from "src/services/auth-svc/modules/admin/commands/saveRevenueData/saveRevenueData.service";
+import { convertToEventRevenueData } from "../getOrgRevenue/getOrgRevenue.service";
 
 @Injectable()
 export class GetEventRevenueDetailService {
@@ -13,6 +15,7 @@ export class GetEventRevenueDetailService {
     private readonly ticketQueryService: TicketQueryService,
     @Inject('EventsRepository') private readonly eventsRepo: EventsRepository,
     @Inject('ShowingRepository') private readonly showingRepo: ShowingRepository,
+    private readonly saveRevenueDataService: SaveRevenueDataService,
   ) {}
 
   async execute(email: string, orgId: string, eventId: number): Promise<Result<ShowingRevenueData[], Error>> {
@@ -43,5 +46,26 @@ export class GetEventRevenueDetailService {
     });
 
     return Ok(result);
+  }
+
+  async executeV2(email: string, orgId: string, eventId: number): Promise<Result<ShowingRevenueData[], Error>> {
+    const isAdmin = await this.getAdminAccessService.execute(email);
+    if (!isAdmin) return Err(new Error('Unauthorized'));
+
+    const event = await this.eventsRepo.findEventById(eventId);
+    if (!event) return Err(new Error('Event not found'));
+
+    const revenue = await this.saveRevenueDataService.getEventRevenueByDateAndEventId(null,null, eventId);
+    
+    const result = convertToEventRevenueData(revenue)
+    
+    return Ok(result[0].showings.map(showing => {
+      return {
+        showingId: showing.showingId,
+        startTime: showing.startDate,
+        endTime: showing.endDate,
+        revenue: showing.revenue,
+      };
+    }));
   }
 }

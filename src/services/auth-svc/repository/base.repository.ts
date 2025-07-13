@@ -114,4 +114,34 @@ export class BaseAuthRepository<
       }
     });
   }
+
+  async countDistinct(field: keyof TModel, filter: any = {}): Promise<number> {
+    const distinctValues = await this.repo.findMany({
+      where: filter,
+      distinct: [field as string],
+      select: {
+        [field as string]: true,
+      },
+    });
+
+    return distinctValues.length;
+  }
+
+  async getDistinct<TField extends keyof TModel>(
+    field: TField,
+    filter: any = {},
+    orderBy: { [K in TField]?: 'asc' | 'desc' } = {},
+    skip?: number,
+    take?: number
+  ): Promise<Pick<TModel, TField>[]> {
+    return this.repo.findMany({
+      where: filter,
+      distinct: [field],
+      select: { [field]: true },
+      ...(Object.keys(orderBy).length ? { orderBy } : {}),
+      ...(skip !== undefined ? { skip } : {}),
+      ...(take !== undefined ? { take } : {}),
+    }) as Promise<Pick<TModel, TField>[]>;
+  }
+
 }

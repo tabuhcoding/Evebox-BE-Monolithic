@@ -288,7 +288,7 @@ function convertToOrganizerRevenueData(revenueData: OrganizerRevenue[]): Organiz
   return Array.from(organizerMap.values());
 }
 
-function convertToOrganizerRevenueDataFoeach(revenueData: OrganizerRevenue[]): OrganizerRevenueData[] {
+export function convertToOrganizerRevenueDataFoeach(revenueData: OrganizerRevenue[]): OrganizerRevenueData[] {
   const organizerMap = new Map<string, OrganizerRevenueData>();
 
   revenueData.forEach((orgRev) => {

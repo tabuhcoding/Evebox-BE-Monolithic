@@ -94,6 +94,7 @@ import { TicketTypeRevenueRepositoryImpl } from "./repository/tickettype-revenue
 import { ShowingRevenueRepositoryImpl } from "./repository/showing-revenue/showing-revenue.impl";
 import { EventRevenueRepositoryImpl } from "./repository/event-revenue/event-revenue.impl";
 import { OrganizerRevenueRepositoryImpl } from './repository/organizer-revenue/organizer-revenue.impl';
+import { SaveRevenueDataService } from './modules/admin/commands/saveRevenueData/saveRevenueData.service';
 
 @Module({
   imports: [
@@ -233,6 +234,7 @@ import { OrganizerRevenueRepositoryImpl } from './repository/organizer-revenue/o
     CheckFavoriteService,
     FindUserByEmailService,
     NewEventTriggerService,
+    SaveRevenueDataService
   ],
   exports: [
     CheckUserExistService,
@@ -244,7 +246,8 @@ import { OrganizerRevenueRepositoryImpl } from './repository/organizer-revenue/o
     GetFavoriteEventService,
     FindUserByEmailService,
     NewEventTriggerService,
-    UpdateUserToOrgService
+    UpdateUserToOrgService,
+    SaveRevenueDataService
   ],
 })
 export class AuthSvcModule { }

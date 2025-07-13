@@ -13,6 +13,7 @@ export class DailyEmbeddingService {
   ) {  }
 
   // @Cron('0 36 17 * * 3')
+  @Cron('0 2 * * *') // Runs every day at midnight
   async runDailyEmbedding() {
     try {
       const events = await this.getAllEventsForRagService.getAllEvents();

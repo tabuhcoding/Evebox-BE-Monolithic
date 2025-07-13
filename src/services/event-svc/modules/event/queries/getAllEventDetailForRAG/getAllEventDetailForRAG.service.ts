@@ -13,9 +13,13 @@ export class GetAllEventDetailForRAGService {
   
   async getAllEvents(): Promise<GetAllEventDetailForRAGResponseDto[]> {
     try {
+      // Get event that updated in yesterday
       const rawEvents = await this.eventsRepository.findMany({
           deleteAt: null,
           isApproved: true,
+          updatedAt: {
+            gte: new Date(new Date().setDate(new Date().getDate() - 1)),
+          }
         },
         {
           Showing: {

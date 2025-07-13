@@ -1,3 +1,5 @@
+import { SaveRevenueDataService } from './../../../auth-svc/modules/admin/commands/saveRevenueData/saveRevenueData.service';
+import { CalculateRevenueService } from './../../../booking-svc/modules/commands/calculateRevenue/calculateRevenue.service';
 import { Injectable } from "@nestjs/common";
 import { Cron } from "@nestjs/schedule";
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
@@ -11,6 +13,8 @@ export class DailyStatusService {
   
   constructor(
     private readonly calculateTicketTypeStatusService: CalculateTicketTypeStatusService,
+    private readonly calculateRevenueService: CalculateRevenueService,
+    private readonly saveRevenueDataService: SaveRevenueDataService,
     private readonly slackService: SlackService,
   ) {
     // Initialization logic can go here if needed
@@ -30,6 +34,36 @@ export class DailyStatusService {
       await this.slackService.sendError(`Daily status update failed: ${error.message}`);
     }
   }  
+
+  @Cron('0 4 * * *')
+  async executeDailyRevenueCalculation() {
+    await this.slackService.sendNotice('Daily revenue calculation started.');
+    try {
+      // // Get all unique dates in orders
+      // const uniqueDates = await this.calculateRevenueService.getAllDatesInOrder();
+      // for (const date of uniqueDates) {
+      //   // Calculate revenue for each date
+      //   const revenueData = await this.calculateRevenueService.getRevenueByDate(date);
+      //   if (revenueData.total_revenue > 0) {
+      //     // Save the revenue data
+      //     await this.saveRevenueDataService.saveRevenueData(revenueData);
+      //     await this.slackService.sendNotice(`Revenue data for ${date} saved successfully.`);
+      //   }
+      // }
+      // Calculate revenue for the previous day
+      // const yesterday = new Date();
+      // yesterday.setDate(yesterday.getDate() - 1);
+      // const revenueData = await this.calculateRevenueService.getRevenueByDate(yesterday.toISOString().split('T')[0]);
+      // if (revenueData.total_revenue > 0) {
+      //   // Save the revenue data
+      //   await this.saveRevenueDataService.saveRevenueData(revenueData);
+      // } else {
+      //   await this.slackService.sendNotice(`No revenue data for ${yesterday.toISOString().split('T')[0]}.`);
+      // }
+    } catch (error) {
+      await this.slackService.sendError(`Daily revenue calculation failed: ${error.message}`);
+    }
+  }
 
   // Cron job to run at 15h10 every day 
   // @Cron('47 16 * * *')

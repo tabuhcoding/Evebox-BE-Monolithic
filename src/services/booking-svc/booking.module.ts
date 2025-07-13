@@ -35,6 +35,7 @@ import { GetOrdersWithTypeService } from './modules/queries/getOrdersWithType/ge
 import { SendEmailController } from './modules/commands/sendEmail/sendEmail.controller';
 import { GiveTicketController } from './modules/commands/giveTicket/giveTicket.controller';
 import { GiveTicketService } from './modules/commands/giveTicket/giveTicket.service';
+import { CalculateRevenueService } from './modules/commands/calculateRevenue/calculateRevenue.service';
 
 @Module({
   imports: [ 
@@ -82,6 +83,7 @@ import { GiveTicketService } from './modules/commands/giveTicket/giveTicket.serv
     GetCheckedInTicketsService,
     GetOrdersWithTypeService,
     GiveTicketService,
+    CalculateRevenueService,
 
     // Repositories
     { provide: 'OrderRepository', useClass: OrderRepositoryImpl },
@@ -99,6 +101,7 @@ import { GiveTicketService } from './modules/commands/giveTicket/giveTicket.serv
     RecheckOrderMissedService,
     TicketQueryService,
     GetOrdersWithTypeService,
+    CalculateRevenueService
   ],
 })
 export class BookingSvcModule {}

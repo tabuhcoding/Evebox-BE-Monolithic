@@ -18,6 +18,7 @@ export class GetPreviewShowingService {
             id: true,
             title: true,
             venue: true,
+            organizerId: true,
             locations: {
               include: {
                 districts: {
@@ -30,6 +31,7 @@ export class GetPreviewShowingService {
             imgPosterUrl: true,
           }
         },
+        TicketType: true,
       })
 
       if (!showing) {
@@ -47,6 +49,9 @@ export class GetPreviewShowingService {
         startTime: showing.startTime,
         endTime: showing.endTime,
         imageUrl: showing.Events.imgPosterUrl,
+        eventId: showing.Events.id,
+        orgId: showing.Events.organizerId,
+        TicketType: showing.TicketType,
       }
     }
     catch (error) {

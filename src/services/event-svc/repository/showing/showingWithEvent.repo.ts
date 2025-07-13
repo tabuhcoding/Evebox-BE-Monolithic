@@ -12,6 +12,7 @@ export type ShowingWithEvent = Prisma.ShowingGetPayload<{
         id: true,
         title: true,
         venue: true,
+        organizerId: true;
         locations: {
           include: {
             districts: {

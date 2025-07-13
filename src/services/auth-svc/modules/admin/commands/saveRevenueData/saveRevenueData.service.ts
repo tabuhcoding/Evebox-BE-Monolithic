@@ -121,6 +121,28 @@ export class SaveRevenueDataService {
     return revenues;
   }
 
+  async getRevenueByDateV2(from?: string, to?: string): Promise<Revenue[]> {
+    var query = {}
+    if (from) {
+      query['date'] = {
+        gte: new Date(from),
+      };
+    }
+    if (to) {
+      query['date'] = {
+        ...query['date'],
+        lte: new Date(to),
+      };
+    }
+
+    const revenues = await this.revenueRepository.findMany(query, {
+    });
+    if (!revenues || revenues.length === 0) {
+      throw new Error(`No revenue data found for date: ${from} to ${to}`);
+    }
+    return revenues;
+  }
+
   async getOrganizerRevenueByDateAndOrgId(pagination: PaginationQuery, from?: string, to?: string, search?: string, org_id?: string[]): Promise<[OrganizerRevenue[], Pagination]> {
     var query = {}
     if (from) {

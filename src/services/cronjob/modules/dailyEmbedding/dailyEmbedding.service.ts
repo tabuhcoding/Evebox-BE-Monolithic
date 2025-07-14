@@ -47,7 +47,7 @@ export class DailyEmbeddingService {
     }
   }
 
-  @Cron('05 1 * * *') // Runs every day at 3 AM
+  // @Cron('05 1 * * *') // Runs every day at 3 AM
   async fakeOrderData() {
     try{
       await this.slackService.sendNotice("Starting to save fake order data for embedding.");

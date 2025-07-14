@@ -6,6 +6,8 @@ import { TicketTypeRepository } from '../../../../repository/ticketType/ticketTy
 import { SeatmapRepository } from '../../../../repository/seatmap/seatmap.repo';
 import { GetAdminAccessService } from 'src/services/auth-svc/modules/user/queries/get-admin-access/get-admin-access.service';
 import { CountCheckedInTicketsService } from 'src/services/booking-svc/modules/queries/getCountCheckedInTickets/getCountCheckedInTickets.service';
+import { CalculateShowingStatusService } from '../../../event/commands/calculateShowingStatus/calculateShowingStatus.service';
+import { calculateShowingStatusAndMinPrice } from 'src/shared/utils/status/status';
 
 @Injectable()
 export class GetShowingAdminDetailService {
@@ -15,6 +17,7 @@ export class GetShowingAdminDetailService {
     @Inject('TicketTypeRepository') private readonly ticketTypeRepo: TicketTypeRepository,
     @Inject('SeatmapRepository') private readonly seatmapRepo: SeatmapRepository,
     private readonly getAdminAccessService: GetAdminAccessService,
+    private readonly calculateShowingStatusService: CalculateShowingStatusService,
   ) {}
 
   async execute(showingId: string, email: string): Promise<Result<ShowingAdminDataDto, Error>> {
@@ -24,13 +27,15 @@ export class GetShowingAdminDetailService {
     const showing = await this.showingRepo.findAdminShowingById(showingId);
     if (!showing) return Err(new Error('Showing not found'));
 
-    const showingStatus = await this.getShowingStatus(showingId);
+    await this.calculateShowingStatusService.reCalculateAllTicketTypesOfShowingStatus(showing);
+    const [showingStatus, _] = await calculateShowingStatusAndMinPrice(showing.TicketType);
+
     const ticketSold = await this.countCheckedInTicketsService.execute( showing.TicketType.map(tt => tt.id),);
 
     const result: ShowingAdminDataDto = {
       id: showing.id,
       eventId: showing.eventId,
-      status: showingStatus.showingStatus,
+      status: showingStatus,
       isFree: showing.isFree,
       isSalable: showing.isSalable,
       isPresale: showing.isPresale,
@@ -42,8 +47,8 @@ export class GetShowingAdminDetailService {
       event: showing.Events,
       ticketTypes: showing.TicketType.map(tt => ({
         ...tt,
-        sold: ticketSold,
-        status: showingStatus.ticketTypesStatus[tt.id] || 'sold_out',
+        sold: ticketSold[tt.id] || 0,
+        status: tt.status || 'sold_out',
       })),
     };
 

@@ -19,7 +19,9 @@ export class TicketRepositoryImpl
     return this.prisma.ticket.count({
       where: {
         ticketTypeId: { in: ticketTypeIds },
-        isCheckedIn: true,
+        Order: {
+          status: 'SUCCESS',
+        }
       },
     });
   }
@@ -28,6 +30,9 @@ export class TicketRepositoryImpl
       by: ['ticketTypeId'],
       where: {
         ticketTypeId: { in: ticketTypeIds },
+        Order: {
+          status: 'SUCCESS',
+        }
       },
       _count: {
         ticketTypeId: true,

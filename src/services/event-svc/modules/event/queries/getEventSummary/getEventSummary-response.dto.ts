@@ -71,3 +71,8 @@ export class EventSummaryResponse extends BaseResponse {
   @ApiProperty({ type: EventSummaryData, description: 'Summary data of an event' })
   data: EventSummaryData;
 }
+
+export class EventSummaryAIResponse extends BaseResponse {
+  @ApiProperty({ description: 'Summary data by AI of an event' })
+  data: string;
+}

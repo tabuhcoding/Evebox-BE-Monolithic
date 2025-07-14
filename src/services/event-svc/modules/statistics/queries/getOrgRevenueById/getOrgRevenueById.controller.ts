@@ -54,7 +54,7 @@ export class GetOrgRevenueByIdController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('/revenue-V2/:orgId')
+  @Get('/revenue-v2/:orgId')
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Get revenue of an org' })
   @ApiQuery({ name: 'fromDate', required: false, type: String })

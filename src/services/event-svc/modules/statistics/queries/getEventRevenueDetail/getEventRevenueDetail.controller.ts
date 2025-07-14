@@ -54,7 +54,7 @@ export class GetEventRevenueDetailController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('/revenue-V2/:orgId/:eventId')
+  @Get('/revenue-v2/:orgId/:eventId')
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Get event revenue detail' })
   @ApiParam({ name: 'orgId', example: "dattruong01082@gmail.com", description: "The gmail stands for ID of the organizer" })

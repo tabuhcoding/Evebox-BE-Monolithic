@@ -66,7 +66,7 @@ export class GetEventSummaryService {
         query: userRequest || ""
       };
 
-      const responseAI = await fetch('http://localhost:8000/revenue', {
+      const responseAI = await fetch('https://evebox-utils.onrender.com/revenue', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

@@ -50,4 +50,42 @@ export class GetEventSummaryService {
       return Err(new Error('Failed to retrieve events'));
     }
   }
+
+  async executeAI(showingId: string, organizerId: string, userRequest?: string): Promise<Result<string, Error>> {
+    try {
+      const result = await this.execute(showingId, organizerId);
+
+      if (result.isErr()) {
+        return Err(new Error(result.unwrapErr().message));
+      }
+
+      const data = result.unwrap();
+
+      const payload = {
+        data: data,
+        query: userRequest || ""
+      };
+
+      const responseAI = await fetch('http://localhost:8000/revenue', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!responseAI.ok) {
+        const errorData = await responseAI.json();
+        return Err(new Error(errorData.detail || 'Failed to analyze revenue data'));
+      }
+
+      const responseAIData = await responseAI.json();
+
+      return Ok(responseAIData.result);
+    } catch (error) {
+      await this.slackService.sendError(`Event Service - Event summary with AI >>> GetEventSummaryService: ${error.message}`);
+
+      return Err(new Error('Internal server error'));
+    }
+  }
 }

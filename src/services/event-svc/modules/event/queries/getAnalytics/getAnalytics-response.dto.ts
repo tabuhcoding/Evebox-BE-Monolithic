@@ -42,3 +42,8 @@ export class AnalyticsResponseDto extends BaseResponse {
   @ApiProperty({ type: AnalyticsResponseData })
   data: AnalyticsResponseData;
 }
+
+export class AnalyticsAIResponseDto extends BaseResponse {
+  @ApiProperty({ description: 'Summary data by AI of an event' })
+  data: string;
+}

@@ -4,11 +4,11 @@ import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagg
 import { DailyEmbeddingService } from './dailyEmbedding.service';
 
 @ApiTags('Cron')
-@Controller('org/member')
+@Controller('org/cron')
 export class CronController {
   constructor(private readonly service: DailyEmbeddingService) {}
 
-  @Post()
+  @Post('/')
   @ApiOperation({ summary: 'Add member to event' })
   @ApiResponse({ status: HttpStatus.CREATED, description: 'Added member successfully' })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid input' })

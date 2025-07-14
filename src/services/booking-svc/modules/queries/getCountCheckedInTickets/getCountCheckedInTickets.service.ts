@@ -8,7 +8,7 @@ export class CountCheckedInTicketsService {
     private readonly ticketRepo: TicketRepository
   ) {}
 
-  async execute(ticketTypeIds: string[]): Promise<number> {
-    return this.ticketRepo.countCheckedInTickets(ticketTypeIds);
+  async execute(ticketTypeIds: string[]): Promise<Record<string, number>> {
+    return this.ticketRepo.countTicketsByTicketTypeIds(ticketTypeIds);
   }
 }

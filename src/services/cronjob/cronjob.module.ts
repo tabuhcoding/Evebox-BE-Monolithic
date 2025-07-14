@@ -6,6 +6,8 @@ import { HourlyOrderStatusService } from "./modules/hourlyOrder/hourlyOrderStatu
 import { DailyEmbeddingService } from "./modules/dailyEmbedding/dailyEmbedding.service";
 import { OpenAIModule } from "../rag-svc/modules/openai/openAI.module";
 import { AuthSvcModule } from "../auth-svc/auth-svc.module";
+import { PaymentSvcModule } from "../payment-svc/payment-svc.module";
+import { CronController } from "./modules/dailyEmbedding/addEventMember.controller";
 
 @Module({
   imports: [
@@ -13,8 +15,9 @@ import { AuthSvcModule } from "../auth-svc/auth-svc.module";
     BookingSvcModule,
     AuthSvcModule,
     OpenAIModule,
+    PaymentSvcModule,
   ],
-  controllers: [],
+  controllers: [CronController],
   providers: [DailyStatusService, HourlyOrderStatusService, DailyEmbeddingService],
   exports: [],
 })

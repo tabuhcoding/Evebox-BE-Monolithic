@@ -8,6 +8,7 @@ export type FormResponse = Prisma.FormResponseGetPayload<{
     FormAnswer: {
       select: {
         value: true,
+        formInputId: true,
         FormInput: {
           select: {
             fieldName: true,
@@ -25,6 +26,8 @@ export interface FormResponseRepository extends BaseEventRepository<FormResponse
 
   // /* Get Form Response by ID */
   getFormResponseById(id: number): Promise<FormResponse | null>;
+
+  cloneFormResponse(id: number, userId: string, orderId: number): Promise<number>;
 
   // /* Get All Form Responses for a Form */
   // getAllFormResponsesByFormId(formId: number): Promise<FormResponse[]>;

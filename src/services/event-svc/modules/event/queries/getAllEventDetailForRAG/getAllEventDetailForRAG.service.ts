@@ -3,11 +3,15 @@ import { Events, EventsRepository } from '../../../../repository/events/events.r
 import { GetAllEventDetailForRAGResponseDto } from './getAllEventDetailForRAG-response.dto';
 import { SlackService } from 'src/infrastructure/adapters/slack/slack.service';
 import { calculateEventStatusAndMinPriceAndStartDate, calculateShowingStatusAndMinPrice, EventStatus } from 'src/shared/utils/status/status';
+import { Showing, ShowingRepository } from 'src/services/event-svc/repository/showing/showing.repo';
+import { FormResponseRepository } from 'src/services/event-svc/repository/formResponse/formResponse.repo';
 
 @Injectable()
 export class GetAllEventDetailForRAGService {
   constructor(
     @Inject('EventsRepository') private readonly eventsRepository: EventsRepository,
+    @Inject('ShowingRepository') private readonly showingRepository: ShowingRepository,
+    @Inject('FormResponseRepository') private readonly formResponseRepository: FormResponseRepository,
     private readonly slackService: SlackService,
   ) {}
   
@@ -19,6 +23,7 @@ export class GetAllEventDetailForRAGService {
           isApproved: true,
           updatedAt: {
             gte: new Date(new Date().setDate(new Date().getDate() - 1)),
+            lt: new Date(),
           }
         },
         {
@@ -143,5 +148,22 @@ export class GetAllEventDetailForRAGService {
 
       return [];
     }
+  }
+
+  async getAllShowing(): Promise<Map<string,Showing>>{
+    const showings = await this.showingRepository.findMany({
+    }, {
+      TicketType: true,
+    })
+
+    const showingMap = new Map<string, Showing>();
+    showings.forEach((showing) => {
+      showingMap.set(showing.id, showing);
+    });
+    return showingMap;
+  }
+
+  async cloneFormResponse(id: number, userId: string, orderId: number): Promise<number> {
+    return await this.formResponseRepository.cloneFormResponse(id, userId, orderId);
   }
 }

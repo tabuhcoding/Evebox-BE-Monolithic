@@ -43,4 +43,13 @@ export class GetPaymentInfoService {
       return null;
     }
   }
+
+  async  createPaymentInfo(orderId: number, date: Date): Promise<number> {
+    return await this.paymentInfoRepository.insertOneWithNumberId({
+      orderId: orderId,
+      paidAt: date,
+      method: 'PAYOS',
+      paymentCode: orderId
+    });
+  }
 }

@@ -126,6 +126,12 @@ import { SaveRevenueDataService } from './modules/admin/commands/saveRevenueData
     ForgotPasswordController,
     GoogleLoginController,
     GetUserController,
+    // Pin-related controllers must be registered before GetUserByIdController
+    // to prevent /:id route from capturing /pin endpoints
+    GetUserPinStatusController,
+    CreateUserPinController,
+    VerifyUserPinController,
+    ChangeUserPinController,
     GetUserByIdController,
     AddToFavoriteController,
     UnfavoriteEventController,
@@ -143,10 +149,6 @@ import { SaveRevenueDataService } from './modules/admin/commands/saveRevenueData
     GetUsersNotifiedByOrgController,
     TurnOffNotificationForEventController,
     TurnOffNotificationForOrgController,
-    GetUserPinStatusController,
-    CreateUserPinController,
-    VerifyUserPinController,
-    ChangeUserPinController,
     GetUsersByAdminController,
   ],
   providers: [
@@ -247,7 +249,8 @@ import { SaveRevenueDataService } from './modules/admin/commands/saveRevenueData
     FindUserByEmailService,
     NewEventTriggerService,
     UpdateUserToOrgService,
-    SaveRevenueDataService
+    SaveRevenueDataService,
+    GetUserPinStatusService,
   ],
 })
 export class AuthSvcModule { }

@@ -21,6 +21,7 @@ export class FormResponseRepositoryImpl
         FormAnswer: {
           select: {
             value: true,
+            formInputId: true,
             FormInput: {
               select: {
                 fieldName: true,
@@ -40,6 +41,7 @@ export class FormResponseRepositoryImpl
         ...formResponse,
         FormAnswer: formResponse.FormAnswer.map(answer => ({
           value: answer.value,
+          formInputId: answer.formInputId,
           FormInput: {
             fieldName: answer.FormInput.fieldName,
             options: answer.FormInput.options
@@ -91,6 +93,7 @@ export class FormResponseRepositoryImpl
         ...formResponse,
         FormAnswer: formResponse.FormAnswer.map(answer => ({
           value: answer.value,
+          formInputId: answer.formInputId,
           FormInput: {
             fieldName: answer.FormInput.fieldName,
             options: answer.FormInput.options
@@ -101,6 +104,35 @@ export class FormResponseRepositoryImpl
       return formattedResponse;
     } catch (error) {
       return null;
+    }
+  }
+
+  async cloneFormResponse(id: number, userId: string, orderId: number): Promise<number> {
+    try {
+      const formResponse = await this.findOneById(id, {
+        FormAnswer: true
+      });
+      if (!formResponse) return -1;
+      const clonedForm = await this.insertOneWithNumberId({
+        userId: userId,
+        formId: formResponse.formId,
+        showingId: formResponse.showingId,
+        orderId: orderId,
+      })
+
+      for (const answer of formResponse.FormAnswer) {
+        await this.prisma.formAnswer.create({
+          data: {
+            formResponseId: clonedForm,
+            formInputId: answer.formInputId,
+            value: answer.value,
+          }
+        });
+      }
+      return clonedForm;
+    } catch (error) {
+      console.error("🚀 ~ FormResponseRepositoryImpl ~ cloneFormResponse ~ error:", error);
+      return -1;
     }
   }
 }

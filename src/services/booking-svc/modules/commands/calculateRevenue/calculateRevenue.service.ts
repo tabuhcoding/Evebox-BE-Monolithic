@@ -284,4 +284,81 @@ export class CalculateRevenueService {
       return null;
     }
   }
+
+  async getAllOrderHasMoreThanThreeTickets(): Promise<Order[]> {
+    try {
+      const orders = await this.orderRepository.findAll({
+        status: BookingTicketStatus.SUCCESS,
+      }, {
+        Ticket: true,
+      });
+
+      return orders.filter(order => order.Ticket.length > 3);
+    } catch (error) {
+      this.slackService.sendError(`Error in CalculateRevenueService.getAllOrderHasMoreThanThreeTickets: ${error.message}`);
+      return [];
+    }
+  }
+
+  async updateOrderPrice(orderId: number, paymentId: number, formid: number): Promise<void> {
+    await this.orderRepository.updateOneById(orderId, {
+      paymentId: paymentId,
+      formResponseId: formid
+    });
+  }
+
+  async createNewOrder(orderId: number, ticketPrice: Map<string,number>, beginDate: Date, endDate: Date): Promise<Order> {
+    const order = await this.orderRepository.findOneById(orderId, {
+      Ticket: true,
+    });
+
+    const randomDateValue = randomDate(beginDate, endDate);
+    
+    const newOrder = await this.orderRepository.insertOneWithNumberId({
+      showingId: order.showingId,
+      userId: `user${Math.floor(betterRandom(50))}@example.com`,
+      totalPrice: 0,
+      price: 0,
+      status: BookingTicketStatus.SUCCESS,
+      type: order.type,
+      mailSent: order.mailSent,
+      createdAt: randomDateValue,
+      updatedAt: randomDateValue,
+    });
+
+    var totalPrice = 0;
+    for (let i = order.Ticket.length - 1; i > 2; i--) {
+      await this.ticketRepository.updateOneById(order.Ticket[i].id,{
+        orderId: newOrder,
+      });
+      totalPrice += ticketPrice.get(order.Ticket[i].ticketTypeId) || 0;
+    }
+
+    await this.orderRepository.updateOneById(newOrder, {
+      totalPrice: totalPrice,
+      price: totalPrice,
+    });
+
+    const rendomDate = randomDate(beginDate, endDate);
+
+    await this.orderRepository.updateOneById(order.id, {
+      totalPrice: order.totalPrice - totalPrice,
+      price: order.price - totalPrice,
+      updatedAt: rendomDate,
+      createdAt: rendomDate,
+    });
+
+    return await this.orderRepository.findOneById(newOrder, {
+      Ticket: true,
+    });
+  }
+}
+
+
+function betterRandom(range = 1) {
+  return (Math.random() + (Date.now() % 1000) / 1000) % 1 * range;
+}
+function randomDate(start: Date, end: Date): Date {
+  const date = new Date(start.getTime() + betterRandom(end.getTime() - start.getTime()));
+  return date;
 }

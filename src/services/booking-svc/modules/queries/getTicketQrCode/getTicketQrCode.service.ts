@@ -13,7 +13,9 @@ export class GetTicketQrCodeService {
 
   async getTicketQrCode(ticketId: string, email: string): Promise<Result<string, Error>>{
     try {
-      const ticket = await this.ticketRepository.findOneById(ticketId);
+      const ticket = await this.ticketRepository.findOneById(ticketId, {
+        Order: true,
+      });
       if (!ticket) {
         return Err(new Error('Ticket not found'));
       }

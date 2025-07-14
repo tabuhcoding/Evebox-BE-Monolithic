@@ -36,6 +36,10 @@ import { SendEmailController } from './modules/commands/sendEmail/sendEmail.cont
 import { GiveTicketController } from './modules/commands/giveTicket/giveTicket.controller';
 import { GiveTicketService } from './modules/commands/giveTicket/giveTicket.service';
 import { CalculateRevenueService } from './modules/commands/calculateRevenue/calculateRevenue.service';
+import { CheckInTicketByQrController } from './modules/commands/checkInTicketByQr/checkInTicketByQr.controller';
+import { CheckInTicketController } from './modules/commands/checkInTicket/checkInTicket.controller';
+import { CheckInTicketByQrService } from './modules/commands/checkInTicketByQr/checkInTicketByQr.service';
+import { CheckInTicketService } from './modules/commands/checkInTicket/checkInTicket.service';
 
 @Module({
   imports: [ 
@@ -56,6 +60,8 @@ import { CalculateRevenueService } from './modules/commands/calculateRevenue/cal
     GetCheckedInTicketsController,
     SendEmailController,
     GiveTicketController,
+    CheckInTicketByQrController,
+    CheckInTicketController
   ],
   providers: [
     // Services
@@ -84,6 +90,8 @@ import { CalculateRevenueService } from './modules/commands/calculateRevenue/cal
     GetOrdersWithTypeService,
     GiveTicketService,
     CalculateRevenueService,
+    CheckInTicketByQrService,
+    CheckInTicketService,
 
     // Repositories
     { provide: 'OrderRepository', useClass: OrderRepositoryImpl },

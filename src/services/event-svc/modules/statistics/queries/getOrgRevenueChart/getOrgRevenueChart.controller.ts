@@ -66,7 +66,7 @@ export class GetOrgRevenueChartController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('/revenue-chart-V2')
+  @Get('/revenue-chart-v2')
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Get revenue data combine org for chart' })
   @ApiQuery({ name: 'fromDate', required: false, type: String, example: '2025-04' })

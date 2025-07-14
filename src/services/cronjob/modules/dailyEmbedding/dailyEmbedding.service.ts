@@ -21,9 +21,11 @@ export class DailyEmbeddingService {
         await this.slackService.sendNotice("No events found for embedding.");
         return;
       }
+      await this.slackService.sendNotice(`Starting daily embedding for ${events.length} events.`);
+      return
 
       const batchSize = 100;
-      for (let i = 2000; i < events.length; i += batchSize) {
+      for (let i = 0; i < events.length; i += batchSize) {
         const batch = events.slice(i, i + batchSize);
         await this.openAIVectorStoreService.embedFullEventDocuments(batch);
         await this.slackService.sendNotice(`Embedded batch ${Math.floor(i / batchSize) + 1} of ${Math.ceil(events.length / batchSize)}.`);
@@ -31,7 +33,7 @@ export class DailyEmbeddingService {
 
       await this.slackService.sendNotice("Daily embedding completed successfully.");
 
-      for (let i = 800; i < events.length; i += batchSize) {
+      for (let i = 0; i < events.length; i += batchSize) {
         const batch = events.slice(i, i + batchSize);
         await this.openAIVectorStoreService.embedSimilarityEventDocuments(batch);
         await this.slackService.sendNotice(`Embedded similar batch ${Math.floor(i / batchSize) + 1} of ${Math.ceil(events.length / batchSize)}.`);

@@ -51,9 +51,12 @@ export class GetEventSummaryService {
     }
   }
 
-  async executeAI(showingId: string, organizerId: string, userRequest?: string): Promise<Result<string, Error>> {
+  async executeAI(showingId: string, userRequest?: string): Promise<Result<string, Error>> {
     try {
-      const result = await this.execute(showingId, organizerId);
+      const showing = await this.showingWithEventRepository.findOneById(showingId, {
+        Events: true,
+      });
+      const result = await this.execute(showingId, showing.Events.organizerId);
 
       if (result.isErr()) {
         return Err(new Error(result.unwrapErr().message));
@@ -66,7 +69,7 @@ export class GetEventSummaryService {
         query: userRequest || ""
       };
 
-      const responseAI = await fetch('https://evebox-utils.onrender.com/revenue', {
+      const responseAI = await fetch(`${process.env.UTILS_URL}/revenue`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

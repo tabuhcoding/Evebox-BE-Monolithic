@@ -86,6 +86,32 @@ export class SaveRevenueDataService {
     return !!revenue;
   }
 
+  async getRangeData(): Promise<[ Date,Date ]> {
+    const revenues = await this.revenueRepository.findMany({});
+    if (revenues.length === 0) {
+      throw new Error('No revenue data found');
+    }
+    const dates = revenues.map(revenue => revenue.date.getTime());
+    return [
+      new Date(Math.min(...dates)),
+      new Date(Math.min(Math.max(...dates), new Date().getTime()))
+    ];
+  }
+
+  async getAllRevenue(from: Date, to: Date): Promise<Map<Date, number>> {
+    const revenues = await this.revenueRepository.findMany({
+      date: {
+        gte: from,
+        lte: to,
+      }
+    });
+    const revenueMap = new Map<Date, number>();
+    revenues.forEach(revenue => {
+      revenueMap.set(revenue.date, revenue.total_revenue);
+    });
+    return revenueMap;
+  }
+
   async getRevenueByDate(from?: string, to?: string): Promise<Revenue[]> {
     var query = {}
     if (from) {

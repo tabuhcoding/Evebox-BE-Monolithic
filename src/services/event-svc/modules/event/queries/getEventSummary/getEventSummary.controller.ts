@@ -68,9 +68,9 @@ export class GetEventSummaryController {
     }
   }
 
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @Post('summary-ai/:showingId')
-  @ApiBearerAuth('access-token')
+  // @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Get summary with AI of a showing in event' })
   @ApiBody({ type: GetSummaryWithAI })
   @ApiResponse({ status: HttpStatus.OK, description: 'Event summary with AI retrieved successfully', type: EventSummaryAIResponse })
@@ -84,13 +84,13 @@ export class GetEventSummaryController {
     @Res() res: Response,
   ) {
     try {
-      const email = req.user?.email;
-      if (!email) {
-        return res.status(HttpStatus.UNAUTHORIZED).json({
-          statusCode: HttpStatus.UNAUTHORIZED,
-          message: 'Unauthorized',
-        });
-      }
+      // const email = req.user?.email;
+      // if (!email) {
+      //   return res.status(HttpStatus.UNAUTHORIZED).json({
+      //     statusCode: HttpStatus.UNAUTHORIZED,
+      //     message: 'Unauthorized',
+      //   });
+      // }
 
       if (!showingId) {
         return res.status(HttpStatus.UNAUTHORIZED).json({
@@ -99,7 +99,7 @@ export class GetEventSummaryController {
         });
       }
 
-      const result = await this.getEventSummaryService.executeAI(showingId, email, body.query || "");
+      const result = await this.getEventSummaryService.executeAI(showingId, body.query || "");
 
       if (result.isErr()) {
         return res.status(HttpStatus.BAD_REQUEST).json({

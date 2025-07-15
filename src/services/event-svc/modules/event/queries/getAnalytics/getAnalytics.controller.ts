@@ -76,9 +76,9 @@ export class GetAnalyticsController {
     }
   }
 
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @Post('analytic-ai/:eventId')
-  @ApiBearerAuth('access-token')
+  // @ApiBearerAuth('access-token')
   @ApiBody({ type: GetAnalyticsWithAI })
   @ApiOperation({ summary: 'Get event analytics' })
   @ApiQuery({ name: 'startDate', description: 'Start date of event', required: false })
@@ -90,19 +90,19 @@ export class GetAnalyticsController {
   async getAnalyticsAI(
     @Param('eventId') eventIdRaw: string,
     @Body() body: GetAnalyticsWithAI,
-    @Request() req,
+    // @Request() req,
     @Res() res: Response,
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string,
   ) {
     try {
-      const email = req.user?.email;
-      if (!email) {
-        return res.status(HttpStatus.UNAUTHORIZED).json({
-          statusCode: HttpStatus.UNAUTHORIZED,
-          message: 'Unauthorized',
-        });
-      }
+      // const email = req.user?.email;
+      // if (!email) {
+      //   return res.status(HttpStatus.UNAUTHORIZED).json({
+      //     statusCode: HttpStatus.UNAUTHORIZED,
+      //     message: 'Unauthorized',
+      //   });
+      // }
 
       if (!eventIdRaw) {
         return res.status(HttpStatus.UNAUTHORIZED).json({
@@ -119,7 +119,7 @@ export class GetAnalyticsController {
       const start = startDate ? new Date(startDate) : undefined;
       const end = endDate ? new Date(endDate) : undefined;
 
-      const result = await this.getAnalyticsService.executeAI(eventId, email, start, end, body.query || "");
+      const result = await this.getAnalyticsService.executeAI(eventId, start, end, body.query || "");
       if (result.isErr()) {
         return res.status(HttpStatus.BAD_REQUEST).json({ message: result.unwrapErr().message });
       }

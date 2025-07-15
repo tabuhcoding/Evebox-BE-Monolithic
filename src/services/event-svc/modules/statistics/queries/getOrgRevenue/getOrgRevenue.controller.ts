@@ -110,7 +110,7 @@ export class GetOrgRevenueController {
 
       const pagination: PaginationQuery = {
         page: paginationQuery.page >> 0 || 1,
-        limit: paginationQuery.limit >> 0 || 10,
+        limit: paginationQuery.limit >> 0 || 0,
       };
 
       const result = await this.getOrgRevenueService.execueWithDB(email, pagination, fromDate, toDate, search);

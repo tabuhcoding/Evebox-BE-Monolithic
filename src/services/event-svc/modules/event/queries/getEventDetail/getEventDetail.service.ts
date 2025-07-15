@@ -185,6 +185,10 @@ export class GetEventDetailService {
         }
       }
 
+      if (eventsDto.minPrice === Number.MAX_VALUE) {
+        eventsDto.minPrice = 0; // If no showing, set min price to 0
+      }
+
       return Ok(eventsDto);
     } catch (error) {
       await this.slackService.sendError(` Event Svc - Event >>> GetEventDetail: ${error}`);

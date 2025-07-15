@@ -2,7 +2,7 @@ name: CI on PR to Staging
 
 on:
   pull_request:
-    branches: [staging]
+    branches: []
     types: [opened, synchronize, reopened]
 
 jobs:

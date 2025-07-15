@@ -22,10 +22,10 @@ export class GetOrgRevenueChartService {
 
   async execute(email: string, fromDate?: string, toDate?: string, filterType: "month" | "year" = "month"): Promise<Result<RevenueSummaryItem[], Error>> {
     try {
-      // const isAdmin = await this.getAdminAccessService.execute(email);
-      // if (!isAdmin) {
-      //   return Err(new Error('You do not have permission to get organizer revenue'));
-      // }
+      const isAdmin = await this.getAdminAccessService.execute(email);
+      if (!isAdmin) {
+        return Err(new Error('You do not have permission to get organizer revenue'));
+      }
 
       var from = fromDate ? new Date(fromDate) : undefined;
       var to = toDate ? new Date(toDate) : undefined;

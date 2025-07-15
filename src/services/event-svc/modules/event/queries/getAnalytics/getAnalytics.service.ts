@@ -88,9 +88,13 @@ export class GetAnalyticsService {
     }
   }
 
-  async executeAI(eventId: number, userEmail: string, startDate?: Date, endDate?: Date, userRequest?: string): Promise<Result<string, Error>> {
+  async executeAI(eventId: number, startDate?: Date, endDate?: Date, userRequest?: string): Promise<Result<string, Error>> {
     try {
-      const result = await this.execute(eventId, userEmail, startDate, endDate);
+      const event = await this.eventRepository.findOneById(eventId);
+      if (!event) {
+        return Err(new Error('Event not found'));
+      }
+      const result = await this.execute(eventId, event.organizerId, startDate, endDate);
 
       if (result.isErr()) {
         return Err(new Error(result.unwrapErr().message));

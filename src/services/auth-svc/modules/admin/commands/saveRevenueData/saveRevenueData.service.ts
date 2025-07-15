@@ -94,7 +94,7 @@ export class SaveRevenueDataService {
     const dates = revenues.map(revenue => revenue.date.getTime());
     return [
       new Date(Math.min(...dates)),
-      new Date(Math.max(...dates))
+      new Date(Math.min(Math.max(...dates), new Date().getTime()))
     ];
   }
 

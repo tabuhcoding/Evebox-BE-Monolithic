@@ -22,6 +22,7 @@ export class CalculateRevenueService {
       createdAt: {
         gte: new Date('2025-01-01T00:00:00Z'),
       },
+      status: BookingTicketStatus.SUCCESS,
     });
     
     var uniqueDays = Array.from(
@@ -48,7 +49,7 @@ export class CalculateRevenueService {
               },
             },
           ],
-          status: { in: [BookingTicketStatus.SUCCESS, BookingTicketStatus.CANCEL] },
+          status: { in: [BookingTicketStatus.SUCCESS, BookingTicketStatus.CANCEL] }
         },
         {
           Ticket: true
@@ -74,7 +75,7 @@ export class CalculateRevenueService {
             showing_id: order.showingId,
             start_date: new Date(),
             end_date: new Date(),
-            total_revenue: order.status === BookingTicketStatus.SUCCESS ? order.totalPrice/1000 : - order.totalPrice/1000,
+            total_revenue: 0,
             ticket_types: new Map<string, TicketTypeRevenueDataDTO>()
           });
         }
@@ -122,7 +123,7 @@ export class CalculateRevenueService {
           revenueData.organizers.set(showingDetail.orgId, {
             org_id: showingDetail.orgId,
             org_name: showingDetail.orgId,
-            total_revenue: showingData.total_revenue,
+            total_revenue: 0,
             events: new Map<number, EventRevenueDataDTO>()
           });
         }
@@ -134,7 +135,7 @@ export class CalculateRevenueService {
           organizerData.events.set(showingDetail.eventId, {
             event_id: showingDetail.eventId,
             event_name: showingDetail.title,
-            total_revenue: showingData.total_revenue,
+            total_revenue: 0,
             showings: new Map<string, ShowingRevenueDataDTO>()
           });
         }
@@ -162,18 +163,10 @@ export class CalculateRevenueService {
   async getRevenueByDateWithoutFail(date: string): Promise<RevenueDataDTO> {
     try {
       const orders = await this.orderRepository.findAll({
-          OR: [
-            { createdAt: {
+          createdAt: {
               gte: new Date(`${date}T00:00:00Z`),
               lt: new Date(`${date}T23:59:59Z`),
-              },
-            },
-            { updatedAt: {
-              gte: new Date(`${date}T00:00:00Z`),
-              lt: new Date(`${date}T23:59:59Z`),
-              },
-            },
-          ],
+        },
           status: BookingTicketStatus.SUCCESS
         },
         {

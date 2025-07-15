@@ -34,18 +34,14 @@ export class GetOrgRevenueChartService {
         return Err(new Error('fromDate must be earlier than or equal to toDate'));
       }
 
-      if (!from || !to) {
-        // const today = new Date();
-        // if (filterType === 'month') {
-        //   from = startOfMonth(subMonths(today, 2));
-        //   to = today; // 4 weeks later
-        // } else if (filterType === 'year') {
-        //   from = new Date(today.getFullYear(), 0, 1); // start of the year
-        //   to = new Date(today.getFullYear() + 1, 0, 1); // start of next year
-        // } else {
-        //   return Err(new Error("Invalid filterType. Must be 'month' or 'year'"));
-        // }
-        [from, to] = await this.saveRevenueDataService.getRangeData();
+      const [rangeFrom, rangeTo] = await this.saveRevenueDataService.getRangeData();
+
+
+      if (!from || from < rangeFrom) {
+        from = rangeFrom;
+      }
+      if (!to || to > rangeTo) {
+        to = rangeTo;
       }
 
       if (filterType && filterType !== 'month' && filterType !== 'year') {

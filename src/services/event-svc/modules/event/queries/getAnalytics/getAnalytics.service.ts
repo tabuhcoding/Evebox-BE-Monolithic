@@ -107,7 +107,7 @@ export class GetAnalyticsService {
         query: userRequest || ""
       };
 
-      const responseAI = await fetch('https://evebox-utils.onrender.com/analytics', {
+      const responseAI = await fetch(`${process.env.UTILS_URL}/analytics`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

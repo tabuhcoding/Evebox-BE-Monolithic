@@ -69,7 +69,7 @@ export class GetEventSummaryService {
         query: userRequest || ""
       };
 
-      const responseAI = await fetch('https://evebox-utils.onrender.com/revenue', {
+      const responseAI = await fetch(`${process.env.UTILS_URL}/revenue`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

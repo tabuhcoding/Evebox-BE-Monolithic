@@ -168,6 +168,7 @@ export class SaveRevenueDataService {
       };
     }
     const count = await this.organizerRevenueRepository.countDistinct('org_id', query);
+    if (pagination.limit <= 0 ) pagination.limit = count;
     const paginationResult: Pagination = {
       totalItems: count,
       page: pagination.page,

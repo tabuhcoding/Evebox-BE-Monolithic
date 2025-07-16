@@ -2,7 +2,7 @@ name: Docker Push on Promote from Dev
 
 on:
   pull_request:
-    branches: []
+    branches: [dev]
     types: [closed]
 
 jobs:

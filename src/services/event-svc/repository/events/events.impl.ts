@@ -421,6 +421,16 @@ export class EventsRepositoryImpl
       const organizerEvents = await this.findMany({
         organizerId: email,
         deleteAt: null,
+      }, {
+        locations: {
+            include: {
+              districts: {
+                include: {
+                  province: true,
+                },
+              },
+            },
+          }
       });
 
       // 2. Get events from UserEventRelationship

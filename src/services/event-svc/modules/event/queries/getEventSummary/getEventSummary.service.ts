@@ -7,6 +7,8 @@ import { EventSummaryData } from "./getEventSummary-response.dto";
 import { EVENT_ROLE } from "../../domain/eventRole";
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 import { CheckUserExistService } from "src/services/auth-svc/modules/user/commands/checkuserExist/checkuserExist.service";
+import { GetAllEventDetailForRAGService } from "../getAllEventDetailForRAG/getAllEventDetailForRAG.service";
+import { EventDocumentBuilder } from "src/services/rag-svc/modules/openai/core-embedding/event-document.builder";
 
 @Injectable()
 export class GetEventSummaryService {
@@ -15,6 +17,7 @@ export class GetEventSummaryService {
     @Inject('ShowingWithEventRepository') private readonly showingWithEventRepository: ShowingWithEventRepository,
     private readonly slackService: SlackService,    
     private readonly checkUserExistService: CheckUserExistService,
+    private readonly getAllEventForRagService: GetAllEventDetailForRAGService
   ) {}
 
   async execute(showingId: string, organizerId: string): Promise<Result<EventSummaryData, Error>> {
@@ -53,10 +56,8 @@ export class GetEventSummaryService {
 
   async executeAI(showingId: string, userRequest?: string): Promise<Result<string, Error>> {
     try {
-      const showing = await this.showingWithEventRepository.findOneById(showingId, {
-        Events: true,
-      });
-      const result = await this.execute(showingId, showing.Events.organizerId);
+      const event = await this.getAllEventForRagService.getEventByShowingId(showingId);
+      const result = await this.execute(showingId, event.organizerId);
 
       if (result.isErr()) {
         return Err(new Error(result.unwrapErr().message));
@@ -64,9 +65,12 @@ export class GetEventSummaryService {
 
       const data = result.unwrap();
 
+      const doc = EventDocumentBuilder.buildFullDocument(event);
+
       const payload = {
         data: data,
-        query: userRequest || ""
+        query: userRequest || "",
+        event: doc.pageContent
       };
 
       const responseAI = await fetch(`${process.env.UTILS_URL}/revenue`, {

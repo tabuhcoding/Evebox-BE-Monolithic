@@ -7,6 +7,7 @@ export class GetAllEventDetailForRAGResponseDto {
   description: string;
   location: string;
   venue: string;
+  organizerId?: string;
   organizer: string;
   organizerDescription: string;
   isOnlineEvent: boolean;

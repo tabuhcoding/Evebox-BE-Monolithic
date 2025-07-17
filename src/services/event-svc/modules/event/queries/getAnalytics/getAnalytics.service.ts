@@ -6,6 +6,8 @@ import { EventsRepository } from "src/services/event-svc/repository/events/event
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 import { CheckUserExistService } from "src/services/auth-svc/modules/user/commands/checkuserExist/checkuserExist.service";
 import { EVENT_ROLE } from "../../domain/eventRole";
+import { GetAllEventDetailForRAGService } from "../getAllEventDetailForRAG/getAllEventDetailForRAG.service";
+import { EventDocumentBuilder } from "src/services/rag-svc/modules/openai/core-embedding/event-document.builder";
 
 @Injectable()
 export class GetAnalyticsService {
@@ -13,6 +15,7 @@ export class GetAnalyticsService {
     @Inject('EventsRepository') private readonly eventRepository: EventsRepository,
     private readonly slackService: SlackService,
     private readonly checkUserExistService: CheckUserExistService,
+    private readonly getAllEventForRagService: GetAllEventDetailForRAGService
   ) { }
 
   async execute(eventId: number, userEmail: string, startDate?: Date, endDate?: Date): Promise<Result<AnalyticsResponseData, Error>> {
@@ -90,11 +93,12 @@ export class GetAnalyticsService {
 
   async executeAI(eventId: number, startDate?: Date, endDate?: Date, userRequest?: string): Promise<Result<string, Error>> {
     try {
-      const event = await this.eventRepository.findOneById(eventId);
+      const event = await this.getAllEventForRagService.getEventById(eventId);
       if (!event) {
         return Err(new Error('Event not found'));
       }
       const result = await this.execute(eventId, event.organizerId, startDate, endDate);
+      const doc = EventDocumentBuilder.buildFullDocument(event);
 
       if (result.isErr()) {
         return Err(new Error(result.unwrapErr().message));
@@ -104,7 +108,8 @@ export class GetAnalyticsService {
 
       const payload = {
         data: data,
-        query: userRequest || ""
+        query: userRequest || "",
+        event: doc.pageContent
       };
 
       const responseAI = await fetch(`${process.env.UTILS_URL}/analytics`, {

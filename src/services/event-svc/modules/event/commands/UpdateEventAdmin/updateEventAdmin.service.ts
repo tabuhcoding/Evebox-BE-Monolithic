@@ -27,6 +27,13 @@ export class UpdateEventAdminService {
       }
 
     try {
+      const currentEvent = await this.eventRepository.findOneById(eventId);
+      if (!currentEvent) {
+        return Err(new Error('Event not found'));
+      }
+      if (dto.isApproved !== undefined && dto.isApproved !== currentEvent.isApproved && emailStr !== currentEvent.manageBy) {
+        return Err(new Error('You do not have permission to approve or unapprove this event'));
+      }
       const event = await this.eventRepository.updateEventFields(dto, eventId);
 
       if (!event) {

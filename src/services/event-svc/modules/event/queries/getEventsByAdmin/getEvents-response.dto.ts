@@ -47,6 +47,12 @@ export class EventAdminDataDto {
   @ApiProperty({ example: 'dattruong01082@gmail.com', description: 'Organizer email' })
   organizerId: string;
 
+  @ApiProperty({ example: 'dattruong01082@gmail.com', description: 'Admin email' })
+  manageBy: string;
+
+  @ApiProperty({ example: true, description: 'Can manage event' })
+  canManage: boolean;
+
   @ApiProperty({ example: true, description: 'Event is approved' })
   isApproved: boolean;
 

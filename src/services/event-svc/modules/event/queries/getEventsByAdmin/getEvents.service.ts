@@ -145,6 +145,7 @@ export class GetEventsByAdminService {
             deleteAt: event.deleteAt,
             organizerId: event.organizerId,
             manageBy: event.manageBy,
+            canManage: event.manageBy === email,
             imgLogoUrl: event.imgLogoUrl,
             imgPosterUrl: event.imgPosterUrl,
             locationString: `${event.locations?.street || ''}, ${event.locations?.ward || ''}, ${event.locations?.districts?.name || ''}, ${event.locations?.districts?.province?.name || ''}`,

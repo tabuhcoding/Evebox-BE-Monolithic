@@ -27,6 +27,27 @@ export class GetPaymentInfoService {
     }
   }
 
+  async executeMany(ids: number[]): Promise<Result<Map<number, PaymentInfo>, Error>> {
+    try {
+      const paymentInfos = await this.paymentInfoRepository.findMany({
+        id: { in: ids }
+      });
+
+      // Filter out null responses
+      const paymentInfoMap = new Map<number, PaymentInfo>();
+      paymentInfos.forEach(paymentInfo => {
+        if (paymentInfo) {
+          paymentInfoMap.set(paymentInfo.orderId, paymentInfo);
+        }
+      });
+      return Ok(paymentInfoMap);
+    } catch (error) {
+      console.error("🚀 ~ GetPaymentInfoService ~ executeMany ~ error:", error);
+      await this.slackService.sendError(` Payment Svc >>> GetPaymentInfoService : ${error.message}`);
+      return Err(new Error('Failed to retrieve payment information'));
+    }
+  }
+
   async getPaymentInfoByOrderId(orderId: number): Promise<PaymentInfo | null> {
     try {
       const paymentInfo = await this.paymentInfoRepository.findOne({

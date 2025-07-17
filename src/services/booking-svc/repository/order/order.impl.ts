@@ -25,6 +25,9 @@ export class OrderRepositoryImpl
       try {
         var filterQuery: any = {
           showingId,
+          status: {
+            not: BookingTicketStatus.PENDING
+          },
         }
         if (userEmail) {
           filterQuery.userId = userEmail;
@@ -37,7 +40,7 @@ export class OrderRepositoryImpl
         const orders = await this.findMany(filterQuery, {
           Ticket: true,
         }, {
-          createdAt: 'desc',
+          id: 'desc',
         }, (paginationQuery.page - 1) * paginationQuery.limit, paginationQuery.limit);
 
 
@@ -45,46 +48,34 @@ export class OrderRepositoryImpl
         return Ok([[], null]);
       }
 
+      let paymentIds = []
+      let formResponseIds = []
+      orders.forEach(order => {
+        if (order.paymentId) {
+          paymentIds.push(order.paymentId);
+        }
+        if (order.formResponseId) {
+          formResponseIds.push(order.formResponseId);
+        }
+      });
+      
+      const paymentInfos = await this.getPaymentInfoService.executeMany(paymentIds);
+      if (paymentInfos.isErr()) {
+        return Err(new Error(paymentInfos.unwrapErr().message));
+      }
+      const formResponses = await this.getFormResponseByIdService.executeMany(formResponseIds);
+      if (formResponses.isErr()) {
+        return Err(new Error(formResponses.unwrapErr().message));
+      }
+
+      const paymentInfosResult = paymentInfos.unwrap();
+      const formResponsesResult = formResponses.unwrap();
+
       let orderData: OrderData[] = [];
-      for (const order of orders) {
-        const formResponseId = order.formResponseId;
-        const paymentInfoId = order.paymentId;
+      orders.forEach(order => {
+        const paymentInfo = paymentInfosResult.get(order.id) || null;
+        const formResponse = formResponsesResult.get(order.id) || null;
 
-        const formResponse = await this.getFormResponseByIdService.execute(Number(formResponseId));
-        if (formResponse.isErr()) {
-          return Err(new Error(`Failed to get form response of order ${order.id}`));
-        }
-
-        const paymentInfo = await this.getPaymentInfoService.execute(paymentInfoId);
-        if (paymentInfo.isErr()) {
-          return Err(new Error(`Failed to get payment info of payment ${paymentInfoId}`));
-        }
-
-        const paymentInfoData = paymentInfo.unwrap();
-
-        // Struct the ticket data group by ticket type
-        // Re structure the tickets
-        // const ticketsMapByTicketTypeId = new Map<string, TicketGroupedByTicketTypeID>();
-
-        // count
-        // for (const ticket of order.Ticket) {
-        //   // Check if the ticket type already exists in the map
-        //   // If not, fetch the ticket type details and add it to the map
-        //   if (!ticketsMapByTicketTypeId.has(ticket.ticketTypeId)) {
-        //     ticketsMapByTicketTypeId.set(ticket.ticketTypeId, {
-        //       id: ticket.ticketTypeId,
-        //       tickets: []
-        //     });
-        //   }
-
-        //   ticketsMapByTicketTypeId.get(ticket.ticketTypeId)!.tickets.push({
-        //     id: ticket.id,
-        //     seatID: ticket.seatId,
-        //     sectionID: ticket.sectionId,
-        //     qrCode: ticket.qrCode,
-        //     description: ticket.description,
-        //   });
-        // }
         orderData.push({
           id: order.id,
           status: order.status,
@@ -94,17 +85,17 @@ export class OrderRepositoryImpl
           showingId: order.showingId,
           userId: order.userId,
           ownerId: order.ownerId || order.userId, // If ownerId is not set, use userId
-          formResponse: formResponse.unwrap(),
+          formResponse: formResponse,
           paymentInfo: {
-            id: paymentInfoData.id,
-            method: paymentInfoData.method,
-            paidAt: paymentInfoData.paidAt,
+            id: paymentInfo.id,
+            method: paymentInfo.method,
+            paidAt: paymentInfo.paidAt,
           },
           createdAt: order.createdAt,
           totalTicket: order.Ticket.length,
           // Ticket: Array.from(ticketsMapByTicketTypeId.values()),         
         });
-      }
+      });
 
       return Ok([orderData, {
         page: paginationQuery.page,

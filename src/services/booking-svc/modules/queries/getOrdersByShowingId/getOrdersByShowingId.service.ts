@@ -87,7 +87,6 @@ export class GetOrdersByShowingIdService {
       if (orderId) {
         querySearch = {
             id: orderId,
-            showingId: showingId,
         };
       }
 
@@ -113,7 +112,7 @@ export class GetOrdersByShowingIdService {
       }, {
         qrCode: false,
         Order: true,
-      }, {}, (pagination.page - 1) * pagination.limit, pagination.limit);
+      }, {orderId: 'desc'}, (pagination.page - 1) * pagination.limit, pagination.limit);
 
       return Ok([tickets, paginationResult]);
     } catch (error) {

@@ -54,7 +54,7 @@ export class CreateEventService {
       }
 
       // Get the admin will manage this event
-      const admin = await this.checkUserExistService.getAdminHasLeastTotalEvent();
+      const admin = await this.checkUserExistService.getAdminHasLeastTotalEvent(email);
 
       // Create the event
       const eventId = await this.eventsRepository.createEvent(dto, email, admin, locationId);

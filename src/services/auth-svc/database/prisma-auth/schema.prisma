@@ -34,6 +34,7 @@ model User {
   role                  Role?                   @relation(fields: [role_id], references: [id])
   favoriteNotiHistory   FavoriteNotiHistory[]   @relation("UserFavoriteHistory")
   userPin             UserPin?
+  totalEvents          Int?                     
   @@map("users")
 }
 

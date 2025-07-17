@@ -205,6 +205,7 @@ model Events {
   title                  String                  @db.VarChar(255)
   description            String?
   organizerId            String?
+  manageBy               String?
   locationId             Int?
   imgLogoUrl             String?
   imgPosterUrl           String?

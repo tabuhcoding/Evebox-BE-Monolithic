@@ -40,4 +40,5 @@ export interface UserRepository extends BaseAuthRepository<User, Prisma.UserDele
   updateUserRoleToOrganizer(email: string): Promise<boolean>;
   countWithSearch(search: string): Promise<number>;
   getUsersWithSearch(search: string, pagination: PaginationQuery): Promise<string[]>;
+  increaseTotalEvents(email: string): Promise<void>;
 }

@@ -36,10 +36,11 @@ export class CheckUserExistService {
   }
 
   // get the admin has the least total event 
-  async getAdminHasLeastTotalEvent(): Promise<string | null> {
+  async getAdminHasLeastTotalEvent(email: string): Promise<string | null> {
     try {
       const admins = await this.userRepository.findMany({
         role_id: 1, // Assuming 1 is the role_id for admin
+        email: { not: email }, // Exclude the current user
       }, {
         totalEvents: true,
       });

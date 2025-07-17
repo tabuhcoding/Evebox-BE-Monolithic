@@ -7,14 +7,14 @@ import { UserDataResponse } from "./getUsersByAdmin-response.dto";
 import { GetUsersByAdminDto } from "./getUsersByAdmin.dto";
 
 @ApiTags('Authentication Service - Admin')
-@Controller('api/admin/user')
+@Controller('api/admin')
 export class GetUsersByAdminController {
   constructor(
     private readonly getUsersByAdminService: GetUsersByAdminService,
   ) { }
 
   @UseGuards(JwtAuthGuard)
-  @Get('/')
+  @Get('/user')
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Get events by admin with filters and pagination' })
   @ApiResponse({
@@ -54,6 +54,46 @@ export class GetUsersByAdminController {
           data: data[0],
           pagination: data[1],
         }
+      });
+    } catch (error) {
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: 'Internal server error',
+      });
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/admin')
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Get all admin email' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Admins retrieved successfully',
+    type: UserDataResponse
+  })
+  async getAllAdmin(
+    @Res() res: Response,
+    @Request() req
+  ) {
+    try {
+      const email = req?.user?.email;
+
+      const result = await this.getUsersByAdminService.getAllAdmin();
+
+      if (result.isErr()) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+          statusCode: HttpStatus.BAD_REQUEST,
+          message: result.unwrapErr().message,
+        });
+      }
+
+      const data = result.unwrap();
+
+      return res.status(HttpStatus.OK).json({
+        statusCode: HttpStatus.OK,
+        message: 'Users retrieved successfully',
+        data
       });
     } catch (error) {
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({

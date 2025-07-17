@@ -53,8 +53,11 @@ export class CreateEventService {
         locationId = locationIdRes;
       }
 
+      // Get the admin will manage this event
+      const admin = await this.checkUserExistService.getAdminHasLeastTotalEvent();
+
       // Create the event
-      const eventId = await this.eventsRepository.createEvent(dto, email, locationId);
+      const eventId = await this.eventsRepository.createEvent(dto, email, admin, locationId);
       if (!eventId) {
         return Err(new Error('Failed to create event'));
       }
@@ -66,8 +69,9 @@ export class CreateEventService {
         return Err(categoryResult.unwrapErr());
       }
 
-      this.newEventTriggerService.sendEmailToAdmin(dto, email);
+      this.newEventTriggerService.sendEmailToAdmin(dto, email, [admin]);
 
+      this.checkUserExistService.increaseTotalEventsOfAdmin(admin)
       return Ok({ id: eventId });
     } catch (error) {
       await this.slackService.sendError(`EventSvc - Event >>> CreateEventService: ${error.message}`);

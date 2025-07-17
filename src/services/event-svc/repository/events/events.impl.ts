@@ -85,7 +85,7 @@ export class EventsRepositoryImpl
   }
 
   /* Create Event */
-  async createEvent(dto: CreateEventDto, email: string, locationId?: number): Promise<number> {
+  async createEvent(dto: CreateEventDto, email: string,admin: string, locationId?: number): Promise<number> {
     try {
       const result = await this.prisma.events.create({
         data: {
@@ -94,6 +94,7 @@ export class EventsRepositoryImpl
           isOnline: dto.isOnline ? true : false,
           locationId: locationId >> 0 || null,
           organizerId: email,
+          manageBy: admin,
           venue: dto.venue,
           imgLogoUrl: dto.imgLogoUrl,
           imgPosterUrl: dto.imgPosterUrl,

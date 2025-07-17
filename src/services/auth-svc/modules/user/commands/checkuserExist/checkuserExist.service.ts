@@ -34,4 +34,36 @@ export class CheckUserExistService {
       return false;
     }
   }
+
+  // get the admin has the least total event 
+  async getAdminHasLeastTotalEvent(): Promise<string | null> {
+    try {
+      const admins = await this.userRepository.findMany({
+        role_id: 1, // Assuming 1 is the role_id for admin
+      }, {
+        totalEvents: true,
+      });
+
+      if (admins.length === 0) return null;
+
+      // Sort admins by totalEvents and return the one with the least
+      const adminWithLeastEvents = admins.reduce((prev, curr) => {
+        return (prev.totalEvents || 0) < (curr.totalEvents || 0) ? prev : curr;
+      });
+
+      return adminWithLeastEvents.email.toString();
+    } catch (error) {
+      await this.slackService.sendError(`AuthSVC >>> Error getting admin with least total events: ${error.message}`);
+      return null;
+    }
+  }
+
+  async increaseTotalEventsOfAdmin(email: string): Promise<void> {
+    try {
+      // Increase the totalEvents count for the admin
+      await this.userRepository.increaseTotalEvents(email);
+    } catch (error) {
+      await this.slackService.sendError(`AuthSVC >>> Error increasing total events for admin: ${error.message}`);
+    }
+  }
 }

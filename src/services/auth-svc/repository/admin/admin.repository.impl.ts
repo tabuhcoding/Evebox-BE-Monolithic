@@ -145,6 +145,7 @@ export class AdminRepositoryImpl implements AdminRepository {
       password,
       phone,
       role,
+      userRecord.totalEvents,
       avatarId,
       status,
       createAt

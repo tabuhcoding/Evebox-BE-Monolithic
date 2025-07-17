@@ -110,4 +110,19 @@ export class GetUsersByAdminService {
       return Err(new Error('Internal server error'));
     }
   }
+
+  async getAllAdmin(): Promise<Result<string[], Error>> {
+    try {
+      const admins = await this.userRepository.findMany({
+        role_id: 1, // Assuming 1 is the ID for admin role
+        status: 'ACTIVE'
+      }, {}, { created_at: 'desc' });
+
+      const adminEmails = admins.map(admin => typeof admin.email === 'object' && 'value' in admin.email ? admin.email.value : String(admin.email));
+      return Ok(adminEmails);
+    } catch (error) {
+      await this.slackService.sendError(`Auth Svc >>> GetUsersByAdminService: ${error.message}`);
+      return Err(new Error('Failed to retrieve admin users'));
+    }
+  }
 }

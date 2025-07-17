@@ -236,6 +236,7 @@ export class UserRepositoryImpl extends BaseAuthRepository<User, Prisma.UserDele
       password,
       phone,
       role,
+      userRecord.totalEvents,
       avatarId,
       status,
       createAt,
@@ -529,5 +530,12 @@ export class UserRepositoryImpl extends BaseAuthRepository<User, Prisma.UserDele
     const userIds = users.map(user => user.email);
 
     return userIds;
+  }
+
+  async increaseTotalEvents(email: string): Promise<void>{
+    await this.prisma.user.update({
+      where: { email: email },
+      data: { totalEvents: { increment: 1 } },
+    });
   }
 }

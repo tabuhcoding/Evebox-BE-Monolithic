@@ -126,7 +126,7 @@ export interface EventsRepository extends BaseEventRepository<Events, Prisma.Eve
   findManyByIdsWithDetails(ids: number[]): Promise<Events[]>;
   updateEventFields(dto: UpdateEventAdminDto, eventId: number): Promise<any | null>;
   /* Create Event */
-  createEvent(data: CreateEventDto, email: string, locationId?: number): Promise<number>;
+  createEvent(data: CreateEventDto, email: string, admin: string, locationId?: number): Promise<number>;
 
   /* Update Event */
   updateEvent(dto: UpdateEventDto, eventId: number, isValid: boolean, locationId?: number): Promise<[number, boolean]>;

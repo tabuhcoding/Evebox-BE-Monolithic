@@ -69,12 +69,17 @@ export class GetEventsByAdminService {
         }
         : undefined;
 
+      const adminFilter = filters.admin
+        ? { manageBy: filters.admin }
+        : undefined;
+
       const payloadFilters = {
         ...titleFilter,
         ...isApprovedFilter,
         ...isDeletedFilter,
         ...timeStampFilter,
         ...categoryFilter,
+        ...adminFilter,
       };
 
       // Count total events
@@ -139,6 +144,7 @@ export class GetEventsByAdminService {
             createdAt: event.createdAt,
             deleteAt: event.deleteAt,
             organizerId: event.organizerId,
+            manageBy: event.manageBy,
             imgLogoUrl: event.imgLogoUrl,
             imgPosterUrl: event.imgPosterUrl,
             locationString: `${event.locations?.street || ''}, ${event.locations?.ward || ''}, ${event.locations?.districts?.name || ''}, ${event.locations?.districts?.province?.name || ''}`,

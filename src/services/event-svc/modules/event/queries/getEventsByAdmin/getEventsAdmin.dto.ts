@@ -48,5 +48,13 @@ export class GetEventsAdminDto extends PaginationQuery {
     type: String,
   })
   createdTo?: string;
+
+  @ApiProperty({
+    example: 'dattruong01082@gmail.com',
+    description: 'Filter events is managed by this admin',
+    required: false,
+    type: String,
+  })
+  admin?: string;
 }
   

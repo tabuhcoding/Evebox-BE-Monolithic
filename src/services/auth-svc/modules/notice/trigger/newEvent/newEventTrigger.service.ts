@@ -15,8 +15,7 @@ export class NewEventTriggerService {
         private readonly emailService: EmailService,
     ) {}
 
-    async sendEmailToAdmin(dto: CreateEventDto, orgId: string): Promise<void> {
-        const adminEmails = await this.userRepository.findAllAdminEmails();
+    async sendEmailToAdmin(dto: CreateEventDto, orgId: string, adminEmails: string[]): Promise<void> {
         await this.emailService.sendNewEventToAdmins(adminEmails, dto, orgId);
         await this.slackService.sendNotice(`
             New event created: ${dto.title} by ${orgId} with Info ${dto.orgName}. Description: ${dto.description}`);

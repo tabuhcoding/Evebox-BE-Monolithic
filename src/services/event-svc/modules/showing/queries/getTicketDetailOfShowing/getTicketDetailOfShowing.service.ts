@@ -25,7 +25,8 @@ export class GetTicketDetailOfShowingService {
     if (!showing || !showing.TicketType.length) return Err(new Error('No ticket of showing found'));
 
     const ticket = showing.TicketType[0];
-    const ticketSold = await this.countCheckedInTicketsService.execute([ticket.id]);
+    const ticketSoldMap = await this.countCheckedInTicketsService.execute([ticket.id]);
+    const ticketSold = ticketSoldMap[ticket.id] ?? 0;
     const statusInfo = await this.getTicketStatus(showing.seatMapId, ticket.id);
 
     const result: TicketTypeDetailData = {

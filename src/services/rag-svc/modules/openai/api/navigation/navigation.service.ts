@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { CreateResponseService } from "../../provider/create-response.service";
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
-import { OpenAIRouteEnum, RouteDescription } from "../../domain/navigation.enum";
+import { OpenAIRouteEnum, RouteDescription, RouteTutorial } from "../../domain/navigation.enum";
 import { FileCacheService } from "src/infrastructure/cache/fileCache/fileCache.service";
 import { OpenAIVectorStoreService } from "../../core-embedding/vector-store.service";
 import { NavigationResponseDTO } from "./navigation-response.dto";
@@ -30,6 +30,10 @@ export class OpenAINavigationService {
       Object.entries(RouteDescription)
         .map(([key, value]) => `- ${key}: ${value}`)
         .join('\n')
+    }
+    ${Object.entries(RouteTutorial)
+      .map(([key, value]) => `- ${key}: ${value}`)
+      .join('\n')
     }
     `;
 

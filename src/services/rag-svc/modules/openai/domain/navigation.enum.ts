@@ -12,6 +12,18 @@ export enum OpenAIRouteEnum {
   LEGAL_DOCUMENT_PAGE = 'LEGAL_DOCUMENT_PAGE',
   POLICY_PAGE = 'POLICY_PAGE',
   NONE = 'NONE',
+  SIGNUP_PAGE = 'SIGNUP_PAGE',
+  SIGNIN_PAGE = 'SIGNIN_PAGE',
+  TUTORIAL_PAGE_SEARCH = 'TUTORIAL_PAGE_SEARCH',
+  TUTORIAL_PAGE_FOLLOW_EVENT = 'TUTORIAL_PAGE_FOLLOW_EVENT',
+  TUTORIAL_PAGE_SIGN_UP = 'TUTORIAL_PAGE_SIGN_UP',
+  TUTORIAL_PAGE_SIGN_IN = 'TUTORIAL_PAGE_SIGN_IN',
+  TUTORIAL_UPDATE_INFO = 'TUTORIAL_UPDATE_INFO',
+  TUTORIAL_PAGE_BUY_TICKET = 'TUTORIAL_PAGE_BUY_TICKET',
+  TUTORIAL_PAGE_VIEW_TICKET_QR = 'TUTORIAL_PAGE_VIEW_TICKET_QR',
+  TUTORIAL_PAGE_CREATE_EVENT = 'TUTORIAL_PAGE_CREATE_EVENT',
+  TUTORIAL_PAGE_MANAGE_EVENT = 'TUTORIAL_PAGE_MANAGE_EVENT',
+  TUTORIAL_PAGE_CHECKIN_EVENT = 'TUTORIAL_PAGE_CHECKIN_EVENT',
 }
 
 export const RouteDescription = {
@@ -30,3 +42,16 @@ export const RouteDescription = {
   [OpenAIRouteEnum.NONE]: 'If you cannot find any page, this is the default page',
 }
 
+
+export const RouteTutorial ={
+  [OpenAIRouteEnum.TUTORIAL_PAGE_SEARCH]: 'This page is showing how can user find their event. Redirect to this page if user is asking about how to find their event, or asking about how to search for events, but dont add any information about their wanted event. If user provided information about their wanted event, redirect to Search Page instead.',
+  [OpenAIRouteEnum.TUTORIAL_PAGE_FOLLOW_EVENT]: 'This page is showing how can user follow an event. Redirect to this page if user is asking about how to follow an event, or asking about how to get notification about an event, but dont add any information about their wanted event.',
+  [OpenAIRouteEnum.TUTORIAL_PAGE_SIGN_UP]: 'This page is showing how can user sign up to Evebox. Redirect to this page if user is asking about how to sign up, or asking about how to create an account. If user is asking something like "I want to create an account", redirect to SIGNUP_PAGE instead.',
+  [OpenAIRouteEnum.TUTORIAL_PAGE_SIGN_IN]: 'This page is showing how can user sign in to Evebox. Redirect to this page if user is asking about how to sign in, or asking about how to log in. If user is asking something like "I want to log in", redirect to SIGNIN_PAGE instead.',
+  [OpenAIRouteEnum.TUTORIAL_UPDATE_INFO]: 'This page is showing how can user update their profile information. Redirect to this page if user is asking about how to update their profile information, or asking about how to change their profile picture, or asking about how to change their name, or asking about how to change their email address. If user is asking something like "I want to change my profile picture", redirect to PROFILE_PAGE instead.',
+  [OpenAIRouteEnum.TUTORIAL_PAGE_BUY_TICKET]: 'This page is showing how can user buy a ticket. Redirect to this page if user is asking about how to buy a ticket, or asking about how to purchase a ticket, or asking about how to pay for a ticket. If user is asking something like "I want to buy a ticket", redirect to EVENT_DETAIL_PAGE instead.',
+  [OpenAIRouteEnum.TUTORIAL_PAGE_VIEW_TICKET_QR]: 'This page is showing how can user view their ticket QR code. Redirect to this page if user is asking about how to view their ticket QR code, or asking about how to check in to an event, or asking about how to show their ticket QR code. If user is asking something like "I want to view my ticket" and not asking something about "checkin, QRCode", redirect to MY_TICKETS_PAGE instead, because Qrcode only can view on MobileApp.',
+  [OpenAIRouteEnum.TUTORIAL_PAGE_CREATE_EVENT]: 'This page is showing how can user create an event. Redirect to this page if user is asking about how to create an event, or asking about how to organize an event, or asking about how to host an event. If user is asking something like "I want to create an event", redirect to CREATE_EVENT_PAGE instead.',
+  [OpenAIRouteEnum.TUTORIAL_PAGE_MANAGE_EVENT]: 'This page is showing how can user manage their event. Redirect to this page if user is asking about how to manage their event, or asking about how to edit their event, or asking about how to update their event. If user is asking something like "I want to edit my event", redirect to MY_EVENTS_PAGE instead.',
+  [OpenAIRouteEnum.TUTORIAL_PAGE_CHECKIN_EVENT]: 'This page is showing how can user check in to an event. Redirect to this page if user is asking about check in their customers for an event, Checkin only can do on MobileApp, so redirect to this page if user is asking any thing about "check in".',
+}

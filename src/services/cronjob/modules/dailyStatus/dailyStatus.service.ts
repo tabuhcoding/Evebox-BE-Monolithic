@@ -59,7 +59,11 @@ export class DailyStatusService {
       // Calculate revenue for the previous day
       const yesterday = new Date();
       yesterday.setDate(yesterday.getDate() - 1);
-      const revenueData = await this.calculateRevenueService.getRevenueByDateWithoutFail(yesterday.toISOString().split('T')[0]);
+      const checkDateExist = await this.saveRevenueDataService.checkDateHasData(yesterday.toISOString().split('T')[0]);
+      if (checkDateExist) {
+        return;
+      }
+      const revenueData = await this.calculateRevenueService.getRevenueByDate(yesterday.toISOString().split('T')[0]);
       await this.slackService.sendNotice(`Revenue data for ${yesterday.toISOString().split('T')[0]}: ${revenueData.total_revenue}`);
       await this.saveRevenueDataService.saveRevenueData(revenueData);
     } catch (error) {
@@ -73,11 +77,11 @@ export class DailyStatusService {
       // Get all unique dates in orders
       const uniqueDates = await this.calculateRevenueService.getAllDatesInOrder();
       for (const date of uniqueDates) {
-        // const checkDateExist = await this.saveRevenueDataService.checkDateHasData(date);
-        // if (checkDateExist) {
-        //   await this.slackService.sendNotice(`Revenue data for ${date} already exists. Skipping.`);
-        //   continue;
-        // }
+        const checkDateExist = await this.saveRevenueDataService.checkDateHasData(date);
+        if (checkDateExist) {
+          await this.slackService.sendNotice(`Revenue data for ${date} already exists. Skipping.`);
+          continue;
+        }
         await this.slackService.sendNotice(`Calculating revenue for date: ${date}`);
         // Calculate revenue for each date
         const revenueData = await this.calculateRevenueService.getRevenueByDateWithoutFail(date);
@@ -86,6 +90,7 @@ export class DailyStatusService {
           await this.saveRevenueDataService.saveRevenueData(revenueData);
           await this.slackService.sendNotice(`Revenue data for ${date} saved successfully. ${revenueData.total_revenue}`);
         }
+        return;
       }
       await this.slackService.sendNotice('Calculating revenue for the day. success');
     } catch (error) {

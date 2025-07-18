@@ -74,6 +74,15 @@ export class AdminRepositoryImpl implements AdminRepository {
       }
     });
 
+    if (role === UserRole.ADMIN) {
+      await this.prisma.adminManageEvent.create({
+        data: {
+          email: userId,
+          area_code: 'HANOI', // Default area code for new admin
+        }
+      });
+    }
+
     const domainEvents = user.getDomainEvents();
     for (const event of domainEvents) {
       await this.eventBus.publish(event);

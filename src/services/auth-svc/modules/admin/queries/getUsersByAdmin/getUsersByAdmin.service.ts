@@ -7,11 +7,13 @@ import { CheckUserExistService } from "../../../user/commands/checkuserExist/che
 import { GetUsersByAdminDto } from "./getUsersByAdmin.dto";
 import { Pagination } from "src/shared/constants/pagination";
 import { UserRole } from "../../../user/domain/enums/user-role.enum";
+import { AdminManageEventRepository } from "src/services/auth-svc/repository/admin-area/admin-area.repo";
 
 @Injectable()
 export class GetUsersByAdminService {
   constructor(
     @Inject('UserRepository') private readonly userRepository: UserRepository,
+    @Inject('AdminManageEventRepository') private readonly adminManageEventRepository: AdminManageEventRepository,
     private readonly checkUserExistService: CheckUserExistService,
     private readonly slackService: SlackService
   ) { }
@@ -123,6 +125,17 @@ export class GetUsersByAdminService {
     } catch (error) {
       await this.slackService.sendError(`Auth Svc >>> GetUsersByAdminService: ${error.message}`);
       return Err(new Error('Failed to retrieve admin users'));
+    }
+  }
+
+  async getAllArea(): Promise<Result<string[], Error>> {
+    try {
+      const areas = await this.adminManageEventRepository.findMany({}, { area_code: true });
+      const areaCodes = areas.map(area => area.area_code);
+      return Ok(areaCodes);
+    } catch (error) {
+      await this.slackService.sendError(`Auth Svc >>> GetUsersByAdminService: ${error.message}`);
+      return Err(new Error('Failed to retrieve area codes'));
     }
   }
 }

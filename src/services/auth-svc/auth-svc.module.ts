@@ -86,6 +86,8 @@ import { GetUsersByAdminController } from "./modules/admin/queries/getUsersByAdm
 import { FindUserByEmailService } from "./modules/user/commands/find-user-by-email/findUserByEmail.service";
 import { GetUserByIdController } from "./modules/user/queries/get-user-by-id/get-user-by-id.controller";
 import { GetUserByIdService } from "./modules/user/queries/get-user-by-id/get-user-by-id.service";
+import { GetUserByEmailController } from './modules/user/queries/get-user-by-email/get-user-by-email.controller';
+import { GetUserByEmailService } from './modules/user/queries/get-user-by-email/get-user-by-email.service';
 import { PrismaAuthModule } from "./database/prisma-auth/prisma.module";
 import { NewEventTriggerService } from "./modules/notice/trigger/newEvent/newEventTrigger.service";
 import { UpdateUserToOrgService } from "./modules/user/commands/update-user-to-org/updateUserToOrg.service";
@@ -133,6 +135,7 @@ import { SaveRevenueDataService } from './modules/admin/commands/saveRevenueData
     VerifyUserPinController,
     ChangeUserPinController,
     GetUserByIdController,
+    GetUserByEmailController,
     AddToFavoriteController,
     UnfavoriteEventController,
     UnfavoriteOrgController,
@@ -169,6 +172,7 @@ import { SaveRevenueDataService } from './modules/admin/commands/saveRevenueData
     GoogleLoginService,
     GetUserService,
     GetUserByIdService,
+    GetUserByEmailService,
     AddToFavoriteService,
     UnfavoriteEventService,
     UnfavoriteOrgService,

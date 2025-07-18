@@ -23,55 +23,75 @@ export class SaveRevenueDataService {
   async saveRevenueData(data: RevenueDataDTO): Promise<void> {
     try{
       // revenue
-      const revenue = await this.revenueRepository.insertOneWithNumberId({
-        date: data.date,
-        total_revenue: data.total_revenue,
+      const revenue = await this.revenueRepository.upsertAndFindOne(
+        {
+          date: data.date,
+        }
+        ,{
+          date: data.date,
+          total_revenue: data.total_revenue,
       })
 
       // organizer revenue
       for (const [_, orgData] of data.organizers.entries()) {
-        const org_revenue = await this.organizerRevenueRepository.insertOneWithNumberId({
-          revenue_id: revenue,
+        const org_revenue = await this.organizerRevenueRepository.upsertAndFindOne( {
+          revenue_id: revenue.id,
+          org_id: orgData.org_id,
+        }, {
+          revenue_id: revenue.id,
           org_id: orgData.org_id,
           total_revenue: orgData.total_revenue,
           org_name: orgData.org_name,
+          date: data.date
         });
 
         // event revenue
         for (const [_, eventData] of orgData.events.entries()) {
-          const event_revenue = await this.eventRevenueRepository.insertOneWithNumberId({
-            org_id: org_revenue,
+          const event_revenue = await this.eventRevenueRepository.upsertAndFindOne({
+            organizer_id: org_revenue.id,
+            event_id: eventData.event_id,
+          }, {
+            organizer_id: org_revenue.id,
             event_id: eventData.event_id,
             event_name: eventData.event_name,
             total_revenue: eventData.total_revenue,
+            date: data.date,
           });
 
           // showing revenue
           for (const [_, showingData] of eventData.showings) {
-            const showing_revenue = await this.showingRevenueRepository.insertOneWithNumberId({
-              event_id: event_revenue,
+            const showing_revenue = await this.showingRevenueRepository.upsertAndFindOne({
+              event_id: event_revenue.id,
+              showing_id: showingData.showing_id,
+            }, {
+              event_id: event_revenue.id,
               showing_id: showingData.showing_id,
               start_date: showingData.start_date,
               end_date: showingData.end_date,
               total_revenue: showingData.total_revenue,
+              date: data.date
             });
 
             // ticket type revenue
             for (const [ticketTypeId, ticketTypeData] of showingData.ticket_types.entries()) {
-              await this.ticketTypeRevenueRepository.insertOneWithNumberId({
-                showing_id: showing_revenue,
+              await this.ticketTypeRevenueRepository.upsertAndFindOne({
+                showing_id: showing_revenue.id,
+                ticket_type_id: ticketTypeId,
+              }, {
+                showing_id: showing_revenue.id,
                 ticket_type_id: ticketTypeId,
                 name: ticketTypeData.name,
                 price: ticketTypeData.price,
                 sold: ticketTypeData.sold,
                 total_revenue: ticketTypeData.total_revenue,
+                date: data.date
               });
             }
           }
         }
       }
 
-      await this.slackService.sendNotice(`Auth Svc >>> SaveRevenueDataService : Revenue data saved successfully for date ${data.date}`);
+      // await this.slackService.sendNotice(`Auth Svc >>> SaveRevenueDataService : Revenue data saved successfully for date ${data.date}`);
     }
     catch (error) {
       await this.slackService.sendError(`Auth Svc >>> SaveRevenueDataService : ${error.message}`);

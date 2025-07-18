@@ -9,6 +9,7 @@ import { CreateEventResponseData } from "./createEvent-response.dto";
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 import { CheckUserExistService } from "src/services/auth-svc/modules/user/commands/checkuserExist/checkuserExist.service";
 import { NewEventTriggerService } from "src/services/auth-svc/modules/notice/trigger/newEvent/newEventTrigger.service";
+import { DistrictsRepository } from "src/services/event-svc/repository/districts/districts.repo";
 
 @Injectable()
 export class CreateEventService {
@@ -16,6 +17,7 @@ export class CreateEventService {
     @Inject('EventsRepository') private readonly eventsRepository: EventsRepository,
     @Inject('EventCategoriesRepository') private readonly eventCategoriesRepository: EventCategoriesRepository,
     @Inject('LocationsRepository') private readonly locationsRepository: LocationsRepository,
+    @Inject('DistrictsRepository') private readonly districtsRepository: DistrictsRepository,
     private readonly slackService: SlackService,
     private readonly checkUserExistService: CheckUserExistService, 
     private readonly newEventTriggerService: NewEventTriggerService,
@@ -54,7 +56,17 @@ export class CreateEventService {
       }
 
       // Get the admin will manage this event
-      const admin = await this.checkUserExistService.getAdminHasLeastTotalEvent(email);
+      var area;
+      if (dto.isOnline) {
+        area = 'MIENBAC';
+      } else {
+        const district = await this.districtsRepository.findOneById(dto.districtId);
+        if (!district) {
+          return Err(new Error('District not found'));
+        }
+        area = district.area_code;
+      }
+      const admin = await this.checkUserExistService.getAdminHasLeastTotalEvent(email, area);
 
       // Create the event
       const eventId = await this.eventsRepository.createEvent(dto, email, admin, locationId);

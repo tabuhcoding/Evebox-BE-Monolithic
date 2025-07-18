@@ -90,7 +90,6 @@ export class DailyStatusService {
           await this.saveRevenueDataService.saveRevenueData(revenueData);
           await this.slackService.sendNotice(`Revenue data for ${date} saved successfully. ${revenueData.total_revenue}`);
         }
-        return;
       }
       await this.slackService.sendNotice('Calculating revenue for the day. success');
     } catch (error) {

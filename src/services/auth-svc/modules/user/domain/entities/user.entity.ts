@@ -21,7 +21,6 @@ interface UserProps {
   password: Password;
   phone: Phone;
   role: Role;
-  totalEvents?: number;
   avatar_id?: Avatar;
   status: Status;
   created_at?: Date;
@@ -82,7 +81,6 @@ export class User extends AggregateRoot<UserId, UserProps> {
     password: Password,
     phone: Phone,
     role: Role,
-    totalEvents?: number,
     avatarId?: Avatar,
     status?: Status,
     created_at?: Date,
@@ -96,7 +94,6 @@ export class User extends AggregateRoot<UserId, UserProps> {
       phone,
       role,
       status,
-      totalEvents: totalEvents,
       avatar_id: avatarId,
       created_at: created_at,
       receiveNoti
@@ -169,9 +166,5 @@ export class User extends AggregateRoot<UserId, UserProps> {
 
   public get receiveNoti(): boolean | undefined {
     return this.props.receiveNoti;
-  }
-
-  public get totalEvents(): number | undefined {
-    return this.props.totalEvents;
   }
 }

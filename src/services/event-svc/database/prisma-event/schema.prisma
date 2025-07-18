@@ -25,6 +25,7 @@ model districts {
   en_name    String?      @db.VarChar(100)
   provinceId Int
   createdAt  DateTime    @default(now())
+  area_code  AREACODE?
   province   Province    @relation(fields: [provinceId], references: [id], onDelete: Cascade)
   locations  locations[]
 }
@@ -412,4 +413,13 @@ enum UserRole {
 enum TicketDeliveryType{
   PHYSICAL_TICKET
   E_TICKET
+}
+
+enum AREACODE {
+  HANOI
+  HCM_TRUNGTAM
+  HCM_BAC 
+  HCM_CONLAI
+  MIENBAC
+  MIENNAM
 }

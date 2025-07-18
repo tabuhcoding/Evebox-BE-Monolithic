@@ -1,0 +1,5 @@
+-- CreateEnum
+CREATE TYPE "AREACODE" AS ENUM ('HANOI', 'HCM_TRUNGTAM', 'HCM_BAC', 'HCM_CONLAI', 'MIENBAC', 'MIENNAM');
+
+-- AlterTable
+ALTER TABLE "districts" ADD COLUMN     "area_code" "AREACODE";

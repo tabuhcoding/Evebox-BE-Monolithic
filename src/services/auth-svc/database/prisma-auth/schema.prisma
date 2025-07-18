@@ -34,8 +34,13 @@ model User {
   role                  Role?                   @relation(fields: [role_id], references: [id])
   favoriteNotiHistory   FavoriteNotiHistory[]   @relation("UserFavoriteHistory")
   userPin             UserPin?
-  totalEvents          Int?                     
   @@map("users")
+}
+
+model AdminManageEvent {
+  email                 String                  @unique @db.VarChar(255)
+  total_events          Int                       @default(0)
+  area_code               AREACODE
 }
 
 model RefreshToken {
@@ -171,3 +176,11 @@ ACTIVE
 BLOCKED
 }
 
+enum AREACODE {
+  HANOI
+  HCM_TRUNGTAM
+  HCM_BAC 
+  HCM_CONLAI
+  MIENBAC
+  MIENNAM
+}

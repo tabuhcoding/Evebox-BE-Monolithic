@@ -1,4 +1,4 @@
-import { AREACODE } from './../../../../../../../prisma/client-event/index.d';
+import { AREACODE } from "prisma/client-auth";
 import { ApiProperty } from "@nestjs/swagger";
 import { UserStatus } from "prisma/client-auth";
 import { IsEnum } from "class-validator";

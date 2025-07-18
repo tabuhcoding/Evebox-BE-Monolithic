@@ -18,6 +18,8 @@
     "prisma:migrate:payment": "npx prisma migrate dev --schema=src/services/payment-svc/database/prisma-payment/schema.prisma",
     "prisma:migrate:event": "npx prisma migrate dev --schema=src/services/event-svc/database/prisma-event/schema.prisma",
     "prestart": "npm run prisma:generate:all",
+    "prestart:prod": "npm run prisma:generate:all",
+    "prestart:dev": "npm run prisma:generate:all",
     "prebuild": "npm run prisma:generate:all",
     "build": "nest build && npm run copy-assets",
     "copy-assets": "copyfiles -u 1 src/assets/**/* dist/assets",

@@ -8,6 +8,7 @@ import { EmailService } from 'src/infrastructure/adapters/email/email.service';
 import { GenerateQrcodeService } from '../generateQrcode/generateQrcode.service';
 import Hashids from 'hashids';
 import { TicketRepository } from 'src/services/booking-svc/repository/ticket/ticket.repo';
+import { GetPreviewShowingService } from 'src/services/event-svc/modules/showing/queries/getPreviewShowing/getPreviewShowing.service';
 
 @Injectable()
 export class GiveTicketService {
@@ -19,6 +20,7 @@ export class GiveTicketService {
         private readonly checkUserExistService: CheckUserExistService,
         private readonly slackService: SlackService,
         private readonly emailService: EmailService,
+            private readonly getPreviewShowingService: GetPreviewShowingService,
         private readonly sendEmailService: GenerateQrcodeService,
     ) {
         this.hashids = new Hashids('evebox-salt', 12);
@@ -32,7 +34,11 @@ export class GiveTicketService {
                 throw new Error(`Invalid orderId: ${orderId}`);
             }
             // Double check order
-            const order = await this.orderRepository.findOneById(id);
+            const order = await this.orderRepository.findOneById(id, 
+                {
+                    Ticket: true,
+                }
+            );
             if (!order) {
                 throw new Error(`Order not found for orderId: ${orderId}`);
             }
@@ -54,6 +60,15 @@ export class GiveTicketService {
             || (!order.ownerId && order.userId === sendTo)
             ) {
                 throw new Error('You cannot give the ticket to yourself');
+            }
+
+            if (order.Ticket.some(ticket => ticket.isCheckedIn)){
+                throw new Error('Cannot give away order that some ticket in order have already been checked in');
+            }
+
+            const showing = await this.getPreviewShowingService.execute(order.showingId);
+            if (!showing || new Date(showing.endTime) < new Date()) {
+                throw new Error('Showing not found or has ended');
             }
 
             const sendData = {
@@ -89,8 +104,26 @@ export class GiveTicketService {
                 throw new Error('Order not found for the provided sendKey');
             }
 
+            const showing = await this.getPreviewShowingService.execute(order.showingId);
+            if (!showing || new Date(showing.endTime) < new Date()) {
+                throw new Error('Showing not found or has ended');
+            }
+
+            if (order.Ticket.some(ticket => ticket.isCheckedIn)) {
+                throw new Error('Cannot receive ticket that some ticket in order have already been checked in');
+            }
+
             const decryptedData = (decrypt(sendKey));
             const { email, key, time } = decryptedData;
+
+            //  validate time, if more than 48 hours, return false
+            const currentTime = new Date();
+            const sendTime = new Date(time);
+            const timeDifference = currentTime.getTime() - sendTime.getTime();
+            const hoursDifference = timeDifference / (1000 * 60 * 60); 
+            if (hoursDifference > 48) {
+                throw new Error('The ticket has expired, please contact the organizer');
+            }
 
             // Process the ticket reception (e.g., update the order status)
             await this.orderRepository.updateOneById(order.id, {

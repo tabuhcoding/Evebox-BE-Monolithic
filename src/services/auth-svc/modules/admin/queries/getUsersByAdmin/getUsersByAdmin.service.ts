@@ -70,6 +70,8 @@ export class GetUsersByAdminService {
         limit
       );
 
+      const areaCodes = await this.adminManageEventRepository.findMany({}, { area_code: true });
+
       const userDtos: UserDto[] = users.map(u => {
         let roleObj: { id: number, role_name: string } | null = null;
 
@@ -96,6 +98,7 @@ export class GetUsersByAdminService {
             : u.created_at
               ? new Date(u.created_at).toISOString()
               : "",
+          area: areaCodes.find(area => area.email === u.email.value)?.area_code || null
         };
       });
 

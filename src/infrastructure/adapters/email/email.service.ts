@@ -420,7 +420,7 @@ export class EmailService implements OnModuleInit {
 
         <p>Dear User,</p>
         <p>You have received a ticket from <strong>${fromEmail}</strong>. Please use the following step to claim your ticket:</p>
-        
+        <p>Please receive this ticket within 48 hours and before the showing be ended, otherwise it will be expired.</p>
         <div style="text-align: center; margin: 40px 0;">
             <a href="https://evebox.azurewebsites.net/order/receive?sendKey=${encodedKey}" 
               style="display: inline-block; background-color: #4CAF50; color: white; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: bold; font-size: 14px;">

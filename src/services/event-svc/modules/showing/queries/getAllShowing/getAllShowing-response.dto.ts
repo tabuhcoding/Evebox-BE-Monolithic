@@ -18,3 +18,17 @@ export class AllShowingsResponseDto {
     showingIds: string[];
   };
 }
+
+export class ConnectShowingToSeatmapDTO {
+  @ApiProperty({ example: '16962844867169', description: 'Showing ID' })
+  showingId: string;
+
+  @ApiProperty({ example: '16962844867170', description: 'Seatmap ID' })
+  seatmapId: string;
+
+  @ApiProperty({
+    example: { '16962844867171': [23456] },
+    description: 'Ticket Type Section Map',
+  })
+  ticketTypeSectionMap: Record<string, number[]>;
+}

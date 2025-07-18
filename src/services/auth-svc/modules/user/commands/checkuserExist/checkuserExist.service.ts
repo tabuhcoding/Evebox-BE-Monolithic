@@ -47,12 +47,12 @@ export class CheckUserExistService {
 
       if (admins.length === 0) return null;
 
-      // Sort admins by totalEvents and return the one with the least
-      const adminWithLeastEvents = admins.reduce((prev, curr) => {
-        return (prev.totalEvents || 0) < (curr.totalEvents || 0) ? prev : curr;
-      });
+      // // Sort admins by totalEvents and return the one with the least
+      // // const adminWithLeastEvents = admins.reduce((prev, curr) => {
+      // //   return (prev.totalEvents || 0) < (curr.totalEvents || 0) ? prev : curr;
+      // // });
 
-      return adminWithLeastEvents.email.toString();
+      // return admins.email.toString();
     } catch (error) {
       await this.slackService.sendError(`AuthSVC >>> Error getting admin with least total events: ${error.message}`);
       return null;

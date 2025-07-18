@@ -7,12 +7,14 @@ import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 import { USER_MESSAGES, ADMIN_MESSAGES } from "src/shared/constants/constants";
 import { Status } from "../../../user/domain/value-objects/user/status.vo";
 import { Email } from "../../../user/domain/value-objects/user/email.vo";
+import { AdminManageEventRepository, AREACODE } from "src/services/auth-svc/repository/admin-area/admin-area.repo";
 
 @Injectable()
 export class UpdateUserStatusService {
   constructor(
     @Inject('AdminRepository') private readonly adminRepository: AdminRepository,
     @Inject('UserRepository') private readonly userRepository: UserRepository,
+    @Inject('AdminManageEventRepository') private readonly adminManageEventRepository: AdminManageEventRepository,
     private readonly slackService: SlackService
   ) { }
 
@@ -49,6 +51,22 @@ export class UpdateUserStatusService {
       }
 
       await this.adminRepository.updateUserStatus(userId, dto.status);
+
+      return Ok(void 0);
+    } catch (error) {
+      await this.slackService.sendError(`AuthSvc >>> User - UpdateUserStatusService: ${error.message}`);
+      return Err(new Error(USER_MESSAGES.ERRORS.SERVER_ERROR));
+    }
+  }
+
+  async updateAdminArea(email, areaCode: AREACODE): Promise<Result<void, Error>> {
+    try {
+      const admin = await this.adminManageEventRepository.findOne({ email });
+      if (!admin) {
+        return Err(new Error(USER_MESSAGES.ERRORS.USER_NOT_FOUND));
+      }
+
+      await this.adminManageEventRepository.updateOne({email}, { area_code: areaCode });
 
       return Ok(void 0);
     } catch (error) {

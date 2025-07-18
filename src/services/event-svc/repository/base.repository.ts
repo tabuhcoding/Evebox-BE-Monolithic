@@ -25,6 +25,10 @@ export class BaseEventRepository<
     await this.repo.delete({ where: { id } });
   }
 
+  async deleteOne(filter: any): Promise<void> {
+    await this.repo.delete({ where: filter });
+  }
+
   async deleteHardMany(filter: any): Promise<void> {
     await this.repo.deleteMany({ where: filter });
   }

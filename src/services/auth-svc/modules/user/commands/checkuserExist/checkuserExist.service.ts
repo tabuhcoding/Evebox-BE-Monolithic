@@ -1,11 +1,13 @@
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
+import { AdminManageEventRepository, AREACODE } from "src/services/auth-svc/repository/admin-area/admin-area.repo";
 import { UserRepositoryImpl } from "src/services/auth-svc/repository/users/user.repository.impl";
 
 @Injectable()
 export class CheckUserExistService {
   constructor(
     private readonly userRepository: UserRepositoryImpl,
+    @Inject('AdminManageEventRepository') private readonly adminManageEventRepository: AdminManageEventRepository,
     private readonly slackService: SlackService,
   ) {}
 
@@ -36,23 +38,20 @@ export class CheckUserExistService {
   }
 
   // get the admin has the least total event 
-  async getAdminHasLeastTotalEvent(email: string): Promise<string | null> {
+  async getAdminHasLeastTotalEvent(email: string, area_code: AREACODE): Promise<string | null> {
     try {
-      const admins = await this.userRepository.findMany({
-        role_id: 1, // Assuming 1 is the role_id for admin
+      const admins = await this.adminManageEventRepository.findMany({
         email: { not: email }, // Exclude the current user
-      }, {
-        totalEvents: true,
+        area_code: area_code,
       });
 
       if (admins.length === 0) return null;
 
-      // // Sort admins by totalEvents and return the one with the least
-      // // const adminWithLeastEvents = admins.reduce((prev, curr) => {
-      // //   return (prev.totalEvents || 0) < (curr.totalEvents || 0) ? prev : curr;
-      // // });
+      const adminWithLeastEvents = admins.reduce((prev, curr) => {
+        return (prev.total_events || 0) < (curr.total_events || 0) ? prev : curr;
+      });
 
-      // return admins.email.toString();
+      return adminWithLeastEvents.email;
     } catch (error) {
       await this.slackService.sendError(`AuthSVC >>> Error getting admin with least total events: ${error.message}`);
       return null;
@@ -62,7 +61,11 @@ export class CheckUserExistService {
   async increaseTotalEventsOfAdmin(email: string): Promise<void> {
     try {
       // Increase the totalEvents count for the admin
-      await this.userRepository.increaseTotalEvents(email);
+      await this.adminManageEventRepository.updateOne({
+        email
+      }, {
+        total_events: { increment: 1 }
+      });
     } catch (error) {
       await this.slackService.sendError(`AuthSVC >>> Error increasing total events for admin: ${error.message}`);
     }

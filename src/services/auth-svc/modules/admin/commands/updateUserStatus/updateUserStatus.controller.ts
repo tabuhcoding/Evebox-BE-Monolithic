@@ -87,4 +87,77 @@ export class UpdateUserStatusController {
         );
     }
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Put('/:email/area')
+  @ApiBearerAuth('access-token')
+  @ApiOperation({
+    summary: 'Update status user',
+    description: 'Update status user by userId',
+  })
+  @ApiBody({
+    description: 'Update status user',
+    type: UpdateUserStatusDto
+  })
+  @ApiOkResponse({
+    description: 'Update status user successfully',
+  })
+  @ApiNotFoundResponse({
+    description: 'User not found',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Failed to Update status user information',
+  })
+  async updateAdminArea(
+    @Res() res: Response,
+    @Body() dto: UpdateUserStatusDto,
+    @Param('userId') userId: string,
+    @Request() req,
+  ) {
+    try {
+      if (!userId) {
+        return res
+          .status(HttpStatus.BAD_REQUEST)
+          .json(ErrorHandler.badRequest('User ID is required'));
+      }
+
+      if (!dto.status) {
+        return res
+          .status(HttpStatus.BAD_REQUEST)
+          .json(ErrorHandler.badRequest('Status is required'));
+      }
+
+      const email = req.user?.email;
+
+      const result = await this.updateUserStatusService.execute(dto, userId, email);
+
+      if (result.isErr()) {
+        const error = result.unwrapErr();
+
+        if (error.message === 'User not found') {
+          return res
+            .status(HttpStatus.NOT_FOUND)
+            .json(ErrorHandler.notFound('User not found'));
+        }
+
+        return res
+          .status(HttpStatus.BAD_REQUEST)
+          .json(ErrorHandler.badRequest(error.message));
+      }
+
+      return res.status(HttpStatus.OK).json({
+        statusCode: HttpStatus.OK,
+        message: 'Update status user successfully',
+      });
+    } catch (error) {
+      await this.slackService.sendError(`AuthSvc - User >>> UpdateUserStatusController: ${error.message}`);
+      return res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json(
+          ErrorHandler.internalServerError(
+            'Failed to Update status user information',
+          ),
+        );
+    }
+  }
 }

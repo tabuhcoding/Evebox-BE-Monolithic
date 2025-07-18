@@ -11,10 +11,12 @@ export class ProvinceRepositoryImpl implements ProvinceRepository {
       select: {
         id: true,
         name: true,
+        en_name: true,
         districts: {
           select: {
             id: true,
-            name: true
+            name: true,
+            en_name: true,
           }
         }
       }
@@ -23,13 +25,13 @@ export class ProvinceRepositoryImpl implements ProvinceRepository {
     const result = province.map((item) => ({
       id: item.id,
       name: {
-        en: "EN will be able later",
+        en: item.en_name,
         vi: item.name
       },
       districts: item.districts.map((district) => ({
         id: district.id,
         name: {
-          en: "EN will be able later",
+          en: district.en_name,
           vi: district.name
         }
       }))

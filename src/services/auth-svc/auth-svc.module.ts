@@ -97,6 +97,7 @@ import { ShowingRevenueRepositoryImpl } from "./repository/showing-revenue/showi
 import { EventRevenueRepositoryImpl } from "./repository/event-revenue/event-revenue.impl";
 import { OrganizerRevenueRepositoryImpl } from './repository/organizer-revenue/organizer-revenue.impl';
 import { SaveRevenueDataService } from './modules/admin/commands/saveRevenueData/saveRevenueData.service';
+import { AdminManageEventRepositoryImpl } from './repository/admin-area/admin-area.impl';
 
 @Module({
   imports: [
@@ -228,6 +229,10 @@ import { SaveRevenueDataService } from './modules/admin/commands/saveRevenueData
     {
       provide: 'OrganizerRevenueRepository',
       useClass: OrganizerRevenueRepositoryImpl,
+    },
+    {
+      provide: 'AdminManageEventRepository',
+      useClass: AdminManageEventRepositoryImpl,
     },
     UpdateUserRoleService,
     SetReceiveNotiService,

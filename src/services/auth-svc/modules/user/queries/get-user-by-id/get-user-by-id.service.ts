@@ -9,6 +9,7 @@ import { UserData } from "./get-user-by-id-response.dto";
 export class GetUserByIdService {
   constructor(
     @Inject('UserRepository') private readonly userRepository: UserRepository,
+    
     private readonly slackService: SlackService,
   ) {}
 

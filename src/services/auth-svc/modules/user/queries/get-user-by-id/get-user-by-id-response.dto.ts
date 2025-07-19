@@ -1,4 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { AREACODE } from "prisma/client-auth";
 import { BaseResponse } from "src/shared/constants/baseResponse";
 
 export class UserData {
@@ -41,6 +42,8 @@ export class UserData {
     description: 'Created date of user'
   })
   created_at: Date;
+
+  area?: AREACODE
 }
 
 export class UserResponseById extends BaseResponse {

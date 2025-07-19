@@ -20,19 +20,47 @@ export class DailyEmbeddingService {
   @Cron('0 2 * * *') // Runs every day at midnight
   async runDailyEmbedding() {
     try {
-      const events = await this.getAllEventsForRagService.getAllEvents();
+      const events = await this.getAllEventsForRagService.getAllEvents(false);
       if (events.length === 0) {
         await this.slackService.sendNotice("No events found for embedding.");
         return;
       }
       await this.slackService.sendNotice(`Starting daily embedding for ${events.length} events.`);
-      return
 
       const batchSize = 100;
       for (let i = 0; i < events.length; i += batchSize) {
         const batch = events.slice(i, i + batchSize);
         await this.openAIVectorStoreService.embedFullEventDocuments(batch);
         await this.slackService.sendNotice(`Embedded batch ${Math.floor(i / batchSize) + 1} of ${Math.ceil(events.length / batchSize)}.`);
+      }
+
+      await this.slackService.sendNotice("Daily embedding completed successfully.");
+
+      for (let i = 0; i < events.length; i += batchSize) {
+        const batch = events.slice(i, i + batchSize);
+        await this.openAIVectorStoreService.embedSimilarityEventDocuments(batch);
+        await this.slackService.sendNotice(`Embedded similar batch ${Math.floor(i / batchSize) + 1} of ${Math.ceil(events.length / batchSize)}.`);
+      }
+    } catch (error) {
+      await this.slackService.sendError(`Daily embedding failed: ${error.message}`);
+    }
+  }
+
+  async runDailyEmbeddingAll() {
+    try {
+      const events = await this.getAllEventsForRagService.getAllEvents(true);
+      if (events.length === 0) {
+        await this.slackService.sendNotice("No events found for embedding.");
+        return;
+      }
+      await this.slackService.sendNotice(`Starting daily embedding for ${events.length} events.`);
+      // return
+      const batchSize = 100;
+      for (let i = 0; i < events.length; i += batchSize) {
+        const batch = events.slice(i, i + batchSize);
+        await this.openAIVectorStoreService.embedFullEventDocuments(batch);
+        await this.slackService.sendNotice(`Embedded batch ${Math.floor(i / batchSize) + 1} of ${Math.ceil(events.length / batchSize)}.`);
+        // return
       }
 
       await this.slackService.sendNotice("Daily embedding completed successfully.");

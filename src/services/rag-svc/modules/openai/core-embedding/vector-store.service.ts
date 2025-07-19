@@ -65,9 +65,17 @@ export class OpenAIVectorStoreService {
   /** Embed full content for prompt-based search */
   async embedFullEventDocuments(events: GetAllEventDetailForRAGResponseDto[]): Promise<void> {
     try {
-      const docs = events.map( event => {
+      // Delete existing vectors for these events
+      const eventIds = events.map(e => e.id.toString());
+      await this.prisma.$executeRawUnsafe(`
+        DELETE FROM ${this.FULL_COLLECTION}
+        WHERE metadata->>'eventId' IN (${eventIds.map((_, i) => `$${i + 1}`).join(',')})
+      `, ...eventIds);
+
+      // Embed documents
+      const docs = await Promise.all(events.map(event => {
         return this.truncateEventDescriptionIfNeeded(event, 8192);
-      });
+      }));
       await this.embeddingWrapperService.embedDocuments(docs, this.FULL_COLLECTION);
     } catch (error) {
       if ( error.message.includes('Please reduce your prompt')) {
@@ -90,6 +98,14 @@ export class OpenAIVectorStoreService {
   /** Embed for similarity recommendation */
   async embedSimilarityEventDocuments(events: GetAllEventDetailForRAGResponseDto[]): Promise<void> {
     try {
+      // Delete existing vectors for these events
+      const eventIds = events.map(e => e.id.toString());
+      await this.prisma.$executeRawUnsafe(`
+        DELETE FROM ${this.SIMILARITY_COLLECTION}
+        WHERE metadata->>'eventId' IN (${eventIds.map((_, i) => `${i + 1}`).join(',')})
+      `, ...eventIds);
+
+      // Embed documents
       const docs = events.map( event => {
         return this.truncateSimilarEventDescriptionIfNeeded(event, 8192);
       });
@@ -167,6 +183,9 @@ export class OpenAIVectorStoreService {
 
   /** Recommend events based on favorite eventIds */
   async recommendEventsFromFavorites(favoriteIds: string[], topK = 10) {
+    if (favoriteIds.length === 0) {
+      return [];
+    }
     var vectors: number[][] = [];
     for (const favoriteId of favoriteIds) {
       const vector = await this.getVectorByEventId(favoriteId);

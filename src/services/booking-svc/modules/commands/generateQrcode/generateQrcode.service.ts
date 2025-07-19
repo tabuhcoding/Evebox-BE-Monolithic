@@ -230,7 +230,7 @@ export class GenerateQrcodeService {
       const imageUrl = order.Showing?.imageUrl;
 
       if (imageUrl) {
-      try {
+        try {
           const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });
           eventImageBuffer = Buffer.from(response.data, 'binary');
         } catch (error) {
@@ -240,6 +240,9 @@ export class GenerateQrcodeService {
       }
 
       for (const ticketType of order.Ticket) {
+        if (!ticketType.tickets || ticketType.tickets.length === 0) {
+          continue; // Skip if no tickets for this type
+        }
         for (const ticket of ticketType.tickets) {
           const doc = new PDFDocument({ size: [pageWidth, pageHeight], margin: 0 }); // A4 size
           const buffers: Buffer[] = [];

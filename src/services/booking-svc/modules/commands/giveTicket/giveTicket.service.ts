@@ -156,7 +156,6 @@ export class GiveTicketService {
 
             return true;
         } catch (error) {
-            await this.slackService.sendError(`GiveTicketService >>> Error receiving ticket: ${error.message}`);
             return false;
         }
     }

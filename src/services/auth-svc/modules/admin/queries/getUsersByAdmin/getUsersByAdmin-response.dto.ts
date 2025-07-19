@@ -2,6 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { BaseResponse } from "src/shared/constants/baseResponse";
 import { Pagination } from "src/shared/constants/pagination";
 import { UserStatus } from "prisma/client-auth";
+import { AREACODE } from "prisma/client-auth";
 
 class UserRole {
   @ApiProperty({ example: 1, description: 'User role id' })
@@ -29,6 +30,8 @@ export class UserDto {
 
   @ApiProperty({ example: '2025-03-25T19:17:37.415Z', description: 'User created date' })
   created_at: string;
+
+  area?: AREACODE
 }
 
 

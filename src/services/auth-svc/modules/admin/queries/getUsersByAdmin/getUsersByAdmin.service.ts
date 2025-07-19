@@ -70,7 +70,7 @@ export class GetUsersByAdminService {
         limit
       );
 
-      const areaCodes = await this.adminManageEventRepository.findMany({}, { area_code: true });
+      const areaCodes = await this.adminManageEventRepository.findMany({});
 
       const userDtos: UserDto[] = users.map(u => {
         let roleObj: { id: number, role_name: string } | null = null;
@@ -133,7 +133,7 @@ export class GetUsersByAdminService {
 
   async getAllArea(): Promise<Result<string[], Error>> {
     try {
-      const areas = await this.adminManageEventRepository.findMany({}, { area_code: true });
+      const areas = await this.adminManageEventRepository.findMany({});
       const areaCodes = areas.map(area => area.area_code);
       return Ok(areaCodes);
     } catch (error) {

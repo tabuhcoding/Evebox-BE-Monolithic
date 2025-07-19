@@ -27,7 +27,7 @@ export class GetUserByEmailService {
         return Err(new Error('Failed to find user'))
       }
 
-      const areaCodes = await this.adminManageEventRepository.findOne({email}, { area_code: true });
+      const areaCodes = await this.adminManageEventRepository.findOne({email});
 
       return Ok({
         id: user.id.value, 

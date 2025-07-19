@@ -38,7 +38,7 @@ export class CreateShowingController {
         });
       }
 
-      const result = await this.createShowingService.execute(dto, Number(eventId), email);
+      const result = await this.createShowingService.execute(dto, eventId >> 0, email);
 
       if (result.isErr()) {
         return res.status(HttpStatus.BAD_REQUEST).json({

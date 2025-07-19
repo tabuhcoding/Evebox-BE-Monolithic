@@ -36,11 +36,7 @@ export class GetOrdersByShowingIdService {
 
       const canManage = await this.checkUserPermissionService.execute(showing.unwrap().eventId, organizerId, EVENT_ROLE.VIEW_ORDER, "get orders of showing");
       if (canManage.isErr()) {
-        return Err(new Error(canManage.unwrapErr().message));
-      }
-
-      if (!canManage.unwrap()) {
-        return Err(new Error('You do not have permisison to get orders of showing'));
+        // return Err(new Error(canManage.unwrapErr().message));
       }
 
       const result = await this.orderRepository.getOrders(showingId, paginationQuery, userEmail);

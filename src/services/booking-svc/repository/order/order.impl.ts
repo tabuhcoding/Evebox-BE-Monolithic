@@ -86,16 +86,18 @@ export class OrderRepositoryImpl
           userId: order.userId,
           ownerId: order.ownerId || order.userId, // If ownerId is not set, use userId
           formResponse: formResponse,
-          paymentInfo: {
+          paymentInfo: paymentInfo ? {
             id: paymentInfo.id,
             method: paymentInfo.method,
             paidAt: paymentInfo.paidAt,
-          },
+          }: null,
           createdAt: order.createdAt,
           totalTicket: order.Ticket.length,
           // Ticket: Array.from(ticketsMapByTicketTypeId.values()),         
         });
       });
+
+      console.log(`Retrieved ${orderData.length} orders for showing ${showingId}`);
 
       return Ok([orderData, {
         page: paginationQuery.page,

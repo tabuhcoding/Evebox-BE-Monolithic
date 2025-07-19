@@ -157,7 +157,7 @@ export class getAllShowingController {
 
     const result = await this.getAllShowingService.connectShowingToSeatmap(
       showingId,
-      seatmapId,
+      Number(seatmapId),
       ticketTypeSectionMap
     );
 

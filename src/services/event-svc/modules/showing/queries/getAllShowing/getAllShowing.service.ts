@@ -54,7 +54,7 @@ export class getAllShowingService {
 
   async connectShowingToSeatmap(
     showingId: string,
-    seatmapId: string,
+    seatmapId: number,
     ticketTypeSectionMap: Record<string, number[]>
   ): Promise<Result<void, Error>> {
     try {

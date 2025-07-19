@@ -42,5 +42,21 @@ export class CronController {
       message: 'Fake order data processing started successfully',
     });
   }
+
+  @Post('/embed-all')
+  @ApiOperation({ summary: 'Add member to event' })
+  @ApiResponse({ status: HttpStatus.CREATED, description: 'Added member successfully' })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid input' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Internal server error' })
+  async embed(
+    @Request() req: any,
+    @Res() res: Response, 
+  ) {
+    this.service.runDailyEmbeddingAll();
+    return res.status(HttpStatus.OK).json({
+      statusCode: HttpStatus.OK,
+      message: 'Fake order data processing started successfully',
+    });
+  }
 }
 

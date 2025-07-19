@@ -15,16 +15,16 @@ export class GetAllEventDetailForRAGService {
     private readonly slackService: SlackService,
   ) {}
   
-  async getAllEvents(): Promise<GetAllEventDetailForRAGResponseDto[]> {
+  async getAllEvents(all: boolean): Promise<GetAllEventDetailForRAGResponseDto[]> {
     try {
       // Get event that updated in yesterday
       const rawEvents = await this.eventsRepository.findMany({
           deleteAt: null,
           isApproved: true,
-          updatedAt: {
+          updatedAt: all ? undefined : {
             gte: new Date(new Date().setDate(new Date().getDate() - 1)),
-            lt: new Date(),
-          }
+            lte: new Date(),
+          },
         },
         {
           Showing: {
@@ -37,7 +37,7 @@ export class GetAllEventDetailForRAGService {
             },
             where: {
               endTime: {
-                gte: new Date(new Date().setMonth(new Date().getMonth() - 1)),
+                gte: new Date(new Date().setMonth(new Date().getMonth() - 3)),
               },
               deleteAt: null,
             },

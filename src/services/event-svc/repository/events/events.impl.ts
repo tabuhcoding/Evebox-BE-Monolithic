@@ -452,13 +452,14 @@ export class EventsRepositoryImpl
         const districtName = districts?.name || '';
         const provinceName = districts?.province?.name || '';
         const locationsString = `${street || ''}, ${ward || ''}, ${districtName}, ${provinceName}`;
-        const startTime = await this.caculateEventsStartDate(showings);
+        const [startTime, isHasShowingInFuture] = await this.caculateEventsStartDate(showings);
 
         results.push({
           ...event,
           startDate: startTime,
+          isHasShowingInFuture,
           locationString: locationsString,
-          role: 2, // Organizer role
+          role: 1, // Organizer role
         });
       }
 
@@ -480,11 +481,12 @@ export class EventsRepositoryImpl
         const locationsArray = [street, ward, districtName, provinceName].filter(Boolean);
 
         const locationsString = locationsArray.join(', ');
-        const startTime = await this.caculateEventsStartDate(showings);
+        const [startTime, isHasShowingInFuture] = await this.caculateEventsStartDate(showings);
 
         results.push({
           ...event,
           startDate: startTime,
+          isHasShowingInFuture,
           locationString: locationsString,
           role: rel.role, // Other role
         });
@@ -496,19 +498,23 @@ export class EventsRepositoryImpl
     }
   }
 
-  async caculateEventsStartDate(showings: any[]) {
+  async caculateEventsStartDate(showings: any[]): Promise <[Date, boolean]> {
     let startTime = new Date("9999-12-31T23:59:59.999Z");
     const nowDate = new Date();
+    let isHasShowingInFuture = false;
     for (const showing of showings) {
-      if (new Date(showing.startTime) > nowDate && new Date(showing.startTime) < startTime) {
-        startTime = new Date(showing.startTime);
-        continue;
-      }
+      // if (new Date(showing.startTime) > nowDate && new Date(showing.startTime) < startTime) {
+      //   startTime = new Date(showing.startTime);
+      //   continue;
+      // }
       if (new Date(showing.startTime) < startTime) {
         startTime = new Date(showing.startTime);
       }
+      if (new Date(showing.startTime) > nowDate) {
+        isHasShowingInFuture = true;
+      }
     }
-    return startTime;
+    return [startTime, isHasShowingInFuture];
   }
 
   async getEventOfOrgDetail(eventId: number): Promise<Result<EventOrgDetailResponseDto, Error>> {

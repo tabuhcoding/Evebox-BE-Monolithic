@@ -37,14 +37,14 @@ export class GetEventMembersService {
         return Err(new Error('Event not found'));
       }
 
-      const hasPermisison = await this.eventsRepository.hasPermissionToManageEvent(eventId, user.id.value, EVENT_ROLE.VIEW_MEMBER);
-      if (hasPermisison.isErr()) {
-        return Err(new Error('Failed to check permission'));
-      }
+      // const hasPermisison = await this.eventsRepository.hasPermissionToManageEvent(eventId, userEmail, EVENT_ROLE.VIEW_MEMBER);
+      // if (hasPermisison.isErr()) {
+      //   return Err(new Error('Failed to check permission'));
+      // }
 
-      if (!hasPermisison.unwrap()) {
-        return Err(new Error('You do not have permission to view member'));
-      }
+      // if (!hasPermisison.unwrap()) {
+      //   return Err(new Error('You do not have permission to view member'));
+      // }
 
       const members = await this.eventUserRelaRepo.findMany({
         eventId,

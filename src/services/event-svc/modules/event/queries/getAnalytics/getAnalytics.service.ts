@@ -9,6 +9,7 @@ import { EVENT_ROLE } from "../../domain/eventRole";
 import { GetAllEventDetailForRAGService } from "../getAllEventDetailForRAG/getAllEventDetailForRAG.service";
 import { EventDocumentBuilder } from "src/services/rag-svc/modules/openai/core-embedding/event-document.builder";
 import { FindUserByEmailService } from "src/services/auth-svc/modules/user/commands/find-user-by-email/findUserByEmail.service";
+import { FileCacheService } from "src/infrastructure/cache/fileCache/fileCache.service";
 
 @Injectable()
 export class GetAnalyticsService {
@@ -17,7 +18,8 @@ export class GetAnalyticsService {
     private readonly slackService: SlackService,
     private readonly checkUserExistService: CheckUserExistService,
     private readonly findUserByEmail: FindUserByEmailService, 
-    private readonly getAllEventForRagService: GetAllEventDetailForRAGService
+    private readonly getAllEventForRagService: GetAllEventDetailForRAGService,
+    private readonly fileCacheService: FileCacheService
   ) { }
 
   async execute(eventId: number, userEmail: string, startDate?: Date, endDate?: Date): Promise<Result<AnalyticsResponseData, Error>> {
@@ -32,10 +34,10 @@ export class GetAnalyticsService {
         return Err(new Error('User does not exist'));
       }
 
-      const user = await this.findUserByEmail.execute(userEmail);
-      if (!user) return Err(new Error('User not found'))
+      // const user = await this.findUserByEmail.execute(userEmail);
+      // if (!user) return Err(new Error('User not found'))
 
-      const canManage = await this.eventRepository.hasPermissionToManageEvent(eventId, user.id.value, EVENT_ROLE.MARKETING);
+      const canManage = await this.eventRepository.hasPermissionToManageEvent(eventId, userEmail, EVENT_ROLE.MARKETING);
       if (canManage.isErr()) {
         return Err(new Error(canManage.unwrapErr().message));
       }
@@ -98,26 +100,43 @@ export class GetAnalyticsService {
 
   async executeAI(eventId: number, startDate?: Date, endDate?: Date, userRequest?: string): Promise<Result<string, Error>> {
     try {
-      const event = await this.getAllEventForRagService.getEventById(eventId);
-      if (!event) {
-        return Err(new Error('Event not found'));
-      }
-      const result = await this.execute(eventId, event.organizerId, startDate, endDate);
-      const doc = EventDocumentBuilder.buildFullDocument(event);
-
-      if (result.isErr()) {
-        return Err(new Error(result.unwrapErr().message));
-      }
-
-      const data = result.unwrap();
-
-      const payload = {
-        data: data,
+      var payload: any = {
         query: userRequest || "",
-        event: doc.pageContent
       };
+      const cacheData = await this.fileCacheService.getCacheObjectById("analyst-ai", {
+        startDate,
+        endDate,
+      }, eventId.toString());
+      
+      if ( cacheData && cacheData.data[0].threadId) {
+        payload = {
+          ...payload,
+          threadId: cacheData.data[0].threadId,
+        };
+      } else {
+        const event = await this.getAllEventForRagService.getEventById(eventId);
+        if (!event) {
+          return Err(new Error('Event not found'));
+        }
+        const result = await this.execute(eventId, event.organizerId, startDate, endDate);
+        const doc = EventDocumentBuilder.buildFullDocument(event);
+        payload = {
+          ...payload,
+          event: doc.pageContent,
+        }
 
-      const responseAI = await fetch(`${process.env.UTILS_URL}/analytics`, {
+        if (result.isErr()) {
+          return Err(new Error(result.unwrapErr().message));
+        }
+
+        const data = result.unwrap();
+        payload = {
+          ...payload,
+          data: data
+        }
+      }
+
+      const responseAI = await fetch(`${process.env.UTILS_URL}/analytics/v2`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -125,14 +144,32 @@ export class GetAnalyticsService {
         body: JSON.stringify(payload)
       });
 
-      if (!responseAI.ok) {
+      if (!responseAI.ok || responseAI.status !== 200) {
         const errorData = await responseAI.json();
         return Err(new Error(errorData.detail || 'Failed to analyze revenue data'));
       }
 
       const responseAIData = await responseAI.json();
 
-      return Ok(responseAIData.result);
+      this.slackService.sendNotice(`Event Service - Event analytics with AI >>> GetAnalyticsService: ${JSON.stringify(payload)}.
+      Result: ${JSON.stringify(responseAIData)}`);
+
+      if (!responseAIData.content) {
+        return Err(new Error('No content returned from AI analysis'));
+      }
+      await this.fileCacheService.cacheObject("analyst-ai",
+        20,
+        {
+          startDate,
+          endDate,
+        },
+        eventId.toString(),
+        [{
+          threadId: responseAIData.threadId,
+        }]
+      )
+
+      return Ok(responseAIData.content);
     } catch (error) {
       await this.slackService.sendError(`Event Service - Event analytics with AI >>> GetAnalyticsService: ${error.message}`);
 

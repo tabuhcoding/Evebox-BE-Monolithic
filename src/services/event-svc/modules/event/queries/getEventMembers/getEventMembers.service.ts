@@ -22,6 +22,11 @@ export class GetEventMembersService {
 
   async execute(eventId: number, query: GetEventMembersQueryDto, userEmail: string): Promise<Result<GetEventMembersResponseDto, Error>> {
     try {
+      const eventFound = await this.eventsRepository.findOneById(eventId);
+      if (!eventFound) {
+        return Err(new Error('Event not found'));
+      }
+
       if (query.email) {
         const userExists = await this.checkUserExistService.execute(query.email);
         if (!userExists) {
@@ -68,6 +73,17 @@ export class GetEventMembersService {
           }))
         ) : [],
       };
+
+      response.data.push({
+        eventId: eventId,
+        userId: userEmail,
+        email: userEmail,
+        role: 1,
+        role_desc: "Organizer",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        isDeleted: false,
+      });
 
       return Ok(response);
     } catch (error) {

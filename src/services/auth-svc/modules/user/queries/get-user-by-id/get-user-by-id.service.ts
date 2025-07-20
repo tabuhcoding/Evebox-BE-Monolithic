@@ -4,12 +4,14 @@ import { UserRepository } from "src/services/auth-svc/repository/users/user.repo
 import { UserId } from "../../domain/value-objects/user/user-id.vo";
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 import { UserData } from "./get-user-by-id-response.dto";
+import { AdminManageEventRepository } from "src/services/auth-svc/repository/admin-area/admin-area.repo";
 
 @Injectable()
 export class GetUserByIdService {
   constructor(
     @Inject('UserRepository') private readonly userRepository: UserRepository,
-    
+    @Inject('AdminManageEventRepository') private readonly adminManageEventRepository: AdminManageEventRepository,
+
     private readonly slackService: SlackService,
   ) {}
 
@@ -25,6 +27,8 @@ export class GetUserByIdService {
         return Err(new Error('Failed to find user'));
       }
 
+      const areaCodes = await this.adminManageEventRepository.findOne({ email: user.email.value });
+
       return Ok({
         id: user.id.value, 
         name: user.name.value, 
@@ -34,6 +38,7 @@ export class GetUserByIdService {
         avatar_id: user.avatarId,
         created_at: user.created_at,
         status: user.status.getValue(),
+        area: areaCodes ? areaCodes.area_code : null
       });
     } catch (error) {
       await this.slackService.sendError(`Auth Svc >>> GetUserByIdService: ${error.message}`);

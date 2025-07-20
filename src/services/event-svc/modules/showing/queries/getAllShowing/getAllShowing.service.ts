@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Result, Ok, Err } from 'oxide.ts';
+import { SlackService } from 'src/infrastructure/adapters/slack/slack.service';
 import { Seatmap, SeatmapRepository } from 'src/services/event-svc/repository/seatmap/seatmap.repo';
 import { ShowingRepository } from 'src/services/event-svc/repository/showing/showing.repo';
 import { TicketTypeSectionRepository } from 'src/services/event-svc/repository/ticketTypeSection/ticketTypeSection.repo';
@@ -10,6 +11,7 @@ export class getAllShowingService {
     @Inject('ShowingRepository') private readonly showingRepository: ShowingRepository,
     @Inject('SeatmapRepository') private readonly seatmapRepository: SeatmapRepository,
     @Inject('TicketTypeSectionRepository') private readonly ticketTypeSectionRepository: TicketTypeSectionRepository,
+    private readonly slackService: SlackService
   ) {}
 
   async getAllShowings(): Promise<Result<String[], Error>> {
@@ -18,7 +20,7 @@ export class getAllShowingService {
       const formattedResult = showings.map(showing => showing.id);
       return Ok(formattedResult);
     } catch (error) {
-      console.error(error);
+      await this.slackService.sendError(`Error fetching showings: ${error.message}`);
       return Err(new Error('Failed to fetch showings data.'));
     }
   }
@@ -30,7 +32,7 @@ export class getAllShowingService {
       });
       return Ok(seatmaps);
     } catch (error) {
-      console.error(error);
+      await this.slackService.sendError(`Error fetching seatmaps: ${error.message}`);
       return Err(new Error('Failed to fetch seatmaps data.'));
     }
   }
@@ -45,14 +47,14 @@ export class getAllShowingService {
       }
       return Ok(seatmap);
     } catch (error) {
-      console.error(error);
+      await this.slackService.sendError(`Error fetching seatmap with sections: ${error.message}`);
       return Err(new Error('Failed to fetch seatmap data.'));
     }
   }
 
   async connectShowingToSeatmap(
     showingId: string,
-    seatmapId: string,
+    seatmapId: number,
     ticketTypeSectionMap: Record<string, number[]>
   ): Promise<Result<void, Error>> {
     try {
@@ -105,7 +107,7 @@ export class getAllShowingService {
       
       return Ok(undefined);
     } catch (error) {
-      console.error(error);
+      await this.slackService.sendError(`Error connecting showing to seatmap: ${error.message}`);
       return Err(new Error('Failed to connect showing to seatmap.'));
     }
   }

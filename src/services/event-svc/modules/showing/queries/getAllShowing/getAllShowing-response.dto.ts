@@ -23,8 +23,8 @@ export class ConnectShowingToSeatmapDTO {
   @ApiProperty({ example: '16962844867169', description: 'Showing ID' })
   showingId: string;
 
-  @ApiProperty({ example: '16962844867170', description: 'Seatmap ID' })
-  seatmapId: string;
+  @ApiProperty({ example: 123, description: 'Seatmap ID' })
+  seatmapId: number;
 
   @ApiProperty({
     example: { '16962844867171': [23456] },

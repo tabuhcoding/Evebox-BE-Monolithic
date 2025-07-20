@@ -27,12 +27,12 @@ export class AddEventMemberService {
       if (!user) return Err(new Error('User not found'));
 
       const addedUser = await this.findUserByEmail.execute(dto.email);
-      if (!user) return Err(new Error('User not found'));
+      if (!addedUser) return Err(new Error('User not found'));
 
-      const canManage = await this.eventUserRepo.hasPermissionToManageMembers(eventId, user.id.value, currentEmail);
+      const canManage = await this.eventUserRepo.hasPermissionToManageMembers(eventId, currentEmail, currentEmail);
       if (!canManage) return Err(new Error('You do not have permission to manage members.'));
 
-      const member = await this.eventUserRepo.addMember(eventId, addedUser.id.value, dto.email, dto);
+      const member = await this.eventUserRepo.addMember(eventId, dto.email, dto.email, dto);
       return Ok({
         statusCode: 201,
         message: 'Member added successfully',

@@ -8,6 +8,7 @@ import { CheckUserExistService } from "src/services/auth-svc/modules/user/comman
 import { EVENT_ROLE } from "../../domain/eventRole";
 import { GetAllEventDetailForRAGService } from "../getAllEventDetailForRAG/getAllEventDetailForRAG.service";
 import { EventDocumentBuilder } from "src/services/rag-svc/modules/openai/core-embedding/event-document.builder";
+import { FindUserByEmailService } from "src/services/auth-svc/modules/user/commands/find-user-by-email/findUserByEmail.service";
 
 @Injectable()
 export class GetAnalyticsService {
@@ -15,6 +16,7 @@ export class GetAnalyticsService {
     @Inject('EventsRepository') private readonly eventRepository: EventsRepository,
     private readonly slackService: SlackService,
     private readonly checkUserExistService: CheckUserExistService,
+    private readonly findUserByEmail: FindUserByEmailService, 
     private readonly getAllEventForRagService: GetAllEventDetailForRAGService
   ) { }
 
@@ -30,7 +32,10 @@ export class GetAnalyticsService {
         return Err(new Error('User does not exist'));
       }
 
-      const canManage = await this.eventRepository.hasPermissionToManageEvent(eventId, userEmail, EVENT_ROLE.VIEW_ORDER);
+      const user = await this.findUserByEmail.execute(userEmail);
+      if (!user) return Err(new Error('User not found'))
+
+      const canManage = await this.eventRepository.hasPermissionToManageEvent(eventId, user.id.value, EVENT_ROLE.MARKETING);
       if (canManage.isErr()) {
         return Err(new Error(canManage.unwrapErr().message));
       }

@@ -8,6 +8,7 @@ import { GetEventMembersQueryDto } from "./getEventMembers.dto";
 import { GetEventMembersResponseDto } from "./getEventMembers-response.dto";
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 import { CheckUserExistService } from "src/services/auth-svc/modules/user/commands/checkuserExist/checkuserExist.service";
+import { FindUserByEmailService } from "src/services/auth-svc/modules/user/commands/find-user-by-email/findUserByEmail.service";
 
 @Injectable()
 export class GetEventMembersService {
@@ -15,7 +16,8 @@ export class GetEventMembersService {
     @Inject('EventsRepository') private readonly eventsRepository: EventsRepository,
     @Inject('EventUserRelationshipRepository') private readonly eventUserRelaRepo: EventUserRelationshipRepository,
     private readonly slackService: SlackService,
-    private readonly checkUserExistService: CheckUserExistService
+    private readonly checkUserExistService: CheckUserExistService,
+    private readonly findUserByEmail: FindUserByEmailService
   ) { }
 
   async execute(eventId: number, query: GetEventMembersQueryDto, userEmail: string): Promise<Result<GetEventMembersResponseDto, Error>> {
@@ -27,17 +29,15 @@ export class GetEventMembersService {
         }
       }
 
-      const currentUserExist = await this.checkUserExistService.execute(userEmail);
-      if (!currentUserExist) {
-        return Err(new Error('User does not exist'));
-      }
+      const user = await this.findUserByEmail.execute(userEmail);
+      if (!user) return Err(new Error('User not found'));
 
       const event = await this.eventsRepository.findOneById(eventId);
       if (!event) {
         return Err(new Error('Event not found'));
       }
 
-      const hasPermisison = await this.eventsRepository.hasPermissionToManageEvent(eventId, userEmail, EVENT_ROLE.VIEW_MEMBER);
+      const hasPermisison = await this.eventsRepository.hasPermissionToManageEvent(eventId, user.id.value, EVENT_ROLE.VIEW_MEMBER);
       if (hasPermisison.isErr()) {
         return Err(new Error('Failed to check permission'));
       }

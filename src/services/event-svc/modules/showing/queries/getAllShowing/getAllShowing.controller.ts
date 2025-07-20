@@ -110,7 +110,7 @@ export class getAllShowingController {
   async getSeatmap(
     @Param('id') id: number,
     @Res() res: Response) {
-    const result = await this.getAllShowingService.getSeatmapWithSection(id);
+    const result = await this.getAllShowingService.getSeatmapWithSection(id >> 0);
 
     if (result.isErr()) {
       return res

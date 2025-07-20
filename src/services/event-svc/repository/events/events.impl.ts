@@ -437,7 +437,7 @@ export class EventsRepositoryImpl
 
       // 2. Get events from UserEventRelationship
       const relatedEvents = await this.eventUserRelaRepo.findMany({
-        userId
+        userId: email
       });
 
       const results: (EventOrgFrontDisplayDto & { role: number })[] = [];

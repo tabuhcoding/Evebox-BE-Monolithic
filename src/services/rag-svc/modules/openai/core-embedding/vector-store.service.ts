@@ -99,11 +99,11 @@ export class OpenAIVectorStoreService {
   async embedSimilarityEventDocuments(events: GetAllEventDetailForRAGResponseDto[]): Promise<void> {
     try {
       // Delete existing vectors for these events
-      const eventIds = events.map(e => e.id.toString());
-      await this.prisma.$executeRawUnsafe(`
-        DELETE FROM ${this.SIMILARITY_COLLECTION}
-        WHERE metadata->>'eventId' IN (${eventIds.map((_, i) => `${i + 1}`).join(',')})
-      `, ...eventIds);
+      // const eventIds = events.map(e => e.id.toString());
+      // await this.prisma.$executeRawUnsafe(`
+      //   DELETE FROM ${this.SIMILARITY_COLLECTION}
+      //   WHERE metadata->>'eventId' IN (${eventIds.map((_, i) => `${i + 1}`).join(',')})
+      // `, ...eventIds);
 
       // Embed documents
       const docs = events.map( event => {

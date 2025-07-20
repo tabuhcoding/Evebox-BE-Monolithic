@@ -89,7 +89,7 @@ export class UpdateUserStatusController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Put('/:email/area')
+  @Put('/:userId/area')
   @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Update status user',

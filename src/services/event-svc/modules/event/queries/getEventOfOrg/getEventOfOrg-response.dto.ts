@@ -40,6 +40,9 @@ export class EventOrgFrontDisplayDto {
 
   @ApiProperty({ example: 0, description: 'User role in this event (0 = Organizer)' })
   role: number;
+
+  @ApiProperty({ example: true, description: 'has showing in futre' })
+  isHasShowingInFuture: boolean;
 }
 
 export class EventOrgFrontDisplayResponse extends BaseResponse {

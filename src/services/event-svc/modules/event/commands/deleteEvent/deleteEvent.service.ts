@@ -23,7 +23,7 @@ export class DeleteEventService {
         return Err(new Error('User does not exist'));
       }
       
-      const hasPermisison = await this.eventsRepository.hasPermissionToManageEvent(Number(id), email, EVENT_ROLE.IS_EDITED);
+      const hasPermisison = await this.eventsRepository.hasPermissionToManageEvent(id>>0, email, EVENT_ROLE.IS_EDITED);
       if (hasPermisison.isErr()) {
         console.error('Failed to check permission');
         return Err(new Error(hasPermisison.unwrapErr().message));

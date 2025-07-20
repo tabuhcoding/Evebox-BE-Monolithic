@@ -9,6 +9,7 @@ import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 import { CheckUserExistService } from "src/services/auth-svc/modules/user/commands/checkuserExist/checkuserExist.service";
 import { GetAllEventDetailForRAGService } from "../getAllEventDetailForRAG/getAllEventDetailForRAG.service";
 import { EventDocumentBuilder } from "src/services/rag-svc/modules/openai/core-embedding/event-document.builder";
+import { FindUserByEmailService } from "src/services/auth-svc/modules/user/commands/find-user-by-email/findUserByEmail.service";
 
 @Injectable()
 export class GetEventSummaryService {
@@ -16,6 +17,7 @@ export class GetEventSummaryService {
     @Inject('EventsRepository') private readonly eventRepository: EventsRepository,
     @Inject('ShowingWithEventRepository') private readonly showingWithEventRepository: ShowingWithEventRepository,
     private readonly slackService: SlackService,    
+    private readonly findUserByEmail: FindUserByEmailService, 
     private readonly checkUserExistService: CheckUserExistService,
     private readonly getAllEventForRagService: GetAllEventDetailForRAGService
   ) {}
@@ -27,15 +29,21 @@ export class GetEventSummaryService {
         return Err(new Error('User does not exist'));
       }
 
+      const user = await this.findUserByEmail.execute(organizerId);
+      if (!user) return Err(new Error('User not found'));
+
       const showing = await this.showingWithEventRepository.findOneById(showingId);
       if (!showing) {
         return Err(new Error('Showing not found'));
       }
 
-      const canSummarized = await this.eventRepository.hasPermissionToManageEvent(showing.eventId, organizerId, EVENT_ROLE.IS_SUMMARIZED);
+     console.log("-------------")
+
+      const canSummarized = await this.eventRepository.hasPermissionToManageEvent(showing.eventId, user.id.value, EVENT_ROLE.IS_SUMMARIZED);
       if (canSummarized.isErr()) {
         return Err(new Error(canSummarized.unwrapErr().message));
       }
+      console.log(canSummarized.unwrap());
 
       if (!canSummarized.unwrap()) {
         return Err(new Error('You do not have permisison to get event summary'));

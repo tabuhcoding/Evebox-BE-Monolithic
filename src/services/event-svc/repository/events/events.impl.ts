@@ -219,6 +219,7 @@ export class EventsRepositoryImpl
       }
 
       const member = await this.getMember(eventId, userEmail);
+      console.log(member)
       if (!member || member.isDeleted) {
         return Ok(false);
       }
@@ -226,6 +227,8 @@ export class EventsRepositoryImpl
       const role = await this.prisma.eventRole.findUnique({
         where: { id: member.role },
       });
+      console.log(role);
+
       if (!role) {
         return Ok(false);
       }

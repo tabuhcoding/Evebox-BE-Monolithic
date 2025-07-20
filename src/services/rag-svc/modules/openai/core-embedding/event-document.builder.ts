@@ -107,4 +107,15 @@ export class EventDocumentBuilder {
       Thể loại: ${event.categories.join(', ')}
     `.trim();
   }
+
+  static eventToStringWithDescription(event: GetAllEventDetailForRAGResponseDto): string {
+    return `
+      Tên sự kiện: ${event.name}
+      Mô tả: ${event.description}
+      Địa điểm: ${event.venue}, ${event.location}
+      Hình thức: ${event.isOnlineEvent ? 'Trực tuyến' : 'Trực tiếp'}
+      Đơn vị tổ chức: ${event.organizer}
+      Thể loại: ${event.categories.join(', ')}
+    `.trim();
+  }
 }

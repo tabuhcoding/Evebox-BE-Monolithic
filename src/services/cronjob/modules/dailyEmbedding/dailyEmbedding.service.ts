@@ -17,7 +17,7 @@ export class DailyEmbeddingService {
   ) {  }
 
   // @Cron('0 36 17 * * 3')
-  @Cron('0 2 * * *') // Runs every day at midnight
+  // @Cron('0 2 * * *') // Runs every day at midnight
   async runDailyEmbedding() {
     try {
       const events = await this.getAllEventsForRagService.getAllEvents(false);
@@ -56,12 +56,12 @@ export class DailyEmbeddingService {
       await this.slackService.sendNotice(`Starting daily embedding for ${events.length} events.`);
       // return
       const batchSize = 100;
-      for (let i = 0; i < events.length; i += batchSize) {
-        const batch = events.slice(i, i + batchSize);
-        await this.openAIVectorStoreService.embedFullEventDocuments(batch);
-        await this.slackService.sendNotice(`Embedded batch ${Math.floor(i / batchSize) + 1} of ${Math.ceil(events.length / batchSize)}.`);
-        // return
-      }
+      // for (let i = 0; i < events.length; i += batchSize) {
+      //   const batch = events.slice(i, i + batchSize);
+      //   await this.openAIVectorStoreService.embedFullEventDocuments(batch);
+      //   await this.slackService.sendNotice(`Embedded batch ${Math.floor(i / batchSize) + 1} of ${Math.ceil(events.length / batchSize)}.`);
+      //   // return
+      // }
 
       await this.slackService.sendNotice("Daily embedding completed successfully.");
 

@@ -10,6 +10,7 @@ import { CheckUserExistService } from "src/services/auth-svc/modules/user/comman
 import { GetAllEventDetailForRAGService } from "../getAllEventDetailForRAG/getAllEventDetailForRAG.service";
 import { EventDocumentBuilder } from "src/services/rag-svc/modules/openai/core-embedding/event-document.builder";
 import { FindUserByEmailService } from "src/services/auth-svc/modules/user/commands/find-user-by-email/findUserByEmail.service";
+import { FileCacheService } from "src/infrastructure/cache/fileCache/fileCache.service";
 
 @Injectable()
 export class GetEventSummaryService {
@@ -19,7 +20,8 @@ export class GetEventSummaryService {
     private readonly slackService: SlackService,    
     private readonly findUserByEmail: FindUserByEmailService, 
     private readonly checkUserExistService: CheckUserExistService,
-    private readonly getAllEventForRagService: GetAllEventDetailForRAGService
+    private readonly getAllEventForRagService: GetAllEventDetailForRAGService,
+    private readonly fileCacheService: FileCacheService
   ) {}
 
   async execute(showingId: string, organizerId: string): Promise<Result<EventSummaryData, Error>> {
@@ -37,13 +39,10 @@ export class GetEventSummaryService {
         return Err(new Error('Showing not found'));
       }
 
-     console.log("-------------")
-
-      const canSummarized = await this.eventRepository.hasPermissionToManageEvent(showing.eventId, user.id.value, EVENT_ROLE.IS_SUMMARIZED);
+      const canSummarized = await this.eventRepository.hasPermissionToManageEvent(showing.eventId, user.email.value, EVENT_ROLE.IS_SUMMARIZED);
       if (canSummarized.isErr()) {
         return Err(new Error(canSummarized.unwrapErr().message));
       }
-      console.log(canSummarized.unwrap());
 
       if (!canSummarized.unwrap()) {
         return Err(new Error('You do not have permisison to get event summary'));
@@ -64,24 +63,37 @@ export class GetEventSummaryService {
 
   async executeAI(showingId: string, userRequest?: string): Promise<Result<string, Error>> {
     try {
-      const event = await this.getAllEventForRagService.getEventByShowingId(showingId);
-      const result = await this.execute(showingId, event.organizerId);
-
-      if (result.isErr()) {
-        return Err(new Error(result.unwrapErr().message));
-      }
-
-      const data = result.unwrap();
-
-      const doc = EventDocumentBuilder.buildFullDocument(event);
-
-      const payload = {
-        data: data,
+      var payload: any = {
         query: userRequest || "",
-        event: doc.pageContent
       };
 
-      const responseAI = await fetch(`${process.env.UTILS_URL}/revenue`, {
+      const cacheData = await this.fileCacheService.getCacheObjectById("analyst-ai", {}, showingId);
+
+      if (cacheData && cacheData.data[0].threadId) {
+        payload = {
+          ...payload,
+          threadId: cacheData.data[0].threadId,
+        };
+      }
+      else {
+        const event = await this.getAllEventForRagService.getEventByShowingId(showingId);
+        const result = await this.execute(showingId, event.organizerId);
+
+        if (result.isErr()) {
+          return Err(new Error(result.unwrapErr().message));
+        }
+
+        const data = result.unwrap();
+
+        const doc = EventDocumentBuilder.buildFullDocument(event);
+
+        payload = {
+          ...payload,
+          data: data,
+          event: doc.pageContent
+        };
+      }
+      const responseAI = await fetch(`${process.env.UTILS_URL}/revenue/v2`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -89,14 +101,28 @@ export class GetEventSummaryService {
         body: JSON.stringify(payload)
       });
 
-      if (!responseAI.ok) {
+      if (!responseAI.ok || responseAI.status !== 200) {
         const errorData = await responseAI.json();
         return Err(new Error(errorData.detail || 'Failed to analyze revenue data'));
       }
 
       const responseAIData = await responseAI.json();
 
-      return Ok(responseAIData.result);
+      this.slackService.sendNotice(`Event Service - Event summary with AI >>> GetEventSummaryService: ${JSON.stringify(payload)}.
+      Result: ${JSON.stringify(responseAIData)}`);
+
+      if (!responseAIData.content) {
+        return Err(new Error('No result returned from AI analysis'));
+      }
+      await this.fileCacheService.cacheObject("analyst-ai",
+        20,
+        {},
+        showingId,
+        [{
+          threadId: responseAIData.threadId
+        }]
+      );
+      return Ok(responseAIData.content);
     } catch (error) {
       await this.slackService.sendError(`Event Service - Event summary with AI >>> GetEventSummaryService: ${error.message}`);
 

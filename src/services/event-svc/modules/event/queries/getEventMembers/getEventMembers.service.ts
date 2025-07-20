@@ -76,8 +76,8 @@ export class GetEventMembersService {
 
       response.data.push({
         eventId: eventId,
-        userId: userEmail,
-        email: userEmail,
+        userId: eventFound.organizerId,
+        email: eventFound.organizerId,
         role: 1,
         role_desc: "Organizer",
         createdAt: new Date(),

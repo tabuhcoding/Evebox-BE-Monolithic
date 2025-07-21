@@ -2,7 +2,7 @@ import { Controller, Get, Query, Res, HttpStatus, UseGuards, Request } from "@ne
 import { Response } from "express";
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { GetOrgRevenueService } from "./getOrgRevenue.service";
-import { OrganizerRevenueResponseDto } from "./getOrgRevenue-response.dto";
+import { AppRevenueData, GetAppRevenueResponseDto, OrganizerRevenueResponseDto } from "./getOrgRevenue-response.dto";
 import { JwtAuthGuard } from "src/shared/guard/jwt-auth.guard";
 import { PaginationQuery } from "src/shared/constants/pagination";
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
@@ -129,6 +129,57 @@ export class GetOrgRevenueController {
         message: 'Organizer revenue retrieved successfully',
         data,
         pagination: paginationResult,
+      });
+    } catch (error) {
+      await this.slackService.sendError(`Error in Event Svc >> Admin - Statistics >> GetOrgRevenueController: ${error.message}`);
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: 'Internal server error',
+      });
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/app-revenue')
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Get revenue combine org' })
+  @ApiQuery({ name: 'fromDate', required: false, type: String })
+  @ApiQuery({ name: 'toDate', required: false, type: String })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Organizer revenue retrieved successfully', type: GetAppRevenueResponseDto })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid input' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Internal server error' })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'You do not have permission to get org revenue' })
+  async executeApp(
+    @Query('fromDate') fromDate: string,
+    @Query('toDate') toDate: string,
+    @Res() res: Response,
+    @Request() req,
+  ) {
+    try {
+      const email = req.user?.email;
+
+      if (!email) {
+        return res.status(HttpStatus.UNAUTHORIZED).json({
+          statusCode: HttpStatus.UNAUTHORIZED,
+          message: 'Unauthorized',
+        });
+      }
+
+      const result = await this.getOrgRevenueService.appRevenue(email, fromDate, toDate);
+
+      if (result.isErr()) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+          statusCode: HttpStatus.BAD_REQUEST,
+          message: result.unwrapErr().message,
+        });
+      }
+
+      const data = result.unwrap();
+
+      return res.status(HttpStatus.OK).json({
+        statusCode: HttpStatus.OK,
+        message: 'Organizer revenue retrieved successfully',
+        data,
       });
     } catch (error) {
       await this.slackService.sendError(`Error in Event Svc >> Admin - Statistics >> GetOrgRevenueController: ${error.message}`);

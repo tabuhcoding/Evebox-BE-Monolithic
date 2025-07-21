@@ -1,7 +1,7 @@
 import { SaveRevenueDataService } from './../../../../../auth-svc/modules/admin/commands/saveRevenueData/saveRevenueData.service';
 import { Inject, Injectable } from "@nestjs/common";
 import { Result, Err, Ok } from "oxide.ts";
-import { OrganizerRevenueData, ShowingRevenueData, TicketTypeRevenueData, EventWithShowings, EventRevenueData } from "./getOrgRevenue-response.dto";
+import { OrganizerRevenueData, ShowingRevenueData, TicketTypeRevenueData, EventWithShowings, EventRevenueData, AppRevenueData } from "./getOrgRevenue-response.dto";
 import { GetAdminAccessService } from "src/services/auth-svc/modules/user/queries/get-admin-access/get-admin-access.service";
 import { EventsRepository } from "src/services/event-svc/repository/events/events.repo";
 import { Pagination, PaginationQuery } from "src/shared/constants/pagination";
@@ -205,6 +205,30 @@ export class GetOrgRevenueService {
     // });
     const organizerRevenueData = convertToOrganizerRevenueDataFoeach(revenueData);
     return Ok([organizerRevenueData, paginationResult]);
+  }
+
+  async appRevenue(
+    email: string,
+    fromDate?: string,
+    toDate?: string,
+  ) : Promise<Result<AppRevenueData, Error>> {
+    const isAdmin = await this.getAdminAccessService.execute(email);
+    if (!isAdmin) return Err(new Error('You do not have permission to get organizer revenue'));
+
+    const from = fromDate ? new Date(fromDate) : undefined;
+    const to = toDate ? new Date(toDate) : undefined;
+
+    if (from && to && from > to) {
+      return Err(new Error("fromDate must be earlier than or equal to toDate"));
+    }
+
+    try {
+      const appRevenue = await this.saveRevenueDataService.getAppRevenue(fromDate?.split('T')[0], 
+      toDate?.split('T')[0]);
+      return Ok(appRevenue);
+    } catch (error) {
+      return Err(new Error(`Error fetching app revenue: ${error.message}`));
+    }
   }
 }
 

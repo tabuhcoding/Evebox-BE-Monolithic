@@ -67,7 +67,7 @@ export class GetEventSummaryService {
         query: userRequest || "",
       };
 
-      const cacheData = await this.fileCacheService.getCacheObjectById("analyst-ai", {}, showingId);
+      const cacheData = await this.fileCacheService.getCacheObjectById("summary-ai", {}, showingId);
 
       if (cacheData && cacheData.data[0].threadId) {
         payload = {
@@ -114,7 +114,7 @@ export class GetEventSummaryService {
       if (!responseAIData.content) {
         return Err(new Error('No result returned from AI analysis'));
       }
-      await this.fileCacheService.cacheObject("analyst-ai",
+      await this.fileCacheService.cacheObject("summary-ai",
         20,
         {},
         showingId,

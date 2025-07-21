@@ -26,7 +26,7 @@ export class getFormOfShowingService {
         FormInput: true,
       });
       if (!form) {
-        return Err(new Error('Form not found.'));
+        return Ok(null);
       }
       return Ok(form);
     } catch (error) {

@@ -1,12 +1,13 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { Result, Ok, Err } from "oxide.ts";
-import { ShowingRevenueData } from "./getEventRevenueDetail-response.dto";
+import { EventRevenueWithInfoData } from "./getEventRevenueDetail-response.dto";
 import { GetAdminAccessService } from "src/services/auth-svc/modules/user/queries/get-admin-access/get-admin-access.service";
 import { EventsRepository } from "src/services/event-svc/repository/events/events.repo";
 import { TicketQueryService } from "src/services/booking-svc/modules/queries/getTicketQuery/ticket-query.service";
 import { ShowingRepository } from "src/services/event-svc/repository/showing/showing.repo";
 import { SaveRevenueDataService } from "src/services/auth-svc/modules/admin/commands/saveRevenueData/saveRevenueData.service";
 import { convertToEventRevenueData } from "../getOrgRevenue/getOrgRevenue.service";
+import { ShowingRevenueData } from "../getOrgRevenue/getOrgRevenue-response.dto";
 
 @Injectable()
 export class GetEventRevenueDetailService {
@@ -39,33 +40,47 @@ export class GetEventRevenueDetailService {
 
       return {
         showingId: showing.id,
-        startTime: showing.startTime,
-        endTime: showing.endTime,
+        startDate: showing.startTime,
+        endDate: showing.endTime,
         revenue: totalRevenue,
+        ticketTypes: []
       };
     });
 
     return Ok(result);
   }
 
-  async executeV2(email: string, orgId: string, eventId: number): Promise<Result<ShowingRevenueData[], Error>> {
+  async executeV2(email: string, orgId: string, eventId: number): Promise<Result<EventRevenueWithInfoData, Error>> {
     const isAdmin = await this.getAdminAccessService.execute(email);
     if (!isAdmin) return Err(new Error('Unauthorized'));
 
-    const event = await this.eventsRepo.findEventById(eventId);
+    const event = await this.eventsRepo.findOneById(eventId, {
+      locations: {
+        include: {
+          districts: {
+            include: {
+              province: true
+            }
+          }
+        }
+      },
+    });
     if (!event) return Err(new Error('Event not found'));
 
+    const { street, ward, districts } = event.locations ?? {};
+    const districtName = districts?.name || '';
+    const provinceName = districts?.province?.name || '';
+    const locationsString = `${street || ''}, ${ward || ''}, ${districtName}, ${provinceName}`;
+      
     const revenue = await this.saveRevenueDataService.getEventRevenueByDateAndEventId(null,null, eventId);
     
     const result = convertToEventRevenueData(revenue)
     
-    return Ok(result[0].showings.map(showing => {
-      return {
-        showingId: showing.showingId,
-        startTime: showing.startDate,
-        endTime: showing.endDate,
-        revenue: showing.revenue,
-      };
-    }));
+    return Ok({
+      title: event.title,
+      venue: event.venue,
+      locationsString: locationsString,
+      showings: result[0]?.showings || [],
+    });
   }
 }

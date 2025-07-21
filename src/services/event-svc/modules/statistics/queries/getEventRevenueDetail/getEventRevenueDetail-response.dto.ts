@@ -1,21 +1,21 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { BaseResponse } from "src/shared/constants/baseResponse";
+import { ShowingRevenueData } from "../getOrgRevenue/getOrgRevenue-response.dto";
 
-export class ShowingRevenueData {
-  @ApiProperty({ example: "abc123", description: "Showing id" })
-  showingId: string;
+export class EventRevenueWithInfoData {
+  @ApiProperty( {example: 'The Batman', description: 'The title of the event' })
+  title: string;
 
-  @ApiProperty({ example: "2025-06-01T19:00:00.000Z", description: "Start time of the showing" })
-  startTime: Date;
+  @ApiProperty( {example: 'Nhà hát kịch Idecaf', description: 'The venue of the event' })
+  venue: string;
 
-  @ApiProperty({ example: "2025-06-01T21:00:00.000Z", description: "End time of the showing" })
-  endTime: Date;
-
-  @ApiProperty({ example: 5000000, description: "Total revenue of the showing" })
-  revenue: number;
+  @ApiProperty( {example: '130 Nguyen Dinh Chieu, Da Kao Ward, District 1, Ho Chi Minh City', description: 'The address of the event' })
+  locationsString: string;
+  
+  showings: ShowingRevenueData[];
 }
 
 export class EventRevenueDetailResponseDto extends BaseResponse {
-  @ApiProperty({ type: [ShowingRevenueData], description: "Showing revenue list in the event" })
-  data: ShowingRevenueData[];
+  @ApiProperty({ type: EventRevenueWithInfoData, description: "Event revenue" })
+  data: EventRevenueWithInfoData;
 }

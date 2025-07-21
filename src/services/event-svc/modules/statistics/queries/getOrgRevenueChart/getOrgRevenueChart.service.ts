@@ -7,6 +7,7 @@ import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 import { startOfWeek, endOfWeek, addWeeks, differenceInCalendarMonths, differenceInCalendarDays, startOfMonth, subMonths, differenceInCalendarWeeks, addDays, startOfDay } from 'date-fns';
 import { GetPaidOrdersByShowingIdService } from "src/services/booking-svc/modules/queries/getPaidOrdersByShowingId/getPaidOrdersByShowingId.service";
 import { SaveRevenueDataService } from "src/services/auth-svc/modules/admin/commands/saveRevenueData/saveRevenueData.service";
+import { FileCacheService } from "src/infrastructure/cache/fileCache/fileCache.service";
 
 const FEE_PERCENT = 10; // default, or can be got from OrgPaymentInfo table
 
@@ -18,6 +19,7 @@ export class GetOrgRevenueChartService {
     private readonly slackService: SlackService,
     private readonly getPaidOrdersByShowingIdService: GetPaidOrdersByShowingIdService,
     private readonly saveRevenueDataService: SaveRevenueDataService,
+        private readonly fileCacheService: FileCacheService
   ) {}
 
   async execute(email: string, fromDate?: string, toDate?: string, filterType: "month" | "year" = "month"): Promise<Result<RevenueSummaryItem[], Error>> {
@@ -165,6 +167,65 @@ export class GetOrgRevenueChartService {
         }
         return parseInt(a.period) - parseInt(b.period);
       }));
+    } catch (error) {
+      this.slackService.sendError(`EventSvc >> GetOrgRevenueChartService: Failed to get org revenue chart: ${error.message}`);
+      return Err(new Error('Internal server error'));
+    }
+  }
+
+  async executeAI(email: string, userRequest: string, fromDate?: string, toDate?: string, filterType: "month" | "year" = "month"): Promise<Result<string, Error>> {
+    try {
+      var payload: any = {
+        query: userRequest || "",
+      };
+
+      const cacheData = await this.fileCacheService.getCacheObjectById("analyst-ai", {}, "revenue");
+
+      if (cacheData && cacheData.data[0].threadId) {
+        payload = {
+          ...payload,
+          threadId: cacheData.data[0].threadId,
+        };
+      }
+      else {
+        const chart = await this.execute(email, fromDate, toDate, filterType);
+        payload = {
+          ...payload,
+          data: {
+            chart: chart.isOk() ? chart.unwrap() : [],
+          },
+        };
+      }
+      const responseAI = await fetch(`${process.env.UTILS_URL}/revenue/admin`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!responseAI.ok || responseAI.status !== 200) {
+        const errorData = await responseAI.json();
+        return Err(new Error(errorData.detail || 'Failed to analyze revenue data'));
+      }
+
+      const responseAIData = await responseAI.json();
+
+      this.slackService.sendNotice(`Event Service - Event summary with AI >>> GetEventSummaryService: ${JSON.stringify(payload)}.
+      Result: ${JSON.stringify(responseAIData)}`);
+
+      if (!responseAIData.content) {
+        return Err(new Error('No result returned from AI analysis'));
+      }
+      await this.fileCacheService.cacheObject("analyst-ai",
+        20,
+        {},
+        "revenue",
+        [{
+          threadId: responseAIData.threadId
+        }]
+      );
+      return Ok(responseAIData.content);
     } catch (error) {
       this.slackService.sendError(`EventSvc >> GetOrgRevenueChartService: Failed to get org revenue chart: ${error.message}`);
       return Err(new Error('Internal server error'));

@@ -400,10 +400,6 @@ export class GetUserOrderService {
       do {
         order = await this.orderRepository.findOne({
           id: originalOrderId,
-          status: {
-            not: BookingTicketStatus.PENDING
-          },
-          mailSent: false,
         }, {
         Ticket: true,
         });
@@ -522,9 +518,6 @@ export class GetUserOrderService {
       do {
         order = await this.orderRepository.findOne({
           id: originalOrderId,
-          status: {
-            not: BookingTicketStatus.PENDING
-          },
           createdAt: {
             // Only check orders created within the last 30 minutes
             gte: new Date(Date.now() - 30 * 60 * 1000), // last 30 minutes

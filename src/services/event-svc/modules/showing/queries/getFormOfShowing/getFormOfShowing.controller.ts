@@ -19,10 +19,9 @@ export class getFormOfShowingController {
   async getForm(@Query('showingId') showingId: string, @Res() res: Response) {
     const result = await this.getFormOfShowingService.execute(showingId);
     if (result.isErr()) {
-      const error = result.unwrapErr();
       return res
-        .status(error.message === 'Form not found.' ? HttpStatus.NOT_FOUND : HttpStatus.BAD_REQUEST)
-        .json(error.message === 'Form not found.' ? ErrorHandler.notFound(result.unwrapErr().message) : ErrorHandler.badRequest(result.unwrapErr().message));
+        .status(HttpStatus.BAD_REQUEST)
+        .json(ErrorHandler.badRequest(result.unwrapErr().message));
     }
 
     const data = result.unwrap();

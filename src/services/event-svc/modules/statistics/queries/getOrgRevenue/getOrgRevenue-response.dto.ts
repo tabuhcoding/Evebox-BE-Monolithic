@@ -136,3 +136,25 @@ export class OrganizerRevenueResponseDto extends BaseResponse {
   @ApiProperty({ type: Pagination, description: 'Pagination information' })
   pagination?: Pagination;
 }
+
+export class AppRevenueData {
+  @ApiProperty({ example: 1000000000, description: "Total revenue from all events" })
+  totalRevenue: number;
+
+  @ApiProperty({ example: 10, description: "Platform fee (%)" })
+  platformFeePercent: number;
+
+  @ApiProperty({ example: 900000000, description: "Actual revenue" })
+  actualRevenue: number;
+
+  @ApiProperty({ type: [OrganizerRevenueData], description: "List of organizer revenue data" })
+  organizers: OrganizerRevenueData[];
+}
+
+export class GetAppRevenueResponseDto extends BaseResponse {
+  @ApiProperty({ type: [OrganizerRevenueData], description: "List of organizer revenue data" })
+  data: AppRevenueData;
+
+  @ApiProperty({ type: Pagination, description: 'Pagination information' })
+  pagination?: Pagination;
+}

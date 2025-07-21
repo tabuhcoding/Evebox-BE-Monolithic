@@ -8,6 +8,7 @@ import { Revenue, RevenueRepository } from "src/services/auth-svc/repository/rev
 import { ShowingRevenue, ShowingRevenueRepository } from "src/services/auth-svc/repository/showing-revenue/showing-revenue.repo";
 import { TicketTypeRevenueRepository } from "src/services/auth-svc/repository/tickettype-revenue/tickettype-revenue.repo";
 import { RevenueDataDTO } from "src/services/booking-svc/modules/commands/calculateRevenue/revenue.dto";
+import { AppRevenueData } from 'src/services/event-svc/modules/statistics/queries/getOrgRevenue/getOrgRevenue-response.dto';
 
 @Injectable()
 export class SaveRevenueDataService {
@@ -151,6 +152,14 @@ export class SaveRevenueDataService {
     return revenues;
   }
 
+  async getAppRevenue(from?: string, to?: string): Promise<AppRevenueData> {
+    try {
+      return await this.revenueRepository.totalRevenue(from, to); 
+    }
+    catch (error) {
+      throw new Error(`Error fetching app revenue: ${error.message}`);
+    }
+  }
   async getRevenueByDateV2(from?: string, to?: string): Promise<Revenue[]> {
     var query = {}
     if (from) {

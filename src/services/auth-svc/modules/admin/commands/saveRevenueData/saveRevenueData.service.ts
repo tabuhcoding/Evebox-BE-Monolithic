@@ -247,7 +247,7 @@ export class SaveRevenueDataService {
     return [organizerRevenues, paginationResult];
   }
 
-  async getOrganizerRevenueByDateAndOrgIdV2(pagination: PaginationQuery, from?: string, to?: string, search?: string, org_id?: string[]): Promise<[OrganizerRevenueData[], Pagination]>{
+  async getOrganizerRevenueByDateAndOrgIdV2(pagination: PaginationQuery, from?: string, to?: string, search?: string): Promise<[OrganizerRevenueData[], Pagination]>{
     try {
       return await this.revenueRepository.getListOrganizerRevenue(pagination, from, to, search);
     }

@@ -10,6 +10,9 @@ import { GetAllEventDetailForRAGService } from "../getAllEventDetailForRAG/getAl
 import { EventDocumentBuilder } from "src/services/rag-svc/modules/openai/core-embedding/event-document.builder";
 import { FindUserByEmailService } from "src/services/auth-svc/modules/user/commands/find-user-by-email/findUserByEmail.service";
 import { FileCacheService } from "src/infrastructure/cache/fileCache/fileCache.service";
+import { AIAnalystService } from "src/services/auth-svc/modules/admin/commands/aiAnalyst/aiAnalyst.service";
+import { Pagination, PaginationQuery } from "src/shared/constants/pagination";
+import { AIAnalyst } from "src/services/auth-svc/repository/ai-analyst/ai-analyst.repo";
 
 @Injectable()
 export class GetAnalyticsService {
@@ -19,7 +22,8 @@ export class GetAnalyticsService {
     private readonly checkUserExistService: CheckUserExistService,
     private readonly findUserByEmail: FindUserByEmailService, 
     private readonly getAllEventForRagService: GetAllEventDetailForRAGService,
-    private readonly fileCacheService: FileCacheService
+    private readonly fileCacheService: FileCacheService,
+    private readonly AIAnalystService: AIAnalystService,
   ) { }
 
   async execute(eventId: number, userEmail: string, startDate?: Date, endDate?: Date): Promise<Result<AnalyticsResponseData, Error>> {
@@ -169,11 +173,39 @@ export class GetAnalyticsService {
         }]
       )
 
+      try {
+        await this.AIAnalystService.createAIAnalyst(
+          eventId.toString(),
+          responseAIData.content,
+          responseAIData.threadId,
+          "org-analytics",
+          userRequest || "",
+        );
+      } catch (error) {
+        this.slackService.sendError(`Event Service - Admin - AIAnalyst >>> Create AI Analyst entry failed: ${error.message}`);
+      }
+
       return Ok(responseAIData.content);
     } catch (error) {
       await this.slackService.sendError(`Event Service - Event analytics with AI >>> GetAnalyticsService: ${error.message}`);
 
       return Err(new Error('Failed to retrieve events'));
+    }
+  }
+
+  async getAIAnalystics(eventId: number, pagination: PaginationQuery): Promise<Result<[AIAnalyst[], Pagination], Error>>{
+    try {
+      const event = await this.eventRepository.findOneById(eventId);
+      if (!event) {
+        return Err(new Error('Event not found'));
+      }
+
+      const aiAnalystData = await this.AIAnalystService.getAIAnalyst(eventId.toString(), "org-analytics", pagination);
+
+      return Ok(aiAnalystData);
+    } catch (error) {
+      await this.slackService.sendError(`Event Service - Event analytics with AI >>> GetAnalyticsService: ${error.message}`);
+      return Err(new Error('Failed to retrieve AI analytics'));
     }
   }
 }

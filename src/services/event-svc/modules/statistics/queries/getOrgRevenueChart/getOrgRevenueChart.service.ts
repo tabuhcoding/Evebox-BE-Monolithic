@@ -8,6 +8,9 @@ import { startOfWeek, endOfWeek, addWeeks, differenceInCalendarMonths, differenc
 import { GetPaidOrdersByShowingIdService } from "src/services/booking-svc/modules/queries/getPaidOrdersByShowingId/getPaidOrdersByShowingId.service";
 import { SaveRevenueDataService } from "src/services/auth-svc/modules/admin/commands/saveRevenueData/saveRevenueData.service";
 import { FileCacheService } from "src/infrastructure/cache/fileCache/fileCache.service";
+import { AIAnalystService } from "src/services/auth-svc/modules/admin/commands/aiAnalyst/aiAnalyst.service";
+import { Pagination, PaginationQuery } from "src/shared/constants/pagination";
+import { AIAnalyst } from "src/services/auth-svc/repository/ai-analyst/ai-analyst.repo";
 
 const FEE_PERCENT = 10; // default, or can be got from OrgPaymentInfo table
 
@@ -19,7 +22,8 @@ export class GetOrgRevenueChartService {
     private readonly slackService: SlackService,
     private readonly getPaidOrdersByShowingIdService: GetPaidOrdersByShowingIdService,
     private readonly saveRevenueDataService: SaveRevenueDataService,
-        private readonly fileCacheService: FileCacheService
+    private readonly fileCacheService: FileCacheService,
+    private readonly AIAnalystService: AIAnalystService,
   ) {}
 
   async execute(email: string, fromDate?: string, toDate?: string, filterType: "month" | "year" = "month"): Promise<Result<RevenueSummaryItem[], Error>> {
@@ -225,9 +229,37 @@ export class GetOrgRevenueChartService {
           threadId: responseAIData.threadId
         }]
       );
+
+      try {
+        await this.AIAnalystService.createAIAnalyst(
+          "admin",
+          responseAIData.content,
+          responseAIData.threadId,
+          "revenue",
+          userRequest || "",
+        );
+      }catch (error) {
+        this.slackService.sendError(`Event Service - Admin - AIAnalyst >>> Create AI Analyst entry failed: ${error.message}`);
+      }
       return Ok(responseAIData.content);
     } catch (error) {
       this.slackService.sendError(`EventSvc >> GetOrgRevenueChartService: Failed to get org revenue chart: ${error.message}`);
+      return Err(new Error('Internal server error'));
+    }
+  }
+
+  async getAIAnalyst(email: string, pagination: PaginationQuery): Promise<Result<[AIAnalyst[], Pagination], Error>> {
+    try {
+      const isAdmin = await this.getAdminAccessService.execute(email);
+      if (!isAdmin) {
+        return Err(new Error('You do not have permission to get AI Analyst data'));
+      }
+
+      const aiAnalystData = await this.AIAnalystService.getAIAnalyst("admin", "revenue", pagination);
+
+      return Ok(aiAnalystData);
+    } catch (error) {
+      this.slackService.sendError(`EventSvc >> GetOrgRevenueChartService: Failed to get AI Analyst data: ${error.message}`);
       return Err(new Error('Internal server error'));
     }
   }

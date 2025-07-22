@@ -12,6 +12,7 @@ import { Pagination, PaginationQuery } from 'src/shared/constants/pagination';
 import { EventWithShowings } from '../../modules/statistics/queries/getOrgRevenue/getOrgRevenue-response.dto';
 import { RevenueSummaryItem } from '../../modules/statistics/queries/getOrgRevenueChart/getOrgRevenueChart-response.dto';
 import { ProvinceRevenueData } from '../../modules/statistics/queries/getOrgRevenueByProvince/getOrgRevenueByProvince-response.dto';
+import { RevenueByTicketPriceData } from '../../modules/statistics/queries/getRevenueByTicketPrice/getRevenueByTicketPrice-response.dto';
 
 export type Events = Prisma.EventsGetPayload<{
   include: {
@@ -165,4 +166,5 @@ export interface EventsRepository extends BaseEventRepository<Events, Prisma.Eve
   getOrgRevenueByProvince(): Promise<Result<ProvinceRevenueData[], Error>>;
   getAllTicketTypes(): Promise<TicketTypesData[]>;
   getTicketTypePriceRange(): Promise<TicketTypePriceRange[]>;
+  getTicketTypePriceRangeWithCount(): Promise<RevenueByTicketPriceData[]>;
 }

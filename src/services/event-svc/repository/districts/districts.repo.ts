@@ -7,5 +7,22 @@ export type Districts = Prisma.districtsGetPayload<{
   };
 }>;
 
+export type DistrictsWithEvents = Prisma.districtsGetPayload<{
+  include: {
+    province: true;
+    locations: { 
+      include: {
+        Events: {
+          include: {
+            Showing: true;
+          };
+        };
+      };
+    };
+  };
+}>;
+
 export interface DistrictsRepository extends BaseEventRepository<Districts, Prisma.districtsDelegate> {
+  getAllWEvent(): Promise<DistrictsWithEvents[]>;
+  transactions( districts: Districts[]): Promise<void>;
 }

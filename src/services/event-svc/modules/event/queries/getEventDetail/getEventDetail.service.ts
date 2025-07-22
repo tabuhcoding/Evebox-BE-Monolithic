@@ -122,8 +122,8 @@ export class GetEventDetailService {
       }
       else{
         var endDate = new Date("1970-12-31T23:59:59.999Z");
-        for (const showing of event.Showing) {
-          await this.calculateShowingStatusService.reCalculateAllTicketTypesOfShowingStatus(showing);
+        event.Showing.forEach(async showing => {
+          // await this.calculateShowingStatusService.reCalculateAllTicketTypesOfShowingStatus(showing);
           var showingStatus: ShowingStatus;
           var showingMinPrice: number;
           if (showing.endTime < nowDate) {
@@ -162,7 +162,7 @@ export class GetEventDetailService {
             })),
           };
           eventsDto.showing.push(showingDto);
-        }
+        });
 
         // Determine event status based on showing statuses
         if (showingStatusSet.has(ShowingStatus.BOOK_NOW) || showingStatusSet.has(ShowingStatus.REGISTER_NOW)) {
@@ -195,8 +195,9 @@ export class GetEventDetailService {
       
       return Err(new Error("Failed to fetch event detail data."));
     }
-    
   }
+
+
 
   async increasePostClickCount(eventId: number, userId?: string){
     if (!eventId) {

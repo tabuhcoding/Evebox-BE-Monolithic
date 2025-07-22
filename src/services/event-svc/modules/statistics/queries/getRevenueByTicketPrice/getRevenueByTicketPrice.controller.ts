@@ -105,7 +105,7 @@ export class GetRevenueByTicketPriceController {
     }
   }
 
-  @Post('/revenue-ticket-ai')
+  @Post('/revenue-price-ai')
   @ApiOperation({ summary: 'Get revenue data combine org for chart' })
   @ApiBody({ type: GetSummaryWithAI })
   @ApiResponse({ status: HttpStatus.OK, description: 'Organizer revenue retrieved successfully' })
@@ -140,7 +140,7 @@ export class GetRevenueByTicketPriceController {
     }
   }
 
-  @Get('/revenue-province-ai')
+  @Get('/revenue-price-ai')
   @ApiOperation({ summary: 'Get AI Analyst data for revenue chart' })
   @ApiQuery({ name: 'page', required: false, type: Number, description: 'Page number for pagination', example: 1 })
   @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Number of items per page', example: 10 })
@@ -174,7 +174,8 @@ export class GetRevenueByTicketPriceController {
       return res.status(HttpStatus.OK).json({
         statusCode: HttpStatus.OK,
         message: 'AI Analyst data retrieved successfully',
-        data: result.unwrap(),
+        data: result.unwrap()[0],
+        pagination: result.unwrap()[1],
       });
     } catch (error) {
       await this.slackService.sendError(`Error in Event Svc >> Admin - Statistics >> GetOrgRevenueChartController: ${error.message}`);

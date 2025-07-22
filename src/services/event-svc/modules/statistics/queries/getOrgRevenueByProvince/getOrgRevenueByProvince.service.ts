@@ -226,14 +226,16 @@ export class GetOrgRevenueByProvinceService {
 
       const revenueList = Array.from(revenueData.values());
 
+      const updatedRevenueList = await this.saveRevenueDataService.appendRevenueToProvinces(revenueList);
+
       await this.fileCacheService.cacheEndpoint(
         'getOrgRevenueByProvinceV3',
         60 * 24,
         {},
-        revenueList,
+        updatedRevenueList.map(data => ({
+        ...data,
+        eventIds: null})),
       );
-
-      const updatedRevenueList = await this.saveRevenueDataService.appendRevenueToProvinces(revenueList);
 
       return Ok(updatedRevenueList.map(data => ({
         ...data,
@@ -259,7 +261,7 @@ export class GetOrgRevenueByProvinceService {
         };
       }
       else {
-        const chart = await this.executeV2();
+        const chart = await this.executeV3();
         payload = {
           ...payload,
           data: {

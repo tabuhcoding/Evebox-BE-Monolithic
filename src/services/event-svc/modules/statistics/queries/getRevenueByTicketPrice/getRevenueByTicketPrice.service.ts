@@ -6,6 +6,7 @@ import { GetOrdersWithTypeService } from "src/services/booking-svc/modules/queri
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 import { RevenueByTicketPriceData } from "./getRevenueByTicketPrice-response.dto";
 import { FileCacheService } from "src/infrastructure/cache/fileCache/fileCache.service";
+import { SaveRevenueDataService } from "src/services/auth-svc/modules/admin/commands/saveRevenueData/saveRevenueData.service";
 
 @Injectable()
 export class GetRevenueByTicketPriceService {
@@ -15,6 +16,7 @@ export class GetRevenueByTicketPriceService {
     private readonly slackService: SlackService,
     private readonly getOrdersWithTypeService: GetOrdersWithTypeService,
     private readonly fileCacheService: FileCacheService,
+    private readonly saveRevenueDataService: SaveRevenueDataService,
   ) {}
 
   async execute(email: string): Promise<Result<RevenueByTicketPriceData[], Error>> {
@@ -71,4 +73,19 @@ export class GetRevenueByTicketPriceService {
       return Err(new Error('Internal server error'));
     }
   }
+
+  async executeV2(): Promise<Result<RevenueByTicketPriceData[], Error>> {
+    try {
+      const data = await this.eventsRepository.getTicketTypePriceRangeWithCount();
+
+      const result = await this.saveRevenueDataService.addTotalSoldToTicketTypeRevenue(data);
+      return Ok(result);
+    }
+    catch (error) {
+      await this.slackService.sendError(`Event Service - Admin - Statistics >>> GetOrgRevenueByTicketPriceService: ${error.message}`);
+      return Err(new Error('Internal server error'));
+    }
+  }
+
+  
 }

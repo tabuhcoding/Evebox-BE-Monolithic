@@ -58,4 +58,49 @@ export class GetRevenueByTicketPriceController {
       });
     }
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/revenue-by-ticket-price-V2')
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Get revenue by ticket price' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Revenue by ticket price retrieved successfully', type: RevenueByTicketPriceResponseDto })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid input' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Internal server error' })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'You do not have permission to get org revenue' })
+  async executeV2(
+    @Res() res: Response,
+    @Request() req
+  ) {
+    try {
+      const email = req.user?.role;
+
+      if (!email || email !== 1) {
+        return res.status(HttpStatus.UNAUTHORIZED).json({
+          statusCode: HttpStatus.UNAUTHORIZED,
+          message: 'Unauthorized',
+        });
+      }
+
+      const result = await this.getOrgRevenueByTicketPriceService.executeV2();
+
+      if (result.isErr()) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+          statusCode: HttpStatus.BAD_REQUEST,
+          message: result.unwrapErr().message,
+        });
+      }
+
+      return res.status(HttpStatus.OK).json({
+        statusCode: HttpStatus.OK,
+        message: 'Revenue by ticket price retrieved successfully',
+        data: result.unwrap(),
+      });
+    } catch (error) {
+      await this.slackService.sendError(`Error in Event Svc >> Admin - Statistics >> GetOrgRevenueByTicketPriceController: ${error.message}`);
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: 'Internal server error',
+      });
+    }
+  }
 }

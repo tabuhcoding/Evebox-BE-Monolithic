@@ -98,6 +98,8 @@ import { EventRevenueRepositoryImpl } from "./repository/event-revenue/event-rev
 import { OrganizerRevenueRepositoryImpl } from './repository/organizer-revenue/organizer-revenue.impl';
 import { SaveRevenueDataService } from './modules/admin/commands/saveRevenueData/saveRevenueData.service';
 import { AdminManageEventRepositoryImpl } from './repository/admin-area/admin-area.impl';
+import { AIAnalystRepositoryImpl } from './repository/ai-analyst/ai-analyst.impl';
+import { AIAnalystService } from './modules/admin/commands/aiAnalyst/aiAnalyst.service';
 
 @Module({
   imports: [
@@ -234,6 +236,10 @@ import { AdminManageEventRepositoryImpl } from './repository/admin-area/admin-ar
       provide: 'AdminManageEventRepository',
       useClass: AdminManageEventRepositoryImpl,
     },
+    {
+      provide: "AIAnalystRepository",
+      useClass: AIAnalystRepositoryImpl,
+    },
     UpdateUserRoleService,
     SetReceiveNotiService,
     TurnOnNotificationService,
@@ -245,7 +251,8 @@ import { AdminManageEventRepositoryImpl } from './repository/admin-area/admin-ar
     CheckFavoriteService,
     FindUserByEmailService,
     NewEventTriggerService,
-    SaveRevenueDataService
+    SaveRevenueDataService,
+    AIAnalystService,
   ],
   exports: [
     CheckUserExistService,
@@ -260,6 +267,7 @@ import { AdminManageEventRepositoryImpl } from './repository/admin-area/admin-ar
     UpdateUserToOrgService,
     SaveRevenueDataService,
     GetUserPinStatusService,
+    AIAnalystService,
   ],
 })
 export class AuthSvcModule { }

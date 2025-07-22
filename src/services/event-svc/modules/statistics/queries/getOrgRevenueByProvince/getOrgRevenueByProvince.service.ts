@@ -228,18 +228,19 @@ export class GetOrgRevenueByProvinceService {
 
       const updatedRevenueList = await this.saveRevenueDataService.appendRevenueToProvinces(revenueList);
 
+      const updatedRevenueListWithOutEventIdsAndSort = updatedRevenueList.map(data => ({
+        ...data,
+        eventIds: null,
+      })).sort((a, b) => b.totalRevenue - a.totalRevenue);
+
       await this.fileCacheService.cacheEndpoint(
         'getOrgRevenueByProvinceV3',
         60 * 24,
         {},
-        updatedRevenueList.map(data => ({
-        ...data,
-        eventIds: null})),
+        updatedRevenueListWithOutEventIdsAndSort,
       );
 
-      return Ok(updatedRevenueList.map(data => ({
-        ...data,
-        eventIds: null})));
+      return Ok(updatedRevenueListWithOutEventIdsAndSort);
     } catch (error) {
       await this.slackService.sendError(`Event Service - Admin - Statistics >>> GetOrgRevenueByProvinceService: ${error.message}`);
       return Err(new Error('Internal server error'));

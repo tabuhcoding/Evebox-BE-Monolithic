@@ -2,6 +2,8 @@ import { AppRevenueData, EventRevenueData, OrganizerRevenueData } from "src/serv
 import { BaseAuthRepository } from "../base.repository";
 import { Prisma } from "prisma/client-auth";
 import { Pagination, PaginationQuery } from "src/shared/constants/pagination";
+import { RevenueByTicketPriceData } from "src/services/event-svc/modules/statistics/queries/getRevenueByTicketPrice/getRevenueByTicketPrice-response.dto";
+import { ProvinceRevenueData } from "src/services/event-svc/modules/statistics/queries/getOrgRevenueByProvince/getOrgRevenueByProvince-response.dto";
 
 export type Revenue = Prisma.RevenueGetPayload<{
   include: {
@@ -36,4 +38,8 @@ export interface RevenueRepository extends BaseAuthRepository<Revenue, Prisma.Re
     to?: string,
     search?: string,
   ): Promise<[EventRevenueData[], Pagination]>;
+  getListTicketTypeRevenue(ranges: RevenueByTicketPriceData[]): Promise<RevenueByTicketPriceData[]>;
+  appendRevenueToDistrictData(
+      districts: (ProvinceRevenueData & { eventIds: number[] })[]
+    ): Promise<ProvinceRevenueData[]>;
 }

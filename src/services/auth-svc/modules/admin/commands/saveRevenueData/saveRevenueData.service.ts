@@ -9,6 +9,8 @@ import { ShowingRevenue, ShowingRevenueRepository } from "src/services/auth-svc/
 import { TicketTypeRevenueRepository } from "src/services/auth-svc/repository/tickettype-revenue/tickettype-revenue.repo";
 import { RevenueDataDTO } from "src/services/booking-svc/modules/commands/calculateRevenue/revenue.dto";
 import { AppRevenueData, EventRevenueData, OrganizerRevenueData } from 'src/services/event-svc/modules/statistics/queries/getOrgRevenue/getOrgRevenue-response.dto';
+import { RevenueByTicketPriceData } from 'src/services/event-svc/modules/statistics/queries/getRevenueByTicketPrice/getRevenueByTicketPrice-response.dto';
+import { ProvinceRevenueData } from 'src/services/event-svc/modules/statistics/queries/getOrgRevenueByProvince/getOrgRevenueByProvince-response.dto';
 
 @Injectable()
 export class SaveRevenueDataService {
@@ -299,6 +301,15 @@ export class SaveRevenueDataService {
     }
   }
 
+  async appendRevenueToProvinces(revenueData: (ProvinceRevenueData & { eventIds: number[] })[]): Promise<ProvinceRevenueData[]> {
+    try {
+      return await this.revenueRepository.appendRevenueToDistrictData(revenueData);
+    } catch (error) {
+
+      throw error;
+    }
+  } 
+
   async getShowingRevenueByDateAndShowingId(pagination: PaginationQuery, from?: string, to?: string, showingId?: string): Promise<ShowingRevenue[]> {
     var query = {}
     if (from) {
@@ -346,4 +357,13 @@ export class SaveRevenueDataService {
     }
     return ticketTypeRevenues;
   }
+
+  async addTotalSoldToTicketTypeRevenue(data: RevenueByTicketPriceData[]): Promise<RevenueByTicketPriceData[]> {
+    try {
+      return await this.revenueRepository.getListTicketTypeRevenue(data);
+    } catch (error) {
+      throw new Error(`Error fetching ticket type revenue: ${error.message}`);
+    }
+  }
+    
 }

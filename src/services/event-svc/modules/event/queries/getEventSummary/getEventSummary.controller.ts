@@ -158,7 +158,8 @@ export class GetEventSummaryController {
       return res.status(HttpStatus.OK).json({
         statusCode: HttpStatus.OK,
         message: 'AI Analyst data retrieved successfully',
-        data: result.unwrap(),
+        data: result.unwrap()[0],
+        pagination: result.unwrap()[1],
       });
     } catch (error) {
       await this.slackService.sendError(`Error in Event Svc >> Admin - Statistics >> GetOrgRevenueChartController: ${error.message}`);

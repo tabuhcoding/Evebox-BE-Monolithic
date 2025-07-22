@@ -26,6 +26,9 @@ model districts {
   provinceId Int
   createdAt  DateTime    @default(now())
   area_code  AREACODE?
+  eventCount Int @default(0)
+  showingCount Int @default(0)
+  totalRevenue Int @default(0)
   province   Province    @relation(fields: [provinceId], references: [id], onDelete: Cascade)
   locations  locations[]
 }

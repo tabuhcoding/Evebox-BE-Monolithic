@@ -34,6 +34,7 @@ import { RevenueSummaryItem } from '../../modules/statistics/queries/getOrgReven
 import { ProvinceRevenueData } from '../../modules/statistics/queries/getOrgRevenueByProvince/getOrgRevenueByProvince-response.dto';
 import { TicketTypesData } from './events.repo';
 import { Ticket } from 'src/services/booking-svc/repository/ticket/ticket.repo';
+import { RevenueByTicketPriceData } from '../../modules/statistics/queries/getRevenueByTicketPrice/getRevenueByTicketPrice-response.dto';
 
 @Injectable()
 export class EventsRepositoryImpl
@@ -1054,9 +1055,11 @@ export class EventsRepositoryImpl
 
       const result: ProvinceRevenueData[] = Array.from(provinceMap.entries()).map(([provinceName, data]) => ({
         provinceName,
+        provinceEnName: provinceName,
         eventCount: data.eventCount,
         showingCount: data.showingCount,
         totalRevenue: data.totalRevenue,
+        area_code: ''
       }));
       return Ok(result);
     } catch (error) {
@@ -1145,6 +1148,97 @@ export class EventsRepositoryImpl
           }
         }
       }));
+
+      return priceRanges;
+    } catch (error) {
+      throw new Error(`Failed to get ticket type price range: ${error.message}`);
+    }
+  }
+
+  async getTicketTypePriceRangeWithCount(): Promise<RevenueByTicketPriceData[]>{
+    try {
+      // const ticketTypes = await this.prisma.ticketType.findMany({
+      //   select: {
+      //     id: true,
+      //     price: true,
+      //     quantity: true,
+      //   },
+      // });
+
+      var priceRanges: RevenueByTicketPriceData[] = [
+        {
+          minPrice: 0,
+          maxPrice: 300000,
+          total: 0,
+          sold: 0,
+          conversionRate: 0,
+          revenue: 0,
+        },
+        {
+          minPrice: 300001,
+          maxPrice: 500000,
+          total: 0,
+          sold: 0,
+          conversionRate: 0,
+          revenue: 0,
+        },
+        {
+          minPrice: 500001,
+          maxPrice: 800000,
+          total: 0,
+          sold: 0,
+          conversionRate: 0,
+          revenue: 0,
+        },
+        {
+          minPrice: 800001,
+          maxPrice: 1500000,
+          total: 0,
+          sold: 0,
+          conversionRate: 0,
+          revenue: 0,
+        },
+        {
+          minPrice: 1500001,
+          maxPrice: 2000000,
+          total: 0,
+          sold: 0,
+          conversionRate: 0,
+          revenue: 0,
+        },
+        {
+          minPrice: 2000001,
+          maxPrice: 5000000,
+          total: 0,
+          sold: 0,
+          conversionRate: 0,
+          revenue: 0,
+        },
+        {
+          minPrice: 5000001,
+          maxPrice: 1000000000,
+          total: 0,
+          sold: 0,
+          conversionRate: 0,
+          revenue: 0,
+        },
+      ];
+      
+      for (const priceRange of priceRanges) {
+        const result = await this.prisma.ticketType.aggregate({
+          where: {
+            price: {
+              gte: priceRange.minPrice,
+              lte: priceRange.maxPrice,
+            },
+          },
+          _sum: {
+            quantity: true,
+          },
+        });
+
+        priceRange.total = result._sum.quantity ?? 0;
+      }
 
       return priceRanges;
     } catch (error) {

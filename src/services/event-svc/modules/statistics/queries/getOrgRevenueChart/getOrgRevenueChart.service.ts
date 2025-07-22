@@ -183,7 +183,11 @@ export class GetOrgRevenueChartService {
         query: userRequest || "",
       };
 
-      const cacheData = await this.fileCacheService.getCacheObjectById("analyst-ai", {}, "revenue");
+      const cacheData = await this.fileCacheService.getCacheObjectById("analyst-ai", {
+        fromDate,
+        toDate,
+        filterType,
+      }, "revenue");
 
       if (cacheData && cacheData.data[0].threadId) {
         payload = {
@@ -223,7 +227,11 @@ export class GetOrgRevenueChartService {
       }
       await this.fileCacheService.cacheObject("analyst-ai",
         20,
-        {},
+        {
+          fromDate,
+          toDate,
+          filterType,
+        },
         "revenue",
         [{
           threadId: responseAIData.threadId
@@ -248,13 +256,8 @@ export class GetOrgRevenueChartService {
     }
   }
 
-  async getAIAnalyst(email: string, pagination: PaginationQuery): Promise<Result<[AIAnalyst[], Pagination], Error>> {
+  async getAIAnalyst(pagination: PaginationQuery): Promise<Result<[AIAnalyst[], Pagination], Error>> {
     try {
-      const isAdmin = await this.getAdminAccessService.execute(email);
-      if (!isAdmin) {
-        return Err(new Error('You do not have permission to get AI Analyst data'));
-      }
-
       const aiAnalystData = await this.AIAnalystService.getAIAnalyst("admin", "revenue", pagination);
 
       return Ok(aiAnalystData);

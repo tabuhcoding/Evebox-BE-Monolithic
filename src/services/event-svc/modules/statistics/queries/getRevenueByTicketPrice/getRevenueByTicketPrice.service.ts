@@ -6,6 +6,10 @@ import { GetOrdersWithTypeService } from "src/services/booking-svc/modules/queri
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 import { RevenueByTicketPriceData } from "./getRevenueByTicketPrice-response.dto";
 import { FileCacheService } from "src/infrastructure/cache/fileCache/fileCache.service";
+import { SaveRevenueDataService } from "src/services/auth-svc/modules/admin/commands/saveRevenueData/saveRevenueData.service";
+import { AIAnalystService } from "src/services/auth-svc/modules/admin/commands/aiAnalyst/aiAnalyst.service";
+import { Pagination, PaginationQuery } from "src/shared/constants/pagination";
+import { AIAnalyst } from "src/services/auth-svc/repository/ai-analyst/ai-analyst.repo";
 
 @Injectable()
 export class GetRevenueByTicketPriceService {
@@ -15,6 +19,8 @@ export class GetRevenueByTicketPriceService {
     private readonly slackService: SlackService,
     private readonly getOrdersWithTypeService: GetOrdersWithTypeService,
     private readonly fileCacheService: FileCacheService,
+    private readonly saveRevenueDataService: SaveRevenueDataService,
+    private readonly AIAnalystService: AIAnalystService,
   ) {}
 
   async execute(email: string): Promise<Result<RevenueByTicketPriceData[], Error>> {
@@ -68,6 +74,101 @@ export class GetRevenueByTicketPriceService {
       return Ok(result);
     } catch (error) {
       await this.slackService.sendError(`Event Service - Admin - Statistics >>> GetOrgRevenueByTicketPriceService: ${error.message}`);
+      return Err(new Error('Internal server error'));
+    }
+  }
+
+  async executeV2(): Promise<Result<RevenueByTicketPriceData[], Error>> {
+    try {
+      const data = await this.eventsRepository.getTicketTypePriceRangeWithCount();
+
+      const result = await this.saveRevenueDataService.addTotalSoldToTicketTypeRevenue(data);
+      return Ok(result);
+    }
+    catch (error) {
+      await this.slackService.sendError(`Event Service - Admin - Statistics >>> GetOrgRevenueByTicketPriceService: ${error.message}`);
+      return Err(new Error('Internal server error'));
+    }
+  }
+
+  async executeAI(userRequest: string): Promise<Result<string, Error>> {
+    try {
+      var payload: any = {
+        query: userRequest || "",
+      };
+
+      const cacheData = await this.fileCacheService.getCacheObjectById("analyst-ai", {}, "ticket-price");
+
+      if (cacheData && cacheData.data[0].threadId) {
+        payload = {
+          ...payload,
+          threadId: cacheData.data[0].threadId,
+        };
+      }
+      else {
+        const chart = await this.executeV2();
+        payload = {
+          ...payload,
+          data: {
+            chart: chart.isOk() ? chart.unwrap() : [],
+          },
+        };
+      }
+      const responseAI = await fetch(`${process.env.UTILS_URL}/revenue/admin`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!responseAI.ok || responseAI.status !== 200) {
+        const errorData = await responseAI.json();
+        return Err(new Error(errorData.detail || 'Failed to analyze revenue data'));
+      }
+
+      const responseAIData = await responseAI.json();
+
+      this.slackService.sendNotice(`Event Service - Event summary with AI >>> GetEventSummaryService: ${JSON.stringify(payload)}.
+      Result: ${JSON.stringify(responseAIData)}`);
+
+      if (!responseAIData.content) {
+        return Err(new Error('No result returned from AI analysis'));
+      }
+      await this.fileCacheService.cacheObject("analyst-ai",
+        20,
+        {},
+        "ticket-price",
+        [{
+          threadId: responseAIData.threadId
+        }]
+      );
+
+      try {
+        await this.AIAnalystService.createAIAnalyst(
+          "admin",
+          responseAIData.content,
+          responseAIData.threadId,
+          "ticket-price",
+          userRequest || "",
+        );
+      }catch (error) {
+        this.slackService.sendError(`Event Service - Admin - AIAnalyst >>> Create AI Analyst entry failed: ${error.message}`);
+      }
+      return Ok(responseAIData.content);
+    } catch (error) {
+      this.slackService.sendError(`EventSvc >> GetOrgRevenueChartService: Failed to get org revenue chart: ${error.message}`);
+      return Err(new Error('Internal server error'));
+    }
+  }
+
+  async getAIAnalyst(pagination: PaginationQuery): Promise<Result<[AIAnalyst[], Pagination], Error>> {
+    try {
+      const aiAnalystData = await this.AIAnalystService.getAIAnalyst("admin", "ticket-price", pagination);
+
+      return Ok(aiAnalystData);
+    } catch (error) {
+      this.slackService.sendError(`EventSvc >> GetOrgRevenueChartService: Failed to get AI Analyst data: ${error.message}`);
       return Err(new Error('Internal server error'));
     }
   }

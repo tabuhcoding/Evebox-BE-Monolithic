@@ -117,7 +117,7 @@ export class GetOrgRevenueChartController {
     }
   }
 
-  @Post('/revenue-chart-ai')
+  @Post('/revenue-day-ai')
   // @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Get revenue data combine org for chart' })
   @ApiBody({ type: GetSummaryWithAI })
@@ -154,7 +154,7 @@ export class GetOrgRevenueChartController {
     }
   }
 
-  @Get('/revenue-chart-ai')
+  @Get('/revenue-day-ai')
   @ApiOperation({ summary: 'Get AI Analyst data for revenue chart' })
   @ApiQuery({ name: 'page', required: false, type: Number, description: 'Page number for pagination', example: 1 })
   @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Number of items per page', example: 10 })
@@ -176,7 +176,7 @@ export class GetOrgRevenueChartController {
         limit: limit >> 0 || 10,
       };
 
-      const result = await this.getOrgRevenueChartService.getAIAnalyst("baobao11062003@gmail.com", pagination);
+      const result = await this.getOrgRevenueChartService.getAIAnalyst(pagination);
 
       if (result.isErr()) {
         return res.status(HttpStatus.BAD_REQUEST).json({
@@ -188,7 +188,8 @@ export class GetOrgRevenueChartController {
       return res.status(HttpStatus.OK).json({
         statusCode: HttpStatus.OK,
         message: 'AI Analyst data retrieved successfully',
-        data: result.unwrap(),
+        data: result.unwrap()[0],
+        pagination: result.unwrap()[1],
       });
     } catch (error) {
       await this.slackService.sendError(`Error in Event Svc >> Admin - Statistics >> GetOrgRevenueChartController: ${error.message}`);

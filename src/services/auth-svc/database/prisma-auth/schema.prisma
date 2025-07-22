@@ -167,6 +167,7 @@ model AIAnalyst{
   thread_id String
   query String
   type String
+  created_at DateTime @default(now())
 }
 
 enum OTPType {

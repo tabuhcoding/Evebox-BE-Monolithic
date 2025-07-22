@@ -4,10 +4,13 @@ import { Injectable } from "@nestjs/common";
 import { Revenue, RevenueRepository } from './revenue.repo';
 import { PrismaAuthService } from '../../database/prisma-auth/prisma.service';
 import { endOfDay, startOfDay } from 'date-fns';
-import { AppRevenueData, EventRevenueData, OrganizerRevenueData } from 'src/services/event-svc/modules/statistics/queries/getOrgRevenue/getOrgRevenue-response.dto';
+import { AppRevenueData, EventRevenueData, OrganizerRevenueData, TicketTypeRevenueData } from 'src/services/event-svc/modules/statistics/queries/getOrgRevenue/getOrgRevenue-response.dto';
 import { Pagination, PaginationQuery } from 'src/shared/constants/pagination';
 import { OrganizerRevenue } from '../organizer-revenue/organizer-revenue.repo';
 import { convertToEventRevenueData } from 'src/services/event-svc/modules/statistics/queries/getOrgRevenue/getOrgRevenue.service';
+import { TicketTypeRevenue } from '../tickettype-revenue/tickettype-revenue.repo';
+import { RevenueByTicketPriceData } from 'src/services/event-svc/modules/statistics/queries/getRevenueByTicketPrice/getRevenueByTicketPrice-response.dto';
+import { ProvinceRevenueData } from 'src/services/event-svc/modules/statistics/queries/getOrgRevenueByProvince/getOrgRevenueByProvince-response.dto';
 
 @Injectable()
 export class RevenueRepositoryImpl
@@ -283,6 +286,9 @@ export class RevenueRepositoryImpl
     });
 
     const totalItems = eventDistinct.length;
+    if (pagination.limit <= 0 ){
+      pagination.limit = totalItems;
+    }
     const eventDistinctWithPagin = eventDistinct.slice(
       (pagination.page - 1) * pagination.limit,
       pagination.page * pagination.limit,
@@ -314,5 +320,53 @@ export class RevenueRepositoryImpl
     const result: EventRevenueData[] = convertToEventRevenueData(data);
 
     return [result, paginationResult];
+  }
+
+  async getListTicketTypeRevenue(ranges: RevenueByTicketPriceData[]): Promise<RevenueByTicketPriceData[]> {
+    if (ranges.length === 0) {
+      return [];
+    }
+
+    for (const range of ranges) {
+      const result = await this.prisma.ticketTypeRevenue.aggregate({
+        where: {
+          price: {
+            gte: range.minPrice,
+            lte: range.maxPrice,
+          },
+        },
+        _sum: {
+          total_revenue: true,
+          sold: true,
+        },
+      });
+
+      range.revenue = result._sum.total_revenue ?? 0;
+      range.sold = result._sum.sold ?? 0;
+      range.conversionRate = range.total && range.total > 0 ? result._sum.sold / range.total : 0;
+    }
+
+    return ranges;
+  }
+
+  async appendRevenueToDistrictData(
+    districts: (ProvinceRevenueData & { eventIds: number[] })[]
+  ): Promise<ProvinceRevenueData[]> {
+    for (const district of districts) {
+      const revenueData = await this.prisma.eventRevenue.aggregate({
+        where: {
+          event_id: {
+            in: district.eventIds,
+          },
+        },
+        _sum: {
+          total_revenue: true,
+        },
+      });
+      const totalRevenue = revenueData._sum.total_revenue ?? 0;
+      district.totalRevenue = totalRevenue;
+    }
+
+    return districts;
   }
 }

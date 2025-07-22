@@ -5,6 +5,9 @@ export class ProvinceRevenueData {
   @ApiProperty({ example: "TP.HCM", description: "Province name" })
   provinceName: string;
 
+  @ApiProperty({ example: "TP.HCM", description: "Province en name" })
+  provinceEnName: string;
+
   @ApiProperty({ example: 100, description: "Number of events" })
   eventCount: number;
 
@@ -13,6 +16,9 @@ export class ProvinceRevenueData {
 
   @ApiProperty({ example: 500000000, description: "Total revenue" })
   totalRevenue: number;
+
+  @ApiProperty({ example: "MIENBAC", description: "Province name" })
+  area_code: string;
 }
 
 export class ProvinceRevenueResponseDto extends BaseResponse {

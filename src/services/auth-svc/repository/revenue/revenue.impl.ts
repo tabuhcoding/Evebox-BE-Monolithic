@@ -4,7 +4,10 @@ import { Injectable } from "@nestjs/common";
 import { Revenue, RevenueRepository } from './revenue.repo';
 import { PrismaAuthService } from '../../database/prisma-auth/prisma.service';
 import { endOfDay, startOfDay } from 'date-fns';
-import { AppRevenueData, EventRevenueData } from 'src/services/event-svc/modules/statistics/queries/getOrgRevenue/getOrgRevenue-response.dto';
+import { AppRevenueData, EventRevenueData, OrganizerRevenueData } from 'src/services/event-svc/modules/statistics/queries/getOrgRevenue/getOrgRevenue-response.dto';
+import { Pagination, PaginationQuery } from 'src/shared/constants/pagination';
+import { OrganizerRevenue } from '../organizer-revenue/organizer-revenue.repo';
+import { convertToEventRevenueData } from 'src/services/event-svc/modules/statistics/queries/getOrgRevenue/getOrgRevenue.service';
 
 @Injectable()
 export class RevenueRepositoryImpl
@@ -173,6 +176,143 @@ export class RevenueRepositoryImpl
   };
 
   return result;
-}
+  }
 
+  async getListOrganizerRevenue(
+    pagination: PaginationQuery,
+    from?: string,
+    to?: string,
+    search?: string,
+  ): Promise<[OrganizerRevenueData[],Pagination]> {
+    const query: any = {};
+    if (from) {
+      query.date = {
+        gte: startOfDay(new Date(from)),
+      };
+    }
+    if (to) {
+      query.date = {
+        ...query.date,
+        lte: endOfDay(new Date(to)),
+      };
+    }
+    if (search) {
+      query.org_id = {
+        contains: search,
+        mode: 'insensitive',
+      };
+    }
+
+    const distinctOrgIds = await this.prisma.organizeRevenue.findMany({
+      where: query,
+      distinct: ["org_id"],
+      select: {
+        org_id: true,
+      },
+      orderBy: { org_id: 'asc' },
+    });
+
+    const totalItems = distinctOrgIds.length;
+    const distictOrgIdsWithPagin = distinctOrgIds.slice(
+      (pagination.page - 1) * pagination.limit,
+      pagination.page * pagination.limit,
+    ).map(item => item.org_id);
+
+    const data = await this.prisma.organizeRevenue.groupBy({
+      by: ["org_id"],
+      where: {
+        ...query,
+        org_id: {
+          in: distictOrgIdsWithPagin,
+        },
+      },
+      _sum: {
+        total_revenue: true,
+      },
+    });
+
+    const paginationResult: Pagination = {
+      page: pagination.page,
+      limit: pagination.limit,
+      totalItems: totalItems,
+      totalPages: Math.ceil(totalItems / pagination.limit),
+    };
+    const result = data.map(item => ({
+      orgId: item.org_id,
+      organizerName: item.org_id,
+      totalRevenue: item._sum.total_revenue ?? 0,
+      actualRevenue: item._sum.total_revenue ? item._sum.total_revenue * 0.9 : 0,
+      platformFeePercent: 10,
+      events: [],
+    }));
+    return [result, paginationResult];
+  }
+
+  async getListEventRevenue(
+    pagination: PaginationQuery,
+    from?: string,
+    to?: string,
+    search?: string,
+  ): Promise<[EventRevenueData[], Pagination]> {
+    const query: any = {};
+    if (from) {
+      query.date = {
+        gte: startOfDay(new Date(from)),
+      };
+    }
+    if (to) {
+      query.date = {
+        ...query.date,
+        lte: endOfDay(new Date(to)),
+      };
+    }
+    if (search) {
+      query.OR = [
+        { event_name: { contains: search, mode: 'insensitive' } },
+        { event_id: { contains: search, mode: 'insensitive' } },
+      ]
+    }
+
+    const eventDistinct = await this.prisma.eventRevenue.findMany({
+      where: query,
+      distinct: ["event_id"],
+      select: {
+        event_id: true,
+      },
+      orderBy: { id: 'desc' },
+    });
+
+    const totalItems = eventDistinct.length;
+    const eventDistinctWithPagin = eventDistinct.slice(
+      (pagination.page - 1) * pagination.limit,
+      pagination.page * pagination.limit,
+    ).map(item => item.event_id);
+
+    const data = await this.prisma.eventRevenue.findMany({
+      where: {
+        event_id: {
+          in: eventDistinctWithPagin 
+        }
+      },
+      include: {
+        ShowingRevenue: {
+          include: {
+            TicketTypeRevenue: true,
+          },
+        }
+      },
+      orderBy: { id: 'desc' },
+    });
+
+    const paginationResult: Pagination = {
+      page: pagination.page,
+      limit: pagination.limit,
+      totalItems: totalItems,
+      totalPages: Math.ceil(totalItems / pagination.limit),
+    };
+
+    const result: EventRevenueData[] = convertToEventRevenueData(data);
+
+    return [result, paginationResult];
+  }
 }

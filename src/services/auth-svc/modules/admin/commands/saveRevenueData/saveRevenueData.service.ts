@@ -8,7 +8,7 @@ import { Revenue, RevenueRepository } from "src/services/auth-svc/repository/rev
 import { ShowingRevenue, ShowingRevenueRepository } from "src/services/auth-svc/repository/showing-revenue/showing-revenue.repo";
 import { TicketTypeRevenueRepository } from "src/services/auth-svc/repository/tickettype-revenue/tickettype-revenue.repo";
 import { RevenueDataDTO } from "src/services/booking-svc/modules/commands/calculateRevenue/revenue.dto";
-import { AppRevenueData } from 'src/services/event-svc/modules/statistics/queries/getOrgRevenue/getOrgRevenue-response.dto';
+import { AppRevenueData, EventRevenueData, OrganizerRevenueData } from 'src/services/event-svc/modules/statistics/queries/getOrgRevenue/getOrgRevenue-response.dto';
 
 @Injectable()
 export class SaveRevenueDataService {
@@ -247,6 +247,14 @@ export class SaveRevenueDataService {
     return [organizerRevenues, paginationResult];
   }
 
+  async getOrganizerRevenueByDateAndOrgIdV2(pagination: PaginationQuery, from?: string, to?: string, search?: string, org_id?: string[]): Promise<[OrganizerRevenueData[], Pagination]>{
+    try {
+      return await this.revenueRepository.getListOrganizerRevenue(pagination, from, to, search);
+    }
+    catch (error) {
+      throw new Error(`Error fetching organizer revenue: ${error.message}`);
+    }
+  }
   async getEventRevenueByDateAndEventId(from?: string, to?: string, eventId?: number, search?: string): Promise<EventRevenue[]> {
     var query = {}
     if (from) {
@@ -280,6 +288,15 @@ export class SaveRevenueDataService {
       throw new Error(`No event revenue data found for eventId: ${eventId} from date: ${from} to ${to}`);
     }
     return eventRevenues;
+  }
+
+  async getEventRevenueWPg(pagination: PaginationQuery, from?: string, to?: string, search?: string): Promise<[EventRevenueData[], Pagination]> {
+    try {
+      return await this.revenueRepository.getListEventRevenue(pagination, from, to, search);
+    }
+    catch (error) {
+      throw new Error(`Error fetching event revenue: ${error.message}`);
+    }
   }
 
   async getShowingRevenueByDateAndShowingId(pagination: PaginationQuery, from?: string, to?: string, showingId?: string): Promise<ShowingRevenue[]> {

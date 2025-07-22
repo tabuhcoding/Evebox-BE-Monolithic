@@ -1,6 +1,6 @@
-import { Controller, Get, Post, Request, Param, Res, UseGuards, HttpStatus, Body } from "@nestjs/common";
+import { Controller, Get, Post, Request, Param, Res, UseGuards, HttpStatus, Body, Query } from "@nestjs/common";
 import { Response } from "express";
-import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { JwtAuthGuard } from "src/shared/guard/jwt-auth.guard";
 import { GetEventSummaryService } from "./getEventSummary.service";
 import { EventSummaryAIResponse, EventSummaryResponse } from "./getEventSummary-response.dto";
@@ -120,6 +120,52 @@ export class GetEventSummaryController {
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
         message: 'Internal server error',
       })
+    }
+  }
+
+  @Get('/summary-ai/:showingId')
+  @ApiOperation({ summary: 'Get AI Analyst data for revenue chart' })
+  @ApiQuery({ name: 'page', required: false, type: Number, description: 'Page number for pagination', example: 1 })
+  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Number of items per page', example: 10 })
+  @ApiResponse({ status: HttpStatus.OK, description: 'AI Analyst data retrieved successfully' })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid input' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Internal server error' })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'You do not have permission to get AI Analyst data' })
+  async getAIAnalystData(
+    @Param('showingId') showingId: string,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+    // @Request() req,
+    @Res() res: Response
+  ) {
+    try {
+      // const email = req.user?.email;
+
+      const pagination = {
+        page: page >> 0 || 1,
+        limit: limit >> 0 || 10,
+      };
+
+      const result = await this.getEventSummaryService.getAISummary(showingId, pagination);
+
+      if (result.isErr()) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+          statusCode: HttpStatus.BAD_REQUEST,
+          message: result.unwrapErr().message,
+        });
+      }
+
+      return res.status(HttpStatus.OK).json({
+        statusCode: HttpStatus.OK,
+        message: 'AI Analyst data retrieved successfully',
+        data: result.unwrap(),
+      });
+    } catch (error) {
+      await this.slackService.sendError(`Error in Event Svc >> Admin - Statistics >> GetOrgRevenueChartController: ${error.message}`);
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: 'Internal server error',
+      });
     }
   }
 }

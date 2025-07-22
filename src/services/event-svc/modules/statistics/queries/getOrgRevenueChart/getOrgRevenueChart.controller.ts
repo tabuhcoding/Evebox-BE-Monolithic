@@ -176,7 +176,7 @@ export class GetOrgRevenueChartController {
         limit: limit >> 0 || 10,
       };
 
-      const result = await this.getOrgRevenueChartService.getAIAnalyst("baobao11062003@gmail.com", pagination);
+      const result = await this.getOrgRevenueChartService.getAIAnalyst(pagination);
 
       if (result.isErr()) {
         return res.status(HttpStatus.BAD_REQUEST).json({

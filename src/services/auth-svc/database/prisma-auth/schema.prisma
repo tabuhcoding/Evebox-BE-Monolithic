@@ -160,6 +160,15 @@ model TicketTypeRevenue{
   ShowingRevenue ShowingRevenue @relation(fields: [showing_id], references: [id])
 }
 
+model AIAnalyst{
+  id Int @id @default(autoincrement())
+  use_for String
+  content String
+  thread_id String
+  query String
+  type String
+}
+
 enum OTPType {
   FORGOT_PASSWORD
   REGISTER

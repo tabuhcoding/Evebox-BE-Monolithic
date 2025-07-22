@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "districts" ADD COLUMN     "eventCount" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "showingCount" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "totalRevenue" INTEGER NOT NULL DEFAULT 0;

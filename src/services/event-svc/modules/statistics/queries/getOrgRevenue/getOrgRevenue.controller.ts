@@ -140,6 +140,67 @@ export class GetOrgRevenueController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get('/revenue-org')
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Get revenue combine org' })
+  @ApiQuery({ name: 'fromDate', required: false, type: String })
+  @ApiQuery({ name: 'toDate', required: false, type: String })
+  @ApiQuery({ name: 'search', required: false, type: String })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Organizer revenue retrieved successfully', type: OrganizerRevenueResponseDto })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid input' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Internal server error' })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'You do not have permission to get org revenue' })
+  async executeORG(
+    @Query('fromDate') fromDate: string,
+    @Query('toDate') toDate: string,
+    @Query('search') search: string,
+    @Query() paginationQuery: PaginationQuery,
+    @Res() res: Response,
+    @Request() req,
+  ) {
+    try {
+      const role = req.user?.role;
+      if (!role || role !== 1) {
+        return res.status(HttpStatus.UNAUTHORIZED).json({
+          statusCode: HttpStatus.UNAUTHORIZED,
+          message: 'Unauthorized',
+        });
+      }
+
+      const pagination: PaginationQuery = {
+        page: paginationQuery.page >> 0 || 1,
+        limit: paginationQuery.limit >> 0 || 0,
+      };
+
+      const result = await this.getOrgRevenueService.getOrgRevenueWPagin(pagination, fromDate, toDate, search);
+
+      if (result.isErr()) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+          statusCode: HttpStatus.BAD_REQUEST,
+          message: result.unwrapErr().message,
+        });
+      }
+
+      const [data, paginationResult] = result.unwrap();
+
+      return res.status(HttpStatus.OK).json({
+        statusCode: HttpStatus.OK,
+        message: 'Organizer revenue retrieved successfully',
+        data,
+        pagination: paginationResult,
+      });
+    } catch (error) {
+      await this.slackService.sendError(`Error in Event Svc >> Admin - Statistics >> GetOrgRevenueController: ${error.message}`);
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: 'Internal server error',
+      });
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get('/app-revenue')
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Get revenue combine org' })

@@ -7,7 +7,9 @@ import { TicketQueryService } from "src/services/booking-svc/modules/queries/get
 import { ShowingRepository } from "src/services/event-svc/repository/showing/showing.repo";
 import { SaveRevenueDataService } from "src/services/auth-svc/modules/admin/commands/saveRevenueData/saveRevenueData.service";
 import { convertToEventRevenueData } from "../getOrgRevenue/getOrgRevenue.service";
-import { ShowingRevenueData } from "../getOrgRevenue/getOrgRevenue-response.dto";
+import { EventRevenueData, ShowingRevenueData } from "../getOrgRevenue/getOrgRevenue-response.dto";
+import { Pagination, PaginationQuery } from "src/shared/constants/pagination";
+import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 
 @Injectable()
 export class GetEventRevenueDetailService {
@@ -17,6 +19,7 @@ export class GetEventRevenueDetailService {
     @Inject('EventsRepository') private readonly eventsRepo: EventsRepository,
     @Inject('ShowingRepository') private readonly showingRepo: ShowingRepository,
     private readonly saveRevenueDataService: SaveRevenueDataService,
+    private readonly slackService: SlackService,
   ) {}
 
   async execute(email: string, orgId: string, eventId: number): Promise<Result<ShowingRevenueData[], Error>> {
@@ -82,5 +85,19 @@ export class GetEventRevenueDetailService {
       locationsString: locationsString,
       showings: result[0]?.showings || [],
     });
+  }
+
+  async executeList(pagination: PaginationQuery, from?: string, to?: string, search?: string): Promise<Result<[EventRevenueData[], Pagination], Error>> {
+    try {
+      const [revenues, paginationResult] = await this.saveRevenueDataService.getEventRevenueWPg(
+        pagination, 
+        from?.split('T')[0], 
+        to?.split('T')[0], 
+        search);
+      return Ok([revenues, paginationResult]);
+    } catch (error) {
+      await this.slackService.sendError(`Event Service - Admin - Statistics >>> GetEventRevenueDetailService: ${error.message}`);
+      return Err(new Error('Internal server error'));
+    }
   }
 }

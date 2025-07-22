@@ -173,8 +173,6 @@ export class GetOrgRevenueService {
       return Err(new Error("fromDate must be earlier than or equal to toDate"));
     }
 
-    // const [users, paginationResult] = await this.getUserService.getUserWithSearch(search, paginationQuery);
-
     const [revenueData, paginationResult] = await this.saveRevenueDataService.getOrganizerRevenueByDateAndOrgId(
       paginationQuery,
       fromDate?.split('T')[0], 
@@ -182,29 +180,24 @@ export class GetOrgRevenueService {
       search,
     );
 
-    // const orgMap = new Map<string, OrganizerRevenueData>();
-    // revenueData.forEach(data => {
-    //   const orgId = data.org_id
-    //   if (!orgMap.has(orgId)) {
-    //     orgMap.set(orgId, {
-    //       orgId,
-    //       organizerName: data.org_name,
-    //       totalRevenue: data.total_revenue,
-    //       actualRevenue: data.total_revenue * (1 - FEE_PERCENT / 100),
-    //       platformFeePercent: FEE_PERCENT,
-    //       events: [],
-    //     });
-    //   }
-
-    //   const orgData = orgMap.get(orgId)!;
-
-    //   data.EventRevenue.forEach(event => {
-
-    //   orgData.totalRevenue += data.total_revenue;
-    //   orgData.actualRevenue += data.total_revenue * (1 - FEE_PERCENT / 100);
-    // });
     const organizerRevenueData = convertToOrganizerRevenueDataFoeach(revenueData);
     return Ok([organizerRevenueData, paginationResult]);
+  }
+
+  async getOrgRevenueWPagin(
+    paginationQuery: PaginationQuery,
+    fromDate?: string,
+    toDate?: string,
+    search?: string
+  ): Promise<Result<[OrganizerRevenueData[], Pagination], Error>> {
+    const [revenues, paginationResult] = await this.saveRevenueDataService.getOrganizerRevenueByDateAndOrgIdV2(
+      paginationQuery, 
+      fromDate?.split('T')[0], 
+      toDate?.split('T')[0], 
+      search
+    );
+    
+    return Ok([revenues, paginationResult]);
   }
 
   async appRevenue(

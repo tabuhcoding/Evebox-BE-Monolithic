@@ -1,6 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { BaseResponse } from "src/shared/constants/baseResponse";
-import { ShowingRevenueData } from "../getOrgRevenue/getOrgRevenue-response.dto";
+import { EventRevenueData, ShowingRevenueData } from "../getOrgRevenue/getOrgRevenue-response.dto";
+import { Pagination } from "src/shared/constants/pagination";
 
 export class EventRevenueWithInfoData {
   @ApiProperty( {example: 'The Batman', description: 'The title of the event' })
@@ -18,4 +19,12 @@ export class EventRevenueWithInfoData {
 export class EventRevenueDetailResponseDto extends BaseResponse {
   @ApiProperty({ type: EventRevenueWithInfoData, description: "Event revenue" })
   data: EventRevenueWithInfoData;
+}
+
+export class EventRevenueDetailResponseDtoV2 extends BaseResponse {
+  @ApiProperty({ type: [EventRevenueData], description: "List of showing revenue details" })
+  data: EventRevenueData[];
+
+  @ApiProperty({ type: Pagination, description: "Pagination information" })
+  pagination: Pagination;
 }

@@ -27,16 +27,62 @@ export class GetOrgRevenueByProvinceController {
     @Request() req
   ) {
     try {
-      const email = req.user?.email;
+      const email = req.user?.role;
 
-      if (!email) {
+      if (!email || email !== 1) {
         return res.status(HttpStatus.UNAUTHORIZED).json({
           statusCode: HttpStatus.UNAUTHORIZED,
           message: 'Unauthorized',
         });
       }
 
-      const result = await this.getOrgRevenueByProvinceService.execute(email);
+      const result = await this.getOrgRevenueByProvinceService.execute();
+
+      if (result.isErr()) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+          statusCode: HttpStatus.BAD_REQUEST,
+          message: result.unwrapErr().message,
+        });
+      }
+
+      return res.status(HttpStatus.OK).json({
+        statusCode: HttpStatus.OK,
+        message: 'Organizer revenue by province retrieved successfully',
+        data: result.unwrap(),
+      });
+    } catch (error) {
+      await this.slackService.sendError(`Event Service - Admin - Statistics >>> GetOrgRevenueByProvinceController: ${error.message}`);
+
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: 'Internal server error',
+      });
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/revenue-by-province-V2')
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Get organizer revenue by province' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Organizer revenue by province retrieved successfully', type: ProvinceRevenueResponseDto })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid input' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Internal server error' })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'You do not have permission to get org revenue' })
+  async executeV2(
+    @Res() res: Response,
+    @Request() req
+  ) {
+    try {
+      const email = req.user?.role;
+
+      if (!email || email !== 1) {
+        return res.status(HttpStatus.UNAUTHORIZED).json({
+          statusCode: HttpStatus.UNAUTHORIZED,
+          message: 'Unauthorized',
+        });
+      }
+
+      const result = await this.getOrgRevenueByProvinceService.executeV3();
 
       if (result.isErr()) {
         return res.status(HttpStatus.BAD_REQUEST).json({

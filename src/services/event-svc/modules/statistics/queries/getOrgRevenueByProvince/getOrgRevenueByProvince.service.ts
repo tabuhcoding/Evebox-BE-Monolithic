@@ -5,24 +5,26 @@ import { EventsRepository } from "src/services/event-svc/repository/events/event
 import { GetAdminAccessService } from "src/services/auth-svc/modules/user/queries/get-admin-access/get-admin-access.service";
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 import { FileCacheService } from "src/infrastructure/cache/fileCache/fileCache.service";
+import { DistrictsRepository } from "src/services/event-svc/repository/districts/districts.repo";
+import { SaveRevenueDataService } from "src/services/auth-svc/modules/admin/commands/saveRevenueData/saveRevenueData.service";
 
 @Injectable()
 export class GetOrgRevenueByProvinceService {
   constructor(
     @Inject('EventsRepository') private readonly eventsRepository: EventsRepository,
+    @Inject('DistrictsRepository') private readonly districtsRepository: DistrictsRepository,
     private readonly getAdminAccessService: GetAdminAccessService,
     private readonly slackService: SlackService,
     private readonly fileCacheService: FileCacheService,
+    private readonly saveRevenueDataService: SaveRevenueDataService,
   ) {}
 
-  async execute(email: string): Promise<Result<ProvinceRevenueData[], Error>> {
+  async execute(): Promise<Result<ProvinceRevenueData[], Error>> {
     try {
       const cacheData = await this.fileCacheService.getCache('getOrgRevenueByProvince', {}) as ProvinceRevenueData[];
       if (cacheData && cacheData.length > 0) {
         return Ok(cacheData);
       }
-      const isAdmin = await this.getAdminAccessService.execute(email);
-      if (!isAdmin) return Err(new Error('You do not have permission to get organizer revenue'));
 
       const result = await this.eventsRepository.getOrgRevenueByProvince();
       if (result.isErr()) {
@@ -37,6 +39,201 @@ export class GetOrgRevenueByProvinceService {
       )
 
       return result;
+    } catch (error) {
+      await this.slackService.sendError(`Event Service - Admin - Statistics >>> GetOrgRevenueByProvinceService: ${error.message}`);
+      return Err(new Error('Internal server error'));
+    }
+  }
+
+  async executeV2(): Promise<Result<ProvinceRevenueData[], Error>> {
+    try {
+      const cacheData = await this.fileCacheService.getCache('getOrgRevenueByProvinceV2', {}) as ProvinceRevenueData[];
+      if (cacheData && cacheData.length > 0) {
+        return Ok(cacheData);
+      }
+
+      const districts = await this.districtsRepository.findAll({},
+        {
+          province: true,
+        }
+      );
+
+      var revenueData = new Map<string, ProvinceRevenueData>();
+      districts.forEach(district => {
+        switch (district.area_code) {
+          case 'HCM_TRUNGTAM':
+            const centralData = revenueData.get('HCM_TRUNGTAM') || null;
+            revenueData.set('HCM_TRUNGTAM', {
+              provinceName: 'Trung Tâm TP.HCM',
+              provinceEnName: 'Central HCM City',
+              eventCount: centralData? centralData.eventCount + district.eventCount : district.eventCount,
+              showingCount: centralData? centralData.showingCount + district.showingCount : district.showingCount,
+              totalRevenue: centralData? centralData.totalRevenue + district.totalRevenue : district.totalRevenue,
+              area_code: 'HCM_TRUNGTAM',
+            })
+            break;
+          case 'HCM_BAC':
+            const northData = revenueData.get('HCM_BAC') || null;
+            revenueData.set('HCM_BAC', {
+              provinceName: 'Bắc TP.HCM',
+              provinceEnName: 'North HCM City',
+              eventCount: northData? northData.eventCount + district.eventCount : district.eventCount,
+              showingCount: northData? northData.showingCount + district.showingCount : district.showingCount,
+              totalRevenue: northData? northData.totalRevenue + district.totalRevenue : district.totalRevenue,
+              area_code: 'HCM_BAC',
+            })
+            break;
+          case 'HCM_CONLAI':
+            const remainingData = revenueData.get('HCM_CONLAI') || null;
+            revenueData.set('HCM_CONLAI', {
+              provinceName: 'Còn lại TP.HCM',
+              provinceEnName: 'Remaining HCM City',
+              eventCount: remainingData? remainingData.eventCount + district.eventCount : district.eventCount,
+              showingCount: remainingData? remainingData.showingCount + district.showingCount : district.showingCount,
+              totalRevenue: remainingData? remainingData.totalRevenue + district.totalRevenue : district.totalRevenue,
+              area_code: 'HCM_CONLAI',
+            })
+            break;
+          default:
+            const provinceData = revenueData.get(district.provinceId.toString()) || null;
+            revenueData.set(district.provinceId.toString(), {
+              provinceName: district.province.name,
+              provinceEnName: district.province.en_name,
+              eventCount: provinceData? provinceData.eventCount + district.eventCount : district.eventCount,
+              showingCount: provinceData? provinceData.showingCount + district.showingCount : district.showingCount,
+              totalRevenue: provinceData? provinceData.totalRevenue + district.totalRevenue : district.totalRevenue,
+              area_code: district.area_code,
+            });
+            break;
+        }
+      });
+
+      const revenueList = Array.from(revenueData.values());
+
+      await this.fileCacheService.cacheEndpoint(
+        'getOrgRevenueByProvinceV2',
+        60 * 24,
+        {},
+        revenueList,
+      );
+
+      this.calculateDistrictRevenueAndUpdate();
+
+      return Ok(revenueList);
+    } catch (error) {
+      await this.slackService.sendError(`Event Service - Admin - Statistics >>> GetOrgRevenueByProvinceService: ${error.message}`);
+      return Err(new Error('Internal server error'));
+    }
+  }
+
+  async calculateDistrictRevenueAndUpdate(): Promise<void> {
+    try {
+      var districts = await this.districtsRepository.getAllWEvent();
+
+      const [eventRevenue, _] = await this.saveRevenueDataService.getEventRevenueWPg({
+        page: 1,
+        limit: 0,
+      })
+
+      districts.forEach(district => {
+        district.locations.forEach(location => {
+          location.Events.forEach(event => {
+            const revenue = eventRevenue.find(rev => rev.eventId === event.id);
+            if (revenue) {
+              district.totalRevenue += revenue.totalRevenue;
+              district.eventCount += 1;
+              district.showingCount += event.Showing.length;
+            }
+          });
+        });
+      });
+
+      await this.districtsRepository.transactions(districts);
+
+      console.log('District revenue updated successfully');
+
+    } catch (error) {
+      await this.slackService.sendError(`Event Service - Admin - Statistics >>> GetOrgRevenueByProvinceService: ${error.message}`);
+    }
+  }
+
+  async executeV3(): Promise<Result<ProvinceRevenueData[], Error>> {
+    try {
+      const cacheData = await this.fileCacheService.getCache('getOrgRevenueByProvinceV3', {}) as ProvinceRevenueData[];
+      if (cacheData && cacheData.length > 0) {
+        return Ok(cacheData);
+      }
+
+      const districts = await this.districtsRepository.getAllWEvent();
+
+      var revenueData = new Map<string, (ProvinceRevenueData & { eventIds: number[] })>();
+      districts.forEach(district => {
+        switch (district.area_code) {
+          case 'HCM_TRUNGTAM':
+            const centralData = revenueData.get('HCM_TRUNGTAM') || null;
+            revenueData.set('HCM_TRUNGTAM', {
+              provinceName: 'Trung Tâm TP.HCM',
+              provinceEnName: 'Central HCM City',
+              eventCount: centralData? centralData.eventCount + district.locations.flatMap(loc => loc.Events).length : district.locations.flatMap(loc => loc.Events).length,
+              showingCount: centralData? centralData.showingCount + district.locations.flatMap(loc => loc.Events.flatMap(ev => ev.Showing)).length : district.locations.flatMap(loc => loc.Events.flatMap(ev => ev.Showing)).length,
+              totalRevenue: 0,
+              area_code: 'HCM_TRUNGTAM',
+              eventIds: centralData? [...centralData.eventIds, ...district.locations.flatMap(loc => loc.Events.map(ev => ev.id))] : district.locations.flatMap(loc => loc.Events.map(ev => ev.id)),
+            })
+            break;
+          case 'HCM_BAC':
+            const northData = revenueData.get('HCM_BAC') || null;
+            revenueData.set('HCM_BAC', {
+              provinceName: 'Bắc TP.HCM',
+              provinceEnName: 'North HCM City',
+              eventCount: northData? northData.eventCount + district.locations.flatMap(loc => loc.Events).length : district.locations.flatMap(loc => loc.Events).length,
+              showingCount: northData? northData.showingCount + district.locations.flatMap(loc => loc.Events.flatMap(ev => ev.Showing)).length : district.locations.flatMap(loc => loc.Events.flatMap(ev => ev.Showing)).length,
+              totalRevenue: 0,
+              area_code: 'HCM_BAC',
+              eventIds: northData? [...northData.eventIds, ...district.locations.flatMap(loc => loc.Events.map(ev => ev.id))] : district.locations.flatMap(loc => loc.Events.map(ev => ev.id)),
+            })
+            break;
+          case 'HCM_CONLAI':
+            const remainingData = revenueData.get('HCM_CONLAI') || null;
+            revenueData.set('HCM_CONLAI', {
+              provinceName: 'Còn lại TP.HCM',
+              provinceEnName: 'Remaining HCM City',
+              eventCount: remainingData? remainingData.eventCount + district.locations.flatMap(loc => loc.Events).length : district.locations.flatMap(loc => loc.Events).length,
+              showingCount: remainingData? remainingData.showingCount + district.locations.flatMap(loc => loc.Events.flatMap(ev => ev.Showing)).length : district.locations.flatMap(loc => loc.Events.flatMap(ev => ev.Showing)).length,
+              totalRevenue: 0,
+              area_code: 'HCM_CONLAI',
+              eventIds: remainingData? [...remainingData.eventIds, ...district.locations.flatMap(loc => loc.Events.map(ev => ev.id))] : district.locations.flatMap(loc => loc.Events.map(ev => ev.id)),
+            })
+            break;
+          default:
+            const provinceData = revenueData.get(district.provinceId.toString()) || null;
+            revenueData.set(district.provinceId.toString(), {
+              provinceName: district.province.name,
+              provinceEnName: district.province.en_name,
+              eventCount: provinceData? provinceData.eventCount + district.locations.flatMap(loc => loc.Events).length : district.locations.flatMap(loc => loc.Events).length,
+              showingCount: provinceData? provinceData.showingCount + district.locations.flatMap(loc => loc.Events.flatMap(ev => ev.Showing)).length : district.locations.flatMap(loc => loc.Events.flatMap(ev => ev.Showing)).length,
+              totalRevenue: 0,
+              area_code: district.area_code,
+              eventIds: provinceData? [...provinceData.eventIds, ...district.locations.flatMap(loc => loc.Events.map(ev => ev.id))] : district.locations.flatMap(loc => loc.Events.map(ev => ev.id)),
+            });
+            break;
+        }
+      });
+
+      const revenueList = Array.from(revenueData.values());
+
+      await this.fileCacheService.cacheEndpoint(
+        'getOrgRevenueByProvinceV3',
+        60 * 24,
+        {},
+        revenueList,
+      );
+
+      const updatedRevenueList = await this.saveRevenueDataService.appendRevenueToProvinces(revenueList);
+
+      return Ok(updatedRevenueList.map(data => ({
+        ...data,
+        eventIds: null})));
     } catch (error) {
       await this.slackService.sendError(`Event Service - Admin - Statistics >>> GetOrgRevenueByProvinceService: ${error.message}`);
       return Err(new Error('Internal server error'));

@@ -97,9 +97,9 @@ export class GetRevenueByTicketPriceService {
         query: userRequest || "",
       };
 
-      const cacheData = await this.fileCacheService.getCacheObjectById("analyst-ai2", {}, "ticket-price");
+      const cacheData = await this.fileCacheService.getCacheObjectById("analyst-ai", {}, "ticket-price");
 
-      if (cacheData && cacheData.data[0]?.threadId) {
+      if (cacheData && cacheData.data[0].threadId) {
         payload = {
           ...payload,
           threadId: cacheData.data[0].threadId,
@@ -135,7 +135,7 @@ export class GetRevenueByTicketPriceService {
       if (!responseAIData.content) {
         return Err(new Error('No result returned from AI analysis'));
       }
-      await this.fileCacheService.cacheObject("analyst-ai2",
+      await this.fileCacheService.cacheObject("analyst-ai",
         20,
         {},
         "ticket-price",

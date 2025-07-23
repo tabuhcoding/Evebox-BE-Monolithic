@@ -110,7 +110,7 @@ export class CreateResponseService {
       const response = await axios.post<ChatResponsesResponse>(this.baseUrl, payload, { headers });
       const data = response.data;
 
-      await this.slackService.sendNotice(`📝 OpenAI content generation successful: ${JSON.stringify(data.output)}`);
+      // await this.slackService.sendNotice(`📝 OpenAI content generation successful: ${JSON.stringify(data.output)}`);
       if (!data.output) {
         throw new Error('Empty content returned from OpenAI');
       }

@@ -183,13 +183,13 @@ export class GetOrgRevenueChartService {
         query: userRequest || "",
       };
 
-      const cacheData = await this.fileCacheService.getCacheObjectById("analyst-ai", {
+      const cacheData = await this.fileCacheService.getCacheObjectById("analyst-ai2", {
         fromDate,
         toDate,
         filterType,
       }, "revenue");
 
-      if (cacheData && cacheData.data[0].threadId) {
+      if (cacheData && cacheData.data[0]?.threadId) {
         payload = {
           ...payload,
           threadId: cacheData.data[0].threadId,
@@ -225,7 +225,7 @@ export class GetOrgRevenueChartService {
       if (!responseAIData.content) {
         return Err(new Error('No result returned from AI analysis'));
       }
-      await this.fileCacheService.cacheObject("analyst-ai",
+      await this.fileCacheService.cacheObject("analyst-ai2",
         20,
         {
           fromDate,

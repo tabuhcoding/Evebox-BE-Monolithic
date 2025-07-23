@@ -253,9 +253,9 @@ export class GetOrgRevenueByProvinceService {
         query: userRequest || "",
       };
 
-      const cacheData = await this.fileCacheService.getCacheObjectById("analyst-ai", {}, "province");
+      const cacheData = await this.fileCacheService.getCacheObjectById("analyst-ai2", {}, "province");
 
-      if (cacheData && cacheData.data[0].threadId) {
+      if (cacheData && cacheData.data[0]?.threadId) {
         payload = {
           ...payload,
           threadId: cacheData.data[0].threadId,
@@ -291,7 +291,7 @@ export class GetOrgRevenueByProvinceService {
       if (!responseAIData.content) {
         return Err(new Error('No result returned from AI analysis'));
       }
-      await this.fileCacheService.cacheObject("analyst-ai",
+      await this.fileCacheService.cacheObject("analyst-ai2",
         20,
         {},
         "province",

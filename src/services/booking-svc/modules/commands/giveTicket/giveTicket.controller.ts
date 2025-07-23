@@ -128,6 +128,7 @@ export class GiveTicketController {
                 data: {
                     access_token: result.access_token,
                     refresh_token: result.refresh_token,
+                    email: result.email,
                     id: result.id,
                 },
             });

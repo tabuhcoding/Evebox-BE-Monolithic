@@ -107,7 +107,7 @@ export class GetAnalyticsService {
       var payload: any = {
         query: userRequest || "",
       };
-      const cacheData = await this.fileCacheService.getCacheObjectById("analyst-ai", {
+      const cacheData = await this.fileCacheService.getCacheObjectById("analyst-ai2", {
         startDate,
         endDate,
       }, eventId.toString());
@@ -161,7 +161,7 @@ export class GetAnalyticsService {
       if (!responseAIData.content) {
         return Err(new Error('No content returned from AI analysis'));
       }
-      await this.fileCacheService.cacheObject("analyst-ai",
+      await this.fileCacheService.cacheObject("analyst-ai2",
         20,
         {
           startDate,

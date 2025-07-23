@@ -275,6 +275,7 @@ export class GetUserOrderService {
           order.status === BookingTicketStatus.SUCCESS 
           && ( ( order.ownerId && order.ownerId !== email) || !order.ownerId)
           && showing.startTime > new Date()
+          && !order.Ticket.some(ticket => ticket.isCheckedIn)
         ) ? true : false,
         ownerId: order.ownerId || order.userId, // If ownerId is not set, use userId
         type: order.type,

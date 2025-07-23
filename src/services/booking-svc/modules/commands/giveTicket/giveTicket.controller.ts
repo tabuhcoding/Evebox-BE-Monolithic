@@ -1,7 +1,7 @@
 import { ApiBearerAuth, ApiBody, ApiHeader, ApiOperation, ApiProperty, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 import { GenerateQrcodeService } from "../generateQrcode/generateQrcode.service";
-import { Controller,Headers, HttpStatus, Param, Post, Res, UseGuards, Request, Query, Body } from "@nestjs/common";
+import { Controller, Headers, HttpStatus, Param, Post, Res, UseGuards, Request, Query, Body } from "@nestjs/common";
 import { JwtAuthGuard } from "src/shared/guard/jwt-auth.guard";
 import { Response } from "express";
 import { GiveTicketService } from "./giveTicket.service";
@@ -26,7 +26,7 @@ export class GiveTicketController {
     constructor(
         private readonly giveTicketService: GiveTicketService,
         private readonly slackService: SlackService,
-    ) {}
+    ) { }
 
     @UseGuards(JwtAuthGuard)
     @Post('/give-ticket')
@@ -57,7 +57,7 @@ export class GiveTicketController {
     })
     async giveTicket(
         @Body() dto: { orderId: string; sendTo: string },
-        @Request() req, 
+        @Request() req,
         @Res() res: Response
     ) {
         try {
@@ -115,7 +115,7 @@ export class GiveTicketController {
         try {
             const result = await this.giveTicketService.receiveTicket(sendKey);
 
-            if (!result) {
+            if (!result.success) {
                 return res.status(HttpStatus.BAD_REQUEST).json({
                     statusCode: HttpStatus.BAD_REQUEST,
                     message: 'Failed to receive ticket',
@@ -125,7 +125,11 @@ export class GiveTicketController {
             return res.status(HttpStatus.OK).json({
                 statusCode: HttpStatus.OK,
                 message: 'Ticket received successfully',
-                data: true,
+                data: {
+                    access_token: result.access_token,
+                    refresh_token: result.refresh_token,
+                    id: result.id,
+                },
             });
         } catch (error) {
             console.error(error);

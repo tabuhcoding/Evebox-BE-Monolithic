@@ -177,33 +177,33 @@ export class GetOrgRevenueChartService {
     }
   }
 
-  async executeAI(email: string, userRequest: string, fromDate?: string, toDate?: string, filterType: "month" | "year" = "month"): Promise<Result<string, Error>> {
+  async executeAI(email: string, userRequest: string): Promise<Result<string, Error>> {
     try {
       var payload: any = {
         query: userRequest || "",
       };
 
-      const cacheData = await this.fileCacheService.getCacheObjectById("analyst-ai2", {
-        fromDate,
-        toDate,
-        filterType,
-      }, "revenue");
+      // const cacheData = await this.fileCacheService.getCacheObjectById("analyst-ai2", {
+      //   fromDate,
+      //   toDate,
+      //   filterType,
+      // }, "revenue");
 
-      if (cacheData && cacheData.data[0]?.threadId) {
-        payload = {
-          ...payload,
-          threadId: cacheData.data[0].threadId,
-        };
-      }
-      else {
-        const chart = await this.executeV2(email, fromDate, toDate, filterType);
+      // if (cacheData && cacheData.data[0]?.threadId) {
+      //   payload = {
+      //     ...payload,
+      //     threadId: cacheData.data[0].threadId,
+      //   };
+      // }
+      // else {
+        const chart = await this.executeV2(email);
         payload = {
           ...payload,
           data: {
             chart: chart.isOk() ? chart.unwrap() : [],
           },
         };
-      }
+      // }
 
       await this.slackService.sendNotice(`Event Service - Admin - Statistics >>> GetOrgRevenueChartService: ${JSON.stringify(payload)}`);
       const responseAI = await fetch(`${process.env.UTILS_URL}/revenue/admin`, {
@@ -214,11 +214,11 @@ export class GetOrgRevenueChartService {
         body: JSON.stringify(payload)
       });
 
-      // if (!responseAI.ok || responseAI.status !== 200) {
-      //   const errorData = await responseAI.json();
-      //   this.slackService.sendError(`EventSvc >> GetOrgRevenueChartService: Failed to get org revenue chart with AI: ${errorData.detail}`);
-      //   return Err(new Error(errorData.detail || 'Failed to analyze revenue data'));
-      // }
+      if (!responseAI.ok || responseAI.status !== 200) {
+        const errorData = await responseAI.json();
+        this.slackService.sendError(`EventSvc >> GetOrgRevenueChartService: Failed to get org revenue chart with AI: ${errorData.detail}`);
+        return Err(new Error(errorData.detail || 'Failed to analyze revenue data'));
+      }
 
       const responseAIData = await responseAI.json();
 
@@ -228,18 +228,18 @@ export class GetOrgRevenueChartService {
       if (!responseAIData.content) {
         return Err(new Error('No result returned from AI analysis'));
       }
-      await this.fileCacheService.cacheObject("analyst-ai2",
-        20,
-        {
-          fromDate,
-          toDate,
-          filterType,
-        },
-        "revenue",
-        [{
-          threadId: responseAIData.threadId
-        }]
-      );
+      // await this.fileCacheService.cacheObject("analyst-ai2",
+      //   20,
+      //   {
+      //     fromDate,
+      //     toDate,
+      //     filterType,
+      //   },
+      //   "revenue",
+      //   [{
+      //     threadId: responseAIData.threadId
+      //   }]
+      // );
 
       try {
         await this.AIAnalystService.createAIAnalyst(

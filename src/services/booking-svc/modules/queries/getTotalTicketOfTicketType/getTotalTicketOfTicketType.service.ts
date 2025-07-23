@@ -3,7 +3,7 @@ import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 import { FileCacheService } from "src/infrastructure/cache/fileCache/fileCache.service";
 import { AggregatedSelectTicketTypeItem } from "src/services/booking-svc/common/type";
 import { OrderRepository } from "src/services/booking-svc/repository/order/order.repo";
-import { TicketRepository } from "src/services/booking-svc/repository/ticket/ticket.repo";
+import { Ticket, TicketRepository } from "src/services/booking-svc/repository/ticket/ticket.repo";
 
 @Injectable()
 export class GetTotalTicketOfTicketTypeService {
@@ -160,6 +160,113 @@ export class GetTotalTicketOfTicketTypeService {
       await this.slackService.sendError(` Booking Svc >>> getAllSeatHasPickedInCacheOfShowing : ${error.message}`);
       
       return null;
+    }
+  }
+
+  async getAllTicketHasSaleInLast2Hours(): Promise<Map<string, number>> {
+    try {
+      // Get the current date and time
+      const currentDate = new Date();
+      // Calculate the date and time 2 hours ago
+      const twoHoursAgo = new Date(currentDate.getTime() - 2 * 60 * 60 * 1000);
+
+      // Find tickets created in the last 2 hours
+      const tickets = await this.ticketRepository.findMany({
+        createdAt: {
+          gte: twoHoursAgo,
+        },
+      });
+
+      if (!tickets || tickets.length === 0) {
+        return new Map();
+      }
+      // Create a map to hold ticketTypeId and their counts
+      const ticketCountMap = new Map<string, number>();
+      tickets.forEach(ticket => {
+        const ticketTypeId = ticket.ticketTypeId;
+        if (ticketCountMap.has(ticketTypeId)) {
+          ticketCountMap.set(ticketTypeId, ticketCountMap.get(ticketTypeId) + 1);
+        } else {
+          ticketCountMap.set(ticketTypeId, 1);
+        }
+      });
+    } catch (error) {
+      await this.slackService.sendError(` Booking Svc >>> getAllTicketHasSaleInLast2Hours : ${error.message}`);
+      
+      return new Map();
+    }
+  }
+
+  async getAllTicketWSectionHasSaleInLast2Hours(): Promise<Map<string, Map<number, number>>> {
+    try {
+      // Get the current date and time
+      const currentDate = new Date();
+      // Calculate the date and time 2 hours ago
+      const twoHoursAgo = new Date(currentDate.getTime() - 2 * 60 * 60 * 1000);
+
+      // Find tickets created in the last 2 hours
+      const tickets = await this.ticketRepository.findMany({
+        createdAt: {
+          gte: twoHoursAgo,
+        },
+        sectionId: {
+          not: null, // Ensure sectionId is not null
+        }
+      });
+
+      if (!tickets || tickets.length === 0) {
+        return new Map();
+      }
+
+      // Create a map to hold ticketTypeId and their section counts
+      const ticketCountMap = new Map<string, Map<number, number>>();
+      tickets.forEach(ticket => {
+        const ticketTypeId = ticket.ticketTypeId;
+        const sectionId = ticket.sectionId;
+
+        if (!ticketCountMap.has(ticketTypeId)) {
+          ticketCountMap.set(ticketTypeId, new Map<number, number>());
+        }
+
+        const sectionMap = ticketCountMap.get(ticketTypeId);
+        if (sectionMap.has(sectionId)) {
+          sectionMap.set(sectionId, sectionMap.get(sectionId) + 1);
+        } else {
+          sectionMap.set(sectionId, 1);
+        }
+      });
+
+      return ticketCountMap;
+    } catch (error) {
+      await this.slackService.sendError(` Booking Svc >>> getAllTicketWSectionHasSaleInLast2Hours : ${error.message}`);
+      
+      return new Map();
+    }
+  }
+
+  async getAllShowingHasSaleInLast2Hours(): Promise<string[]> {
+    try {
+      // Get the current date and time
+      const currentDate = new Date();
+      // Calculate the date and time 2 hours ago
+      const twoHoursAgo = new Date(currentDate.getTime() - 2 * 60 * 60 * 1000);
+
+      // Find tickets created in the last 2 hours
+      const order = await this.orderRepository.findMany({
+        createdAt: {
+          gte: twoHoursAgo,
+        },
+      });
+
+      if (!order || order.length === 0) {
+        return [];
+      }
+
+      return Array.from(new Set(order.map(o => o.showingId)));
+    } catch (error) {
+      await this.slackService.sendError(` Booking Svc >>> getAllShowingHasSaleInLast2Hours : ${error.message}`);
+      
+      return [];
     }
   }
 }

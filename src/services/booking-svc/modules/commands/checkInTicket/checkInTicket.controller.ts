@@ -28,7 +28,7 @@ export class CheckInTicketController {
     try {
       const user = req.user;
 
-      const result = await this.checkInTicketService.execute(id, user.email, dto.eventId);
+      const result = await this.checkInTicketService.execute(id, user.email, dto.eventId >> 0);
 
       if (result.isErr()) {
         return res.status(HttpStatus.BAD_REQUEST).json({

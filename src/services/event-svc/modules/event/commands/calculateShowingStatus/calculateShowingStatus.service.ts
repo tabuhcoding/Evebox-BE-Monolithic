@@ -232,4 +232,32 @@ export class CalculateShowingStatusService {
       return undefined;
     }
   }
+
+  async reCalculateTicketTypeHasEnd(): Promise<void> {
+    try {
+      const ticketTypes = await this.ticketTypeRepository.findMany({
+        endTime: {
+          lt: new Date(),
+        },
+        status: {
+          not: [TicketTypeStatus.SALE_CLOSED, TicketTypeStatus.REGISTER_CLOSED],
+        },
+      });
+
+      for (const ticketType of ticketTypes) {
+        if (ticketType.isFree) {
+          ticketType.status = TicketTypeStatus.REGISTER_CLOSED;
+        } else {
+          ticketType.status = TicketTypeStatus.SALE_CLOSED;
+        }
+
+        await this.ticketTypeRepository.updateOneById(ticketType.id, {
+          status: ticketType.status,
+        });
+      }
+    } catch (error) {
+      await this.slackService.sendError(`Event Svc - Event >>> reCalculateTicketTypeHasEnd: ${error.message}`);
+    }
+  }
+
 }

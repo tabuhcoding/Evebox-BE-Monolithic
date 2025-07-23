@@ -522,7 +522,26 @@ export class GenerateQrcodeService {
   }
 
   async sendTicketEmailToUser(orderIds: number[]) : Promise<boolean> {
+    const orderFalse = await this.orderRepository.findAll({
+      id: { in: orderIds },
+      mailSent: false,
+    });
+    const orderFalseId = orderFalse.map(order => order.id);
     try {
+      const count = await this.orderRepository.count({
+        id: { in: orderIds },
+        mailSent: true,
+      });
+      if (count > 0) {
+        await this.slackService.sendError(`Booking Svc >>> sendTicketEmailToUser : Some orders have already been sent email, OrderIds: ${orderIds}`);
+        return false;
+      }
+
+      await this.orderRepository.updateMany({
+        id: { in: orderIds },
+      }, {
+        mailSent: true,
+      });
       var sampleOrderMapping = new Map<number, UserOrderDto>();
       var userIdMapping = new Map<number, string[]>();
       for (const orderId of orderIds) {
@@ -570,6 +589,11 @@ export class GenerateQrcodeService {
 
       return true;
     } catch (error) {
+      await this.orderRepository.updateMany({
+        id: { in: orderFalseId },
+      }, {
+        mailSent: false,
+      });
       await this.slackService.sendError(`Booking Svc >>> sendTicketEmailToUser : Error generating ticket email, Error: ${error.message}, OrderIds: ${orderIds}`);
       return false;
     }

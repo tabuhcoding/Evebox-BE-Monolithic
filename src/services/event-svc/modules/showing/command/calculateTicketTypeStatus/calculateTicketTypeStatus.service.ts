@@ -4,6 +4,7 @@ import { CalculateShowingStatusService } from "../../../event/commands/calculate
 import { SlackService } from "src/infrastructure/adapters/slack/slack.service";
 import { TicketTypeRepository, TicketTypeStatus } from "src/services/event-svc/repository/ticketType/ticketType.repo";
 import { EventsRepository } from "src/services/event-svc/repository/events/events.repo";
+import { GetTotalTicketOfTicketTypeService } from "src/services/booking-svc/modules/queries/getTotalTicketOfTicketType/getTotalTicketOfTicketType.service";
 
 @Injectable()
 export class CalculateTicketTypeStatusService {
@@ -12,17 +13,43 @@ export class CalculateTicketTypeStatusService {
     @Inject('TicketTypeRepository') private readonly ticketTypeRepository: TicketTypeRepository,
     @Inject('EventsRepository') private readonly eventsRepository: EventsRepository,
     private readonly reCalculateAllTicketTypesOfShowingStatus: CalculateShowingStatusService,
+    private readonly getTotalTicketOfTicketTypeService: GetTotalTicketOfTicketTypeService,
     private readonly slackService: SlackService,
   ) {}
   
   async execute(): Promise<void> {
+    const showingIdsHasSale = await this.getTotalTicketOfTicketTypeService.getAllShowingHasSaleInLast2Hours();
     // Get all showings
     const showings = await this.showingRepository.findAll({
-      deleteAt: null,
-      endTime:{
-        // Endtime should be greater than or equal to the month ago since now
-        gte: new Date(new Date().setMonth(new Date().getMonth() - 1)),
-      }
+      OR: [
+        {
+          deleteAt: null,
+          id: {
+            in: showingIdsHasSale,
+          },
+          TicketType: {
+            some: {
+              status: { in: [TicketTypeStatus.BOOK_NOW, TicketTypeStatus.REGISTER_NOW] },
+            },
+          }
+        },
+        {
+          // startTime in the last 2 hours
+          startTime: {
+            gte: new Date(new Date().getTime() - 2 * 60 * 60 * 1000),
+          }
+        },
+        {
+          // Ticket type start time in the last 2 hours
+          TicketType: {
+            some: {
+              startTime: {
+                gte: new Date(new Date().getTime() - 2 * 60 * 60 * 1000),
+              },
+            },
+          }
+        }
+      ]
     }, {
       TicketType: true,
     });

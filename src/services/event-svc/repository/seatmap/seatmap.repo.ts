@@ -13,7 +13,12 @@ export type Seatmap = Prisma.SeatmapGetPayload<{
               }
             };
           };
-        }
+        },
+        ticketTypes: {
+          include: {
+            TicketType: true;
+          };
+        };
       }
     }
   }

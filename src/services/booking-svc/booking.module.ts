@@ -40,14 +40,24 @@ import { CheckInTicketByQrController } from './modules/commands/checkInTicketByQ
 import { CheckInTicketController } from './modules/commands/checkInTicket/checkInTicket.controller';
 import { CheckInTicketByQrService } from './modules/commands/checkInTicketByQr/checkInTicketByQr.service';
 import { CheckInTicketService } from './modules/commands/checkInTicket/checkInTicket.service';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
-  imports: [ 
-     forwardRef(() => AuthSvcModule),
-     forwardRef(() => EventSvcModule),
-     forwardRef(() => PaymentSvcModule),
-     EmailModule,
-     PrismaBookingModule,
+  imports: [
+    forwardRef(() => AuthSvcModule),
+    forwardRef(() => EventSvcModule),
+    forwardRef(() => PaymentSvcModule),
+    EmailModule,
+    PrismaBookingModule,
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET'),
+        signOptions: { expiresIn: configService.get<string>('JWT_EXPIRES_IN') },
+      }),
+      inject: [ConfigService],
+    }),
   ],
   controllers: [
     SelectSeatController,
@@ -99,8 +109,8 @@ import { CheckInTicketService } from './modules/commands/checkInTicket/checkInTi
   ],
   exports: [
     GetTotalTicketOfTicketTypeService,
-    CountCheckedInTicketsService, 
-    GetRedisSeatService, 
+    CountCheckedInTicketsService,
+    GetRedisSeatService,
     CreateOrderService,
     GetPaidOrdersByShowingIdService,
     GetOrdersInShowingIdsService,
@@ -112,4 +122,4 @@ import { CheckInTicketService } from './modules/commands/checkInTicket/checkInTi
     CalculateRevenueService
   ],
 })
-export class BookingSvcModule {}
+export class BookingSvcModule { }

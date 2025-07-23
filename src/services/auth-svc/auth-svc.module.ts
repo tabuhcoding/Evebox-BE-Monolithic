@@ -100,6 +100,7 @@ import { SaveRevenueDataService } from './modules/admin/commands/saveRevenueData
 import { AdminManageEventRepositoryImpl } from './repository/admin-area/admin-area.impl';
 import { AIAnalystRepositoryImpl } from './repository/ai-analyst/ai-analyst.impl';
 import { AIAnalystService } from './modules/admin/commands/aiAnalyst/aiAnalyst.service';
+import { InternalSaveUserService } from './modules/user/commands/internal-save-user/internal-save-user.service';
 
 @Module({
   imports: [
@@ -186,6 +187,7 @@ import { AIAnalystService } from './modules/admin/commands/aiAnalyst/aiAnalyst.s
     VerifyUserPinService,
     ChangeUserPinService,
     GetUsersByAdminService,
+    InternalSaveUserService,
 
     // Repositories
     GetFavoriteEventService,
@@ -268,6 +270,7 @@ import { AIAnalystService } from './modules/admin/commands/aiAnalyst/aiAnalyst.s
     SaveRevenueDataService,
     GetUserPinStatusService,
     AIAnalystService,
+    InternalSaveUserService,
   ],
 })
 export class AuthSvcModule { }

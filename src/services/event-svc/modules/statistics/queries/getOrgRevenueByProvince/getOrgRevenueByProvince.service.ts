@@ -253,15 +253,15 @@ export class GetOrgRevenueByProvinceService {
         query: userRequest || "",
       };
 
-      const cacheData = await this.fileCacheService.getCacheObjectById("analyst-ai2", {}, "province");
+      // const cacheData = await this.fileCacheService.getCacheObjectById("analyst-ai2", {}, "province");
 
-      if (cacheData && cacheData.data[0]?.threadId) {
-        payload = {
-          ...payload,
-          threadId: cacheData.data[0].threadId,
-        };
-      }
-      else {
+      // if (cacheData && cacheData.data[0]?.threadId) {
+      //   payload = {
+      //     ...payload,
+      //     threadId: cacheData.data[0].threadId,
+      //   };
+      // }
+      // else {
         const chart = await this.executeV3();
         payload = {
           ...payload,
@@ -269,7 +269,7 @@ export class GetOrgRevenueByProvinceService {
             chart: chart.isOk() ? chart.unwrap() : [],
           },
         };
-      }
+      // }
       await this.slackService.sendNotice(`Event Service - Admin - Statistics >>> GetOrgRevenueByProvinceService: ${JSON.stringify(payload)}`);
 
       const responseAI = await fetch(`${process.env.UTILS_URL}/revenue/admin`, {
@@ -280,10 +280,10 @@ export class GetOrgRevenueByProvinceService {
         body: JSON.stringify(payload)
       });
 
-      // if (!responseAI.ok || responseAI.status !== 200) {
-      //   const errorData = await responseAI.json();
-      //   return Err(new Error(errorData.detail || 'Failed to analyze revenue data'));
-      // }
+      if (!responseAI.ok || responseAI.status !== 200) {
+        const errorData = await responseAI.json();
+        return Err(new Error(errorData.detail || 'Failed to analyze revenue data'));
+      }
 
       const responseAIData = await responseAI.json();
 
@@ -293,14 +293,14 @@ export class GetOrgRevenueByProvinceService {
       if (!responseAIData.content) {
         return Err(new Error('No result returned from AI analysis'));
       }
-      await this.fileCacheService.cacheObject("analyst-ai2",
-        20,
-        {},
-        "province",
-        [{
-          threadId: responseAIData.threadId
-        }]
-      );
+      // await this.fileCacheService.cacheObject("analyst-ai2",
+      //   20,
+      //   {},
+      //   "province",
+      //   [{
+      //     threadId: responseAIData.threadId
+      //   }]
+      // );
 
       try {
         await this.AIAnalystService.createAIAnalyst(

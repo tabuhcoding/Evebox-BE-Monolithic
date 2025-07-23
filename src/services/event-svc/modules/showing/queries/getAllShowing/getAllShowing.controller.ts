@@ -1,6 +1,6 @@
-import { Controller, Get, Res, HttpStatus, Param, Body, Post, UseGuards } from '@nestjs/common';
+import { Controller, Get, Res, HttpStatus, Param, Body, Post, UseGuards, Query } from '@nestjs/common';
 import { Response } from 'express';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { getAllShowingService } from './getAllShowing.service';
 import { AllShowingsResponseDto, ConnectShowingToSeatmapDTO } from './getAllShowing-response.dto';
@@ -50,7 +50,7 @@ export class getAllShowingController {
     });
   }
 
-  @Get('/all-seatmaps')
+  @Get('/all-seatmaps/:id')
   @ApiOperation({ summary: 'Get all showings' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -69,8 +69,10 @@ export class getAllShowingController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     description: 'Internal server error',
   })
-  async getAllSeatmap(@Res() res: Response) {
-    const result = await this.getAllShowingService.getAllSeatmap();
+  async getAllSeatmap(
+    @Param('id') id: string,
+    @Res() res: Response) {
+    const result = await this.getAllShowingService.getAllSeatmap(id);
 
     if (result.isErr()) {
       return res
@@ -91,6 +93,7 @@ export class getAllShowingController {
 
   @Get('/seatmap-details/:id')
   @ApiOperation({ summary: 'Get all showings' })
+  @ApiQuery({ name: 'showingId', required: true, description: 'Showing ID' })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'All showings retrieved successfully',
@@ -109,8 +112,9 @@ export class getAllShowingController {
   })
   async getSeatmap(
     @Param('id') id: number,
+    @Query('showingId') showingId: string,
     @Res() res: Response) {
-    const result = await this.getAllShowingService.getSeatmapWithSection(id >> 0);
+    const result = await this.getAllShowingService.getSeatmapWithSection(showingId, id >> 0);
 
     if (result.isErr()) {
       return res
@@ -153,12 +157,8 @@ export class getAllShowingController {
     @Body() connectShowingToSeatmapDTO: ConnectShowingToSeatmapDTO,
     @Res() res: Response
   ) {
-    const { showingId, seatmapId, ticketTypeSectionMap } = connectShowingToSeatmapDTO;
-
     const result = await this.getAllShowingService.connectShowingToSeatmap(
-      showingId,
-      Number(seatmapId),
-      ticketTypeSectionMap
+      connectShowingToSeatmapDTO
     );
 
     if (result.isErr()) {

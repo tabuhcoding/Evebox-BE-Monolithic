@@ -11,6 +11,95 @@ export class GetAllShowingDetailOfEventController {
   constructor(private readonly getAllShowingDetailOfEventService: GetAllShowingDetailOfEventService) {}
 
   @UseGuards(JwtAuthGuard)
+  @Get('/all-id/:eventId')
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Get all showing & ticketType of Event of Organizer' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Get all showing of Event of Organizer',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Bad request',
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
+  async getShowingId(
+    @Param('eventId') eventId: number,
+    @Request() req,
+    @Res() res: Response,
+  ) {
+    try{
+      const email = req.user.email;
+      const result = await this.getAllShowingDetailOfEventService.findAllId(email, eventId >> 0);
+      if (result.isErr()) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+          statusCode: HttpStatus.BAD_REQUEST,
+          message: result.unwrapErr().message,
+        });
+      }
+
+      return res.status(HttpStatus.OK).json({
+        statusCode: HttpStatus.OK,
+        message: 'Get all showing of Event of Organizer successfully',
+        data: result.unwrap(),
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: 'Internal server error',
+      });
+    }    
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/basic-info/:showingId')
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Get all showing & ticketType of Event of Organizer' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Get all showing of Event of Organizer',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Bad request',
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
+  async getShowingIdInfo(
+    @Param('showingId') showingId: string,
+    @Request() req,
+    @Res() res: Response,
+  ) {
+    try{
+      const result = await this.getAllShowingDetailOfEventService.findShowingCanEditSeatmap(showingId);
+      if (result.isErr()) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+          statusCode: HttpStatus.BAD_REQUEST,
+          message: "Showing has started to sell tickets, can't edit seatmap",
+        });
+      }
+
+      return res.status(HttpStatus.OK).json({
+        statusCode: HttpStatus.OK,
+        message: 'Get all showing of Event of Organizer successfully',
+        data: result.unwrap(),
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: 'Internal server error',
+      });
+    }    
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get('/:eventId')
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Get all showing & ticketType of Event of Organizer' })

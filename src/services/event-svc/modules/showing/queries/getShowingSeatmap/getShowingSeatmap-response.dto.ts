@@ -43,10 +43,19 @@ class RowDto {
 
 class SectionDto {
   @ApiProperty({ example: '18237', description: 'Section TicketTypeId' })
-  ticketTypeId: string;
+  ticketTypeId?: string;
 
   @ApiProperty({ example: 2000, description: 'Section ID' })
   id: number;
+
+  @ApiProperty({ example: 10, description: 'Maximum quantity per order' })
+  quantity?: number;
+
+  @ApiProperty({ example: 1, description: 'Minimum quantity per order' })
+  sold?: number;
+
+  color?: string;
+  ticketTypeName?: string;
 
   @ApiProperty({ example: 'SUPER_VIP', description: 'Section name' })
   name: string;

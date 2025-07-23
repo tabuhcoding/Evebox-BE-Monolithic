@@ -50,6 +50,11 @@ export class getShowingSeatmapService {
                 },
               },
             },
+            // ticketType: {
+            //   include: {
+            //     TicketType: true,
+            //   }
+            // }
           },
         }
       })

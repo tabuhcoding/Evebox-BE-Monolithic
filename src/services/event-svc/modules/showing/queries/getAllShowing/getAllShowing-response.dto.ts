@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { SeatStatus } from 'src/services/event-svc/repository/seatStatus/seatStatus.repo';
 
 export class AllShowingsResponseDto {
   @ApiProperty({ example: 200, description: 'Response status code' })
@@ -19,6 +20,26 @@ export class AllShowingsResponseDto {
   };
 }
 
+export class TicketTypeSectionMapDto {
+  @ApiProperty({
+    example: '16962844867171',
+    description: 'TicketType ID',
+  })
+  ticketTypeId?: string;
+
+  @ApiProperty({
+    example: 23456,
+    description: 'Section IDs',
+  })
+  sectionId: number;
+
+  @ApiProperty({
+    example: 30,
+    description: 'Number of seats in the section',
+  })
+  quantity?: number;
+}
+
 export class ConnectShowingToSeatmapDTO {
   @ApiProperty({ example: '16962844867169', description: 'Showing ID' })
   showingId: string;
@@ -27,8 +48,14 @@ export class ConnectShowingToSeatmapDTO {
   seatmapId: number;
 
   @ApiProperty({
-    example: { '16962844867171': [23456] },
+    type: [TicketTypeSectionMapDto],
+    description: 'Map of ticket types to section IDs and quantities',
+  })
+  ticketTypeSectionMap: TicketTypeSectionMapDto[];
+
+  @ApiProperty({
+    example: { 16962844867171:  'AVAILABLE'},
     description: 'Ticket Type Section Map',
   })
-  ticketTypeSectionMap: Record<string, number[]>;
+  seatStatusMap?: Record<number, SeatStatus>;
 }

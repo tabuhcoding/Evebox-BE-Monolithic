@@ -45,4 +45,18 @@ export class CalculateSectionStatusService {
       return [SectionStatus.NOT_SALE, null];
     }
   }
+
+  async totalSoldTicketOfSection(ticketTypeId: string, sectionId: number): Promise<number> {
+    try {
+      const totalTicketOfSection = await this.getTotalTicketOfTicketTypeService.getTotalTicketOfSection(ticketTypeId, sectionId);
+      if (totalTicketOfSection === null) {
+        await this.slackService.sendError(`Booking Svc >>> getTotalTicketOfSection : Failed to get total tickets for section ${sectionId} of ticket type ${ticketTypeId}`);
+        return 0;
+      }
+      return totalTicketOfSection;
+    } catch (error) {
+      await this.slackService.sendError(`Event Svc >>> totalSoldTicketOfSection: ${error.message}`);
+      return 0;
+    }
+  }
 }

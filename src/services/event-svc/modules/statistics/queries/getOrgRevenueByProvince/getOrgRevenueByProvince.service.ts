@@ -270,6 +270,8 @@ export class GetOrgRevenueByProvinceService {
           },
         };
       }
+      await this.slackService.sendNotice(`Event Service - Admin - Statistics >>> GetOrgRevenueByProvinceService: ${JSON.stringify(payload)}`);
+
       const responseAI = await fetch(`${process.env.UTILS_URL}/revenue/admin`, {
         method: 'POST',
         headers: {
@@ -278,10 +280,10 @@ export class GetOrgRevenueByProvinceService {
         body: JSON.stringify(payload)
       });
 
-      if (!responseAI.ok || responseAI.status !== 200) {
-        const errorData = await responseAI.json();
-        return Err(new Error(errorData.detail || 'Failed to analyze revenue data'));
-      }
+      // if (!responseAI.ok || responseAI.status !== 200) {
+      //   const errorData = await responseAI.json();
+      //   return Err(new Error(errorData.detail || 'Failed to analyze revenue data'));
+      // }
 
       const responseAIData = await responseAI.json();
 
@@ -313,7 +315,7 @@ export class GetOrgRevenueByProvinceService {
       }
       return Ok(responseAIData.content);
     } catch (error) {
-      this.slackService.sendError(`EventSvc >> GetOrgRevenueChartService: Failed to get org revenue chart: ${error.message}`);
+      this.slackService.sendError(`Event Service - Admin - Statistics >>>  Failed to get org revenue chart: ${error.message}`);
       return Err(new Error('Internal server error'));
     }
   }

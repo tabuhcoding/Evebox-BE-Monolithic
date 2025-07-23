@@ -23,13 +23,17 @@ export class SlackService {
         parse_mode: 'Markdown',
       });
     } catch (err) {
-      console.error('Failed to send Telegram message:', err.message);
+      await axios.post(url, {
+        chat_id: this.chatId,
+        text: `*Error sending message to Telegram*\n${text}. Err: ${err.message}`,
+      });
     }
   }
 
   async sendError(message: string) {
     if (this.use_telegram) {
       await this.sendMessage(`🚨 *ERROR*:\n${message}`);
+      await this.sendSlackError(message);
       return;
     } else {
       await this.sendSlackError(message);
@@ -39,6 +43,7 @@ export class SlackService {
   async sendNotice(message: string) {
     if (this.use_telegram) {
       await this.sendMessage(`📝 *NOTICE*:\n${message}`);
+      await this.sendSlackNotice(message);
       return;
     } else{
       await this.sendSlackNotice(message);

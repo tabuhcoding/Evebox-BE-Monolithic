@@ -40,10 +40,26 @@ export class CalculateTicketTypeStatusService {
           }
         },
         {
+          // startTime in the last 2 hours
+          endTime: {
+            gte: new Date(new Date().getTime() - 2 * 60 * 60 * 1000),
+          }
+        },
+        {
           // Ticket type start time in the last 2 hours
           TicketType: {
             some: {
               startTime: {
+                gte: new Date(new Date().getTime() - 2 * 60 * 60 * 1000),
+              },
+            },
+          }
+        },
+        {
+          // Ticket type start time in the last 2 hours
+          TicketType: {
+            some: {
+              endTime: {
                 gte: new Date(new Date().getTime() - 2 * 60 * 60 * 1000),
               },
             },

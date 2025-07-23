@@ -65,11 +65,6 @@ export class GiveTicketService {
                 throw new Error('Order is not eligible for giving away');
             }
 
-            // const userExists = await this.checkUserExistService.execute(sendTo);
-            // if (!userExists) {
-            //     throw new Error(`User with email ${sendTo} does not exist`);
-            // }
-
             if (order.ownerId && order.ownerId === sendTo
                 || (!order.ownerId && order.userId === sendTo)
             ) {
@@ -104,75 +99,6 @@ export class GiveTicketService {
             return false;
         }
     }
-
-    // async receiveTicket(sendKey: string): Promise<boolean> {
-    //     try {
-    //         const order = await this.orderRepository.findOne({
-    //             sendKey: sendKey,
-    //         },
-    //             {
-    //                 Ticket: true,
-    //             })
-
-    //         if (!order) {
-    //             throw new Error('Order not found for the provided sendKey');
-    //         }
-
-    //         const showing = await this.getPreviewShowingService.execute(order.showingId);
-    //         if (!showing || new Date(showing.endTime) < new Date()) {
-    //             throw new Error('Showing not found or has ended');
-    //         }
-
-    //         if (order.Ticket.some(ticket => ticket.isCheckedIn)) {
-    //             throw new Error('Cannot receive ticket that some ticket in order have already been checked in');
-    //         }
-
-    //         const decryptedData = (decrypt(sendKey));
-    //         const { email, key, time } = decryptedData;
-
-    //         //  validate time, if more than 48 hours, return false
-    //         const currentTime = new Date();
-    //         const sendTime = new Date(time);
-    //         const timeDifference = currentTime.getTime() - sendTime.getTime();
-    //         const hoursDifference = timeDifference / (1000 * 60 * 60);
-    //         if (hoursDifference > 48) {
-    //             throw new Error('The ticket has expired, please contact the organizer');
-    //         }
-
-    //         // Process the ticket reception (e.g., update the order status)
-    //         await this.orderRepository.updateOneById(order.id, {
-    //             ownerId: email,
-    //             sendKey: null,
-    //             mailSent: false,
-    //         });
-
-    //         for (const ticket of order.Ticket) {
-    //             await this.ticketRepository.updateOneById(ticket.id, {
-    //                 qrCode: `${ticket.id}-${v4()}`,
-    //             });
-    //         }
-
-    //         const emailSent = await this.sendEmailService.sendTicketEmailToUser([order.id]);
-    //         if (!emailSent) {
-    //             await this.orderRepository.updateOneById(order.id, {
-    //                 ownerId: order.ownerId,
-    //                 sendKey: order.sendKey,
-    //                 mailSent: order.mailSent,
-    //             });
-    //             for (const ticket of order.Ticket) {
-    //                 await this.ticketRepository.updateOneById(ticket.id, {
-    //                     qrCode: ticket.qrCode,
-    //                 });
-    //             }
-    //             throw new Error('Failed to receive ticket email, try again later');
-    //         }
-    //         await this.emailService.sendConfirmMessageWhenReceived(order.userId, order.id, order.ownerId);
-
-    //         return true;
-    //     } catch (error) {
-    //         return false;
-    //     }
-    // }
 
     async receiveTicket(sendKey: string): Promise<
         | { success: true; email: string, access_token: string; refresh_token: string; id: string }

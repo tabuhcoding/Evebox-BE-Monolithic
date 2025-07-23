@@ -253,15 +253,15 @@ export class GetOrgRevenueByProvinceService {
         query: userRequest || "",
       };
 
-      // const cacheData = await this.fileCacheService.getCacheObjectById("analyst-ai2", {}, "province");
+      const cacheData = await this.fileCacheService.getCacheObjectById("analyst-ai", {}, "province");
 
-      // if (cacheData && cacheData.data[0]?.threadId) {
-      //   payload = {
-      //     ...payload,
-      //     threadId: cacheData.data[0].threadId,
-      //   };
-      // }
-      // else {
+      if (cacheData && cacheData.data[0].threadId) {
+        payload = {
+          ...payload,
+          threadId: cacheData.data[0].threadId,
+        };
+      }
+      else {
         const chart = await this.executeV3();
         payload = {
           ...payload,
@@ -269,9 +269,7 @@ export class GetOrgRevenueByProvinceService {
             chart: chart.isOk() ? chart.unwrap() : [],
           },
         };
-      // }
-      await this.slackService.sendNotice(`Event Service - Admin - Statistics >>> GetOrgRevenueByProvinceService: ${JSON.stringify(payload)}`);
-
+      }
       const responseAI = await fetch(`${process.env.UTILS_URL}/revenue/admin`, {
         method: 'POST',
         headers: {
@@ -293,14 +291,14 @@ export class GetOrgRevenueByProvinceService {
       if (!responseAIData.content) {
         return Err(new Error('No result returned from AI analysis'));
       }
-      // await this.fileCacheService.cacheObject("analyst-ai2",
-      //   20,
-      //   {},
-      //   "province",
-      //   [{
-      //     threadId: responseAIData.threadId
-      //   }]
-      // );
+      await this.fileCacheService.cacheObject("analyst-ai",
+        20,
+        {},
+        "province",
+        [{
+          threadId: responseAIData.threadId
+        }]
+      );
 
       try {
         await this.AIAnalystService.createAIAnalyst(
@@ -315,7 +313,7 @@ export class GetOrgRevenueByProvinceService {
       }
       return Ok(responseAIData.content);
     } catch (error) {
-      this.slackService.sendError(`Event Service - Admin - Statistics >>>  Failed to get org revenue chart: ${error.message}`);
+      this.slackService.sendError(`EventSvc >> GetOrgRevenueChartService: Failed to get org revenue chart: ${error.message}`);
       return Err(new Error('Internal server error'));
     }
   }

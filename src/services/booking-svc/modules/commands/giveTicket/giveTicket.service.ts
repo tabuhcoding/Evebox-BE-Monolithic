@@ -128,7 +128,11 @@ export class GiveTicketService {
             let user = await this.findUserByEmailService.execute(email);
             if (!user) {
                 const name = email.split('@')[0];
-                const nameOrError = Name.create(name.replace(/[._-]/g, ' '));
+                const nameOrError = Name.create(
+                    name
+                        .replace(/[._-]/g, ' ')
+                        .replace(/[^a-zA-Z\s]/g, '')
+                );
                 const emailOrError = Email.create(email);
                 const passwordOrError = await Password.create('receive-ticket');
                 const phoneOrError = Phone.create('0123456789');

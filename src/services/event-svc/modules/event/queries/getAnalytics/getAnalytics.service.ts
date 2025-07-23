@@ -155,7 +155,7 @@ export class GetAnalyticsService {
 
       const responseAIData = await responseAI.json();
 
-      this.slackService.sendNotice(`Event Service - Event analytics with AI >>> GetAnalyticsService: ${JSON.stringify(payload)}.
+      await this.slackService.sendNotice(`Event Service - Event analytics with AI >>> GetAnalyticsService: ${JSON.stringify(payload)}.
       Result: ${JSON.stringify(responseAIData)}`);
 
       if (!responseAIData.content) {

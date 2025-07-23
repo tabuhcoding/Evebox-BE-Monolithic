@@ -129,7 +129,7 @@ export class GetRevenueByTicketPriceService {
 
       const responseAIData = await responseAI.json();
 
-      this.slackService.sendNotice(`Event Service - Event summary with AI >>> GetEventSummaryService: ${JSON.stringify(payload)}.
+      await this.slackService.sendNotice(`Event Service - Event summary with AI >>> GetEventSummaryService: ${JSON.stringify(payload)}.
       Result: ${JSON.stringify(responseAIData)}`);
 
       if (!responseAIData.content) {

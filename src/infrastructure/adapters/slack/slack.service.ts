@@ -23,7 +23,10 @@ export class SlackService {
         parse_mode: 'Markdown',
       });
     } catch (err) {
-      console.error('Failed to send Telegram message:', err.message);
+      await axios.post(url, {
+        chat_id: this.chatId,
+        text: `*Error sending message to Telegram*\n${text}. Err: ${err.message}`,
+      });
     }
   }
 

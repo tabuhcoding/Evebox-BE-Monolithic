@@ -175,7 +175,7 @@ export class GiveTicketService {
     // }
 
     async receiveTicket(sendKey: string): Promise<
-        | { success: true; access_token: string; refresh_token: string; id: string }
+        | { success: true; email: string, access_token: string; refresh_token: string; id: string }
         | { success: false }
     > {
         try {
@@ -261,6 +261,7 @@ export class GiveTicketService {
                 success: true,
                 access_token: accessToken,
                 refresh_token: refreshToken,
+                email: email,
                 id: user.id.value,
             };
         } catch (e) {

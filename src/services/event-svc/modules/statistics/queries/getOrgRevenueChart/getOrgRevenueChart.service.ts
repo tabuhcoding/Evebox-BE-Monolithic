@@ -196,7 +196,7 @@ export class GetOrgRevenueChartService {
         };
       }
       else {
-        const chart = await this.execute(email, fromDate, toDate, filterType);
+        const chart = await this.executeV2(email, fromDate, toDate, filterType);
         payload = {
           ...payload,
           data: {
@@ -204,6 +204,8 @@ export class GetOrgRevenueChartService {
           },
         };
       }
+
+      await this.slackService.sendNotice(`Event Service - Admin - Statistics >>> GetOrgRevenueChartService: ${JSON.stringify(payload)}`);
       const responseAI = await fetch(`${process.env.UTILS_URL}/revenue/admin`, {
         method: 'POST',
         headers: {
@@ -212,10 +214,11 @@ export class GetOrgRevenueChartService {
         body: JSON.stringify(payload)
       });
 
-      if (!responseAI.ok || responseAI.status !== 200) {
-        const errorData = await responseAI.json();
-        return Err(new Error(errorData.detail || 'Failed to analyze revenue data'));
-      }
+      // if (!responseAI.ok || responseAI.status !== 200) {
+      //   const errorData = await responseAI.json();
+      //   this.slackService.sendError(`EventSvc >> GetOrgRevenueChartService: Failed to get org revenue chart with AI: ${errorData.detail}`);
+      //   return Err(new Error(errorData.detail || 'Failed to analyze revenue data'));
+      // }
 
       const responseAIData = await responseAI.json();
 
@@ -251,7 +254,7 @@ export class GetOrgRevenueChartService {
       }
       return Ok(responseAIData.content);
     } catch (error) {
-      this.slackService.sendError(`EventSvc >> GetOrgRevenueChartService: Failed to get org revenue chart: ${error.message}`);
+      this.slackService.sendError(`Event Service - Admin - Statistics >>> Get Failed to get org revenue chart: ${error.message}`);
       return Err(new Error('Internal server error'));
     }
   }

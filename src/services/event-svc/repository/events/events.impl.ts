@@ -258,9 +258,9 @@ export class EventsRepositoryImpl
 
   async updateEventFields(dto: UpdateEventAdminDto, eventId: number): Promise<any | null> {
     const updateData: any = {};
-    if (dto.isSpecial) updateData.isSpecial = dto.isSpecial;
-    if (dto.isOnlyOnEve) updateData.isOnlyOnEve = dto.isOnlyOnEve;
-    if (dto.isApproved) {
+    if (dto.isSpecial !== undefined) updateData.isSpecial = dto.isSpecial;
+    if (dto.isOnlyOnEve !== undefined) updateData.isOnlyOnEve = dto.isOnlyOnEve;
+    if (dto.isApproved !== undefined) {
       updateData.isApproved = Boolean(dto.isApproved);
     }
     else updateData.isApproved = false;

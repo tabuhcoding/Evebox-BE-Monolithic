@@ -50,11 +50,16 @@ export class getShowingSeatmapService {
                 },
               },
             },
-            // ticketType: {
-            //   include: {
-            //     TicketType: true,
-            //   }
-            // }
+            ticketTypes: {
+              include: {
+                TicketType: true,
+              },
+              where: {
+                ticketTypeId: {
+                  in: showing.TicketType.map(tt => tt.id),
+                }
+              }
+            },
           },
         }
       })
@@ -83,6 +88,7 @@ export class getShowingSeatmapService {
             ...section,
             status: null,
             ticketTypeId: null,
+            color: section.ticketTypes.length == 1 ? section.ticketTypes[0].TicketType.color : null,
           })),
           seatMapType: seatmapType,
         };
@@ -123,6 +129,7 @@ export class getShowingSeatmapService {
             ...section,
             status: null,
             ticketTypeId: ticketTypeSectionMap.get(section.id) || null,
+            color: section.ticketTypes.length == 1 ? section.ticketTypes[0].TicketType.color : null,
             Row: section.Row?.map(row => ({
               ...row,
               Seat: row.Seat?.map(seat => ({

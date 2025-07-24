@@ -151,7 +151,6 @@ export class getAllShowingService {
           seatMapType: seatmapType,
         }
         for (const section of seatmap.Section) {
-          console.log(section);
           const soldSeats = section.ticketTypes.length == 1 ? await this.getTotalTicketOfTicketTypeService.getTotalTicketOfSection(section.ticketTypes[0].ticketTypeId, section.id) : 0
           const quantity = section.ticketTypes.length == 1 ? section.ticketTypes[0].quantity : 0;
           formattedSeatmap.Section.push({

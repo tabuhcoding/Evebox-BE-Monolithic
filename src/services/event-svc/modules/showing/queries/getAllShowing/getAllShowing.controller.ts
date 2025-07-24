@@ -133,8 +133,8 @@ export class getAllShowingController {
     });
   }
 
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('access-token')
+  // @UseGuards(JwtAuthGuard)
+  // @ApiBearerAuth('access-token')
   @Post('/connect-showing-seatmap')
   @ApiOperation({ summary: 'Connect showing to seatmap' })
   @ApiResponse({

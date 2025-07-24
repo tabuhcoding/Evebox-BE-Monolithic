@@ -183,19 +183,19 @@ export class GetOrgRevenueChartService {
         query: userRequest || "",
       };
 
-      const cacheData = await this.fileCacheService.getCacheObjectById("analyst-ai", {
-        fromDate,
-        toDate,
-        filterType,
-      }, "revenue");
+      // const cacheData = await this.fileCacheService.getCacheObjectById("analyst-ai2", {
+      //   fromDate,
+      //   toDate,
+      //   filterType,
+      // }, "revenue");
 
-      if (cacheData && cacheData.data[0].threadId) {
-        payload = {
-          ...payload,
-          threadId: cacheData.data[0].threadId,
-        };
-      }
-      else {
+      // if (cacheData && cacheData.data[0]?.threadId) {
+      //   payload = {
+      //     ...payload,
+      //     threadId: cacheData.data[0].threadId,
+      //   };
+      // }
+      // else {
         const chart = await this.execute(email, fromDate, toDate, filterType);
         payload = {
           ...payload,
@@ -203,17 +203,25 @@ export class GetOrgRevenueChartService {
             chart: chart.isOk() ? chart.unwrap() : [],
           },
         };
+      // }
+      var responseAI: any;
+      try {
+        await this.slackService.sendNotice(`Event Service - Event summary with AI >>> revenue-ai: ${JSON.stringify(payload)}`);
+        responseAI = await fetch(`${process.env.UTILS_URL}/revenue/admin`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+      } catch (error) {
+        await this.slackService.sendError(`Event Service - Event summary with AI >>> revenue-ai: Failed to call AI service: ${error.message}`);
+        return Err(new Error('Failed to call AI service'));
       }
-      const responseAI = await fetch(`${process.env.UTILS_URL}/revenue/admin`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
-      });
 
       if (!responseAI.ok || responseAI.status !== 200) {
         const errorData = await responseAI.json();
+        await this.slackService.sendError(`Event Service - Event summary with AI >>> revenue-ai: AI service returned an error: ${JSON.stringify(errorData)}`);
         return Err(new Error(errorData.detail || 'Failed to analyze revenue data'));
       }
 

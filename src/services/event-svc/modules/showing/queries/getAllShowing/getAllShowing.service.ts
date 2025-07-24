@@ -7,7 +7,7 @@ import { TicketTypeSectionRepository } from 'src/services/event-svc/repository/t
 import { ConnectShowingToSeatmapDTO } from './getAllShowing-response.dto';
 import { SeatMapResponseDto, ShowingSeatMapResponseDto } from '../getShowingSeatmap/getShowingSeatmap-response.dto';
 import { getSeatmapType, SeatmapType, SectionStatus } from 'src/shared/utils/status/seatmap';
-import { SeatStatusEnum } from 'src/services/event-svc/repository/seatStatus/seatStatus.repo';
+import { SeatStatusEnum, SeatStatusRepository } from 'src/services/event-svc/repository/seatStatus/seatStatus.repo';
 import { CalculateSectionStatusService } from '../../command/calculateSectionStatus/calculateSectionStatus.service';
 import { GetTotalTicketOfTicketTypeService } from 'src/services/booking-svc/modules/queries/getTotalTicketOfTicketType/getTotalTicketOfTicketType.service';
 
@@ -19,6 +19,7 @@ export class getAllShowingService {
     private readonly getSectionStatusService: CalculateSectionStatusService,
     private readonly getTotalTicketOfTicketTypeService: GetTotalTicketOfTicketTypeService,
     @Inject('TicketTypeSectionRepository') private readonly ticketTypeSectionRepository: TicketTypeSectionRepository,
+    @Inject('SeatStatusRepository') private readonly seatStatusRepository: SeatStatusRepository,
     private readonly slackService: SlackService
   ) {}
 
@@ -150,6 +151,7 @@ export class getAllShowingService {
           seatMapType: seatmapType,
         }
         for (const section of seatmap.Section) {
+          console.log(section);
           const soldSeats = section.ticketTypes.length == 1 ? await this.getTotalTicketOfTicketTypeService.getTotalTicketOfSection(section.ticketTypes[0].ticketTypeId, section.id) : 0
           const quantity = section.ticketTypes.length == 1 ? section.ticketTypes[0].quantity : 0;
           formattedSeatmap.Section.push({
@@ -217,45 +219,71 @@ export class getAllShowingService {
       }
 
       const seatmap = await this.seatmapRepository.findOneById(dto.seatmapId >> 0, {
-        Section: true,
+        Section: {
+          include: {
+            Row: true,
+            // ticketTypes: {
+            //   include: {
+            //     TicketType: true,
+            //   },
+            //   where: {
+            //     ticketTypeId: {
+            //       in: showing.TicketType.map(tt => tt.id),
+            //     }
+            //   }
+            // },
+          }
+        },
       });
       if (!seatmap) {
         return Err(new Error('Seatmap not found.'));
       }
 
-      // // Update the showing with the seatmap and ticket type section map
-      // const ticketTypeIds = Object.keys(ticketTypeSectionMap);
-      // const sections = Object.values(ticketTypeSectionMap);
-      // ticketTypeIds.forEach(tic ketTypeId => {
-      //   if (!showing.TicketType.some(tt => tt.id === ticketTypeId)) {
-      //     return Err(new Error(`Ticket type ${ticketTypeId} not found in showing.`));
-      //   }
-      // });
-      // sections.forEach(sectionArray => {
-      //   sectionArray.forEach(sectionId => {
-      //     if (!seatmap.Section.some(s => s.id === sectionId)) {
-      //       return Err(new Error(`Section ${sectionId} not found in seatmap.`));
-      //     }
-      //   });
-      // });
+      const seatMapType = getSeatmapType(seatmap);
 
-      // await this.showingRepository.updateOneById(showingId, {
-      //   seatMapId: seatmapId,
-      // });
+      await this.seatStatusRepository.deleteHardMany({
+        showingId: dto.showingId,
+        status: {
+          in: [SeatStatusEnum.AVAILABLE, SeatStatusEnum.NOTSALE],
+        }
+      });
+      await this.ticketTypeSectionRepository.deleteHardMany({
+        ticketTypeId: {
+          in: showing.TicketType.map(tt => tt.id),
+        }
+      });
 
-      // await this.ticketTypeSectionRepository.deleteHardMany({
-      //   ticketTypeId: { in: ticketTypeIds },
-      // });
+      await this.showingRepository.updateOneById(dto.showingId, {
+        seatMapId: dto.seatmapId >> 0,
+        // seatMapType: seatMapType,
+      });
 
-      // for (const [ticketTypeId, sectionIds] of Object.entries(ticketTypeSectionMap)) {
-      //   for (const sectionId of sectionIds) {
-      //     await this.ticketTypeSectionRepository.insertOne({
-      //         ticketTypeId: ticketTypeId,
-      //         sectionId: sectionId,
-      //     });
-      //   }
-      // }
-      
+      const ticketTypeSectionMap = dto.ticketTypeSectionMap
+      .filter(map => map.ticketTypeId && map.sectionId)
+      .map(map => ({
+        ticketTypeId: map.ticketTypeId,
+        sectionId: map.sectionId >> 0,
+        quantity: map.quantity >> 0,
+      }));
+
+      await this.ticketTypeSectionRepository.insertMany(ticketTypeSectionMap);
+
+      if (seatMapType === SeatmapType.SELECT_SEAT) {
+        const seatStatusMap = dto.seatStatusMap || {};
+
+        const seatStatusEntries = Object.entries(seatStatusMap)
+          .filter(([, status]) => status === 'AVAILABLE' || status === 'NOTSALE')
+          .map(([seatId, status]) => ({
+            showingId: dto.showingId,
+            status,
+            seatMapId: dto.seatmapId >> 0,
+            seatId: Number(seatId),
+          }));
+
+        await this.seatStatusRepository.insertMany(seatStatusEntries);
+      }
+
+
       return Ok(undefined);
     } catch (error) {
       await this.slackService.sendError(`Error connecting showing to seatmap: ${error.message}`);

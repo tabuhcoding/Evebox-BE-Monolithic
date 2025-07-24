@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { SeatStatus } from 'src/services/event-svc/repository/seatStatus/seatStatus.repo';
+import { SeatStatus, SeatStatusEnum } from 'src/services/event-svc/repository/seatStatus/seatStatus.repo';
 
 export class AllShowingsResponseDto {
   @ApiProperty({ example: 200, description: 'Response status code' })
@@ -57,5 +57,5 @@ export class ConnectShowingToSeatmapDTO {
     example: { 16962844867171:  'AVAILABLE'},
     description: 'Ticket Type Section Map',
   })
-  seatStatusMap?: Record<number, SeatStatus>;
+  seatStatusMap?: Record<number, SeatStatusEnum>;
 }

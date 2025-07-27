@@ -17,7 +17,7 @@ export class HourlyOrderStatusService {
   }
 
   // Cron job to run every 2 hours
-  @Cron('0 */2 * * *')
+  // @Cron('0 */2 * * *')
   async execueHourlyOrderStatus() {
     await this.slackService.sendNotice('Hourly order status update started.');
     try {

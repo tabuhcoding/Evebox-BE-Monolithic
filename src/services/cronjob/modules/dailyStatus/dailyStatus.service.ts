@@ -20,7 +20,7 @@ export class DailyStatusService {
     // Initialization logic can go here if needed
   }
 
-  @Cron('0 */2 * * *')
+  // @Cron('0 */2 * * *')
   async executeDailyStatusUpdate() {
     await this.slackService.sendNotice('Daily status update started.');
     try {
@@ -35,7 +35,7 @@ export class DailyStatusService {
     }
   }  
 
-  @Cron('0 4 * * *')
+  // @Cron('0 4 * * *')
   async executeDailyRevenueCalculation() {
     await this.slackService.sendNotice('Daily revenue calculation started.');
     try {

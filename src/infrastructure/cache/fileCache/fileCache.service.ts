@@ -222,7 +222,7 @@ export class FileCacheService {
 
 
   // 🔁 Cron job chạy mỗi 4h dọn file hết hạn
-  @Cron('0 */4 * * *')
+  // @Cron('0 */4 * * *')
   // @Cron('*/4 * * * *')
   async cleanExpiredCache() {
     const files = fs.readdirSync(this.cacheDir);
